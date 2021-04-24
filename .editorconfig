@@ -1,0 +1,20 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[{LICENSE,*.md,*.txt}]
+# these files are often read from terminal
+max_line_length = 80
+trim_trailing_whitespace = false
+
+[*.py]
+max_line_length = 88
+
+[*.sh]
+indent_size = 2
