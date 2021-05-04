@@ -1,8 +1,10 @@
 import os
-import subprocess
-import requests
 import socket
+import subprocess
+
 from contextlib import closing
+
+import requests
 
 
 class LanguageToolLocalServer:
@@ -24,21 +26,27 @@ class LanguageToolLocalServer:
         return self.port
 
     def get_server_run_command(self):
-        result = os.popen('which languagetool-server.jar').read()
+        result = os.popen("which languagetool-server.jar").read()
 
         if not result or "not found" in result:
-            print('Could not find languagetool-server.jar in system PATH.')
-            print('Please make sure you installed languagetool properly and added the '
-                  'directory to your system\'s PATH variable. Also make sure to make '
-                  'the jar-files executable.')
-            print('For more information check the LaTeXBuddy manual.')
-            raise(Exception('Unable to find languagetool installation!'))
+            print("Could not find languagetool-server.jar in system PATH.")
+            print(
+                "Please make sure you installed languagetool properly and added the "
+                "directory to your system's PATH variable. Also make sure to make "
+                "the jar-files executable."
+            )
+            print("For more information check the LaTeXBuddy manual.")
+            raise (Exception("Unable to find languagetool installation!"))
 
         self.lt_path = result.splitlines()[0]
-        self.lt_server_command = ["java",
-                                  "-cp", self.lt_path,
-                                  "org.languagetool.server.HTTPServer",
-                                  "--port", str(self.port)]
+        self.lt_server_command = [
+            "java",
+            "-cp",
+            self.lt_path,
+            "org.languagetool.server.HTTPServer",
+            "--port",
+            str(self.port),
+        ]
 
     def start_local_server(self, port: int = _DEFAULT_PORT) -> int:
 
@@ -60,7 +68,7 @@ class LanguageToolLocalServer:
         up = False
         while not up:
             try:
-                requests.post(f'http://localhost:{self.port}/v2/check')
+                requests.post(f"http://localhost:{self.port}/v2/check")
                 up = True
             # TODO: Specify concrete exceptions to be caught
             except Exception:
@@ -81,7 +89,7 @@ class LanguageToolLocalServer:
             return port
 
         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
-            s.bind(('localhost', 0))
+            s.bind(("localhost", 0))
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             return s.getsockname()[1]
 
@@ -92,4 +100,4 @@ class LanguageToolLocalServer:
             return True
 
         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
-            return s.connect_ex(('localhost', port)) == 0
+            return s.connect_ex(("localhost", port)) == 0

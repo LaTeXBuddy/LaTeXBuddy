@@ -2,12 +2,12 @@ import json
 import os
 import subprocess
 
-import requests
-
-import error_dummy as error
-import detex_dummy as detex
-import languagetool_local_server as lt_server
 from enum import Enum, auto
+
+import detex_dummy as detex
+import error_dummy as error
+import languagetool_local_server as lt_server
+import requests
 
 
 class Mode(Enum):
@@ -20,8 +20,12 @@ class LanguageToolModule:
 
     # TODO: implement whitelisting certain rules
     #       (exclude multiple whitespaces error by default)
-    def __init__(self, mode: Mode = Mode.LOCAL_SERVER, remote_url: str = None,
-                 language: str = None):
+    def __init__(
+        self,
+        mode: Mode = Mode.LOCAL_SERVER,
+        remote_url: str = None,
+        language: str = None,
+    ):
 
         self.mode = mode
         self.language = language
@@ -42,20 +46,20 @@ class LanguageToolModule:
             self.find_languagetool_command()
 
     def find_languagetool_command(self):
-        result = os.popen('which languagetool-commandline.jar').read()
+        result = os.popen("which languagetool-commandline.jar").read()
 
         if not result or "not found" in result:
-            print('Could not find languagetool-commandline.jar in your system\'s PATH.')
-            print('Please make sure you installed languagetool properly and added the '
-                  'directory to your system\'s PATH variable. Also make sure to make '
-                  'the jar-files executable.')
-            print('For more information check the LaTeXBuddy manual.')
-            raise (Exception('Unable to find languagetool installation!'))
+            print("Could not find languagetool-commandline.jar in your system's PATH.")
+            print(
+                "Please make sure you installed languagetool properly and added the "
+                "directory to your system's PATH variable. Also make sure to make "
+                "the jar-files executable."
+            )
+            print("For more information check the LaTeXBuddy manual.")
+            raise (Exception("Unable to find languagetool installation!"))
 
         lt_path = result.splitlines()[0]
-        self.lt_console_command = ["java",
-                                   "-jar", lt_path,
-                                   "--json"]
+        self.lt_console_command = ["java", "-jar", lt_path, "--json"]
         if self.language:
             self.lt_console_command.append("-l")
             self.lt_console_command.append(self.language)
@@ -67,10 +71,9 @@ class LanguageToolModule:
         raw_errors = None
 
         if self.mode == Mode.LOCAL_SERVER:
-            raw_errors = self.send_post_request(file_path,
-                                                'http://localhost:'
-                                                f'{self.local_server.port}'
-                                                '/v2/check')
+            raw_errors = self.send_post_request(
+                file_path, "http://localhost:" f"{self.local_server.port}" "/v2/check"
+            )
 
         elif self.mode == Mode.REMOTE_SERVER:
             raw_errors = self.send_post_request(file_path, self.remote_url)
@@ -92,8 +95,9 @@ class LanguageToolModule:
         with open(detex_file.name) as file:
             text = file.read()
 
-        response = requests.post(url=server_url, data={"language": "de-DE",
-                                                       "text": text})
+        response = requests.post(
+            url=server_url, data={"language": "de-DE", "text": text}
+        )
         return response.json()
 
     def execute_commandline_request(self, file_path: str):
@@ -109,7 +113,7 @@ class LanguageToolModule:
         # TODO: pipe stderr to /dev/null after finishing tests
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         out, err = process.communicate()
-        output = out.decode('ISO8859-1')
+        output = out.decode("ISO8859-1")
 
         return json.loads(output)
 
@@ -117,29 +121,31 @@ class LanguageToolModule:
     def format_errors(raw_errors, file_path):
 
         errors = []
-        tool_name = raw_errors['software']['name']
+        tool_name = raw_errors["software"]["name"]
 
-        for match in raw_errors['matches']:
+        for match in raw_errors["matches"]:
 
-            offset = match['context']['offset']
-            offset_end = offset + match['context']['length']
+            offset = match["context"]["offset"]
+            offset_end = offset + match["context"]["length"]
 
-            error_type = 'grammar'
+            error_type = "grammar"
 
-            if match['rule']['category']['id'] == 'TYPOS':
-                error_type = 'spelling'
+            if match["rule"]["category"]["id"] == "TYPOS":
+                error_type = "spelling"
 
-            errors.append(error.Error(
-                file_path,
-                tool_name,
-                error_type,
-                match['rule']['id'],
-                match['context']['text'][offset: offset_end],
-                match['offset'],
-                match['length'],
-                LanguageToolModule.parse_error_replacements(match['replacements']),
-                False
-            ))
+            errors.append(
+                error.Error(
+                    file_path,
+                    tool_name,
+                    error_type,
+                    match["rule"]["id"],
+                    match["context"]["text"][offset:offset_end],
+                    match["offset"],
+                    match["length"],
+                    LanguageToolModule.parse_error_replacements(match["replacements"]),
+                    False,
+                )
+            )
 
         return errors
 
@@ -149,15 +155,15 @@ class LanguageToolModule:
         output = []
 
         for entry in json_replacements:
-            output.append(entry['value'])
+            output.append(entry["value"])
 
         return output
 
 
 if __name__ == "__main__":
 
-    lt_module_local = LanguageToolModule(Mode.LOCAL_SERVER, language='de-DE')
-    lt_module_cmd = LanguageToolModule(Mode.COMMANDLINE, language='de-DE')
+    lt_module_local = LanguageToolModule(Mode.LOCAL_SERVER, language="de-DE")
+    lt_module_cmd = LanguageToolModule(Mode.COMMANDLINE, language="de-DE")
 
     es_local = lt_module_local.check_tex("tex_files/05_entwicklungsrichtlinien.tex")
     es_cmd = lt_module_cmd.check_tex("tex_files/05_entwicklungsrichtlinien.tex")
