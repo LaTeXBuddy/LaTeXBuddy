@@ -28,9 +28,10 @@ class LanguageToolLocalServer:
 
         if not result or "not found" in result:
             print('Could not find languagetool-server.jar in system PATH.')
-            print('Please make sure you installed languagetool properly and added the directory to '
-                  'your system\'s PATH variable. Also make sure to make the jar-files executable.'
-                  'For more information check the LaTeXBuddy manual.')
+            print('Please make sure you installed languagetool properly and added the '
+                  'directory to your system\'s PATH variable. Also make sure to make '
+                  'the jar-files executable.')
+            print('For more information check the LaTeXBuddy manual.')
             raise(Exception('Unable to find languagetool installation!'))
 
         self.lt_path = result.splitlines()[0]
@@ -42,13 +43,13 @@ class LanguageToolLocalServer:
     def start_local_server(self, port: int = _DEFAULT_PORT) -> int:
 
         if self.server_process:
-            return None
+            return -1
 
         self.port = self.find_free_port(port)
 
         self.get_server_run_command()
         # TODO: map stdout to /dev/null after testing
-        self.server_process = subprocess.Popen(self.lt_server_command)  # , stdout=subprocess.DEVNULL)
+        self.server_process = subprocess.Popen(self.lt_server_command)
 
         self.wait_till_server_up()
 

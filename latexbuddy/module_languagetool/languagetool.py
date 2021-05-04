@@ -18,8 +18,10 @@ class Mode(Enum):
 
 class LanguageToolModule:
 
-    # TODO: implement whitelisting certain rules (exclude multiple whitespaces error by default)
-    def __init__(self, mode: Mode = Mode.LOCAL_SERVER, remote_url: str = None, language: str = None):
+    # TODO: implement whitelisting certain rules
+    #       (exclude multiple whitespaces error by default)
+    def __init__(self, mode: Mode = Mode.LOCAL_SERVER, remote_url: str = None,
+                 language: str = None):
 
         self.mode = mode
         self.language = language
@@ -33,7 +35,8 @@ class LanguageToolModule:
             self.local_server.start_local_server()
 
         elif self.mode == Mode.REMOTE_SERVER:
-            self.remote_url = remote_url  # must include the port and api call (e.g. /v2/check)
+            # must include the port and api call (e.g. /v2/check)
+            self.remote_url = remote_url
 
         elif self.mode == Mode.COMMANDLINE:
             self.find_languagetool_command()
@@ -43,9 +46,10 @@ class LanguageToolModule:
 
         if not result or "not found" in result:
             print('Could not find languagetool-commandline.jar in your system\'s PATH.')
-            print('Please make sure you installed languagetool properly and added the directory to '
-                  'your system\'s PATH variable. Also make sure to make the jar-files executable.'
-                  'For more information check the LaTeXBuddy manual.')
+            print('Please make sure you installed languagetool properly and added the '
+                  'directory to your system\'s PATH variable. Also make sure to make '
+                  'the jar-files executable.')
+            print('For more information check the LaTeXBuddy manual.')
             raise (Exception('Unable to find languagetool installation!'))
 
         lt_path = result.splitlines()[0]
@@ -60,8 +64,13 @@ class LanguageToolModule:
 
     def check_tex(self, file_path: str):
 
+        raw_errors = None
+
         if self.mode == Mode.LOCAL_SERVER:
-            raw_errors = self.send_post_request(file_path, f'http://localhost:{self.local_server.port}/v2/check')
+            raw_errors = self.send_post_request(file_path,
+                                                'http://localhost:'
+                                                f'{self.local_server.port}'
+                                                '/v2/check')
 
         elif self.mode == Mode.REMOTE_SERVER:
             raw_errors = self.send_post_request(file_path, self.remote_url)
@@ -72,7 +81,8 @@ class LanguageToolModule:
         formatted_errors = LanguageToolModule.format_errors(raw_errors, file_path)
         return formatted_errors
 
-    def send_post_request(self, file_path: str, server_url: str):
+    @staticmethod
+    def send_post_request(file_path: str, server_url: str):
 
         if file_path is None:
             return None
@@ -82,7 +92,8 @@ class LanguageToolModule:
         with open(detex_file.name) as file:
             text = file.read()
 
-        response = requests.post(url=server_url, data={"language": "de-DE", "text": text})
+        response = requests.post(url=server_url, data={"language": "de-DE",
+                                                       "text": text})
         return response.json()
 
     def execute_commandline_request(self, file_path: str):
@@ -96,7 +107,7 @@ class LanguageToolModule:
         cmd.append(detex_file.name)
 
         # TODO: pipe stderr to /dev/null after finishing tests
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)  # , stderr=subprocess.DEVNULL)
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         out, err = process.communicate()
         output = out.decode('ISO8859-1')
 
@@ -104,7 +115,7 @@ class LanguageToolModule:
 
     @staticmethod
     def format_errors(raw_errors, file_path):
-        
+
         errors = []
         tool_name = raw_errors['software']['name']
 
@@ -129,7 +140,7 @@ class LanguageToolModule:
                 LanguageToolModule.parse_error_replacements(match['replacements']),
                 False
             ))
-            
+
         return errors
 
     @staticmethod
