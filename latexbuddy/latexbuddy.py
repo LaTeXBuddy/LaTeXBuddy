@@ -2,6 +2,8 @@ import json
 import os
 
 import chktex
+import aspell
+import tools
 
 
 class LatexBuddy:
@@ -22,7 +24,7 @@ class LatexBuddy:
 
     def parse_error(self, error):
         with open(self.error_file, "a") as file:
-            json.dump(error.__dict__, file)
+            json.dump(error.__dict__, file, indent=6)
 
     """
     not working
@@ -52,6 +54,9 @@ class LatexBuddy:
 
     def run_tools(self):
         chktex.run(self, self.file_to_check)
+        detexed_file = tools.detex(self.file_to_check)
+        aspell.run(self, detexed_file)
+        os.remove(detexed_file)
 
 
 if __name__ == "__main__":
