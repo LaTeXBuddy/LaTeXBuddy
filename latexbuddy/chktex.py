@@ -1,6 +1,8 @@
 import subprocess
+
 import error_class
 import latexbuddy
+
 
 # import io
 filename = ""
@@ -11,7 +13,10 @@ def run(buddy, file):
     global filename
     filename = file
     calculate_line_lengths()
-    p = subprocess.Popen(["chktex", "-f %f:%l:%c:%d:%n:%s:%m:%k\n", "-q", filename], stdout=subprocess.PIPE)
+    p = subprocess.Popen(
+        ["chktex", "-f %f:%l:%c:%d:%n:%s:%m:%k\n", "-q", filename],
+        stdout=subprocess.PIPE,
+    )
     iso_out, err = p.communicate()
     out = iso_out.decode("ISO8859-1").split("\n")
     # buffer = io.StringIO(out)
@@ -19,12 +24,23 @@ def run(buddy, file):
         s_arr = error.split(":")
         if len(s_arr) < 2:
             continue
-        warning = True if s_arr[7] == 'Warning' else False
+        warning = True if s_arr[7] == "Warning" else False
         line = int(s_arr[2])
         offset = int(s_arr[3])
         length = int(s_arr[4])
         start = start_char(line, offset)
-        error_class.Error(buddy, s_arr[0], "chktex", "latex", s_arr[1], s_arr[5], start, length, s_arr[6], warning)
+        error_class.Error(
+            buddy,
+            s_arr[0],
+            "chktex",
+            "latex",
+            s_arr[1],
+            s_arr[5],
+            start,
+            length,
+            s_arr[6],
+            warning,
+        )
 
 
 """
@@ -34,7 +50,7 @@ To later convert the line, offset to starting char
 
 
 def calculate_line_lengths():
-    file = open(filename, "r", encoding='utf-8', errors='ignore')
+    file = open(filename, "r", encoding="utf-8", errors="ignore")
     lines = file.readlines()
     file.close()
     for line in lines:
