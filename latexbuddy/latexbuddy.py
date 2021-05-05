@@ -24,6 +24,10 @@ class LatexBuddy:
         with open(self.error_file, "a") as file:
             json.dump(error.__dict__, file)
 
+    """
+    not working
+    """
+
     def check_whitelist(self):
         with open(self.whitelist_file, "r") as file:
             whitelist = json.load(file)
@@ -31,6 +35,10 @@ class LatexBuddy:
             for uid in self.errors.keys():
                 # if whitelist_error.__eq__(errors[uid]):
                 self.errors.pop(uid)
+
+    """
+    not working
+    """
 
     def add_to_whitelist(self, uid):
         if uid not in self.errors.keys():
