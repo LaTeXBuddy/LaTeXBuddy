@@ -1,5 +1,6 @@
 import json
 import os
+
 import chktex
 
 
@@ -20,8 +21,12 @@ class LatexBuddy:
             self.parse_error(self.errors[uid])
 
     def parse_error(self, error):
-        with open(self.error_file, 'a') as file:
+        with open(self.error_file, "a") as file:
             json.dump(error.__dict__, file)
+
+    """
+    not working
+    """
 
     def check_whitelist(self):
         with open(self.whitelist_file, "r") as file:
@@ -31,12 +36,16 @@ class LatexBuddy:
                 # if whitelist_error.__eq__(errors[uid]):
                 self.errors.pop(uid)
 
+    """
+    not working
+    """
+
     def add_to_whitelist(self, uid):
         if uid not in self.errors.keys():
             raise  # exception
 
         # write in whitelist
-        with open(self.whitelist_file, 'a') as file:
+        with open(self.whitelist_file, "a") as file:
             json.dump(self.errors[uid], file)
 
         self.errors.pop(uid)
