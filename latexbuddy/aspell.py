@@ -1,19 +1,16 @@
 import shlex
 import subprocess
-from spellchecker import SpellChecker
-from speller3x.checker import Checker
 
 file_to_check = "/home/paul/Desktop/TestProject/main.tex"
 language = "de"
 language = shlex.quote(language)
 
 #check which dictionaries are installed
-t = subprocess.Popen(["aspell dump dicts"], shell=True,
+langs = subprocess.Popen(["aspell dump dicts"], shell=True,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT)
 
-langs, errs = t.communicate()
-langs = langs.decode("ISO8859-1")
+#langs = tools.execute("aspell", "dump dicts", False)
 
 print(langs)
 
@@ -44,23 +41,3 @@ for error in out:
         cleaned_errors.append(error.replace("&", "").replace("\n", "").strip())
     if error[0] == '#':
         cleaned_errors.append(error.replace("#", "").replace("\n", "").strip())
-
-print("---------------------------------------")
-for e in cleaned_errors:
-    print(e)
-print("---------------------------------------")
-print(cleaned_errors)
-
-"""p = subprocess.Popen(["aspell -a" + " --lang=" + language + " < " + file_to_check], shell=True,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT)
-
-#format aspell output
-out, e = p.communicate()
-out = out.decode("ISO8859-1")[70:].rstrip().replace("\n", "").split('&')
-
-#print errors to console
-for error in out:
-    print(error.strip())"""
-
-
