@@ -1,10 +1,9 @@
 import subprocess
 
 import error_class
-import latexbuddy
+import tools
 
 
-# import io
 filename = ""
 line_lengths = []
 
@@ -13,13 +12,10 @@ def run(buddy, file):
     global filename
     filename = file
     calculate_line_lengths()
-    p = subprocess.Popen(
-        ["chktex", "-f %f:%l:%c:%d:%n:%s:%m:%k\n", "-q", filename],
-        stdout=subprocess.PIPE,
+    out = tools.execute("chktex", "-f %f:%l:%c:%d:%n:%s:%m:%k\n", "-q", filename).split(
+        "\n"
     )
-    iso_out, err = p.communicate()
-    out = iso_out.decode("ISO8859-1").split("\n")
-    # buffer = io.StringIO(out)
+
     for error in out:
         s_arr = error.split(":")
         if len(s_arr) < 2:
