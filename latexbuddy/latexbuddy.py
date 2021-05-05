@@ -2,7 +2,7 @@ import json
 import os
 
 import chktex
-# import aspell
+import aspell
 import tools
 
 
@@ -54,9 +54,9 @@ class LatexBuddy:
 
     def run_tools(self):
         chktex.run(self, self.file_to_check)
-        # detexed_file = tools.detex(self.file_to_check)
-        # aspell.run(self, detexed_file)
-        # os.remove(detexed_file)
+        detexed_file = tools.detex(self.file_to_check)
+        aspell.run(self, detexed_file)
+        os.remove(detexed_file)
 
 
 if __name__ == "__main__":
