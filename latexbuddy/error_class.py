@@ -6,7 +6,19 @@ class Error:
     creates an error object
     """
 
-    def __init__(self, buddy, path, src, error_type, error_id, text, start, length, suggestions, warning):
+    def __init__(
+        self,
+        buddy,
+        path,
+        src,
+        error_type,
+        error_id,
+        text,
+        start,
+        length,
+        suggestions,
+        warning,
+    ):
         self.path = path  # the path to the file
         self.src = src  # the src tool of the error <chktex/aspell/...>
         self.error_type = error_type  # <grammar/spelling/latex>
@@ -15,7 +27,9 @@ class Error:
         self.start = start  # the starting character
         self.length = length  # the length
         self.suggestions = suggestions  # suggestions to solve the error
-        self.warning = warning  # boolean. true if the error is a warning, only in tex checks
+        self.warning = (
+            warning  # boolean. true if the error is a warning, only in tex checks
+        )
         self.uid = self.uid()
         buddy.add_error(self)
 
@@ -24,8 +38,9 @@ class Error:
     """
 
     def uid(self):
-        return '{}\0{}\0{}\0{}\0{}\0{}'.format(self.path, self.src, self.error_type,
-                                               self.error_id, self.start, self.length)
+        return "{}\0{}\0{}\0{}\0{}\0{}".format(
+            self.path, self.src, self.error_type, self.error_id, self.start, self.length
+        )
 
     """
     gets uid
@@ -33,6 +48,7 @@ class Error:
 
     def get_uid(self):
         return self.uid
+
 
 """
     def __eq__(self, other):
