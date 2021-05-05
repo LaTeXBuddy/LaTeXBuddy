@@ -31,6 +31,7 @@ def run(buddy, file):
         if error[0] == '#':
             cleaned_errors.append(error.replace("#", "").replace("\n", "").strip())
 
+    # create error instances
     for error in cleaned_errors:
         print(error)
         split = error.split(":")
