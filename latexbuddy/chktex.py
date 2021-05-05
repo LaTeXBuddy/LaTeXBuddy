@@ -2,7 +2,7 @@ import subprocess
 
 import error_class
 import tools
-
+import shlex
 
 filename = ""
 line_lengths = []
@@ -12,13 +12,12 @@ def run(buddy, file):
     global filename
     filename = file
     calculate_line_lengths()
-    out = tools.execute("chktex", "-f %f:%l:%c:%d:%n:%s:%m:%k\n", "-q", filename).split(
-        "\n"
-    )
+    out = tools.execute("chktex", '-f "%f:%l:%c:%d:%n:%s:%m:%k\n"', "-q",
+                        filename).split("\n")
 
     for error in out:
         s_arr = error.split(":")
-        if len(s_arr) < 2:
+        if len(s_arr) < 5:
             continue
         warning = True if s_arr[7] == "Warning" else False
         line = int(s_arr[2])
