@@ -25,7 +25,7 @@ class LatexBuddy:
 
     def parse_error(self, error):
         with open(self.error_file, "a") as file:
-            json.dump(error.__dict__, file, indent=6)
+            json.dump(error.__dict__, file, indent=4)
 
     """
     not working

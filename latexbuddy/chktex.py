@@ -33,7 +33,7 @@ def run(buddy, file):
             s_arr[5],
             start,
             length,
-            s_arr[6],
+            [s_arr[6]],
             warning,
         )
 
