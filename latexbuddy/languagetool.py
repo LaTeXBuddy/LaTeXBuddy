@@ -1,5 +1,4 @@
 import json
-import os
 
 from enum import Enum, auto
 
@@ -12,9 +11,9 @@ import tools as tools
 
 def run(buddy, file):
 
-    # TODO: get settings (mode, language etc.) from buddy instance
+    # TODO: get settings (mode, language etc.) from buddy instance (config needed)
 
-    ltm = LanguageToolModule(buddy, mode=Mode.COMMANDLINE, language="de-DE")
+    ltm = LanguageToolModule(buddy, language="de-DE")
     ltm.check_tex(file)
 
 
@@ -56,9 +55,10 @@ class LanguageToolModule:
             self.find_languagetool_command()
 
     def find_languagetool_command(self):
-        result = os.popen("which languagetool-commandline.jar").read()
 
-        if not result or "not found" in result:
+        try:
+            result = tools.find_executable("languagetool-commandline.jar")
+        except FileNotFoundError:
             print("Could not find languagetool-commandline.jar in your system's PATH.")
             print(
                 "Please make sure you installed languagetool properly and added the "
@@ -68,7 +68,7 @@ class LanguageToolModule:
             print("For more information check the LaTeXBuddy manual.")
             raise (Exception("Unable to find languagetool installation!"))
 
-        lt_path = result.splitlines()[0]
+        lt_path = result
         self.lt_console_command = ["java", "-jar", lt_path, "--json"]
         if self.language:
             self.lt_console_command.append("-l")
@@ -114,7 +114,7 @@ class LanguageToolModule:
         cmd = list(self.lt_console_command)
         cmd.append(detex_file)
 
-        output = tools.execute(tuple(cmd))
+        output = tools.execute_no_errors_from_list(cmd, encoding="utf_8")
 
         return json.loads(output)
 
