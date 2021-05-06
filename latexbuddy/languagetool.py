@@ -9,11 +9,14 @@ import languagetool_local_server as lt_server
 import tools as tools
 
 
+_LANGUAGES = {"de": "de-DE", "en": "en"}
+
+
 def run(buddy, file):
 
-    # TODO: get settings (mode, language etc.) from buddy instance (config needed)
+    # TODO: get settings (mode etc.) from buddy instance (config needed)
 
-    ltm = LanguageToolModule(buddy, language="de-DE")
+    ltm = LanguageToolModule(buddy, language=_LANGUAGES[buddy.get_lang()])
     ltm.check_tex(file)
 
 
