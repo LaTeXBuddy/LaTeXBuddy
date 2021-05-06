@@ -1,13 +1,21 @@
 import json
 import os
-import subprocess
 
 from enum import Enum, auto
 
-import detex_dummy as detex
-import error_dummy as error
-import languagetool_local_server as lt_server
 import requests
+
+import error_class as error
+import languagetool_local_server as lt_server
+import tools as tools
+
+
+def run(buddy, file):
+
+    # TODO: get settings (mode, language etc.) from buddy instance
+
+    ltm = LanguageToolModule(buddy, mode=Mode.COMMANDLINE, language="de-DE")
+    ltm.check_tex(file)
 
 
 class Mode(Enum):
@@ -22,11 +30,13 @@ class LanguageToolModule:
     #       (exclude multiple whitespaces error by default)
     def __init__(
         self,
+        buddy,
         mode: Mode = Mode.LOCAL_SERVER,
         remote_url: str = None,
         language: str = None,
     ):
 
+        self.buddy = buddy
         self.mode = mode
         self.language = language
 
@@ -66,61 +76,50 @@ class LanguageToolModule:
         else:
             self.lt_console_command.append("--autoDetect")
 
-    def check_tex(self, file_path: str):
+    def check_tex(self, detex_file: str):
 
         raw_errors = None
 
         if self.mode == Mode.LOCAL_SERVER:
             raw_errors = self.send_post_request(
-                file_path, "http://localhost:" f"{self.local_server.port}" "/v2/check"
+                detex_file, "http://localhost:" f"{self.local_server.port}" "/v2/check"
             )
 
         elif self.mode == Mode.REMOTE_SERVER:
-            raw_errors = self.send_post_request(file_path, self.remote_url)
+            raw_errors = self.send_post_request(detex_file, self.remote_url)
 
         elif self.mode == Mode.COMMANDLINE:
-            raw_errors = self.execute_commandline_request(file_path)
+            raw_errors = self.execute_commandline_request(detex_file)
 
-        formatted_errors = LanguageToolModule.format_errors(raw_errors, file_path)
-        return formatted_errors
+        self.format_errors(raw_errors, detex_file)
 
-    @staticmethod
-    def send_post_request(file_path: str, server_url: str):
+    def send_post_request(self, detex_file: str, server_url: str):
 
-        if file_path is None:
+        if detex_file is None:
             return None
 
-        detex_file = detex.detex(file_path)
-
-        with open(detex_file.name) as file:
+        with open(detex_file) as file:
             text = file.read()
 
         response = requests.post(
-            url=server_url, data={"language": "de-DE", "text": text}
+            url=server_url, data={"language": self.language, "text": text}
         )
         return response.json()
 
-    def execute_commandline_request(self, file_path: str):
+    def execute_commandline_request(self, detex_file: str):
 
-        if file_path is None:
+        if detex_file is None:
             return None
 
-        detex_file = detex.detex(file_path)
-
         cmd = list(self.lt_console_command)
-        cmd.append(detex_file.name)
+        cmd.append(detex_file)
 
-        # TODO: pipe stderr to /dev/null after finishing tests
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        out, err = process.communicate()
-        output = out.decode("ISO8859-1")
+        output = tools.execute(tuple(cmd))
 
         return json.loads(output)
 
-    @staticmethod
-    def format_errors(raw_errors, file_path):
+    def format_errors(self, raw_errors, detex_file):
 
-        errors = []
         tool_name = raw_errors["software"]["name"]
 
         for match in raw_errors["matches"]:
@@ -133,21 +132,18 @@ class LanguageToolModule:
             if match["rule"]["category"]["id"] == "TYPOS":
                 error_type = "spelling"
 
-            errors.append(
-                error.Error(
-                    file_path,
-                    tool_name,
-                    error_type,
-                    match["rule"]["id"],
-                    match["context"]["text"][offset:offset_end],
-                    match["offset"],
-                    match["length"],
-                    LanguageToolModule.parse_error_replacements(match["replacements"]),
-                    False,
-                )
+            error.Error(
+                self.buddy,
+                detex_file,
+                tool_name,
+                error_type,
+                match["rule"]["id"],
+                match["context"]["text"][offset:offset_end],
+                match["offset"],
+                match["length"],
+                LanguageToolModule.parse_error_replacements(match["replacements"]),
+                False,
             )
-
-        return errors
 
     @staticmethod
     def parse_error_replacements(json_replacements):
@@ -158,17 +154,3 @@ class LanguageToolModule:
             output.append(entry["value"])
 
         return output
-
-
-if __name__ == "__main__":
-
-    lt_module_local = LanguageToolModule(Mode.LOCAL_SERVER, language="de-DE")
-    lt_module_cmd = LanguageToolModule(Mode.COMMANDLINE, language="de-DE")
-
-    es_local = lt_module_local.check_tex("tex_files/05_entwicklungsrichtlinien.tex")
-    es_cmd = lt_module_cmd.check_tex("tex_files/05_entwicklungsrichtlinien.tex")
-
-    for i in range(min(len(es_local), len(es_cmd))):
-        print(es_local[i])
-        print(es_cmd[i])
-        print()

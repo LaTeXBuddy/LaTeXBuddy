@@ -56,7 +56,7 @@ class LanguageToolLocalServer:
         self.port = self.find_free_port(port)
 
         self.get_server_run_command()
-        # TODO: map stdout to /dev/null after testing
+        # TODO: map stdout to /dev/null after testing & add routine to tools.py
         self.server_process = subprocess.Popen(self.lt_server_command)
 
         self.wait_till_server_up()
@@ -70,8 +70,8 @@ class LanguageToolLocalServer:
             try:
                 requests.post(f"http://localhost:{self.port}/v2/check")
                 up = True
-            # TODO: Specify concrete exceptions to be caught
-            except Exception:
+
+            except requests.RequestException:
                 up = False
 
     def stop_local_server(self):
