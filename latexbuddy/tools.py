@@ -2,18 +2,18 @@ import subprocess
 
 
 # example usage in aspell.py
-def execute(*cmd: str) -> str:
+def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     command = get_command_string(cmd)
 
     error_list = subprocess.Popen(
         [command], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
     out, err_out = error_list.communicate()
-    return out.decode("ISO8859-1")
+    return out.decode(encoding)
 
 
-def execute_from_list(cmd: list[str]) -> str:
-    return execute(*cmd)
+def execute_from_list(cmd: list[str], encoding: str = "ISO8859-1") -> str:
+    return execute(*cmd, encoding)
 
 
 def execute_background(*cmd: str) -> subprocess.Popen:
@@ -29,18 +29,18 @@ def execute_background_from_list(cmd: list[str]) -> subprocess.Popen:
     return execute_background(*cmd)
 
 
-def execute_no_errors(*cmd: str) -> str:
+def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
     command = get_command_string(cmd)
 
     error_list = subprocess.Popen(
         [command], shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL
     )
     out, err_out = error_list.communicate()
-    return out.decode("ISO8859-1")
+    return out.decode(encoding)
 
 
-def execute_no_errors_from_list(cmd: list[str]) -> str:
-    return execute_no_errors(*cmd)
+def execute_no_errors_from_list(cmd: list[str], encoding: str = "ISO8859-1") -> str:
+    return execute_no_errors(*cmd, encoding)
 
 
 def get_command_string(cmd: tuple[str]) -> str:
