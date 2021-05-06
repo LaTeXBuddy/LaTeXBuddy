@@ -4,7 +4,7 @@ import error_class
 
 
 def run(buddy, file):
-    language = "en"
+    language = buddy.get_lang()
     language = shlex.quote(language)
     langs = tools.execute("aspell", "dump dicts")
 
