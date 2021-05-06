@@ -29,11 +29,21 @@ def execute_background_from_list(cmd: list[str]) -> subprocess.Popen:
     return execute_background(*cmd)
 
 
-def get_command_string(*cmd: str) -> str:
+def get_command_string(cmd: tuple[str]) -> str:
     command = ""
     for arg in cmd:
         command += arg + " "
     return command.strip()
+
+
+def find_executable(name: str) -> str:
+
+    result = execute("which", name)
+
+    if not result or "not found" in result:
+        raise FileNotFoundError(f"could not find {name} in system's PATH")
+    else:
+        return result.splitlines()[0]
 
 
 def detex(file_to_detex):
