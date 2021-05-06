@@ -40,9 +40,3 @@ def detex(file_to_detex):
     detexed_file = file_to_detex + ".detexed"
     execute("detex", file_to_detex, " > ", detexed_file)
     return detexed_file
-
-
-if __name__ == "__main__":
-    command_ = ["echo", "hi,", "what\\'s", "up?"]
-    print(execute(*command_))
-    # print(execute_from_list(command_))
