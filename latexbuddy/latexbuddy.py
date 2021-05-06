@@ -66,6 +66,6 @@ class LatexBuddy:
 
 
 if __name__ == "__main__":
-    buddy = LatexBuddy('en')
+    buddy = LatexBuddy("en")
     buddy.run_tools()
     buddy.parse_to_json()
