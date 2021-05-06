@@ -4,7 +4,7 @@ import error_class
 
 
 def run(buddy, file):
-    language = "en"
+    language = buddy.get_lang()
     language = shlex.quote(language)
     langs = tools.execute("aspell", "dump dicts")
 
@@ -38,7 +38,7 @@ def run(buddy, file):
         temp = split[0].split(" ")
         location = temp[2] if len(temp) > 2 else temp[1]
         text = temp[0]
-        suggestions = split[1].strip().split(",") if len(split) > 1 else [""]
+        suggestions = split[1].strip().split(",") if len(split) > 1 else []
 
         error_class.Error(
             buddy,

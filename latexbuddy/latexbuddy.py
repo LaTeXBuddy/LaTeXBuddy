@@ -8,11 +8,12 @@ import tools
 
 
 class LatexBuddy:
-    def __init__(self):
+    def __init__(self, lang):
         self.errors = {}
         self.error_file = "errors.json"
         self.whitelist_file = "whitelist.json"
         self.file_to_check = "Test.tex"
+        self.lang = lang
 
     def add_error(self, error):
         self.errors[error.get_uid()] = error
@@ -60,8 +61,11 @@ class LatexBuddy:
         languagetool.run(self, detexed_file)
         os.remove(detexed_file)
 
+    def get_lang(self):
+        return self.lang
+
 
 if __name__ == "__main__":
-    buddy = LatexBuddy()
+    buddy = LatexBuddy('en')
     buddy.run_tools()
     buddy.parse_to_json()

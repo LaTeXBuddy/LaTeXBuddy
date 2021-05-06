@@ -24,6 +24,7 @@ def run(buddy, file):
         offset = int(s_arr[3])
         length = int(s_arr[4])
         start = start_char(line, offset)
+        suggestions = [s_arr[6]] if len(s_arr[6]) > 0 else []
         error_class.Error(
             buddy,
             s_arr[0],
@@ -33,7 +34,7 @@ def run(buddy, file):
             s_arr[5],
             start,
             length,
-            [s_arr[6]],
+            suggestions,
             warning,
         )
 
