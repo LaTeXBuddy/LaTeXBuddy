@@ -1,4 +1,6 @@
 import subprocess
+from typing import List
+from typing import Tuple
 
 
 # example usage in aspell.py
@@ -12,7 +14,7 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     return out.decode(encoding)
 
 
-def execute_from_list(cmd: list[str], encoding: str = "ISO8859-1") -> str:
+def execute_from_list(cmd: List[str], encoding: str = "ISO8859-1") -> str:
     return execute(*cmd, encoding)
 
 
@@ -25,7 +27,7 @@ def execute_background(*cmd: str) -> subprocess.Popen:
     return process
 
 
-def execute_background_from_list(cmd: list[str]) -> subprocess.Popen:
+def execute_background_from_list(cmd: List[str]) -> subprocess.Popen:
     return execute_background(*cmd)
 
 
@@ -39,11 +41,11 @@ def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
     return out.decode(encoding)
 
 
-def execute_no_errors_from_list(cmd: list[str], encoding: str = "ISO8859-1") -> str:
+def execute_no_errors_from_list(cmd: List[str], encoding: str = "ISO8859-1") -> str:
     return execute_no_errors(*cmd, encoding)
 
 
-def get_command_string(cmd: tuple[str]) -> str:
+def get_command_string(cmd: Tuple[str]) -> str:
     command = ""
     for arg in cmd:
         command += arg + " "
