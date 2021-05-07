@@ -1,8 +1,9 @@
 import json
 import os
 
-import chktex
 import aspell
+import chktex
+import languagetool
 import tools
 
 
@@ -57,6 +58,7 @@ class LatexBuddy:
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
         aspell.run(self, detexed_file)
+        languagetool.run(self, detexed_file)
         os.remove(detexed_file)
 
     def get_lang(self):
@@ -64,6 +66,6 @@ class LatexBuddy:
 
 
 if __name__ == "__main__":
-    buddy = LatexBuddy('en')
+    buddy = LatexBuddy("en")
     buddy.run_tools()
     buddy.parse_to_json()

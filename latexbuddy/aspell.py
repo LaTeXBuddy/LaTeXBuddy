@@ -1,6 +1,7 @@
 import shlex
-import tools
+
 import error_class
+import tools
 
 
 def run(buddy, file):
@@ -11,7 +12,10 @@ def run(buddy, file):
     # error if language dict not installed
     if language not in langs:
         print(
-            "Dict for language \"" + language + "\" not found - [Linux]Install via sudo apt install - check available dicts at https://ftp.gnu.org/gnu/aspell/dict/0index.html")
+            'Dict for language "'
+            + language
+            + '" not found - [Linux]Install via sudo apt install - check available dicts at https://ftp.gnu.org/gnu/aspell/dict/0index.html'
+        )
         raise Exception("Spell check Failed")
 
     # execute aspell on given file and collect output
@@ -26,9 +30,9 @@ def run(buddy, file):
     for error in out:
         if error == "":
             error = "x"
-        if error[0] == '&':
+        if error[0] == "&":
             cleaned_errors.append(error.replace("&", "").replace("\n", "").strip())
-        if error[0] == '#':
+        if error[0] == "#":
             cleaned_errors.append(error.replace("#", "").replace("\n", "").strip())
 
     # create error instances
