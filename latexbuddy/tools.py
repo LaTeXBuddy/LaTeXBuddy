@@ -15,7 +15,7 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
 
 
 def execute_from_list(cmd: List[str], encoding: str = "ISO8859-1") -> str:
-    return execute(*cmd, encoding)
+    return execute(*cmd, encoding=encoding)
 
 
 def execute_background(*cmd: str) -> subprocess.Popen:
@@ -42,7 +42,7 @@ def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
 
 
 def execute_no_errors_from_list(cmd: List[str], encoding: str = "ISO8859-1") -> str:
-    return execute_no_errors(*cmd, encoding)
+    return execute_no_errors(*cmd, encoding=encoding)
 
 
 def get_command_string(cmd: Tuple[str]) -> str:
