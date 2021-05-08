@@ -103,7 +103,7 @@ class LanguageToolLocalServer:
         if not self.server_process:
             return
 
-        self.server_process.kill()
+        tools.kill_background_process(self.server_process)
         self.server_process = None
 
     @staticmethod
