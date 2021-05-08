@@ -1,4 +1,5 @@
 import socket
+import time
 
 from contextlib import closing
 
@@ -10,6 +11,8 @@ import tools
 class LanguageToolLocalServer:
 
     _DEFAULT_PORT = 8081
+    _SERVER_REQUEST_TIMEOUT = 1  # in seconds
+    _SERVER_MAX_ATTEMPTS = 20
 
     def __init__(self):
 
@@ -76,14 +79,24 @@ class LanguageToolLocalServer:
 
     def wait_till_server_up(self):
 
+        attempts = 0
         up = False
-        while not up:
+
+        while not up and attempts < self._SERVER_MAX_ATTEMPTS:
             try:
-                requests.post(f"http://localhost:{self.port}/v2/check")
+                requests.post(
+                    f"http://localhost:{self.port}/v2/check",
+                    timeout=self._SERVER_REQUEST_TIMEOUT
+                )
                 up = True
 
             except requests.RequestException:
                 up = False
+                attempts += 1
+                time.sleep(0.5)
+
+        if not up:
+            raise ConnectionError("Could not connect to local server.")
 
     def stop_local_server(self):
 
