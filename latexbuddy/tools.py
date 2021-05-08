@@ -63,6 +63,19 @@ def find_executable(name: str) -> str:
 
 
 def detex(file_to_detex):
+
+    try:
+        find_executable("detex")
+    except FileNotFoundError:
+
+        print("Could not find a valid detex installation on your system.")
+        print("Please make sure you installed detex correctly and it is in your ")
+        print("System\'s PATH.")
+
+        print("For more information check the LaTeXBuddy manual.")
+
+        raise FileNotFoundError("Unable to find detex installation!")
+
     detexed_file = file_to_detex + ".detexed"
     execute("detex", file_to_detex, " > ", detexed_file)
     return detexed_file
