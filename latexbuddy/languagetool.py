@@ -63,7 +63,7 @@ class LanguageToolModule:
             tools.find_executable("java")
         except FileNotFoundError:
             print("Could not find a Java runtime environment on your system.")
-            print("Please make sure you installes Java correctly.")
+            print("Please make sure you installed Java correctly.")
 
             print("For more information check the LaTeXBuddy manual.")
 
