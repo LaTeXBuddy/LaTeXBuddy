@@ -1,10 +1,13 @@
 import json
 import os
 
-import aspell
-import chktex
-import languagetool
-import tools
+import latexbuddy.aspell as aspell
+import latexbuddy.chktex as chktex
+import latexbuddy.languagetool as languagetool
+import latexbuddy.tools as tools
+
+
+# TODO: rename this file to stop PyCharm throwing warnings
 
 
 class LatexBuddy:

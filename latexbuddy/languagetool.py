@@ -4,9 +4,9 @@ from enum import Enum, auto
 
 import requests
 
-import error_class as error
-import languagetool_local_server as lt_server
-import tools as tools
+import latexbuddy.error_class as error
+import latexbuddy.languagetool_local_server as lt_server
+import latexbuddy.tools as tools
 
 
 _LANGUAGES = {"de": "de-DE", "en": "en"}
