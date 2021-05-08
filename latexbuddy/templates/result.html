@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Result</title>
+    <style>
+        body {
+        font-size:16px;
+        font-family:sans-serif;
+
+        }
+        pre {
+        background-color:#eeeeee;
+        padding:10px;
+        border-radius:5px;
+
+        white-space: pre-wrap;
+        white-space: -moz-pre-wrap;
+        white-space: -o-pre-wrap;
+        word-wrap: break-word;
+        }
+        .line-number {
+        font-size:12px;
+        }
+        .error-description {
+
+        }
+        .error-id {
+        font-size:12px;
+        }
+        .error>ul {
+        list-style:none;
+        padding-left:10px
+        }
+
+
+    </style>
+</head>
+<body>
+<h1>LatexBuddy</h1>
+<h2>{{file_name}}</h2>
+<main>
+    <div>
+        <pre><code>{{file_text|e}}</code></pre>
+    </div>
+    <div>
+        <h3>Error list</h3>
+        <ol>
+            {% for error in errors %}
+            <li class="error">
+                <ul>
+                    <li class="error-description">
+                        {{error['src']}}: {{error['error_type']}}: <b>{{error['text']}}</b>
+                    </li>
+                   <!-- <li class="line-number">
+
+                    </li>-->
+                    <li class="error-id">
+                        Error ID: {{error['error_id']}}
+                    </li>
+                </ul>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+</main>
+</body>
+</html>
