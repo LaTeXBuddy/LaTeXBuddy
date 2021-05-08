@@ -26,17 +26,28 @@ class LanguageToolLocalServer:
         return self.port
 
     def get_server_run_command(self):
+
+        try:
+            tools.find_executable("java")
+        except FileNotFoundError:
+            print("Could not find a Java runtime environment on your system.")
+            print("Please make sure you installed Java correctly.")
+
+            print("For more information check the LaTeXBuddy manual.")
+
+            raise FileNotFoundError("Unable to find Java runtime environment!")
+
         try:
             result = tools.find_executable("languagetool-server.jar")
         except FileNotFoundError:
-            print("Could not find languagetool-server.jar in system PATH.")
-            print(
-                "Please make sure you installed languagetool properly and added the "
-                "directory to your system's PATH variable. Also make sure to make "
-                "the jar-files executable."
-            )
+            print("Could not find languagetool-commandline.jar in your system's PATH.")
+            print("Please make sure you installed languagetool properly and added the ")
+            print("directory to your system's PATH variable. Also make sure to make ")
+            print("the jar-files executable.")
+
             print("For more information check the LaTeXBuddy manual.")
-            raise (Exception("Unable to find languagetool installation!"))
+
+            raise FileNotFoundError("Unable to find languagetool installation!")
 
         self.lt_path = result
         self.lt_server_command = [
