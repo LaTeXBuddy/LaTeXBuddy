@@ -1,3 +1,5 @@
+import os
+import signal
 import subprocess
 from typing import List
 from typing import Tuple
@@ -22,13 +24,18 @@ def execute_background(*cmd: str) -> subprocess.Popen:
     command = get_command_string(cmd)
 
     process = subprocess.Popen(
-        [command], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        [command], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        preexec_fn=os.setsid
     )
     return process
 
 
 def execute_background_from_list(cmd: List[str]) -> subprocess.Popen:
     return execute_background(*cmd)
+
+
+def kill_background_process(process: subprocess.Popen):
+    os.killpg(os.getpgid(process.pid), signal.SIGTERM)
 
 
 def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
