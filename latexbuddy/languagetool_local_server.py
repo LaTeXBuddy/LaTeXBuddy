@@ -1,4 +1,5 @@
 import socket
+import time
 
 from contextlib import closing
 
@@ -10,6 +11,8 @@ import latexbuddy.tools as tools
 class LanguageToolLocalServer:
 
     _DEFAULT_PORT = 8081
+    _SERVER_REQUEST_TIMEOUT = 1  # in seconds
+    _SERVER_MAX_ATTEMPTS = 20
 
     def __init__(self):
 
@@ -26,17 +29,28 @@ class LanguageToolLocalServer:
         return self.port
 
     def get_server_run_command(self):
+
+        try:
+            tools.find_executable("java")
+        except FileNotFoundError:
+            print("Could not find a Java runtime environment on your system.")
+            print("Please make sure you installed Java correctly.")
+
+            print("For more information check the LaTeXBuddy manual.")
+
+            raise FileNotFoundError("Unable to find Java runtime environment!")
+
         try:
             result = tools.find_executable("languagetool-server.jar")
         except FileNotFoundError:
-            print("Could not find languagetool-server.jar in system PATH.")
-            print(
-                "Please make sure you installed languagetool properly and added the "
-                "directory to your system's PATH variable. Also make sure to make "
-                "the jar-files executable."
-            )
+            print("Could not find languagetool-commandline.jar in your system's PATH.")
+            print("Please make sure you installed languagetool properly and added the ")
+            print("directory to your system's PATH variable. Also make sure to make ")
+            print("the jar-files executable.")
+
             print("For more information check the LaTeXBuddy manual.")
-            raise (Exception("Unable to find languagetool installation!"))
+
+            raise FileNotFoundError("Unable to find languagetool installation!")
 
         self.lt_path = result
         self.lt_server_command = [
@@ -65,21 +79,31 @@ class LanguageToolLocalServer:
 
     def wait_till_server_up(self):
 
+        attempts = 0
         up = False
-        while not up:
+
+        while not up and attempts < self._SERVER_MAX_ATTEMPTS:
             try:
-                requests.post(f"http://localhost:{self.port}/v2/check")
+                requests.post(
+                    f"http://localhost:{self.port}/v2/check",
+                    timeout=self._SERVER_REQUEST_TIMEOUT
+                )
                 up = True
 
             except requests.RequestException:
                 up = False
+                attempts += 1
+                time.sleep(0.5)
+
+        if not up:
+            raise ConnectionError("Could not connect to local server.")
 
     def stop_local_server(self):
 
         if not self.server_process:
             return
 
-        self.server_process.kill()
+        tools.kill_background_process(self.server_process)
         self.server_process = None
 
     @staticmethod
