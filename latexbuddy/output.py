@@ -1,5 +1,7 @@
-from jinja2 import PackageLoader, Environment, Template
 from pathlib import Path
+
+from jinja2 import Environment, PackageLoader, Template
+
 
 env = Environment(loader=PackageLoader("latexbuddy"))
 
@@ -82,10 +84,10 @@ errors_list = [
             " Deer's",
             " Dee's",
             " Tie's",
-            " Dieter's"
+            " Dieter's",
         ],
         "warning": False,
-        "uid": "Test.tex.detexed\u0000aspell\u0000spelling\u00000\u00000\u00006"
+        "uid": "Test.tex.detexed\u0000aspell\u0000spelling\u00000\u00000\u00006",
     },
     {
         "path": "Test.tex.detexed",
@@ -95,13 +97,9 @@ errors_list = [
         "text": "Kapitel",
         "start": "7",
         "length": 7,
-        "suggestions": [
-            "Capitol",
-            " Capital",
-            " Capitol's"
-        ],
+        "suggestions": ["Capitol", " Capital", " Capitol's"],
         "warning": False,
-        "uid": "Test.tex.detexed\u0000aspell\u0000spelling\u00000\u00007\u00007"
+        "uid": "Test.tex.detexed\u0000aspell\u0000spelling\u00000\u00007\u00007",
     },
     {
         "path": "Test.tex.detexed",
@@ -135,10 +133,10 @@ errors_list = [
             " beholden",
             " Bernhardt's",
             " insulted",
-            " benefited"
+            " benefited",
         ],
         "warning": False,
-        "uid": "Test.tex.detexed\u0000aspell\u0000spelling\u00000\u000015\u000010"
+        "uid": "Test.tex.detexed\u0000aspell\u0000spelling\u00000\u000015\u000010",
     },
     {
         "path": "Test.tex.detexed",
@@ -248,10 +246,10 @@ errors_list = [
             " GUI",
             " Guy",
             " Hui",
-            " Que"
+            " Que",
         ],
         "warning": False,
-        "uid": "Test.tex.detexed\u0000aspell\u0000spelling\u00000\u000034\u00002"
+        "uid": "Test.tex.detexed\u0000aspell\u0000spelling\u00000\u000034\u00002",
     },
     {
         "path": "Test.tex.detexed",
@@ -305,10 +303,10 @@ errors_list = [
             " Tom",
             " tam",
             " tom",
-            " tum"
+            " tum",
         ],
         "warning": False,
-        "uid": "Test.tex.detexed\u0000aspell\u0000spelling\u00000\u000037\u00003"
+        "uid": "Test.tex.detexed\u0000aspell\u0000spelling\u00000\u000037\u00003",
     },
     {
         "path": "Test.tex.detexed",
@@ -336,11 +334,11 @@ errors_list = [
             " Ebola",
             " ELF",
             " Elf",
-            " Bailiff"
+            " Bailiff",
         ],
         "warning": False,
-        "uid": "Test.tex.detexed\u0000aspell\u0000spelling\u00000\u000041\u00006"
-    }
+        "uid": "Test.tex.detexed\u0000aspell\u0000spelling\u00000\u000041\u00006",
+    },
 ]
 
 
@@ -349,5 +347,6 @@ def render_html(file_name, file_text, errors):
     result = template.render(file_name=file_name, file_text=file_text, errors=errors)
     (Path.cwd() / "output.html").write_text(result)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     render_html(tex_file_name, tex_file_text, errors_list)

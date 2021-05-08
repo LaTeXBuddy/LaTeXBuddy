@@ -8,32 +8,37 @@
     <title>Result</title>
     <style>
         body {
-        font-size:16px;
-        font-family:sans-serif;
-
+            font-size: 16px;
+            font-family: sans-serif;
         }
+
         pre {
-        background-color:#eeeeee;
-        padding:10px;
-        border-radius:5px;
+            background-color: #eeeeee;
+            padding: 10px;
+            border-radius: 5px;
 
-        white-space: pre-wrap;
-        white-space: -moz-pre-wrap;
-        white-space: -o-pre-wrap;
-        word-wrap: break-word;
+            /* TODO: maybe add Autoprefixer? */
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
         }
+
         .line-number {
-        font-size:12px;
+            font-size: 12px;
         }
+
         .error-description {
 
         }
+
         .error-id {
-        font-size:12px;
+            font-size: 12px;
         }
-        .error>ul {
-        list-style:none;
-        padding-left:10px
+
+        .error > ul {
+            list-style: none;
+            padding-left: 10px
         }
 
 
@@ -55,9 +60,9 @@
                     <li class="error-description">
                         {{error['src']}}: {{error['error_type']}}: <b>{{error['text']}}</b>
                     </li>
-                   <!-- <li class="line-number">
+                    <!-- <li class="line-number">
 
-                    </li>-->
+                     </li>-->
                     <li class="error-id">
                         Error ID: {{error['error_id']}}
                     </li>
