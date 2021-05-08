@@ -1,7 +1,7 @@
 import shlex
 
-import error_class
-import tools
+import latexbuddy.error_class as error_class
+import latexbuddy.tools as tools
 
 
 def run(buddy, file):

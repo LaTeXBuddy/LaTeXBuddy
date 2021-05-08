@@ -4,7 +4,7 @@ from contextlib import closing
 
 import requests
 
-import tools
+import latexbuddy.tools as tools
 
 
 class LanguageToolLocalServer:

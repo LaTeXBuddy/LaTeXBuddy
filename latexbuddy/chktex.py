@@ -1,8 +1,8 @@
 import shlex
 import subprocess
 
-import error_class
-import tools
+import latexbuddy.error_class as error_class
+import latexbuddy.tools as tools
 
 
 filename = ""

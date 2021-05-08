@@ -1,6 +1,6 @@
 import subprocess
-from typing import List
-from typing import Tuple
+
+from typing import List, Tuple
 
 
 # example usage in aspell.py

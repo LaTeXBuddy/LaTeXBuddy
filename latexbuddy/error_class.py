@@ -1,6 +1,3 @@
-import latexbuddy
-
-
 class Error:
     """
     creates an error object

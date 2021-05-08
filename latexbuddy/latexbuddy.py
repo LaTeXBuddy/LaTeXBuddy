@@ -1,18 +1,21 @@
 import json
 import os
 
-import aspell
-import chktex
-import languagetool
-import tools
+import latexbuddy.aspell as aspell
+import latexbuddy.chktex as chktex
+import latexbuddy.languagetool as languagetool
+import latexbuddy.tools as tools
+
+
+# TODO: rename this file to stop PyCharm throwing warnings
 
 
 class LatexBuddy:
-    def __init__(self, lang):
+    def __init__(self, error_file, whitelist_file, file_to_check, lang):
         self.errors = {}
-        self.error_file = "errors.json"
-        self.whitelist_file = "whitelist.json"
-        self.file_to_check = "Test.tex"
+        self.error_file = error_file
+        self.whitelist_file = whitelist_file
+        self.file_to_check = file_to_check
         self.lang = lang
 
     def add_error(self, error):
@@ -63,9 +66,3 @@ class LatexBuddy:
 
     def get_lang(self):
         return self.lang
-
-
-if __name__ == "__main__":
-    buddy = LatexBuddy("en")
-    buddy.run_tools()
-    buddy.parse_to_json()
