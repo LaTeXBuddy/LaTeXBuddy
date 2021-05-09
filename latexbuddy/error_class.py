@@ -1,3 +1,6 @@
+import hashlib
+
+
 class Error:
     """
     creates an error object
@@ -46,9 +49,11 @@ class Error:
     def get_uid(self):
         return self.uid
 
+    # TODO: maybe different hashes for different error types
+    def get_hash(self, language):
+        string_for_hash = self.error_type + self.text + language
+        return hashlib.md5(string_for_hash).hexdigest()
 
-"""
     def __eq__(self, other):
-        return self.src == other.src & self.error_type == other.error_typ & \
-               self.error_id == other.error_id & self.text == other.text
-"""
+        return self.error_type == other.error_type & self.text == other.text  # &\
+               #.error_id == other.error_id & self.src == other.src

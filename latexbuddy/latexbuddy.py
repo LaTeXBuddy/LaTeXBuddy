@@ -51,10 +51,13 @@ class LatexBuddy:
         if uid not in self.errors.keys():
             raise  # exception
 
-        # write in whitelist
+        # write error in whitelist
         with open(self.whitelist_file, "a") as file:
-            json.dump(self.errors[uid], file)
+            # json.dump(self.errors[uid], file)
+            file.write("\n")
+            file.write(self.errors[uid].get_hash(self.lang))
 
+        # delete error
         self.errors.pop(uid)
 
     def run_tools(self):
