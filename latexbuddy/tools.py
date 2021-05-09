@@ -24,8 +24,11 @@ def execute_background(*cmd: str) -> subprocess.Popen:
     command = get_command_string(cmd)
 
     process = subprocess.Popen(
-        [command], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-        preexec_fn=os.setsid
+        [command],
+        shell=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        preexec_fn=os.setsid,
     )
     return process
 
@@ -77,7 +80,7 @@ def detex(file_to_detex):
 
         print("Could not find a valid detex installation on your system.")
         print("Please make sure you installed detex correctly and it is in your ")
-        print("System\'s PATH.")
+        print("System's PATH.")
 
         print("For more information check the LaTeXBuddy manual.")
 
