@@ -1,0 +1,22 @@
+image: python:latest
+
+variables:
+    SRC_DIR: "$CI_PROJECT_DIR/latexbuddy"
+
+before_script:
+    - python --version
+
+stages:
+    - Lint
+
+isort:
+    stage: Lint
+    script:
+        - pip install isort
+        - isort --check --diff "$SRC_DIR"
+
+black:
+    stage: Lint
+    script:
+        - pip install black
+        - black --check --diff "$SRC_DIR"
