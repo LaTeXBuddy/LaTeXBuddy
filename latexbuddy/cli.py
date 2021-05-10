@@ -9,6 +9,12 @@ parser.add_argument(
     "--language", "-l", default="en", help="Target language of the file."
 )
 parser.add_argument(
+    "--config",
+    "-c",
+    default="config.py",
+    help="Location of the config file.",
+)
+parser.add_argument(
     "--whitelist",
     "-w",
     default="whitelist.json",
