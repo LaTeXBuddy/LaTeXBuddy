@@ -8,7 +8,19 @@ def run(buddy, file):
     language = buddy.get_lang()
     language = shlex.quote(language)
     langs = tools.execute("aspell", "dump dicts")
+    check_language(language, langs)
+    # execute aspell on given file and collect output
+    error_list = tools.execute("aspell -a --lang=" + language + " < " + file)
 
+    # format aspell output
+    out = error_list[70:]
+    out = out.split("\n")
+
+    # cleanup error list
+    save_errors(format_errors(out), buddy, file)
+
+
+def check_language(language, langs):
     # error if language dict not installed
     if language not in langs:
         print(
@@ -18,14 +30,8 @@ def run(buddy, file):
         )
         raise Exception("Spell check Failed")
 
-    # execute aspell on given file and collect output
-    error_list = tools.execute("aspell -a --lang=" + language + " < " + file)
 
-    # format aspell output
-    out = error_list[70:]
-    out = out.split("\n")
-
-    # cleanup error list
+def format_errors(out):
     cleaned_errors = []
     for error in out:
         if error == "":
@@ -35,6 +41,8 @@ def run(buddy, file):
         if error[0] == "#":
             cleaned_errors.append(error.replace("#", "").replace("\n", "").strip())
 
+
+def save_errors(cleaned_errors, buddy, file):
     # create error instances
     for error in cleaned_errors:
         split = error.split(":")
@@ -46,7 +54,7 @@ def run(buddy, file):
 
         error_class.Error(
             buddy,
-            file,
+            file.removesuffix(".detexed"),
             "aspell",
             "spelling",
             "0",

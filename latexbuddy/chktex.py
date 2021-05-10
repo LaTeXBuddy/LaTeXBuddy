@@ -16,7 +16,10 @@ def run(buddy, file):
     out = tools.execute(
         "chktex", '-f "%f:%l:%c:%d:%n:%s:%m:%k\n"', "-q", filename
     ).split("\n")
+    save_output(out, buddy, file)
 
+
+def save_output(out, buddy, file):
     for error in out:
         s_arr = error.split(":")
         if len(s_arr) < 5:
