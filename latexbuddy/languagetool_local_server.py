@@ -86,7 +86,7 @@ class LanguageToolLocalServer:
             try:
                 requests.post(
                     f"http://localhost:{self.port}/v2/check",
-                    timeout=self._SERVER_REQUEST_TIMEOUT
+                    timeout=self._SERVER_REQUEST_TIMEOUT,
                 )
                 up = True
 
