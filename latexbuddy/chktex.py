@@ -4,6 +4,7 @@ import subprocess
 import latexbuddy.error_class as error_class
 import latexbuddy.tools as tools
 
+
 filename = ""
 line_lengths = []
 

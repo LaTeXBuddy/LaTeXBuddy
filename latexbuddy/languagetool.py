@@ -8,6 +8,7 @@ import latexbuddy.error_class as error
 import latexbuddy.languagetool_local_server as lt_server
 import latexbuddy.tools as tools
 
+
 _LANGUAGES = {"de": "de-DE", "en": "en"}
 
 
