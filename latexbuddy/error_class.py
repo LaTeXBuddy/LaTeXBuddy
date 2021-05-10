@@ -9,15 +9,17 @@ class Error:
     def __init__(
         self,
         buddy,
-        path,
-        src,
-        error_type,
-        error_id,
-        text,
-        start,
-        length,
-        suggestions,
-        warning,
+        path,           # the path to the file
+        src,            # the src tool of the error <chktex/aspell/...>
+        error_type,     # <grammar/spelling/latex>
+        error_id,       # tool intern error id as integer
+        text,           # the error as text if possible
+        start,          # the starting character
+        length,         # the length
+        suggestions,    # suggestions to solve the error
+        warning,        # boolean. true if the error is a warning, only in tex checks
+        compare_id      # ID to compare two errors that are semantically equal, to be
+                        # implemented by each module TODO: make sure all modules do this
     ):
         self.dict = {
             "path": path,
@@ -30,6 +32,7 @@ class Error:
             "suggestions": suggestions,
             "warning": warning,
             "uid": self.uid(),
+            "compare_id": compare_id
         }
         buddy.add_error(self)
 
@@ -54,15 +57,13 @@ class Error:
     def get_uid(self):
         return self.dict["uid"]
 
-    # TODO: maybe different hashes for different error types
-    def get_hash(self, language):
-        string_for_hash = self.dict["error_type"] + self.dict["text"] + language
-        return hashlib.md5(string_for_hash).hexdigest()
+    def get_comp_id(self):
+        return self.dict["compare_id"]
 
-    def __eq__(self, other):
-        return (
-            self.dict["error_type"]
-            == other.dict["error_type"] & self.dict["text"]
-            == other.dict["text"]
-        )  # &\
-        # .error_id == other.error_id & self.src == other.src
+    # TODO: Ignore for now (maybe different hashes for different error types)
+    # def get_hash(self, language):
+    #    string_for_hash = self.dict["error_type"] + self.dict["text"] + language
+    #    return hashlib.md5(string_for_hash).hexdigest()
+
+    def compare_with_other_comp_id(self, other_comp_id):
+        return self.dict["compare_id"] == other_comp_id

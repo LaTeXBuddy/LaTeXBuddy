@@ -8,7 +8,7 @@ import latexbuddy.tools as tools
 
 
 # TODO: rename this file to stop PyCharm throwing warnings
-
+# TODO: some comments
 
 class LatexBuddy:
     def __init__(self, error_file, whitelist_file, file_to_check, lang):
@@ -32,19 +32,20 @@ class LatexBuddy:
             json.dump(error.dict, file, indent=4)
 
     """
-    not working
+    should be working
     """
 
     def check_whitelist(self):
         with open(self.whitelist_file, "r") as file:
-            whitelist = json.load(file)
-        for whitelist_error in whitelist:
+            whitelist = file.read().split('\n')
+
+        for whitelist_element in whitelist:
             for uid in self.errors.keys():
-                # if whitelist_error.__eq__(errors[uid]):
-                self.errors.pop(uid)
+                if self.errors[uid].compare_with_other_comp_id(whitelist_element):
+                    self.errors.pop(uid)
 
     """
-    not working
+    should be working
     """
 
     def add_to_whitelist(self, uid):
@@ -54,11 +55,20 @@ class LatexBuddy:
         # write error in whitelist
         with open(self.whitelist_file, "a") as file:
             # json.dump(self.errors[uid], file)
+            file.write(self.errors[uid].get_comp_id())
             file.write("\n")
-            file.write(self.errors[uid].get_hash(self.lang))
 
-        # delete error
+        # delete error & check errors with whitelist again
         self.errors.pop(uid)
+        # TODO: check errors with this error object alone to avoid having to check
+        #  with the entire whitelist
+        self.check_whitelist()
+
+    # TODO: implement rest
+    def check_errors(self):
+        self.check_whitelist()
+        # self.check_config()
+        # self.check_parameters()
 
     def run_tools(self):
         chktex.run(self, self.file_to_check)
