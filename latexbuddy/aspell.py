@@ -54,7 +54,7 @@ def save_errors(cleaned_errors, buddy, file):
 
         error_class.Error(
             buddy,
-            file.removesuffix('.detexed'),
+            file.removesuffix(".detexed"),
             "aspell",
             "spelling",
             "0",
