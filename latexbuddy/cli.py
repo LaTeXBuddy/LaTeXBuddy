@@ -29,6 +29,7 @@ def main():
     args = parser.parse_args()
     buddy = LatexBuddy(
         error_file=args.output,
+        config_file=args.config,
         whitelist_file=args.whitelist,
         file_to_check=args.file,
         lang=args.language,

@@ -11,9 +11,10 @@ import latexbuddy.tools as tools
 
 
 class LatexBuddy:
-    def __init__(self, error_file, whitelist_file, file_to_check, lang):
+    def __init__(self, error_file, config_file, whitelist_file, file_to_check, lang):
         self.errors = {}
         self.error_file = error_file
+        self.config_file = config_file
         self.whitelist_file = whitelist_file
         self.file_to_check = file_to_check
         self.lang = lang
