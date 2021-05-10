@@ -19,18 +19,10 @@ class Error:
         suggestions,
         warning,
     ):
-        self.path = path  # the path to the file
-        self.src = src  # the src tool of the error <chktex/aspell/...>
-        self.error_type = error_type  # <grammar/spelling/latex>
-        self.error_id = error_id  # tool intern error id as integer
-        self.text = text  # the error as text if possible
-        self.start = start  # the starting character
-        self.length = length  # the length
-        self.suggestions = suggestions  # suggestions to solve the error
-        self.warning = (
-            warning  # boolean. true if the error is a warning, only in tex checks
-        )
-        self.uid = self.uid()
+        self.dict = {"path": path, "src": src, "error_type": error_type,
+                      "error_id": error_id,
+                      "text": text, "start": start, "length": length,
+                      "suggestions": suggestions, "warning": warning, "uid": self.uid()}
         buddy.add_error(self)
 
     """
@@ -39,7 +31,8 @@ class Error:
 
     def uid(self):
         return "{}\0{}\0{}\0{}\0{}\0{}".format(
-            self.path, self.src, self.error_type, self.error_id, self.start, self.length
+            self.error['path'], self.['src'], self.['error_type'], self.['error_id'],
+            self.['start'], self.['length']
         )
 
     """
@@ -56,4 +49,4 @@ class Error:
 
     def __eq__(self, other):
         return self.error_type == other.error_type & self.text == other.text  # &\
-               #.error_id == other.error_id & self.src == other.src
+        # .error_id == other.error_id & self.src == other.src
