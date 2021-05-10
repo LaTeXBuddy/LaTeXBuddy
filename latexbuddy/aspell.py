@@ -40,6 +40,7 @@ def format_errors(out):
             cleaned_errors.append(error.replace("&", "").replace("\n", "").strip())
         if error[0] == "#":
             cleaned_errors.append(error.replace("#", "").replace("\n", "").strip())
+    return cleaned_errors
 
 
 def save_errors(cleaned_errors, buddy, file):
