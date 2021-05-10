@@ -8,12 +8,10 @@ import latexbuddy.error_class as error
 import latexbuddy.languagetool_local_server as lt_server
 import latexbuddy.tools as tools
 
-
 _LANGUAGES = {"de": "de-DE", "en": "en"}
 
 
 def run(buddy, file):
-
     # TODO: get settings (mode etc.) from buddy instance (config needed)
 
     ltm = LanguageToolModule(buddy, language=_LANGUAGES[buddy.get_lang()])
@@ -147,7 +145,7 @@ class LanguageToolModule:
 
             error.Error(
                 self.buddy,
-                detex_file,
+                detex_file.removesuffix(".detexed"),
                 tool_name,
                 error_type,
                 match["rule"]["id"],
