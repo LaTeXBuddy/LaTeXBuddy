@@ -1,3 +1,7 @@
+import importlib.util as importutil
+import sys
+import traceback
+
 from typing import Any
 
 
@@ -13,7 +17,30 @@ class ConfigLoader:
         self.load_configurations()
 
     def load_configurations(self) -> None:
-        raise NotImplementedError()
+
+        try:
+            spec = importutil.spec_from_file_location("config", self.config_file_path)
+            config = importutil.module_from_spec(spec)
+            spec.loader.exec_module(config)
+
+            self.configurations = config.modules
+
+        except FileNotFoundError:
+            print(
+                f"Could not find a config file at '{self.config_file_path}'. ",
+                f"Using default configurations...",
+                file=sys.stderr,
+            )
+
+        except Exception as e:
+
+            print(
+                f"An error occurred while loading config file at "
+                f"'{self.config_file_path}':\n",
+                f"{e.__class__.__name__}: {getattr(e, 'message', e)}",
+                file=sys.stderr,
+            )
+            traceback.print_exc(file=sys.stderr)
 
     def get_config_option(self, tool_name: str, key: str) -> Any:
         raise NotImplementedError()
