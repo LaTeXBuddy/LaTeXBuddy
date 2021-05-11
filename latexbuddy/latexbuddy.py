@@ -10,6 +10,7 @@ import latexbuddy.tools as tools
 # TODO: rename this file to stop PyCharm throwing warnings
 # TODO: some comments
 
+
 class LatexBuddy:
     def __init__(self, error_file, whitelist_file, file_to_check, lang):
         self.errors = {}
@@ -23,7 +24,7 @@ class LatexBuddy:
 
     # TODO: fix error_file creation
     def parse_to_json(self):
-        #if os.path.isfile(self.error_file):
+        # if os.path.isfile(self.error_file):
         #    os.remove(self.error_file)
         for uid in self.errors:
             self.parse_error(self.errors[uid])
@@ -38,7 +39,7 @@ class LatexBuddy:
 
     def check_whitelist(self):
         with open(self.whitelist_file, "r") as file:
-            whitelist = file.read().split('\n')
+            whitelist = file.read().split("\n")
 
         for whitelist_element in whitelist:
             keys = list(self.errors.keys())
