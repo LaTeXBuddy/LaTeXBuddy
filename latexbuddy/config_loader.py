@@ -4,8 +4,13 @@ from typing import Any
 class ConfigLoader:
     def __init__(self, config_file_path: str):
 
+        if not config_file_path:
+            raise AttributeError("Path of the config file must be specified!")
+
         self.config_file_path = config_file_path
         self.configurations = {}
+
+        self.load_configurations()
 
     def load_configurations(self) -> None:
         raise NotImplementedError()
