@@ -1,6 +1,6 @@
 import hashlib
 
-
+i = "1"
 class Error:
     """
     creates an error object
@@ -41,14 +41,17 @@ class Error:
     """
 
     def uid(self):
-        return "{}\0{}\0{}\0{}\0{}\0{}".format(
+        """return "{}\0{}\0{}\0{}\0{}\0{}".format(
             self.dict["path"],
             self.dict["src"],
             self.dict["error_type"],
             self.dict["error_id"],
             self.dict["start"],
             self.dict["length"],
-        )
+        )"""
+        global i
+        i = i + "1"
+        return i
 
     """
     gets uid
