@@ -21,6 +21,7 @@ class LatexBuddy:
     def add_error(self, error):
         self.errors[error.get_uid()] = error
 
+    # TODO: fix error_file creation
     def parse_to_json(self):
         #if os.path.isfile(self.error_file):
         #    os.remove(self.error_file)
@@ -75,14 +76,17 @@ class LatexBuddy:
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
         aspell.run(self, detexed_file)
-
+        # languagetool.run(self, detexed_file)  # TODO: languagetool has to implement compare_id
         self.check_errors()
+
+        # FOR TESTING ONLY
+        """
         keys = list(self.errors.keys())
         for key in keys:
-            self.add_to_whitelist(key)  # Test
+            self.add_to_whitelist(key)
             return
+        """
 
-        #languagetool.run(self, detexed_file)
         os.remove(detexed_file)
 
     def get_lang(self):
