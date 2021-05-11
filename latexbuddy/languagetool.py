@@ -155,6 +155,7 @@ class LanguageToolModule:
                 match["length"],
                 LanguageToolModule.parse_error_replacements(match["replacements"]),
                 False,
+                # TODO: add compare_id here, see error_class.py
             )
 
     @staticmethod

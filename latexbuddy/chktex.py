@@ -41,6 +41,7 @@ def save_output(out, buddy, file):
             length,
             suggestions,
             warning,
+            # TODO: add compare_id here, see error_class.py
         )
 
 
