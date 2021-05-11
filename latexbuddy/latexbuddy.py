@@ -42,15 +42,17 @@ class LatexBuddy:
         for whitelist_element in whitelist:
             for uid in self.errors.keys():
                 if self.errors[uid].compare_with_other_comp_id(whitelist_element):
-                    self.errors.pop(uid)
+                    a = 1
+                    #self.errors.pop(uid)
 
     """
     should be working
     """
 
     def add_to_whitelist(self, uid):
-        if uid not in self.errors.keys():
-            raise  # exception
+        #if uid not in self.errors.keys():
+        #    return
+        #raise  # exception
 
         # write error in whitelist
         with open(self.whitelist_file, "a") as file:
@@ -59,7 +61,7 @@ class LatexBuddy:
             file.write("\n")
 
         # delete error & check errors with whitelist again
-        self.errors.pop(uid)
+        # self.errors.pop(uid)
         # TODO: check errors with this error object alone to avoid having to check
         #  with the entire whitelist
         self.check_whitelist()
@@ -74,7 +76,10 @@ class LatexBuddy:
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
         aspell.run(self, detexed_file)
-        languagetool.run(self, detexed_file)
+
+        self.add_to_whitelist("111")
+        self.errors.pop("111")
+        #languagetool.run(self, detexed_file)
         os.remove(detexed_file)
 
     def get_lang(self):
