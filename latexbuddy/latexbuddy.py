@@ -22,8 +22,8 @@ class LatexBuddy:
         self.errors[error.get_uid()] = error
 
     def parse_to_json(self):
-        if os.path.isfile(self.error_file):
-            os.remove(self.error_file)
+        #if os.path.isfile(self.error_file):
+        #    os.remove(self.error_file)
         for uid in self.errors:
             self.parse_error(self.errors[uid])
 
@@ -40,9 +40,10 @@ class LatexBuddy:
             whitelist = file.read().split('\n')
 
         for whitelist_element in whitelist:
-            for uid, error in self.errors.items():
-                if error.compare_with_other_comp_id(whitelist_element):
-                    del self.errors[uid]
+            keys = list(self.errors.keys())
+            for key in keys:
+                if self.errors[key].compare_with_other_comp_id(whitelist_element):
+                    del self.errors[key]
 
     """
     should be working
@@ -75,7 +76,11 @@ class LatexBuddy:
         detexed_file = tools.detex(self.file_to_check)
         aspell.run(self, detexed_file)
 
-        self.add_to_whitelist("111")  # Test
+        self.check_errors()
+        keys = list(self.errors.keys())
+        for key in keys:
+            self.add_to_whitelist(key)  # Test
+            return
 
         #languagetool.run(self, detexed_file)
         os.remove(detexed_file)
