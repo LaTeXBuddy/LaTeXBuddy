@@ -29,7 +29,7 @@ class LatexBuddy:
 
     def parse_error(self, error):
         with open(self.error_file, "a") as file:
-            json.dump(error.dict, file, indent=4)
+            json.dump(error.__dict__, file, indent=4)
 
     """
     should be working
@@ -40,28 +40,26 @@ class LatexBuddy:
             whitelist = file.read().split('\n')
 
         for whitelist_element in whitelist:
-            for uid in self.errors.keys():
-                if self.errors[uid].compare_with_other_comp_id(whitelist_element):
-                    a = 1
-                    #self.errors.pop(uid)
+            for uid, error in self.errors.items():
+                if error.compare_with_other_comp_id(whitelist_element):
+                    del self.errors[uid]
 
     """
     should be working
     """
 
     def add_to_whitelist(self, uid):
-        #if uid not in self.errors.keys():
-        #    return
-        #raise  # exception
+        if uid not in self.errors.keys():
+            print("Error: invalid UID, error object not found")
+            return
 
         # write error in whitelist
         with open(self.whitelist_file, "a") as file:
-            # json.dump(self.errors[uid], file)
             file.write(self.errors[uid].get_comp_id())
             file.write("\n")
 
         # delete error & check errors with whitelist again
-        # self.errors.pop(uid)
+        del self.errors[uid]
         # TODO: check errors with this error object alone to avoid having to check
         #  with the entire whitelist
         self.check_whitelist()
@@ -77,8 +75,8 @@ class LatexBuddy:
         detexed_file = tools.detex(self.file_to_check)
         aspell.run(self, detexed_file)
 
-        self.add_to_whitelist("111")
-        self.errors.pop("111")
+        self.add_to_whitelist("111")  # Test
+
         #languagetool.run(self, detexed_file)
         os.remove(detexed_file)
 
