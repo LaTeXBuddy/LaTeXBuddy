@@ -42,7 +42,6 @@ def save_output(out, buddy, file):
             suggestions,
             warning,
             "chktex_" + s_arr[1] + "_" + s_arr[5]
-            # TODO: add compare_id here, see error_class.py
         )
 
 

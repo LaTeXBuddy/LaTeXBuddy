@@ -22,16 +22,10 @@ class LatexBuddy:
     def add_error(self, error):
         self.errors[error.get_uid()] = error
 
-    # TODO: fix error_file creation
     def parse_to_json(self):
-        # if os.path.isfile(self.error_file):
-        #    os.remove(self.error_file)
-        for uid in self.errors:
-            self.parse_error(self.errors[uid])
-
-    def parse_error(self, error):
-        with open(self.error_file, "a") as file:
-            json.dump(error.__dict__, file, indent=4)
+        with open(self.error_file, "w+") as file:
+            for uid in self.errors:
+                json.dump(self.errors[uid].__dict__, file, indent=4)
 
     """
     should be working
@@ -53,11 +47,12 @@ class LatexBuddy:
 
     def add_to_whitelist(self, uid):
         if uid not in self.errors.keys():
-            print("Error: invalid UID, error object not found")
+            print("Error: invalid UID, error object with ID: " + uid
+                  + "not found and not added to whitelist")
             return
 
         # write error in whitelist
-        with open(self.whitelist_file, "a") as file:
+        with open(self.whitelist_file, "a+") as file:
             file.write(self.errors[uid].get_comp_id())
             file.write("\n")
 
@@ -77,8 +72,9 @@ class LatexBuddy:
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
         aspell.run(self, detexed_file)
-        # languagetool.run(self, detexed_file)  # TODO: languagetool has to implement compare_id
-        self.check_errors()
+        languagetool.run(self, detexed_file)
+
+        self.check_errors()  # TODO: Move to main
 
         # FOR TESTING ONLY
         """
