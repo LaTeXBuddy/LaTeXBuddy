@@ -28,4 +28,5 @@ def main():
         lang=args.language,
     )
     buddy.run_tools()
+    buddy.check_whitelist()
     buddy.parse_to_json()

@@ -13,38 +13,46 @@ import latexbuddy.tools as tools
 
 class LatexBuddy:
     def __init__(self, error_file, whitelist_file, file_to_check, lang):
-        self.errors = {}
-        self.error_file = error_file
-        self.whitelist_file = whitelist_file
-        self.file_to_check = file_to_check
-        self.lang = lang
+        self.errors = {}                        # all current errors
+        self.error_file = error_file            # file where the error should be saved
+        self.whitelist_file = whitelist_file    # file that represents the whitelist
+        self.file_to_check = file_to_check      # .tex file that is to be error checked
+        self.lang = lang                        # current language
 
+    """
+    Adds an error to the dict with UID as key and the error object as value
+    """
     def add_error(self, error):
         self.errors[error.get_uid()] = error
 
+    """
+    Writes all the current error objects into the error file
+    """
     def parse_to_json(self):
         with open(self.error_file, "w+") as file:
             for uid in self.errors:
                 json.dump(self.errors[uid].__dict__, file, indent=4)
 
     """
-    should be working
+    Checks the errors if any match an element in the whitelist and if so deletes it
     """
-
     def check_whitelist(self):
+        if not os.path.isfile(self.whitelist_file):
+            return  # if no whitelist yet, don't have to check
+
         with open(self.whitelist_file, "r") as file:
             whitelist = file.read().split("\n")
 
         for whitelist_element in whitelist:
-            keys = list(self.errors.keys())
-            for key in keys:
-                if self.errors[key].compare_with_other_comp_id(whitelist_element):
-                    del self.errors[key]
+            uids = list(self.errors.keys())
+            for uid in uids:
+                if self.errors[uid].compare_with_other_comp_id(whitelist_element):
+                    del self.errors[uid]
 
     """
-    should be working
+    Adds the error identified by the given UID to the whitelist, afterwards deletes all
+    other errors that are the same as the one just added
     """
-
     def add_to_whitelist(self, uid):
         if uid not in self.errors.keys():
             print("Error: invalid UID, error object with ID: " + uid
@@ -56,28 +64,32 @@ class LatexBuddy:
             file.write(self.errors[uid].get_comp_id())
             file.write("\n")
 
-        # delete error & check errors with whitelist again
+        # delete error and save comp_id for further check
+        compare_id = self.errors[uid].get_comp_id()
         del self.errors[uid]
-        # TODO: check errors with this error object alone to avoid having to check
-        #  with the entire whitelist
-        self.check_whitelist()
 
-    # TODO: implement rest
-    def check_errors(self):
-        self.check_whitelist()
-        # self.check_config()
-        # self.check_parameters()
+        # check if there are other errors equal to the one just added to the whitelist
+        uids = list(self.errors.keys())
+        for curr_uid in uids:
+            if self.errors[curr_uid].compare_with_other_comp_id(compare_id):
+                del self.errors[curr_uid]
+
+    # TODO: implement
+    def add_to_whitelist_manually(self):
+        return
 
     def run_tools(self):
+        # check_preprocessor
+        # check_config
+
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
         aspell.run(self, detexed_file)
         languagetool.run(self, detexed_file)
 
-        self.check_errors()  # TODO: Move to main
-
         # FOR TESTING ONLY
         """
+        self.check_whitelist()
         keys = list(self.errors.keys())
         for key in keys:
             self.add_to_whitelist(key)
