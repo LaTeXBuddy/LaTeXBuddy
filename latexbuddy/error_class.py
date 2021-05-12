@@ -31,7 +31,7 @@ class Error:
         self.length = length
         self.suggestions = suggestions
         self.warning = warning
-        self.compare_id = buddy.get_lang + "_" + compare_id
+        self.compare_id = buddy.get_lang() + "_" + compare_id
 
         self.uid = self.uid()
         buddy.add_error(self)
@@ -53,7 +53,7 @@ class Error:
         return self.uid
 
     def get_comp_id(self):
-        return self.buddy.get_lang + self.compare_id
+        return self.compare_id
 
     # Ignore for now
     """

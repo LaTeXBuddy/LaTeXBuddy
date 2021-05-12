@@ -1,5 +1,6 @@
 import json
 import os
+import pickle
 
 import latexbuddy.aspell as aspell
 import latexbuddy.chktex as chktex
@@ -29,9 +30,16 @@ class LatexBuddy:
     Writes all the current error objects into the error file
     """
     def parse_to_json(self):
+        items = list(self.errors.values())
         with open(self.error_file, "w+") as file:
-            for uid in self.errors:
+            file.write("[")
+            uids = list(self.errors.keys())
+            for uid in uids:
                 json.dump(self.errors[uid].__dict__, file, indent=4)
+                if not uid == uids[-1]:
+                    file.write(",")
+
+            file.write("]")
 
     """
     Checks the errors if any match an element in the whitelist and if so deletes it
@@ -82,10 +90,10 @@ class LatexBuddy:
         # check_preprocessor
         # check_config
 
-        chktex.run(self, self.file_to_check)
+        #chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
         aspell.run(self, detexed_file)
-        languagetool.run(self, detexed_file)
+        #languagetool.run(self, detexed_file)
 
         # FOR TESTING ONLY
         """
