@@ -11,7 +11,7 @@ class Aspell(Modules):
     # overriding abstract method to run aspell
     def run(self, buddy, file):
         import latexbuddy.aspell as aspell
-        
+
         aspell.run(buddy, file)
 
 
