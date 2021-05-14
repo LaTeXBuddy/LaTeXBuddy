@@ -11,7 +11,7 @@ parser.add_argument(
 parser.add_argument(
     "--whitelist",
     "-w",
-    default="whitelist.json",
+    default="whitelist.wlist",
     help="Location of the whitelist file.",
 )
 parser.add_argument(
@@ -28,4 +28,5 @@ def main():
         lang=args.language,
     )
     buddy.run_tools()
+    buddy.check_whitelist()
     buddy.parse_to_json()
