@@ -1,6 +1,5 @@
 import json
 import os
-import pickle
 
 import latexbuddy.aspell as aspell
 import latexbuddy.chktex as chktex
@@ -8,8 +7,7 @@ import latexbuddy.languagetool as languagetool
 import latexbuddy.tools as tools
 
 
-# TODO: rename this file to stop PyCharm throwing warnings
-# TODO: some comments
+# TODO: rename this file to stop PyCharm throwing warnings. ?
 
 
 class LatexBuddy:
