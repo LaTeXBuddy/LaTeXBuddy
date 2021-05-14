@@ -9,18 +9,18 @@ class Error:
 
     def __init__(
         self,
-        buddy,          # latexbuddy instance where the error is to be added
-        path,           # the path to the file
-        src,            # the src tool of the error <chktex/aspell/...>
-        error_type,     # <grammar/spelling/latex>
-        error_id,       # tool intern error id as integer
-        text,           # the error as text if possible
-        start,          # the starting character
-        length,         # the length
-        suggestions,    # suggestions to solve the error
-        warning,        # boolean. true if the error is a warning, only in tex checks
-        compare_id      # ID to compare two errors that are semantically equal, to be
-                        # implemented by each module TODO: make sure all modules do this
+        buddy,  # latexbuddy instance where the error is to be added
+        path,  # the path to the file
+        src,  # the src tool of the error <chktex/aspell/...>
+        error_type,  # <grammar/spelling/latex>
+        error_id,  # tool intern error id as integer
+        text,  # the error as text if possible
+        start,  # the starting character
+        length,  # the length
+        suggestions,  # suggestions to solve the error
+        warning,  # boolean. true if the error is a warning, only in tex checks
+        compare_id  # ID to compare two errors that are semantically equal, to be
+        # implemented by each module TODO: make sure all modules do this
     ):
         self.path = path
         self.src = src

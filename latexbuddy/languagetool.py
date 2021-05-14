@@ -146,7 +146,7 @@ class LanguageToolModule:
 
             error.Error(
                 self.buddy,
-                detex_file.removesuffix(".detexed"),
+                detex_file,
                 tool_name,
                 error_type,
                 match["rule"]["id"],

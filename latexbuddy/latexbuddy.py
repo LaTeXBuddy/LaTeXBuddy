@@ -14,21 +14,23 @@ import latexbuddy.tools as tools
 
 class LatexBuddy:
     def __init__(self, error_file, whitelist_file, file_to_check, lang):
-        self.errors = {}                        # all current errors
-        self.error_file = error_file            # file where the error should be saved
-        self.whitelist_file = whitelist_file    # file that represents the whitelist
-        self.file_to_check = file_to_check      # .tex file that is to be error checked
-        self.lang = lang                        # current language
+        self.errors = {}  # all current errors
+        self.error_file = error_file  # file where the error should be saved
+        self.whitelist_file = whitelist_file  # file that represents the whitelist
+        self.file_to_check = file_to_check  # .tex file that is to be error checked
+        self.lang = lang  # current language
 
     """
     Adds an error to the dict with UID as key and the error object as value
     """
+
     def add_error(self, error):
         self.errors[error.get_uid()] = error
 
     """
     Writes all the current error objects into the error file
     """
+
     def parse_to_json(self):
         items = list(self.errors.values())
         with open(self.error_file, "w+") as file:
@@ -44,6 +46,7 @@ class LatexBuddy:
     """
     Checks the errors if any match an element in the whitelist and if so deletes it
     """
+
     def check_whitelist(self):
         if not os.path.isfile(self.whitelist_file):
             return  # if no whitelist yet, don't have to check
@@ -61,10 +64,14 @@ class LatexBuddy:
     Adds the error identified by the given UID to the whitelist, afterwards deletes all
     other errors that are the same as the one just added
     """
+
     def add_to_whitelist(self, uid):
         if uid not in self.errors.keys():
-            print("Error: invalid UID, error object with ID: " + uid
-                  + "not found and not added to whitelist")
+            print(
+                "Error: invalid UID, error object with ID: "
+                + uid
+                + "not found and not added to whitelist"
+            )
             return
 
         # write error in whitelist
@@ -90,10 +97,10 @@ class LatexBuddy:
         # check_preprocessor
         # check_config
 
-        #chktex.run(self, self.file_to_check)
+        chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
         aspell.run(self, detexed_file)
-        #languagetool.run(self, detexed_file)
+        languagetool.run(self, detexed_file)
 
         # FOR TESTING ONLY
         """
