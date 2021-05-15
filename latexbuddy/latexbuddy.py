@@ -1,12 +1,12 @@
 import json
 import os
+
 from pathlib import Path
 
 import latexbuddy.aspell as aspell
 import latexbuddy.chktex as chktex
 import latexbuddy.languagetool as languagetool
 import latexbuddy.tools as tools
-
 
 # TODO: rename this file to stop PyCharm throwing warnings. ?
 from latexbuddy.output import render_html
@@ -120,11 +120,8 @@ class LatexBuddy:
         html_output_path = Path(self.error_file + ".html")
         html_output_path.write_text(
             render_html(
-                self.file_to_check,
-                Path(self.file_to_check).read_text(),
-                self.errors
+                self.file_to_check, Path(self.file_to_check).read_text(), self.errors
             )
         )
 
         print(f"File output to {html_output_path}")
-
