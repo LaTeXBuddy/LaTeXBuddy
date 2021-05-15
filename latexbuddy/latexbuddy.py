@@ -113,3 +113,16 @@ class LatexBuddy:
 
     def get_lang(self):
         return self.lang
+
+    def output_html(self):
+        html_output_path = Path(self.error_file + ".html")
+        html_output_path.write_text(
+            render_html(
+                self.file_to_check,
+                Path(self.file_to_check).read_text(),
+                self.errors
+            )
+        )
+
+        print(f"File output to {html_output_path}")
+

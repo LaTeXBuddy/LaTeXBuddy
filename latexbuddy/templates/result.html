@@ -6,19 +6,21 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Result</title>
-    <link rel="stylesheet" href="style.css" type="text/css">
+    <style>
+        {% include "style.css" %}
+    </style>
 </head>
 <body>
 <h1>LatexBuddy</h1>
 <h2>{{file_name}}</h2>
 <main>
     <div>
-        <pre><code>{{file_text|e}}</code></pre>
+        <pre><code>{{highlighted_file_text|safe}}</code></pre>
     </div>
     <div>
         <h3>Error list</h3>
         <ol>
-            {% for error in errors %}
+            {% for uid, error in errors.items() %}
             <li class="error">
                 <ul>
                     <li class="error-description">
@@ -27,8 +29,11 @@
                     <!-- <li class="line-number">
 
                      </li>-->
-                    <li class="error-id">
+                    {# <li class="error-id">
                         Error ID: {{error['error_id']}}
+                    </li> #}
+                    <li class="error-suggestions">
+                        Suggestions: {{", ".join(error['suggestions'])}}
                     </li>
                 </ul>
             </li>
