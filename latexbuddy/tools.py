@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import List, Tuple
 
 
-# example usage in aspell.py
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     """Executes a terminal command with subprocess.
 
@@ -164,9 +163,6 @@ def calculate_line_lengths(filename: str) -> List[int]:
     :param filename: path to the inspected file
     :return: list of line lengths with indices representing 1-based line numbers
     """
-    # file = open(filename, "r", encoding="utf-8", errors="ignore")
-    # lines = file.readlines()
-    # file.close()
 
     return list(
         map(lambda l: len(l), Path(filename).read_text().splitlines(keepends=True))

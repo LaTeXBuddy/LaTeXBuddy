@@ -29,10 +29,10 @@ class LatexBuddy:
         :param lang: language of the file
         """
         self.errors = {}  # all current errors
-        self.error_file = error_file  # file where the error should be saved
-        self.whitelist_file = whitelist_file  # file that represents the whitelist
-        self.file_to_check = file_to_check  # .tex file that is to be error checked
-        self.lang = lang  # current language
+        self.error_file = error_file
+        self.whitelist_file = whitelist_file
+        self.file_to_check = file_to_check
+        self.lang = lang
 
     def add_error(self, error: Error):
         """Adds the error to the errors dictionary.
@@ -48,8 +48,6 @@ class LatexBuddy:
     # TODO: maybe remove the method completely
     def parse_to_json(self):
         """Writes all the current error objects into the error file."""
-
-        items = list(self.errors.values())
 
         # TODO: extend JSONEncoder to get rid of such hacks
         with open(self.error_file, "w+") as file:
@@ -109,8 +107,8 @@ class LatexBuddy:
                 del self.errors[curr_uid]
 
     # TODO: implement
-    def add_to_whitelist_manually(self):
-        return
+    # def add_to_whitelist_manually(self):
+    #     return
 
     def run_tools(self):
         """Runs all tools in the LaTeXBuddy toolchain"""

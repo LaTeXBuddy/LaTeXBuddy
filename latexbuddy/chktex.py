@@ -1,7 +1,4 @@
 """This module defines the connection between LaTeXBuddy and ChkTeX."""
-import shlex
-import subprocess
-
 from typing import List
 
 import latexbuddy.error_class as error_class
@@ -32,7 +29,7 @@ def run(buddy, file: str):
     out = tools.execute(
         "chktex", '-f "%f:%l:%c:%d:%n:%s:%m:%k\n"', "-q", filename
     ).split("\n")
-    save_output(out, buddy, file)
+    save_output(out, buddy)
 
 
 def save_output(out: List[str], buddy):
@@ -41,7 +38,6 @@ def save_output(out: List[str], buddy):
 
     :param out: line-split output of the chktex command
     :param buddy: the LaTeXBuddy instance
-    :param file: the file path
     """
     for error in out:
         s_arr = error.split(":")

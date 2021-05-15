@@ -64,7 +64,6 @@ def format_errors(out: List[str], buddy, file: str):
     :param file: the file path
     """
     line_number = 1
-    line_lengths = tools.calculate_line_lengths(file)
     line_offsets = tools.calculate_line_offsets(file)
 
     for error in out:
@@ -93,8 +92,6 @@ def format_errors(out: List[str], buddy, file: str):
             print(f"Offset in line is {location}")
             print(f"Line {line_number} begins at character {line_offsets[line_number]}")
 
-            # TODO: do something with line_number
-            # location = str(tools.start_char(line_number, location, line_lengths))
             location = str(line_offsets[line_number] + location)
 
             print(f"Offset in file is {location}")

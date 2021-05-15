@@ -1,6 +1,4 @@
 """This module describes the LaTeXBuddy Error class and its properties."""
-import hashlib
-
 from typing import List
 
 
@@ -67,10 +65,6 @@ class Error:
         return "{}\0{}\0{}\0{}\0{}\0{}".format(
             self.path, self.src, self.error_type, self.error_id, self.start, self.length
         )
-
-    """
-    gets uid
-    """
 
     # TODO: why does this exist? Use the uid() method
     def get_uid(self) -> str:
