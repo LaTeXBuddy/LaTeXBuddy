@@ -10,6 +10,7 @@ import requests
 import latexbuddy.tools as tools
 
 
+# TODO: do we even need a separate class? Everything could be done with few functions.
 class LanguageToolLocalServer:
     """Defines an instance of a local LanguageTool deployment."""
 
@@ -28,6 +29,7 @@ class LanguageToolLocalServer:
 
         self.stop_local_server()
 
+    # TODO: why is that needed? use local access
     def get_server_port(self) -> int:
         """Returns the LanguageTool server port.
 
@@ -115,6 +117,7 @@ class LanguageToolLocalServer:
                 time.sleep(0.5)
 
         if not up:
+            # TODO: catch this so that the app still can work but without LT
             raise ConnectionError("Could not connect to local server.")
 
     def stop_local_server(self):

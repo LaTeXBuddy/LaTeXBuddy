@@ -14,16 +14,16 @@ class Error:
     def __init__(
         self,
         buddy,
-        path: str,
+        path: str,  # TODO: use pathlib.Path
         src: str,
         error_type: str,
         error_id: str,
         text: str,
-        start,
+        start,  # TODO: is this a string? please make this into an int
         length,
         suggestions: List[str],
-        warning: bool,
-        compare_id,
+        warning: bool,  # TODO: make this a string/enum with values error/warning/info
+        compare_id,  # TODO: make sure all modules implement this
     ):
         """Creates an error object.
 
@@ -55,6 +55,7 @@ class Error:
         # TODO: remove this; constructors shouldn't produce side effects
         buddy.add_error(self)
 
+    # TODO: can't we replace this with __str__()?
     def uid(self) -> str:
         """Calculates the UID of the Error object.
 
@@ -62,6 +63,7 @@ class Error:
 
         :return: the UID of the Error object
         """
+        # TODO: use f-strings
         return "{}\0{}\0{}\0{}\0{}\0{}".format(
             self.path, self.src, self.error_type, self.error_id, self.start, self.length
         )
@@ -70,6 +72,7 @@ class Error:
     gets uid
     """
 
+    # TODO: why does this exist? Use the uid() method
     def get_uid(self) -> str:
         """Returns the UID of the Error object.
 
@@ -79,6 +82,7 @@ class Error:
         """
         return self.uid
 
+    # TODO: why does this exist? Use direct access
     def get_comp_id(self) -> str:
         """Returns the comparing ID of the Error object.
 
@@ -93,6 +97,7 @@ class Error:
         return hashlib.md5(string_for_hash).hexdigest()
     """
 
+    # TODO: can't we replace this with __eq__()?
     def compare_with_other_comp_id(self, other_comp_id: str) -> bool:
         """Compares this Error to another using the comparing ID.
 

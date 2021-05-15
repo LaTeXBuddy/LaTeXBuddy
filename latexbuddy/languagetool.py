@@ -13,6 +13,7 @@ import latexbuddy.languagetool_local_server as lt_server
 import latexbuddy.tools as tools
 
 
+# TODO: define for all languages or let users choose it
 _LANGUAGES = {"de": "de-DE", "en": "en-GB"}
 
 
@@ -43,6 +44,7 @@ class Mode(Enum):
     REMOTE_SERVER = auto()
 
 
+# TODO: rewrite this using the Abstract Module API
 class LanguageToolModule:
     """Wraps the LanguageTool API calls to check files."""
 
@@ -116,6 +118,7 @@ class LanguageToolModule:
         else:
             self.lt_console_command.append("--autoDetect")
 
+    # TODO: use pathlib.Path
     def check_tex(self, detex_file: str):
         """Runs the LanguageTool checks on a file.
 
@@ -137,6 +140,8 @@ class LanguageToolModule:
 
         self.format_errors(raw_errors, detex_file)
 
+    # TODO: rename method; current name unclear
+    # TODO: use pathlib.Path
     def send_post_request(self, detex_file: str, server_url: str) -> Optional[Dict]:
         """Send a POST request to the LanguageTool server to check the text.
 
@@ -155,6 +160,7 @@ class LanguageToolModule:
         )
         return response.json()
 
+    # TODO: use pathlib.Path
     def execute_commandline_request(self, detex_file: str) -> Optional[Dict]:
         """Execute the LanguageTool command line app to check the text.
 
@@ -165,6 +171,7 @@ class LanguageToolModule:
         if detex_file is None:
             return None
 
+        # TODO: is that needed here? lt_console_command is already a list
         cmd = list(self.lt_console_command)
         cmd.append(detex_file)
 
@@ -172,6 +179,7 @@ class LanguageToolModule:
 
         return json.loads(output)
 
+    # TODO: use pathlib.Path
     def format_errors(self, raw_errors: Dict, detex_file: str):
         """Parses LanguageTool errors and converts them to LaTeXBuddy Error objects.
 

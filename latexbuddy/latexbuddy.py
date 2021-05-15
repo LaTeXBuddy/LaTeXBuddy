@@ -8,12 +8,16 @@ import latexbuddy.tools as tools
 
 from latexbuddy.error_class import Error
 
-# TODO: rename this file to stop PyCharm throwing warnings. ?
+
+# FIXME: rename this file (e.g. to 'buddy') because it's confusing
+
+# TODO: make this a singleton class with static methods
 
 
 class LatexBuddy:
     """The main instance of the applications that controls all the internal tools."""
 
+    # TODO: use pathlib.Path
     def __init__(
         self, error_file: str, whitelist_file: str, file_to_check: str, lang: str
     ):
@@ -40,10 +44,14 @@ class LatexBuddy:
 
         self.errors[error.get_uid()] = error
 
+    # TODO: rename method. Parse = read; this method writes
+    # TODO: maybe remove the method completely
     def parse_to_json(self):
         """Writes all the current error objects into the error file."""
 
         items = list(self.errors.values())
+
+        # TODO: extend JSONEncoder to get rid of such hacks
         with open(self.error_file, "w+") as file:
             file.write("[")
             uids = list(self.errors.keys())
@@ -136,8 +144,10 @@ class LatexBuddy:
             return
         """
 
+        # TODO: use tempfile.TemporaryFile instead
         os.remove(detexed_file)
 
+    # TODO: why does this exist? Use direct access
     def get_lang(self) -> str:
         """Returns the set LaTeXBuddy language.
 

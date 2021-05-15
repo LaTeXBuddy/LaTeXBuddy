@@ -3,9 +3,14 @@
 from abc import ABC, abstractmethod
 
 
+# TODO: rename this file to something shorter since it may be imported by others
+
+
+# FIXME: don't use plural in class names
 class Modules(ABC):
     """Abstract class that defines a simple LaTeXBuddy module."""
 
+    # FIXME: abstract method signature is different from implementations
     @abstractmethod
     def run(self):
         """Runs the checks for the respective module."""

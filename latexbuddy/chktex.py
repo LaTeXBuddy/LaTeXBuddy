@@ -8,10 +8,14 @@ import latexbuddy.error_class as error_class
 import latexbuddy.tools as tools
 
 
+# TODO: rewrite this using the Abstract Module API
+
+
 filename = ""
-line_lengths = []
+line_lengths = []  # TODO: please don't use global variables. Like, anywhere.
 
 
+# TODO: use pathlib.Path instead of strings
 def run(buddy, file: str):
     """Runs the chktex checks on a file and saves the results in a LaTeXBuddy
     instance.

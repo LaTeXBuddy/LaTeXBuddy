@@ -9,6 +9,9 @@ import latexbuddy.error_class as error_class
 import latexbuddy.tools as tools
 
 
+# TODO: rewrite this using the Abstract Module API
+
+# TODO: use pathlib.Path
 def run(buddy, file: str):
     """Runs the aspell checks on a file and saves the results in a LaTeXBuddy
     instance.
@@ -32,6 +35,7 @@ def run(buddy, file: str):
     format_errors(out, buddy, file)
 
 
+# TODO: possibly inline unnecessary method
 def check_language(language: str, langs: str):
     """Checks if a language is in a list of languages.
 
@@ -51,6 +55,7 @@ def check_language(language: str, langs: str):
         raise Exception("Spell check Failed")
 
 
+# TODO: use pathlib.Path
 def format_errors(out: List[str], buddy, file: str):
     """Parses Aspell errors and converts them to LaTeXBuddy Error objects.
 

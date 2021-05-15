@@ -112,6 +112,7 @@ def find_executable(name: str) -> str:
         return result.splitlines()[0]
 
 
+# TODO: use pathlib.Path instead of strings
 def detex(file_to_detex: str) -> str:
     """Strips TeX control structures from a file.
 

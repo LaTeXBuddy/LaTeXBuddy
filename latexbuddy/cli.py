@@ -14,6 +14,7 @@ parser.add_argument(
 parser.add_argument(
     "--whitelist",
     "-w",
+    # TODO: why a new file format? if it's JSON, use .json. If not, don't use one.
     default="whitelist.wlist",
     help="Location of the whitelist file.",
 )
