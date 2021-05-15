@@ -86,7 +86,7 @@ class LanguageToolLocalServer:
 
         self.get_server_run_command()
 
-        self.server_process = tools.execute_background_from_list(self.lt_server_command)
+        self.server_process = tools.execute_background(*self.lt_server_command)
 
         self.wait_till_server_up()
 

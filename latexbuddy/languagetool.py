@@ -175,7 +175,7 @@ class LanguageToolModule:
         cmd = list(self.lt_console_command)
         cmd.append(detex_file)
 
-        output = tools.execute_no_errors_from_list(cmd, encoding="utf_8")
+        output = tools.execute_no_errors(*cmd, encoding="utf_8")
 
         return json.loads(output)
 

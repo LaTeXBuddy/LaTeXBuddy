@@ -26,10 +26,6 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     return out.decode(encoding)
 
 
-def execute_from_list(cmd: List[str], encoding: str = "ISO8859-1") -> str:
-    return execute(*cmd, encoding=encoding)
-
-
 def execute_background(*cmd: str) -> subprocess.Popen:
     """Executes a terminal command in background.
 
@@ -46,10 +42,6 @@ def execute_background(*cmd: str) -> subprocess.Popen:
         preexec_fn=os.setsid,
     )
     return process
-
-
-def execute_background_from_list(cmd: List[str]) -> subprocess.Popen:
-    return execute_background(*cmd)
 
 
 def kill_background_process(process: subprocess.Popen):
@@ -76,10 +68,6 @@ def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
     )
     out, err_out = error_list.communicate()
     return out.decode(encoding)
-
-
-def execute_no_errors_from_list(cmd: List[str], encoding: str = "ISO8859-1") -> str:
-    return execute_no_errors(*cmd, encoding=encoding)
 
 
 def get_command_string(cmd: Tuple[str]) -> str:
