@@ -2,6 +2,7 @@ import importlib.util as importutil
 import sys
 import traceback
 
+from pathlib import Path
 from typing import Any
 
 
@@ -10,7 +11,7 @@ class ConfigOptionNotFoundError(Exception):
 
 
 class ConfigLoader:
-    def __init__(self, config_file_path: str):
+    def __init__(self, config_file_path: Path):
 
         if not config_file_path:
             raise AttributeError("Path of the config file must be specified!")
