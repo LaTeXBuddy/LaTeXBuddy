@@ -41,6 +41,7 @@ def save_output(out, buddy, file):
             length,
             suggestions,
             warning,
+            "chktex_" + s_arr[1] + "_" + s_arr[5],
         )
 
 
