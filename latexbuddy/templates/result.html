@@ -20,7 +20,7 @@
     <div>
         <h3>Error list</h3>
         <ol>
-            {% for uid, error in errors.items() %}
+            {% for error in errors %}
             <li class="error">
                 <ul>
                     <li class="error-description">
@@ -29,9 +29,9 @@
                     <!-- <li class="line-number">
 
                      </li>-->
-                    {# <li class="error-id">
-                        Error ID: {{error['error_id']}}
-                    </li> #}
+                    <li class="error-id">
+                        Character: {{error['start']}}
+                    </li>
                     <li class="error-suggestions">
                         Suggestions: {{", ".join(error['suggestions'])}}
                     </li>

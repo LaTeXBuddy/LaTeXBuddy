@@ -7,9 +7,9 @@ env = Environment(loader=PackageLoader("latexbuddy"))
 def render_html(file_name, file_text, errors):
     err_values = sorted(errors.values(), key=lambda e: int(e.start))
     template = env.get_template("result.html")
-    highlighted_file_text = highlight_code(file_text, errors)
+    # highlighted_file_text = highlight_code(file_text, errors)
     return template.render(
-        file_name=file_name, highlighted_file_text=highlighted_file_text, errors=errors
+        file_name=file_name, highlighted_file_text=file_text, errors=err_values
     )
 
 
