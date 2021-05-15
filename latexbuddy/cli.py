@@ -8,11 +8,7 @@ from latexbuddy.latexbuddy import LatexBuddy
 
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
 
-parser.add_argument(
-    "file",
-    type=Path,
-    help="File that will be processed."
-)
+parser.add_argument("file", type=Path, help="File that will be processed.")
 parser.add_argument(
     "--config",
     "-c",
