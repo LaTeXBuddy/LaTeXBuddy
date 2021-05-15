@@ -14,11 +14,12 @@ class ConfigOptionNotFoundError(Exception):
 class ConfigLoader:
     def __init__(self, cli_arguments: Namespace):
 
-        self.flags = self.__parse_flags(cli_arguments)
+        self.flags = ConfigLoader.__parse_flags(cli_arguments)
         self.configurations = {}
 
         if not cli_arguments.config:
             print("No configuration file specified. Using default values...")
+            return
 
         if cli_arguments.config.exists():
             self.load_configurations(cli_arguments.config)
@@ -28,8 +29,18 @@ class ConfigLoader:
                 file=sys.stderr,
             )
 
-    def __parse_flags(self, args: Namespace) -> Dict[str, Dict[str, Any]]:
-        return {"latexbuddy": vars(args)}
+    @staticmethod
+    def __parse_flags(args: Namespace) -> Dict[str, Dict[str, Any]]:
+        # filter out none-parameters
+        parsed = {"latexbuddy": {}}
+
+        args_dict = vars(args)
+
+        for key in args_dict:
+            if args_dict[key]:
+                parsed["latexbuddy"][key] = args_dict[key]
+
+        return parsed
 
     def load_configurations(self, config_file_path: Path) -> None:
 
