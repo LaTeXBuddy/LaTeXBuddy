@@ -125,22 +125,17 @@ class LatexBuddy:
         languagetool.run(self, detexed_file)
 
         # without abstractmodules
-        """"
-        chktex.run(self, self.file_to_check)
-        detexed_file = tools.detex(self.file_to_check)
-        aspell.run(self, detexed_file)
-        languagetool.run(self, detexed_file)
-        """
+        # chktex.run(self, self.file_to_check)
+        # detexed_file = tools.detex(self.file_to_check)
+        # aspell.run(self, detexed_file)
+        # languagetool.run(self, detexed_file)
 
         # FOR TESTING ONLY
-
-        """
-        self.check_whitelist()
-        keys = list(self.errors.keys())
-        for key in keys:
-            self.add_to_whitelist(key)
-            return
-        """
+        # self.check_whitelist()
+        # keys = list(self.errors.keys())
+        # for key in keys:
+        #     self.add_to_whitelist(key)
+        #     return
 
         # TODO: use tempfile.TemporaryFile instead
         os.remove(detexed_file)

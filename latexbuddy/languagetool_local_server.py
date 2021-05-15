@@ -19,14 +19,12 @@ class LanguageToolLocalServer:
     _SERVER_MAX_ATTEMPTS = 20
 
     def __init__(self):
-
         self.lt_path = None
         self.lt_server_command = None
         self.server_process = None
         self.port = None
 
     def __del__(self):
-
         self.stop_local_server()
 
     # TODO: why is that needed? use local access

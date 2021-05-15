@@ -85,11 +85,9 @@ class Error:
         return self.compare_id
 
     # Ignore for now
-    """
-    def get_hash(self, language):
-        string_for_hash = self.dict["error_type"] + self.dict["text"] + language
-        return hashlib.md5(string_for_hash).hexdigest()
-    """
+    # def get_hash(self, language):
+    #     string_for_hash = self.dict["error_type"] + self.dict["text"] + language
+    #     return hashlib.md5(string_for_hash).hexdigest()
 
     # TODO: can't we replace this with __eq__()?
     def compare_with_other_comp_id(self, other_comp_id: str) -> bool:
