@@ -1,38 +1,54 @@
 import argparse
+import pathlib
 
+from typing import Optional
+
+from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.latexbuddy import LatexBuddy
 
 
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
+
 parser.add_argument("file", help="File that will be processed.")
-parser.add_argument(
-    "--language", "-l", default="en", help="Target language of the file."
-)
 parser.add_argument(
     "--config",
     "-c",
-    default="config.py",
+    type=Optional[pathlib.Path],
+    default=None,
     help="Location of the config file.",
+)
+
+parser.add_argument(
+    "--language",
+    "-l",
+    type=Optional[str],
+    default=None,
+    help="Target language of the file.",
 )
 parser.add_argument(
     "--whitelist",
     "-w",
-    default="whitelist.wlist",
+    type=Optional[pathlib.Path],
+    default=None,
     help="Location of the whitelist file.",
 )
 parser.add_argument(
-    "--output", "-o", default="errors.json", help="Where to output the errors file."
+    "--output",
+    "-o",
+    type=Optional[pathlib.Path],
+    default=None,
+    help="Where to output the errors file.",
 )
 
 
 def main():
     args = parser.parse_args()
+
+    config_loader = ConfigLoader(args)
+
     buddy = LatexBuddy(
-        error_file=args.output,
-        config_file=args.config,
-        whitelist_file=args.whitelist,
+        config_loader=config_loader,
         file_to_check=args.file,
-        lang=args.language,
     )
     buddy.run_tools()
     buddy.check_whitelist()

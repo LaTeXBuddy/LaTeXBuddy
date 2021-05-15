@@ -2,8 +2,9 @@ import importlib.util as importutil
 import sys
 import traceback
 
+from argparse import Namespace
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 
 class ConfigOptionNotFoundError(Exception):
@@ -11,31 +12,33 @@ class ConfigOptionNotFoundError(Exception):
 
 
 class ConfigLoader:
-    def __init__(self, config_file_path: Path):
+    def __init__(self, cli_arguments: Namespace):
 
-        if not config_file_path:
-            raise AttributeError("Path of the config file must be specified!")
-
-        self.config_file_path = config_file_path
+        self.flags = self.__parse_flags(cli_arguments)
         self.configurations = {}
 
-        self.load_configurations()
+        if not cli_arguments.config:
+            print("No configuration file specified. Using default values...")
 
-    def load_configurations(self) -> None:
+        if cli_arguments.config.exists():
+            self.load_configurations(cli_arguments.config)
+        else:
+            print(
+                "Specified config file does not exist. Using default values...",
+                file=sys.stderr,
+            )
+
+    def __parse_flags(self, args: Namespace) -> Dict[str, Dict[str, Any]]:
+        return {"latexbuddy": vars(args)}
+
+    def load_configurations(self, config_file_path: Path) -> None:
 
         try:
-            spec = importutil.spec_from_file_location("config", self.config_file_path)
+            spec = importutil.spec_from_file_location("config", config_file_path)
             config = importutil.module_from_spec(spec)
             spec.loader.exec_module(config)
 
             self.configurations = config.modules
-
-        except FileNotFoundError:
-            print(
-                f"Could not find a config file at '{self.config_file_path}'. ",
-                f"Using default configurations...",
-                file=sys.stderr,
-            )
 
         except Exception as e:
 
@@ -47,15 +50,25 @@ class ConfigLoader:
             )
             traceback.print_exc(file=sys.stderr)
 
+    def __get_option(
+        self, config_dict: Dict, tool_name: str, key: str, error_indicator="config"
+    ) -> Any:
+
+        if tool_name not in config_dict or key not in config_dict[tool_name]:
+            raise ConfigOptionNotFoundError(
+                f"Tool: {tool_name}, key: {key} ({error_indicator})"
+            )
+
+        return config_dict[tool_name][key]
+
     def get_config_option(self, tool_name: str, key: str) -> Any:
 
-        if (
-            tool_name not in self.configurations
-            or key not in self.configurations[tool_name]
-        ):
-            raise ConfigOptionNotFoundError(f"Tool: {tool_name}, key: {key}")
+        try:
+            return self.__get_option(self.flags, tool_name, key, "flag")
+        except ConfigOptionNotFoundError:
+            pass
 
-        return self.configurations[tool_name][key]
+        return self.__get_option(self.configurations, tool_name, key)
 
     def get_config_option_or_default(
         self, tool_name: str, key: str, default_value: Any

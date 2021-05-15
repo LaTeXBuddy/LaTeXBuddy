@@ -1,22 +1,34 @@
 import json
 import os
 
+from pathlib import Path
+
 import latexbuddy.aspell as aspell
 import latexbuddy.chktex as chktex
 import latexbuddy.languagetool as languagetool
 import latexbuddy.tools as tools
+
+from latexbuddy.config_loader import ConfigLoader
 
 
 # TODO: rename this file to stop PyCharm throwing warnings. ?
 
 
 class LatexBuddy:
-    def __init__(self, error_file, whitelist_file, file_to_check, lang):
+    def __init__(self, config_loader: ConfigLoader, file_to_check: Path):
         self.errors = {}  # all current errors
-        self.error_file = error_file  # file where the error should be saved
-        self.whitelist_file = whitelist_file  # file that represents the whitelist
+        self.cfg = config_loader  # configuration
         self.file_to_check = file_to_check  # .tex file that is to be error checked
-        self.lang = lang  # current language
+
+        self.error_file = self.cfg.get_config_option_or_default(
+            "latexbuddy", "output", Path("errors.json")
+        )  # file where the error should be saved
+        self.whitelist_file = self.cfg.get_config_option_or_default(
+            "latexbuddy", "whitelist", Path("whitelist.wlist")
+        )  # file that represents the whitelist
+        self.lang = self.cfg.get_config_option_or_default(
+            "latexbuddy", "language", "en"
+        )  # current language
 
     """
     Adds an error to the dict with UID as key and the error object as value
