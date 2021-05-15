@@ -1,3 +1,5 @@
+"""This module defines the connection between LaTeXBuddy and GNU Aspell."""
+
 import shlex
 
 from pathlib import PurePath
@@ -7,6 +9,14 @@ import latexbuddy.tools as tools
 
 
 def run(buddy, file):
+    """Runs the aspell checks on a file and saves the results in a LaTeXBuddy
+    instance.
+
+    Requires aspell to be separately installed
+
+    :param buddy: the LaTeXBuddy instance
+    :param file: the file to run checks on
+    """
     language = buddy.get_lang()
     language = shlex.quote(language)
     langs = tools.execute("aspell", "dump dicts")
@@ -22,6 +32,14 @@ def run(buddy, file):
 
 
 def check_language(language, langs):
+    """Checks if a language is in a list of languages.
+
+    The list of languages is actually a string; e.g., the output of a terminal command.
+
+    :param language: language to search for
+    :param langs: language list to search in
+    :raises Exception: if the language is not on the list
+    """
     # error if language dict not installed
     if language not in langs:
         print(
@@ -33,6 +51,12 @@ def check_language(language, langs):
 
 
 def format_errors(out, buddy, file):
+    """Parses Aspell errors and converts them to LaTeXBuddy Error objects.
+
+    :param out: line-split output of the aspell command
+    :param buddy: the LaTeXBuddy instance
+    :param file: the file path
+    """
     line_number = 1
     line_lengths = tools.calculate_line_lengths(file)
     line_offsets = tools.calculate_line_offsets(file)

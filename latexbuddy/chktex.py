@@ -1,3 +1,4 @@
+"""This module defines the connection between LaTeXBuddy and ChkTeX."""
 import shlex
 import subprocess
 
@@ -10,6 +11,14 @@ line_lengths = []
 
 
 def run(buddy, file):
+    """Runs the chktex checks on a file and saves the results in a LaTeXBuddy
+    instance.
+
+    Requires chktex to be separately installed
+
+    :param buddy: the LaTeXBuddy instance
+    :param file: the file to run checks on
+    """
     global line_lengths
     global filename
     filename = file
@@ -21,6 +30,13 @@ def run(buddy, file):
 
 
 def save_output(out, buddy, file):
+    """Saves the output of ChkTeX as LaTeXBuddy Error objects inside the LaTeXBuddy
+    instance.
+
+    :param out: line-split output of the chktex command
+    :param buddy: the LaTeXBuddy instance
+    :param file: the file path
+    """
     for error in out:
         s_arr = error.split(":")
         if len(s_arr) < 5:

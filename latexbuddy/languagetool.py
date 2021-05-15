@@ -1,3 +1,5 @@
+"""This module defines the connection between LaTeXBuddy and LanguageTool."""
+
 import json
 
 from enum import Enum, auto
@@ -14,6 +16,14 @@ _LANGUAGES = {"de": "de-DE", "en": "en-GB"}
 
 
 def run(buddy, file):
+    """Runs the LanguageTool checks on a file and saves the results in a LaTeXBuddy
+    instance.
+
+    Requires LanguageTool server to be set up. Local or global servers can be used.
+
+    :param buddy: the LaTeXBuddy instance
+    :param file: the file to run checks on
+    """
     # TODO: get settings (mode etc.) from buddy instance (config needed)
 
     ltm = LanguageToolModule(buddy, language=_LANGUAGES[buddy.get_lang()])
@@ -21,12 +31,19 @@ def run(buddy, file):
 
 
 class Mode(Enum):
+    """Describes the LanguageTool mode.
+
+    LanguageTool can be run as a command line program, a local server, or a remote
+    server.
+    """
+
     COMMANDLINE = auto()
     LOCAL_SERVER = auto()
     REMOTE_SERVER = auto()
 
 
 class LanguageToolModule:
+    """Wraps the LanguageTool API calls to check files."""
 
     # TODO: implement whitelisting certain rules
     #       (exclude multiple whitespaces error by default)
@@ -37,7 +54,13 @@ class LanguageToolModule:
         remote_url: str = None,
         language: str = None,
     ):
+        """Creates a LanguageTool checking module.
 
+        :param buddy: the LaTeXBuddy instance
+        :param mode: LT mode
+        :param remote_url: URL of the LT server
+        :param language: language to run checks with
+        """
         self.buddy = buddy
         self.mode = mode
         self.language = language
@@ -58,7 +81,10 @@ class LanguageToolModule:
             self.find_languagetool_command()
 
     def find_languagetool_command(self):
+        """Searches for the LanguageTool command line app.
 
+        This method also checks if Java is installed.
+        """
         try:
             tools.find_executable("java")
         except FileNotFoundError:
@@ -90,6 +116,10 @@ class LanguageToolModule:
             self.lt_console_command.append("--autoDetect")
 
     def check_tex(self, detex_file: str):
+        """Runs the LanguageTool checks on a file.
+
+        :param detex_file: the detexed file to run checks on
+        """
 
         raw_errors = None
 
@@ -107,7 +137,12 @@ class LanguageToolModule:
         self.format_errors(raw_errors, detex_file)
 
     def send_post_request(self, detex_file: str, server_url: str):
+        """Send a POST request to the LanguageTool server to check the text.
 
+        :param detex_file: path to the detex'ed file
+        :param server_url: URL of the LanguageTool server
+        :return: server's response
+        """
         if detex_file is None:
             return None
 
@@ -120,6 +155,11 @@ class LanguageToolModule:
         return response.json()
 
     def execute_commandline_request(self, detex_file: str):
+        """Execute the LanguageTool command line app to check the text.
+
+        :param detex_file: path to the detex'ed file
+        :return: app's response
+        """
 
         if detex_file is None:
             return None
@@ -132,6 +172,11 @@ class LanguageToolModule:
         return json.loads(output)
 
     def format_errors(self, raw_errors, detex_file):
+        """Parses LanguageTool errors and converts them to LaTeXBuddy Error objects.
+
+        :param raw_errors: LanguageTool's error output
+        :param detex_file: path to the detex'ed file
+        """
 
         tool_name = raw_errors["software"]["name"]
 
@@ -161,7 +206,11 @@ class LanguageToolModule:
 
     @staticmethod
     def parse_error_replacements(json_replacements):
+        """Converts LanguageTool's replacements to LaTeXBuddy suggestions list.
 
+        :param json_replacements: list of LT's replacements for a particular word
+        :return: list of string values of said replacements
+        """
         output = []
 
         for entry in json_replacements:

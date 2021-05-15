@@ -1,3 +1,6 @@
+"""This module contains code for the command-line interface used to run and manage
+LaTeXBuddy."""
+
 import argparse
 
 from latexbuddy.latexbuddy import LatexBuddy
@@ -20,6 +23,7 @@ parser.add_argument(
 
 
 def main():
+    """Parses CLI arguments and launches the LaTeXBuddy instance."""
     args = parser.parse_args()
     buddy = LatexBuddy(
         error_file=args.output,

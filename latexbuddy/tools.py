@@ -1,3 +1,5 @@
+"""This module contains various utilitary tools."""
+
 import os
 import signal
 import subprocess
@@ -8,6 +10,14 @@ from typing import List, Tuple
 
 # example usage in aspell.py
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
+    """Executes a terminal command with subprocess.
+
+    See usage example in latexbuddy.aspell.
+
+    :param cmd: command name and arguments
+    :param encoding: output encoding
+    :return: command output
+    """
     command = get_command_string(cmd)
 
     error_list = subprocess.Popen(
@@ -22,6 +32,11 @@ def execute_from_list(cmd: List[str], encoding: str = "ISO8859-1") -> str:
 
 
 def execute_background(*cmd: str) -> subprocess.Popen:
+    """Executes a terminal command in background.
+
+    :param cmd: command name and arguments
+    :return: subprocess instance of the executed command
+    """
     command = get_command_string(cmd)
 
     process = subprocess.Popen(
@@ -39,10 +54,22 @@ def execute_background_from_list(cmd: List[str]) -> subprocess.Popen:
 
 
 def kill_background_process(process: subprocess.Popen):
+    """Kills previously opened background process.
+
+    For example, it can accept the return value of execute_background() as argument.
+
+    :param process: subprocess instance of the process
+    """
     os.killpg(os.getpgid(process.pid), signal.SIGTERM)
 
 
 def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
+    """Executes a terminal command while suppressing errors.
+
+    :param cmd: command name and arguments
+    :param encoding: output encoding
+    :return: command output
+    """
     command = get_command_string(cmd)
 
     error_list = subprocess.Popen(
@@ -57,6 +84,11 @@ def execute_no_errors_from_list(cmd: List[str], encoding: str = "ISO8859-1") -> 
 
 
 def get_command_string(cmd: Tuple[str]) -> str:
+    """Constructs a command string from a tuple of arguments.
+
+    :param cmd: tuple of command line arguments
+    :return: the command string
+    """
     command = ""
     for arg in cmd:
         command += arg + " "
@@ -64,6 +96,14 @@ def get_command_string(cmd: Tuple[str]) -> str:
 
 
 def find_executable(name: str) -> str:
+    """Finds path to an executable.
+
+    This uses 'which', i.e. the executable should at least be in user's $PATH
+
+    :param name: executable name
+    :return: path to the executable
+    :raises FileNotFoundError: if the executable couldn't be found
+    """
     result = execute("which", name)
 
     if not result or "not found" in result:
@@ -73,6 +113,14 @@ def find_executable(name: str) -> str:
 
 
 def detex(file_to_detex):
+    """Strips TeX control structures from a file.
+
+    Using OpenDetex, removes TeX code from the file, leaving only the content behind.
+
+    :param file_to_detex: path to the file to be detex'ed
+    :return: path to the detex'ed file
+    :raises FileNotFoundError: if detex executable couldn't be found
+    """
     try:
         find_executable("detex")
     except FileNotFoundError:
@@ -91,11 +139,14 @@ def detex(file_to_detex):
 
 
 def calculate_line_offsets(filename: str) -> list[int]:
-    """Calculates character offsets for each line in file.
+    """Calculates character offsets for each line in a file.
 
     Indices correspond to the line numbers. For example, if first 4 lines
     contain 100 characters (including line breaks),result[5] will be 100.
     result[0] = result[1] = 0
+
+    :param filename: path to the inspected file
+    :return: list of line offsets with indices representing 1-based line numbers
     """
     lines = Path(filename).read_text().splitlines(keepends=True)
     offset = 0
@@ -107,6 +158,11 @@ def calculate_line_offsets(filename: str) -> list[int]:
 
 
 def calculate_line_lengths(filename):
+    """Calculates line lengths for each line in a file.
+
+    :param filename: path to the inspected file
+    :return: list of line lengths with indices representing 1-based line numbers
+    """
     # file = open(filename, "r", encoding="utf-8", errors="ignore")
     # lines = file.readlines()
     # file.close()
@@ -117,6 +173,13 @@ def calculate_line_lengths(filename):
 
 
 def start_char(line, offset, line_lengths):
+    """Calculates the absolute char offset in a file from line-based char offset.
+
+    :param line: line number
+    :param offset: character offset in line
+    :param line_lengths: line lengths list, e.g. from calculate_line_lengths
+    :return: absolute character offset
+    """
     start = 0
     for line_length in line_lengths[:line]:
         start += line_length

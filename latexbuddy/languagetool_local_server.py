@@ -1,3 +1,5 @@
+"""This module provides a starter for LanguageTool local server."""
+
 import socket
 import time
 
@@ -9,6 +11,7 @@ import latexbuddy.tools as tools
 
 
 class LanguageToolLocalServer:
+    """Defines an instance of a local LanguageTool deployment."""
 
     _DEFAULT_PORT = 8081
     _SERVER_REQUEST_TIMEOUT = 1  # in seconds
@@ -26,10 +29,17 @@ class LanguageToolLocalServer:
         self.stop_local_server()
 
     def get_server_port(self):
+        """Returns the LanguageTool server port.
+
+        :return: LT server port
+        """
         return self.port
 
     def get_server_run_command(self):
+        """Searches for the LanguageTool server executable.
 
+        This method also checks if Java is installed.
+        """
         try:
             tools.find_executable("java")
         except FileNotFoundError:
@@ -63,6 +73,11 @@ class LanguageToolLocalServer:
         ]
 
     def start_local_server(self, port: int = _DEFAULT_PORT) -> int:
+        """Starts the LanguageTool server locally.
+
+        :param port: port for the server to losten at
+        :return: the actual port of the server
+        """
 
         if self.server_process:
             return -1
@@ -78,6 +93,10 @@ class LanguageToolLocalServer:
         return self.port
 
     def wait_till_server_up(self):
+        """Waits for the LanguageTool server to start.
+
+        :raises ConnectionError: if server didn't start
+        """
 
         attempts = 0
         up = False
@@ -99,6 +118,7 @@ class LanguageToolLocalServer:
             raise ConnectionError("Could not connect to local server.")
 
     def stop_local_server(self):
+        """Stops the local LanguageTool server process."""
 
         if not self.server_process:
             return
@@ -108,6 +128,11 @@ class LanguageToolLocalServer:
 
     @staticmethod
     def find_free_port(port: int = None) -> int:
+        """Tries to find a free port for the LanguageTool server.
+
+        :param port: port to check first
+        :return: a free port that the LanguageTool server can listen at
+        """
 
         if port and not LanguageToolLocalServer.is_port_in_use(port):
             return port
@@ -119,6 +144,11 @@ class LanguageToolLocalServer:
 
     @staticmethod
     def is_port_in_use(port: int) -> bool:
+        """Checks if a port is already in use.
+
+        :param port: port to check
+        :return: True if port already in use, False otherwise
+        """
 
         if not port:
             return True
