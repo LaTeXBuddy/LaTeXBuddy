@@ -4,6 +4,7 @@ import os
 import latexbuddy.abstractmodules as abstract
 import latexbuddy.tools as tools
 
+
 # TODO: rename this file to stop PyCharm throwing warnings. ?
 
 
