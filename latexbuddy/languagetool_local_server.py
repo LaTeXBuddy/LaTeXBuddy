@@ -28,7 +28,7 @@ class LanguageToolLocalServer:
 
         self.stop_local_server()
 
-    def get_server_port(self):
+    def get_server_port(self) -> int:
         """Returns the LanguageTool server port.
 
         :return: LT server port

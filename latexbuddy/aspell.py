@@ -3,12 +3,13 @@
 import shlex
 
 from pathlib import PurePath
+from typing import List
 
 import latexbuddy.error_class as error_class
 import latexbuddy.tools as tools
 
 
-def run(buddy, file):
+def run(buddy, file: str):
     """Runs the aspell checks on a file and saves the results in a LaTeXBuddy
     instance.
 
@@ -31,7 +32,7 @@ def run(buddy, file):
     format_errors(out, buddy, file)
 
 
-def check_language(language, langs):
+def check_language(language: str, langs: str):
     """Checks if a language is in a list of languages.
 
     The list of languages is actually a string; e.g., the output of a terminal command.
@@ -50,7 +51,7 @@ def check_language(language, langs):
         raise Exception("Spell check Failed")
 
 
-def format_errors(out, buddy, file):
+def format_errors(out: List[str], buddy, file: str):
     """Parses Aspell errors and converts them to LaTeXBuddy Error objects.
 
     :param out: line-split output of the aspell command

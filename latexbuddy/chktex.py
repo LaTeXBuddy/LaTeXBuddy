@@ -2,6 +2,8 @@
 import shlex
 import subprocess
 
+from typing import List
+
 import latexbuddy.error_class as error_class
 import latexbuddy.tools as tools
 
@@ -10,7 +12,7 @@ filename = ""
 line_lengths = []
 
 
-def run(buddy, file):
+def run(buddy, file: str):
     """Runs the chktex checks on a file and saves the results in a LaTeXBuddy
     instance.
 
@@ -29,7 +31,7 @@ def run(buddy, file):
     save_output(out, buddy, file)
 
 
-def save_output(out, buddy, file):
+def save_output(out: List[str], buddy):
     """Saves the output of ChkTeX as LaTeXBuddy Error objects inside the LaTeXBuddy
     instance.
 

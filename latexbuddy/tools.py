@@ -112,7 +112,7 @@ def find_executable(name: str) -> str:
         return result.splitlines()[0]
 
 
-def detex(file_to_detex):
+def detex(file_to_detex: str) -> str:
     """Strips TeX control structures from a file.
 
     Using OpenDetex, removes TeX code from the file, leaving only the content behind.
@@ -138,7 +138,7 @@ def detex(file_to_detex):
     return detexed_file
 
 
-def calculate_line_offsets(filename: str) -> list[int]:
+def calculate_line_offsets(filename: str) -> List[int]:
     """Calculates character offsets for each line in a file.
 
     Indices correspond to the line numbers. For example, if first 4 lines
@@ -157,7 +157,7 @@ def calculate_line_offsets(filename: str) -> list[int]:
     return result
 
 
-def calculate_line_lengths(filename):
+def calculate_line_lengths(filename: str) -> List[int]:
     """Calculates line lengths for each line in a file.
 
     :param filename: path to the inspected file
@@ -172,7 +172,7 @@ def calculate_line_lengths(filename):
     )
 
 
-def start_char(line, offset, line_lengths):
+def start_char(line: int, offset: int, line_lengths: List[int]) -> int:
     """Calculates the absolute char offset in a file from line-based char offset.
 
     :param line: line number

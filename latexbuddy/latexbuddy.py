@@ -6,6 +6,7 @@ import os
 import latexbuddy.abstractmodules as abstract
 import latexbuddy.tools as tools
 
+from latexbuddy.error_class import Error
 
 # TODO: rename this file to stop PyCharm throwing warnings. ?
 
@@ -13,7 +14,9 @@ import latexbuddy.tools as tools
 class LatexBuddy:
     """The main instance of the applications that controls all the internal tools."""
 
-    def __init__(self, error_file, whitelist_file, file_to_check, lang):
+    def __init__(
+        self, error_file: str, whitelist_file: str, file_to_check: str, lang: str
+    ):
         """Initializes the LaTeXBuddy instance.
 
         :param error_file: path to the file where the error should be saved
@@ -27,8 +30,7 @@ class LatexBuddy:
         self.file_to_check = file_to_check  # .tex file that is to be error checked
         self.lang = lang  # current language
 
-
-    def add_error(self, error):
+    def add_error(self, error: Error):
         """Adds the error to the errors dictionary.
 
         UID is used as key, the error object is used as value.
@@ -136,7 +138,7 @@ class LatexBuddy:
 
         os.remove(detexed_file)
 
-    def get_lang(self):
+    def get_lang(self) -> str:
         """Returns the set LaTeXBuddy language.
 
         :returns: language code

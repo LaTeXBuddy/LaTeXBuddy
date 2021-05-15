@@ -4,6 +4,7 @@ import json
 
 from enum import Enum, auto
 from pathlib import PurePath
+from typing import Dict, List, Optional
 
 import requests
 
@@ -15,7 +16,7 @@ import latexbuddy.tools as tools
 _LANGUAGES = {"de": "de-DE", "en": "en-GB"}
 
 
-def run(buddy, file):
+def run(buddy, file: str):
     """Runs the LanguageTool checks on a file and saves the results in a LaTeXBuddy
     instance.
 
@@ -136,7 +137,7 @@ class LanguageToolModule:
 
         self.format_errors(raw_errors, detex_file)
 
-    def send_post_request(self, detex_file: str, server_url: str):
+    def send_post_request(self, detex_file: str, server_url: str) -> Optional[Dict]:
         """Send a POST request to the LanguageTool server to check the text.
 
         :param detex_file: path to the detex'ed file
@@ -154,7 +155,7 @@ class LanguageToolModule:
         )
         return response.json()
 
-    def execute_commandline_request(self, detex_file: str):
+    def execute_commandline_request(self, detex_file: str) -> Optional[Dict]:
         """Execute the LanguageTool command line app to check the text.
 
         :param detex_file: path to the detex'ed file
@@ -171,7 +172,7 @@ class LanguageToolModule:
 
         return json.loads(output)
 
-    def format_errors(self, raw_errors, detex_file):
+    def format_errors(self, raw_errors: Dict, detex_file: str):
         """Parses LanguageTool errors and converts them to LaTeXBuddy Error objects.
 
         :param raw_errors: LanguageTool's error output
@@ -205,7 +206,7 @@ class LanguageToolModule:
             )
 
     @staticmethod
-    def parse_error_replacements(json_replacements):
+    def parse_error_replacements(json_replacements: List[Dict]) -> List[str]:
         """Converts LanguageTool's replacements to LaTeXBuddy suggestions list.
 
         :param json_replacements: list of LT's replacements for a particular word
