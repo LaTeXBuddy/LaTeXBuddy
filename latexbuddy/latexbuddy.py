@@ -1,9 +1,7 @@
 import json
 import os
 
-import latexbuddy.aspell as aspell
-import latexbuddy.chktex as chktex
-import latexbuddy.languagetool as languagetool
+import latexbuddy.abstractmodules as abstract
 import latexbuddy.tools as tools
 
 # TODO: rename this file to stop PyCharm throwing warnings. ?
@@ -94,12 +92,25 @@ class LatexBuddy:
         # check_preprocessor
         # check_config
 
+        # with abstractmodules
+        chktex = abstract.Chktex()
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
-        # aspell.run(self, detexed_file)
-        languagetool.run(self, self.file_to_check)
+        aspell = abstract.Aspell()
+        aspell.run(self, detexed_file)
+        languagetool = abstract.Languagetool()
+        languagetool.run(self, detexed_file)
+
+        # without abstractmodules
+        """"
+        chktex.run(self, self.file_to_check)
+        detexed_file = tools.detex(self.file_to_check)
+        aspell.run(self, detexed_file)
+        languagetool.run(self, detexed_file)
+        """
 
         # FOR TESTING ONLY
+
         """
         self.check_whitelist()
         keys = list(self.errors.keys())
