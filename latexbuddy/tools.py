@@ -2,6 +2,7 @@ import os
 import signal
 import subprocess
 
+from pathlib import Path
 from typing import List, Tuple
 
 
@@ -63,7 +64,6 @@ def get_command_string(cmd: Tuple[str]) -> str:
 
 
 def find_executable(name: str) -> str:
-
     result = execute("which", name)
 
     if not result or "not found" in result:
@@ -73,7 +73,6 @@ def find_executable(name: str) -> str:
 
 
 def detex(file_to_detex):
-
     try:
         find_executable("detex")
     except FileNotFoundError:
@@ -89,3 +88,36 @@ def detex(file_to_detex):
     detexed_file = file_to_detex + ".detexed"
     execute("detex", file_to_detex, " > ", detexed_file)
     return detexed_file
+
+
+def calculate_line_offsets(filename: str) -> list[int]:
+    """Calculates character offsets for each line in file.
+
+    Indices correspond to the line numbers. For example, if first 4 lines
+    contain 100 characters (including line breaks),result[5] will be 100.
+    result[0] = result[1] = 0
+    """
+    lines = Path(filename).read_text().splitlines(keepends=True)
+    offset = 0
+    result = [0]
+    for line in lines:
+        result.append(offset)
+        offset += len(line)
+    return result
+
+
+def calculate_line_lengths(filename):
+    # file = open(filename, "r", encoding="utf-8", errors="ignore")
+    # lines = file.readlines()
+    # file.close()
+
+    return list(
+        map(lambda l: len(l), Path(filename).read_text().splitlines(keepends=True))
+    )
+
+
+def start_char(line, offset, line_lengths):
+    start = 0
+    for line_length in line_lengths[:line]:
+        start += line_length
+    return start + offset

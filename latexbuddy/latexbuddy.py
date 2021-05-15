@@ -6,7 +6,6 @@ import latexbuddy.chktex as chktex
 import latexbuddy.languagetool as languagetool
 import latexbuddy.tools as tools
 
-
 # TODO: rename this file to stop PyCharm throwing warnings. ?
 
 
@@ -97,8 +96,8 @@ class LatexBuddy:
 
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
-        aspell.run(self, detexed_file)
-        languagetool.run(self, detexed_file)
+        # aspell.run(self, detexed_file)
+        languagetool.run(self, self.file_to_check)
 
         # FOR TESTING ONLY
         """

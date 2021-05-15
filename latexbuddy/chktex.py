@@ -10,9 +10,10 @@ line_lengths = []
 
 
 def run(buddy, file):
+    global line_lengths
     global filename
     filename = file
-    calculate_line_lengths()
+    line_lengths = tools.calculate_line_lengths(filename)
     out = tools.execute(
         "chktex", '-f "%f:%l:%c:%d:%n:%s:%m:%k\n"', "-q", filename
     ).split("\n")
@@ -28,7 +29,7 @@ def save_output(out, buddy, file):
         line = int(s_arr[2])
         offset = int(s_arr[3])
         length = int(s_arr[4])
-        start = start_char(line, offset)
+        start = tools.start_char(line, offset, line_lengths)
         suggestions = [s_arr[6]] if len(s_arr[6]) > 0 else []
         error_class.Error(
             buddy,
@@ -43,30 +44,3 @@ def save_output(out, buddy, file):
             warning,
             "chktex_" + s_arr[1] + "_" + s_arr[5],
         )
-
-
-"""
-Calculates the lengths of each line
-To later convert the line, offset to starting char
-"""
-
-
-def calculate_line_lengths():
-    file = open(filename, "r", encoding="utf-8", errors="ignore")
-    lines = file.readlines()
-    file.close()
-    for line in lines:
-        line_lengths.append(len(line))
-
-
-"""
-Calculates the starting character based on line and offset
-"""
-
-
-def start_char(line, offset):
-    start = 0
-    for i in range(len(line_lengths)):
-        if i < line:
-            start += line_lengths[i]
-    return start + offset

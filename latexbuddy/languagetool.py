@@ -1,6 +1,7 @@
 import json
 
 from enum import Enum, auto
+from pathlib import PurePath
 
 import requests
 
@@ -9,7 +10,7 @@ import latexbuddy.languagetool_local_server as lt_server
 import latexbuddy.tools as tools
 
 
-_LANGUAGES = {"de": "de-DE", "en": "en"}
+_LANGUAGES = {"de": "de-DE", "en": "en-GB"}
 
 
 def run(buddy, file):
@@ -32,7 +33,7 @@ class LanguageToolModule:
     def __init__(
         self,
         buddy,
-        mode: Mode = Mode.LOCAL_SERVER,
+        mode: Mode = Mode.COMMANDLINE,
         remote_url: str = None,
         language: str = None,
     ):
@@ -146,7 +147,7 @@ class LanguageToolModule:
 
             error.Error(
                 self.buddy,
-                detex_file,
+                PurePath(detex_file).stem,
                 tool_name,
                 error_type,
                 match["rule"]["id"],
