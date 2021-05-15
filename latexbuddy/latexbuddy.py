@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 import latexbuddy.aspell as aspell
 import latexbuddy.chktex as chktex
@@ -8,6 +9,7 @@ import latexbuddy.tools as tools
 
 
 # TODO: rename this file to stop PyCharm throwing warnings. ?
+from latexbuddy.output import render_html
 
 
 class LatexBuddy:
