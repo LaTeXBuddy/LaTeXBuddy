@@ -125,7 +125,7 @@ def detex(file_to_detex: str) -> str:
         find_executable("detex")
     except FileNotFoundError:
         print("Could not find a valid detex installation on your system.")
-        print("Please make sure you installed detex correctly and it is in your ")
+        print("Please make sure you installed detex correctly, and it is in your ")
         print("System's PATH.")
 
         print("For more information check the LaTeXBuddy manual.")

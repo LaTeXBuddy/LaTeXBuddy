@@ -47,12 +47,15 @@ def check_language(language: str, langs: str):
     """
     # error if language dict not installed
     if language not in langs:
+        print(f'Dictionary for language "{language}" not found')
+
+        # TODO: remove APT reference; it's not on every distro
+        print("Install dictionary via sudo apt install")
         print(
-            'Dict for language "'
-            + language
-            + '" not found - [Linux]Install via sudo apt install - check available dicts at https://ftp.gnu.org/gnu/aspell/dict/0index.html'
+            "check available dictionaries "
+            "at https://ftp.gnu.org/gnu/aspell/dict/0index.html"
         )
-        raise Exception("Spell check Failed")
+        raise Exception("Spell check Failed")  # TODO: write a better Exception message
 
 
 # TODO: use pathlib.Path
