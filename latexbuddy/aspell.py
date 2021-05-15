@@ -64,4 +64,5 @@ def save_errors(cleaned_errors, buddy, file):
             len(text),
             suggestions,
             False,
+            "spelling_" + text,
         )

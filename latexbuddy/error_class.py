@@ -1,32 +1,38 @@
+import hashlib
+
+
 class Error:
+
     """
     creates an error object
     """
 
     def __init__(
         self,
-        buddy,
-        path,
-        src,
-        error_type,
-        error_id,
-        text,
-        start,
-        length,
-        suggestions,
-        warning,
+        buddy,  # latexbuddy instance where the error is to be added
+        path,  # the path to the file
+        src,  # the src tool of the error <chktex/aspell/...>
+        error_type,  # <grammar/spelling/latex>
+        error_id,  # tool intern error id as integer
+        text,  # the error as text if possible
+        start,  # the starting character
+        length,  # the length
+        suggestions,  # suggestions to solve the error
+        warning,  # boolean. true if the error is a warning, only in tex checks
+        compare_id  # ID to compare two errors that are semantically equal, to be
+        # implemented by each module TODO: make sure all modules do this
     ):
-        self.path = path  # the path to the file
-        self.src = src  # the src tool of the error <chktex/aspell/...>
-        self.error_type = error_type  # <grammar/spelling/latex>
-        self.error_id = error_id  # tool intern error id as integer
-        self.text = text  # the error as text if possible
-        self.start = start  # the starting character
-        self.length = length  # the length
-        self.suggestions = suggestions  # suggestions to solve the error
-        self.warning = (
-            warning  # boolean. true if the error is a warning, only in tex checks
-        )
+        self.path = path
+        self.src = src
+        self.error_type = error_type
+        self.error_id = error_id
+        self.text = text
+        self.start = start
+        self.length = length
+        self.suggestions = suggestions
+        self.warning = warning
+        self.compare_id = buddy.get_lang() + "_" + compare_id
+
         self.uid = self.uid()
         buddy.add_error(self)
 
@@ -46,9 +52,15 @@ class Error:
     def get_uid(self):
         return self.uid
 
+    def get_comp_id(self):
+        return self.compare_id
 
-"""
-    def __eq__(self, other):
-        return self.src == other.src & self.error_type == other.error_typ & \
-               self.error_id == other.error_id & self.text == other.text
-"""
+    # Ignore for now
+    """
+    def get_hash(self, language):
+        string_for_hash = self.dict["error_type"] + self.dict["text"] + language
+        return hashlib.md5(string_for_hash).hexdigest()
+    """
+
+    def compare_with_other_comp_id(self, other_comp_id):
+        return self.compare_id == other_comp_id

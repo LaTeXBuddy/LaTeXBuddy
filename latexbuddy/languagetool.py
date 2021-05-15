@@ -155,6 +155,7 @@ class LanguageToolModule:
                 match["length"],
                 LanguageToolModule.parse_error_replacements(match["replacements"]),
                 False,
+                tool_name + "_" + match["rule"]["id"],
             )
 
     @staticmethod
