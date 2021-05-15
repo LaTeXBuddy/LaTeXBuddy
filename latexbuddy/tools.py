@@ -151,9 +151,11 @@ def calculate_line_lengths(filename: str) -> List[int]:
     :return: list of line lengths with indices representing 1-based line numbers
     """
 
-    return list(
-        map(lambda l: len(l), Path(filename).read_text().splitlines(keepends=True))
-    )
+    lines = Path(filename).read_text().splitlines(keepends=True)
+    result = [0]
+    for line in lines:
+        result.append(len(line))
+    return result
 
 
 def start_char(line: int, offset: int, line_lengths: List[int]) -> int:
