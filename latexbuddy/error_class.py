@@ -34,6 +34,8 @@ class Error:
         self.compare_id = buddy.get_lang() + "_" + compare_id
 
         self.uid = self.uid()
+
+        # TODO: remove this; constructors shouldn't produce side effects
         buddy.add_error(self)
 
     """
