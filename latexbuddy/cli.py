@@ -35,3 +35,4 @@ def main():
     buddy.run_tools()
     buddy.check_whitelist()
     buddy.parse_to_json()
+    buddy.output_html()
