@@ -69,6 +69,8 @@ def format_errors(out: List[str], buddy, file: str):
     line_number = 1
     line_offsets = tools.calculate_line_offsets(file)
 
+    linelength = tools.calculate_line_lengths(file)
+
     for error in out:
         if error.strip() == "":
             # this is a line separator
@@ -78,9 +80,9 @@ def format_errors(out: List[str], buddy, file: str):
 
 
         if error[0] in ("&", "#"):
-            print("XXXXXXXXXXX " + error[1:])
 
-
+            if error[-1].isdigit():
+                error += ": NoSuggestion";
 
             meta_str, suggestions_str = error[1:].strip().split(": ", 1)
 
@@ -101,7 +103,8 @@ def format_errors(out: List[str], buddy, file: str):
             #print(f"Offset in line is {location}")
             #print(f"Line {line_number} begins at character {line_offsets[line_number]}")
 
-            location = str(line_offsets[line_number] + location)
+            #location = str(line_offsets[line_number] + location)
+            location = tools.start_char(line_number, location, linelength)
 
             #print(f"Offset in file is {location}")
 

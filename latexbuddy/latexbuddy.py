@@ -116,6 +116,7 @@ class LatexBuddy:
         # check_config
 
         # with abstractmodules
+        formated_file = tools.format_input_file(self.file_to_check)
         chktex = abstract.Chktex()
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)

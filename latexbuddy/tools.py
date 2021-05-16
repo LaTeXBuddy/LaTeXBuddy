@@ -170,3 +170,15 @@ def start_char(line: int, offset: int, line_lengths: List[int]) -> int:
     for line_length in line_lengths[:line]:
         start += line_length
     return start + offset
+
+
+def format_input_file(file):
+    lines = Path(file).read_text().splitlines(keepends=True)
+    temp_file = Path('temp_file')
+    i = 1
+    text = ""
+    for line in lines:
+        text = text + str(i) + ":" + line
+        i = i + 1
+    temp_file.write_text(text)
+    return temp_file
