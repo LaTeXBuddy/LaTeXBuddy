@@ -3,10 +3,13 @@
 import json
 import os
 
+from pathlib import Path
+
 import latexbuddy.abstractmodules as abstract
 import latexbuddy.tools as tools
 
 from latexbuddy.error_class import Error
+from latexbuddy.output import render_html
 
 
 # FIXME: rename this file (e.g. to 'buddy') because it's confusing
@@ -117,6 +120,8 @@ class LatexBuddy:
 
         # with abstractmodules
         formated_file = tools.format_input_file(self.file_to_check)
+        detexed_formatted = tools.detex_path(formated_file)
+
         chktex = abstract.Chktex()
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)

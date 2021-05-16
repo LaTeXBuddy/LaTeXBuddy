@@ -4,7 +4,7 @@ import os
 import signal
 import subprocess
 
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import List, Tuple
 
 
@@ -125,6 +125,31 @@ def detex(file_to_detex: str) -> str:
     return detexed_file
 
 
+def detex_path(file_to_detex: Path) -> Path:
+    """Strips TeX control structures from a file.
+
+    Using OpenDetex, removes TeX code from the file, leaving only the content behind.
+
+    :param file_to_detex: path to the file to be detex'ed
+    :return: path to the detex'ed file
+    :raises FileNotFoundError: if detex executable couldn't be found
+    """
+    try:
+        find_executable("detex")
+    except FileNotFoundError:
+        print("Could not find a valid detex installation on your system.")
+        print("Please make sure you installed detex correctly, and it is in your ")
+        print("System's PATH.")
+
+        print("For more information check the LaTeXBuddy manual.")
+
+        raise FileNotFoundError("Unable to find detex installation!")
+
+    detexed_file = Path(PurePath(file_to_detex).with_suffix(".detexed"))
+    execute("detex", file_to_detex.resolve(), " > ", detexed_file.resolve())
+    return detexed_file.resolve()
+
+
 def calculate_line_offsets(filename: str) -> List[int]:
     """Calculates character offsets for each line in a file.
 
@@ -174,7 +199,7 @@ def start_char(line: int, offset: int, line_lengths: List[int]) -> int:
 
 def format_input_file(file):
     lines = Path(file).read_text().splitlines(keepends=True)
-    temp_file = Path('temp_file')
+    temp_file = Path("temp_file")
     i = 1
     text = ""
     for line in lines:
