@@ -90,7 +90,7 @@ def detex(file_to_detex):
     return detexed_file
 
 
-def calculate_line_offsets(filename: str) -> list[int]:
+def calculate_line_offsets(filename: str):
     """Calculates character offsets for each line in file.
 
     Indices correspond to the line numbers. For example, if first 4 lines

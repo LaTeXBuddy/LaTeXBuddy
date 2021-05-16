@@ -43,7 +43,13 @@ def format_errors(out, buddy, file):
             line_number += 1
             continue
 
+
+
         if error[0] in ("&", "#"):
+            print("XXXXXXXXXXX " + error[1:])
+
+
+
             meta_str, suggestions_str = error[1:].strip().split(": ", 1)
 
             # & original count offset
@@ -59,15 +65,15 @@ def format_errors(out, buddy, file):
             else:  # there are no suggestions
                 location = int(meta[1])
 
-            print(f"Word is {text}")
-            print(f"Offset in line is {location}")
-            print(f"Line {line_number} begins at character {line_offsets[line_number]}")
+            #print(f"Word is {text}")
+            #print(f"Offset in line is {location}")
+            #print(f"Line {line_number} begins at character {line_offsets[line_number]}")
 
             # TODO: do something with line_number
             # location = str(tools.start_char(line_number, location, line_lengths))
             location = str(line_offsets[line_number] + location)
 
-            print(f"Offset in file is {location}")
+            #print(f"Offset in file is {location}")
 
             error_class.Error(
                 buddy,
