@@ -1,68 +1,114 @@
+"""This module defines the connection between LaTeXBuddy and GNU Aspell."""
+
 import shlex
+
+from pathlib import PurePath
+from typing import List
 
 import latexbuddy.error_class as error_class
 import latexbuddy.tools as tools
 
 
-def run(buddy, file):
+# TODO: rewrite this using the Abstract Module API
+
+# TODO: use pathlib.Path
+def run(buddy, file: str):
+    """Runs the aspell checks on a file and saves the results in a LaTeXBuddy
+    instance.
+
+    Requires aspell to be separately installed
+
+    :param buddy: the LaTeXBuddy instance
+    :param file: the file to run checks on
+    """
     language = buddy.get_lang()
     language = shlex.quote(language)
     langs = tools.execute("aspell", "dump dicts")
     check_language(language, langs)
     # execute aspell on given file and collect output
-    error_list = tools.execute("aspell -a --lang=" + language + " < " + file)
+    error_list = tools.execute(f"cat {file} | aspell -a --lang={language}")
 
     # format aspell output
-    out = error_list[70:]
-    out = out.split("\n")
+    out = error_list.splitlines()[1:]  # the first line specifies aspell version
 
     # cleanup error list
-    save_errors(format_errors(out), buddy, file)
+    format_errors(out, buddy, file)
 
 
-def check_language(language, langs):
+# TODO: possibly inline unnecessary method
+def check_language(language: str, langs: str):
+    """Checks if a language is in a list of languages.
+
+    The list of languages is actually a string; e.g., the output of a terminal command.
+
+    :param language: language to search for
+    :param langs: language list to search in
+    :raises Exception: if the language is not on the list
+    """
     # error if language dict not installed
     if language not in langs:
+        print(f'Dictionary for language "{language}" not found')
+
+        # TODO: remove APT reference; it's not on every distro
+        print("Install dictionary via sudo apt install")
         print(
-            'Dict for language "'
-            + language
-            + '" not found - [Linux]Install via sudo apt install - check available dicts at https://ftp.gnu.org/gnu/aspell/dict/0index.html'
+            "check available dictionaries "
+            "at https://ftp.gnu.org/gnu/aspell/dict/0index.html"
         )
-        raise Exception("Spell check Failed")
+        raise Exception("Spell check Failed")  # TODO: write a better Exception message
 
 
-def format_errors(out):
-    cleaned_errors = []
+# TODO: use pathlib.Path
+def format_errors(out: List[str], buddy, file: str):
+    """Parses Aspell errors and converts them to LaTeXBuddy Error objects.
+
+    :param out: line-split output of the aspell command
+    :param buddy: the LaTeXBuddy instance
+    :param file: the file path
+    """
+    line_number = 1
+    line_offsets = tools.calculate_line_offsets(file)
+
     for error in out:
-        if error == "":
-            error = "x"
-        if error[0] == "&":
-            cleaned_errors.append(error.replace("&", "").replace("\n", "").strip())
-        if error[0] == "#":
-            cleaned_errors.append(error.replace("#", "").replace("\n", "").strip())
-    return cleaned_errors
+        if error.strip() == "":
+            # this is a line separator
+            line_number += 1
+            continue
 
+        if error[0] in ("&", "#"):
+            meta_str, suggestions_str = error[1:].strip().split(": ", 1)
 
-def save_errors(cleaned_errors, buddy, file):
-    # create error instances
-    for error in cleaned_errors:
-        split = error.split(":")
+            # & original count offset
+            # # original
+            meta = meta_str.split(" ")
 
-        temp = split[0].split(" ")
-        location = temp[2] if len(temp) > 2 else temp[1]
-        text = temp[0]
-        suggestions = split[1].strip().split(",") if len(split) > 1 else []
+            text = meta[0]
+            suggestions = []
 
-        error_class.Error(
-            buddy,
-            file.removesuffix(".detexed"),
-            "aspell",
-            "spelling",
-            "0",
-            text,
-            location,
-            len(text),
-            suggestions,
-            False,
-            "spelling_" + text,
-        )
+            if error[0] == "&":  # there are suggestions
+                location = int(meta[2])  # meta[1] is suggestion count
+                suggestions = suggestions_str.split(", ")
+            else:  # there are no suggestions
+                location = int(meta[1])
+
+            print(f"Word is {text}")
+            print(f"Offset in line is {location}")
+            print(f"Line {line_number} begins at character {line_offsets[line_number]}")
+
+            location = str(line_offsets[line_number] + location)
+
+            print(f"Offset in file is {location}")
+
+            error_class.Error(
+                buddy,
+                PurePath(file).stem,
+                "aspell",
+                "spelling",
+                "0",
+                text,
+                location,
+                len(text),
+                suggestions,
+                False,
+                "spelling_" + text,
+            )

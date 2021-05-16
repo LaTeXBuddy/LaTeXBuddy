@@ -1,38 +1,55 @@
+"""This module descibes the main LaTeXBuddy instance class."""
+
 import json
 import os
 
-from pathlib import Path
-
-import latexbuddy.aspell as aspell
-import latexbuddy.chktex as chktex
-import latexbuddy.languagetool as languagetool
+import latexbuddy.abstractmodules as abstract
 import latexbuddy.tools as tools
 
-# TODO: rename this file to stop PyCharm throwing warnings. ?
-from latexbuddy.output import render_html
+from latexbuddy.error_class import Error
+
+
+# FIXME: rename this file (e.g. to 'buddy') because it's confusing
+
+# TODO: make this a singleton class with static methods
 
 
 class LatexBuddy:
-    def __init__(self, error_file, whitelist_file, file_to_check, lang):
+    """The main instance of the applications that controls all the internal tools."""
+
+    # TODO: use pathlib.Path
+    def __init__(
+        self, error_file: str, whitelist_file: str, file_to_check: str, lang: str
+    ):
+        """Initializes the LaTeXBuddy instance.
+
+        :param error_file: path to the file where the error should be saved
+        :param whitelist_file: path to the whitelist file
+        :param file_to_check: file that will be checked
+        :param lang: language of the file
+        """
         self.errors = {}  # all current errors
-        self.error_file = error_file  # file where the error should be saved
-        self.whitelist_file = whitelist_file  # file that represents the whitelist
-        self.file_to_check = file_to_check  # .tex file that is to be error checked
-        self.lang = lang  # current language
+        self.error_file = error_file
+        self.whitelist_file = whitelist_file
+        self.file_to_check = file_to_check
+        self.lang = lang
 
-    """
-    Adds an error to the dict with UID as key and the error object as value
-    """
+    def add_error(self, error: Error):
+        """Adds the error to the errors dictionary.
 
-    def add_error(self, error):
+        UID is used as key, the error object is used as value.
+
+        :param error: error to add to the dictionary
+        """
+
         self.errors[error.get_uid()] = error
 
-    """
-    Writes all the current error objects into the error file
-    """
-
+    # TODO: rename method. Parse = read; this method writes
+    # TODO: maybe remove the method completely
     def parse_to_json(self):
-        items = list(self.errors.values())
+        """Writes all the current error objects into the error file."""
+
+        # TODO: extend JSONEncoder to get rid of such hacks
         with open(self.error_file, "w+") as file:
             file.write("[")
             uids = list(self.errors.keys())
@@ -43,11 +60,8 @@ class LatexBuddy:
 
             file.write("]")
 
-    """
-    Checks the errors if any match an element in the whitelist and if so deletes it
-    """
-
     def check_whitelist(self):
+        """Remove errors that are whitelisted."""
         if not os.path.isfile(self.whitelist_file):
             return  # if no whitelist yet, don't have to check
 
@@ -60,12 +74,15 @@ class LatexBuddy:
                 if self.errors[uid].compare_with_other_comp_id(whitelist_element):
                     del self.errors[uid]
 
-    """
-    Adds the error identified by the given UID to the whitelist, afterwards deletes all
-    other errors that are the same as the one just added
-    """
-
     def add_to_whitelist(self, uid):
+        """Adds the error identified by the given UID to the whitelist
+
+        Afterwards this method deletes all other errors that are the same as the one
+        just whitelisted.
+
+        :param uid: the UID of the error to be deleted
+        """
+
         if uid not in self.errors.keys():
             print(
                 "Error: invalid UID, error object with ID: "
@@ -90,30 +107,45 @@ class LatexBuddy:
                 del self.errors[curr_uid]
 
     # TODO: implement
-    def add_to_whitelist_manually(self):
-        return
+    # def add_to_whitelist_manually(self):
+    #     return
 
     def run_tools(self):
+        """Runs all tools in the LaTeXBuddy toolchain"""
         # check_preprocessor
         # check_config
 
+        # with abstractmodules
+        chktex = abstract.Chktex()
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
+        aspell = abstract.Aspell()
         aspell.run(self, detexed_file)
+        languagetool = abstract.Languagetool()
         languagetool.run(self, detexed_file)
 
-        # FOR TESTING ONLY
-        """
-        self.check_whitelist()
-        keys = list(self.errors.keys())
-        for key in keys:
-            self.add_to_whitelist(key)
-            return
-        """
+        # without abstractmodules
+        # chktex.run(self, self.file_to_check)
+        # detexed_file = tools.detex(self.file_to_check)
+        # aspell.run(self, detexed_file)
+        # languagetool.run(self, detexed_file)
 
+        # FOR TESTING ONLY
+        # self.check_whitelist()
+        # keys = list(self.errors.keys())
+        # for key in keys:
+        #     self.add_to_whitelist(key)
+        #     return
+
+        # TODO: use tempfile.TemporaryFile instead
         os.remove(detexed_file)
 
-    def get_lang(self):
+    # TODO: why does this exist? Use direct access
+    def get_lang(self) -> str:
+        """Returns the set LaTeXBuddy language.
+
+        :returns: language code
+        """
         return self.lang
 
     def output_html(self):
