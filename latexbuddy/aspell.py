@@ -1,12 +1,26 @@
+"""This module defines the connection between LaTeXBuddy and GNU Aspell."""
+
 import shlex
 
 from pathlib import PurePath
+from typing import List
 
 import latexbuddy.error_class as error_class
 import latexbuddy.tools as tools
 
 
-def run(buddy, file):
+# TODO: rewrite this using the Abstract Module API
+
+# TODO: use pathlib.Path
+def run(buddy, file: str):
+    """Runs the aspell checks on a file and saves the results in a LaTeXBuddy
+    instance.
+
+    Requires aspell to be separately installed
+
+    :param buddy: the LaTeXBuddy instance
+    :param file: the file to run checks on
+    """
     language = buddy.get_lang()
     language = shlex.quote(language)
     langs = tools.execute("aspell", "dump dicts")
@@ -21,20 +35,38 @@ def run(buddy, file):
     format_errors(out, buddy, file)
 
 
-def check_language(language, langs):
+# TODO: possibly inline unnecessary method
+def check_language(language: str, langs: str):
+    """Checks if a language is in a list of languages.
+
+    The list of languages is actually a string; e.g., the output of a terminal command.
+
+    :param language: language to search for
+    :param langs: language list to search in
+    :raises Exception: if the language is not on the list
+    """
     # error if language dict not installed
     if language not in langs:
+        print(f'Dictionary for language "{language}" not found')
+
+        # TODO: remove APT reference; it's not on every distro
+        print("Install dictionary via sudo apt install")
         print(
-            'Dict for language "'
-            + language
-            + '" not found - [Linux]Install via sudo apt install - check available dicts at https://ftp.gnu.org/gnu/aspell/dict/0index.html'
+            "check available dictionaries "
+            "at https://ftp.gnu.org/gnu/aspell/dict/0index.html"
         )
-        raise Exception("Spell check Failed")
+        raise Exception("Spell check Failed")  # TODO: write a better Exception message
 
 
-def format_errors(out, buddy, file):
+# TODO: use pathlib.Path
+def format_errors(out: List[str], buddy, file: str):
+    """Parses Aspell errors and converts them to LaTeXBuddy Error objects.
+
+    :param out: line-split output of the aspell command
+    :param buddy: the LaTeXBuddy instance
+    :param file: the file path
+    """
     line_number = 1
-    line_lengths = tools.calculate_line_lengths(file)
     line_offsets = tools.calculate_line_offsets(file)
 
     for error in out:
@@ -69,8 +101,6 @@ def format_errors(out, buddy, file):
             #print(f"Offset in line is {location}")
             #print(f"Line {line_number} begins at character {line_offsets[line_number]}")
 
-            # TODO: do something with line_number
-            # location = str(tools.start_char(line_number, location, line_lengths))
             location = str(line_offsets[line_number] + location)
 
             #print(f"Offset in file is {location}")
