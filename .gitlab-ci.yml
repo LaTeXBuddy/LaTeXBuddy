@@ -1,7 +1,12 @@
 image: python:latest
 
 variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
     SRC_DIR: "$CI_PROJECT_DIR/latexbuddy"
+
+cache:
+    paths:
+        - .cache/pip
 
 before_script:
     - python --version
