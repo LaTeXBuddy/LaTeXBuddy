@@ -19,9 +19,15 @@ isort:
     script:
         - pip install isort
         - isort --check --diff "$SRC_DIR"
+    only:
+        - master
+        - merge_requests
 
 black:
     stage: Lint
     script:
         - pip install black
         - black --check --diff "$SRC_DIR"
+    only:
+        - master
+        - merge_requests
