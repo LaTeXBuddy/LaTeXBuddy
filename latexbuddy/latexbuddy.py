@@ -125,7 +125,7 @@ class LatexBuddy:
         aspell = abstract.Aspell()
         aspell.run(self, detexed_file)
         languagetool = abstract.Languagetool()
-        languagetool.run(self, detexed_file)
+        languagetool.run(self, Path(detexed_file))
 
         # without abstractmodules
         # chktex.run(self, self.file_to_check)

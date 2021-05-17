@@ -195,11 +195,16 @@ class LanguageToolModule:
         # cloning list to in order to append the file name
         # w/o changing lt_console_command
         cmd = list(self.lt_console_command)
-        cmd.append(detex_file.name)
+        cmd.append(str(detex_file))
 
         output = tools.execute_no_errors(*cmd, encoding="utf_8")
 
-        return json.loads(output)
+        try:
+            json_output = json.loads(output)
+        except json.decoder.JSONDecodeError:
+            json_output = json.loads("{}")
+
+        return json_output
 
     def format_errors(self, raw_errors: Dict, detex_file: Path):
         """Parses LanguageTool errors and converts them to LaTeXBuddy Error objects.
@@ -207,6 +212,9 @@ class LanguageToolModule:
         :param raw_errors: LanguageTool's error output
         :param detex_file: path to the detex'ed file
         """
+
+        if len(raw_errors) == 0:
+            return
 
         tool_name = raw_errors["software"]["name"]
 
