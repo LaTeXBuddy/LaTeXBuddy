@@ -38,9 +38,8 @@ black:
     before_script:
         - pip install poetry
     script:
-        - poetry export -o requirements.txt
-        - pip install -r requirements.txt
-        - python -m compileall ./latexbuddy/
+        - poetry install
+        - poetry run latexbuddy --help
     only:
         - master
         - merge_requests
