@@ -177,7 +177,9 @@ class LatexBuddy:
         html_output_path = Path(self.error_file + ".html")
         html_output_path.write_text(
             render_html(
-                self.file_to_check, Path(self.file_to_check).read_text(), self.errors
+                str(self.file_to_check),
+                self.file_to_check.read_text(),
+                self.errors,
             )
         )
 

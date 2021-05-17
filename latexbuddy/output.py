@@ -1,41 +1,39 @@
+from typing import Dict
+
 from jinja2 import Environment, PackageLoader
+
+from latexbuddy.error_class import Error
 
 
 env = Environment(loader=PackageLoader("latexbuddy"))
 
 
-def error_key(err):
+def error_key(err: Error) -> int:
+    """Returns a number for each error to be able to sort them.
+
+    This puts YaLaFi's errors on top, followed by errors without location.
+
+    :param err: error object
+    :return: error's "rating" for sorting
+    """
     if err.src.lower() == "yalafi":
-        return -2
+        return -3
     if not err.start:
+        return -2
+    if not isinstance(err.start, tuple):
         return -1
-    if isinstance(err.start, tuple):
-        return err.start[0]
 
-    return err.start
+    return err.start[0]
 
 
-def render_html(file_name, file_text, errors):
+def render_html(file_name: str, file_text: str, errors: Dict[str, Error]) -> str:
+    """Renders an HTML page based on file contents and discovered errors.
+
+    :param file_name: file name
+    :param file_text: contents of the file
+    :param errors: dictionary of errors returned from latexbuddy
+    :return: generated HTML
+    """
     err_values = sorted(errors.values(), key=error_key)
     template = env.get_template("result.html")
-    # highlighted_file_text = highlight_code(file_text, errors)
-    return template.render(
-        file_name=file_name, highlighted_file_text=file_text, errors=err_values
-    )
-
-
-def highlight_code(file_text, errors):
-    # offset = 0
-    # for error in sorted(errors.values(), key=lambda e: int(e.start)):
-    #     start_index = int(error.start) + offset
-    #     end_index = start_index + int(error.length)
-    #     file_text = (
-    #         file_text[:start_index]
-    #         + "<u>"
-    #         + file_text[start_index:end_index]
-    #         + "</u>"
-    #         + file_text[end_index:]
-    #     )
-    #     offset += len("<u></u>")
-
-    return file_text
+    return template.render(file_name=file_name, file_text=file_text, errors=err_values)
