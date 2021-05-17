@@ -7,7 +7,6 @@ from pathlib import Path
 
 import latexbuddy.aspell as aspell
 import latexbuddy.chktex as chktex
-import latexbuddy.languagetool as languagetool
 import latexbuddy.tools as tools
 
 from latexbuddy.config_loader import ConfigLoader
@@ -127,6 +126,10 @@ class LatexBuddy:
 
     def run_tools(self):
         """Runs all tools in the LaTeXBuddy toolchain"""
+
+        # importing this here to avoid circular import error
+        import latexbuddy.languagetool as languagetool
+
         # check_preprocessor
         # check_config
 
@@ -150,10 +153,22 @@ class LatexBuddy:
                 )
             )
 
+        # without abstract module
         chktex.run(self, self.file_to_check)
         aspell.run(self, detexed_file)
-        languagetool.run(self, detexed_file)
+        # languagetool.run(self, detexed_file)
         chktex.run(self, self.file_to_check)
+
+        # with abstract module
+        modules = [
+            languagetool.LanguageToolModule(),
+        ]
+
+        for module in modules:
+            module.run_module(self, detexed_file)
+
+            # TODO: add this line after removing the adding feature from error_class.py
+            # module.save_errors()
 
         # FOR TESTING ONLY
         # self.check_whitelist()

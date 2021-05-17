@@ -4,6 +4,7 @@ import json
 import socket
 import sys
 import time
+import traceback
 
 from contextlib import closing
 from enum import Enum
@@ -12,39 +13,11 @@ from typing import Dict, List, Optional
 
 import requests
 
-import latexbuddy.error_class as error
 import latexbuddy.tools as tools
+import latexbuddy.latexbuddy as ltb
 
-
-_LANGUAGE_MAP = {"de": "de-DE", "en": "en-GB"}
-
-
-def run(buddy, file: Path):
-    """Runs the LanguageTool checks on a file and saves the results in a LaTeXBuddy
-    instance.
-
-    Requires LanguageTool server to be set up. Local or global servers can be used.
-
-    :param buddy: the LaTeXBuddy instance
-    :param file: the file to run checks on
-    """
-    # TODO: get settings (mode etc.) from buddy instance (config needed)
-
-    cfg_mode = buddy.cfg.get_config_option_or_default(
-        "languagetool", "mode", "COMMANDLINE"
-    )
-    try:
-        cfg_mode = Mode(cfg_mode)
-    except ValueError:
-        cfg_mode = Mode.COMMANDLINE
-
-    try:
-        ltm = LanguageToolModule(
-            buddy, language=_LANGUAGE_MAP[buddy.lang], mode=cfg_mode
-        )
-        ltm.check_tex(file)
-    except ConnectionError as e:
-        print("LanguageTool server: " + str(e), file=sys.stderr)
+from latexbuddy.abs_module import Module
+from latexbuddy.error_class import Error
 
 
 class Mode(Enum):
@@ -59,44 +32,90 @@ class Mode(Enum):
     REMOTE_SERVER = "REMOTE_SERVER"
 
 
-# TODO: rewrite this using the Abstract Module API
-class LanguageToolModule:
+class LanguageToolModule(Module):
     """Wraps the LanguageTool API calls to check files."""
+
+    _LANGUAGE_MAP = {"de": "de-DE", "en": "en-GB"}
 
     # TODO: implement whitelisting certain rules
     #       (exclude multiple whitespaces error by default)
-    def __init__(
-        self,
-        buddy,
-        mode: Mode = Mode.COMMANDLINE,
-        remote_url: str = None,
-        language: str = None,
-    ):
-        """Creates a LanguageTool checking module.
+    def __init__(self):
+        """Creates a LanguageTool checking module."""
 
-        :param buddy: the LaTeXBuddy instance
-        :param mode: LT mode
-        :param remote_url: URL of the LT server
-        :param language: language to run checks with
-        """
-        self.buddy = buddy
-        self.mode = mode
-        self.language = language
+        self.buddy = None
+        self.mode = None
+        self.language = None
 
         self.local_server = None
         self.remote_url = None
         self.lt_console_command = None
 
-        if self.mode == Mode.LOCAL_SERVER:
-            self.local_server = LanguageToolLocalServer()
-            self.local_server.start_local_server()
+        self.errors = None
 
-        elif self.mode == Mode.REMOTE_SERVER:
-            # must include the port and api call (e.g. /v2/check)
-            self.remote_url = remote_url
+    def run_module(self, buddy: ltb.LatexBuddy, file_path: Path):
+        """Runs the LanguageTool checks on a file and saves the results in a LaTeXBuddy
+            instance.
 
-        elif self.mode == Mode.COMMANDLINE:
-            self.find_languagetool_command()
+            Requires LanguageTool (server) to be set up.
+            Local or global servers can be used.
+
+            :param buddy: the LaTeXBuddy instance
+            :param file_path: the file to run checks on
+        """
+
+        try:
+            self.buddy = buddy
+
+            cfg_language = buddy.cfg.get_config_option_or_default(
+                "latexbuddy", "language", "en"
+            )
+            try:
+                self.language = LanguageToolModule._LANGUAGE_MAP[cfg_language]
+            except KeyError:
+                self.language = None
+
+            cfg_mode = buddy.cfg.get_config_option_or_default(
+                "languagetool", "mode", "COMMANDLINE"
+            )
+            try:
+                self.mode = Mode(cfg_mode)
+            except ValueError:
+                self.mode = Mode.COMMANDLINE
+
+            if self.mode == Mode.LOCAL_SERVER:
+                self.local_server = LanguageToolLocalServer()
+                self.local_server.start_local_server()
+
+            elif self.mode == Mode.REMOTE_SERVER:
+                # must include the port and api call (e.g. /v2/check)
+                self.remote_url = buddy.cfg.get_config_option(
+                    "languagetool", "remote_url"
+                )
+
+            elif self.mode == Mode.COMMANDLINE:
+                self.find_languagetool_command()
+
+            self.errors = []
+            self.check_tex(file_path)
+
+        except Exception as e:
+
+            print(
+                f"An error occurred while executing latexbuddy:\n",
+                f"{e.__class__.__name__}: {getattr(e, 'message', e)}",
+                file=sys.stderr,
+            )
+            traceback.print_exc(file=sys.stderr)
+
+    def save_errors(self):
+        """Passes the accumulated errors on to the main LaTeXBuddy instance.
+
+        """
+
+        for error in self.errors:
+            self.buddy.add_error(error)
+
+        self.errors = []
 
     def find_languagetool_command(self):
         """Searches for the LanguageTool command line app.
@@ -246,18 +265,20 @@ class LanguageToolModule:
             if match["rule"]["category"]["id"] == "TYPOS":
                 error_type = "spelling"
 
-            error.Error(
-                self.buddy,
-                str(self.buddy.file_to_check),
-                tool_name,
-                error_type,
-                match["rule"]["id"],
-                text,
-                location,
-                match["length"],
-                LanguageToolModule.parse_error_replacements(match["replacements"]),
-                False,
-                tool_name + "_" + match["rule"]["id"],
+            self.errors.append(
+                Error(
+                    self.buddy,
+                    str(self.buddy.file_to_check),
+                    tool_name,
+                    error_type,
+                    match["rule"]["id"],
+                    text,
+                    location,
+                    match["length"],
+                    LanguageToolModule.parse_error_replacements(match["replacements"]),
+                    False,
+                    tool_name + "_" + match["rule"]["id"],
+                )
             )
 
     @staticmethod
