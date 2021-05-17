@@ -142,7 +142,7 @@ class LatexBuddy:
         #     return
 
         # TODO: use tempfile.TemporaryFile instead
-        os.remove(detexed_file)
+        # os.remove(detexed_file)
 
     # TODO: why does this exist? Use direct access
     def get_lang(self) -> str:

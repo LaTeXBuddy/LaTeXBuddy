@@ -30,7 +30,9 @@
                     </h4>
                     <span class="error-meta">
                         {{ error.error_type }} error
-                        in character {{ error.start }}
+                        {% if error.start %}
+                        at {{ error.start[0] }}:{{ error.start[1] }}
+                        {% endif %}
                         <i>({{ error.src }}#{{ error.error_id }})</i>
                     </span>
                     {% if error.suggestions|length <= 1 %}

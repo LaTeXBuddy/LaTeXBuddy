@@ -1,11 +1,14 @@
 """This module contains various utilitary tools."""
 
 import os
+import re
 import signal
 import subprocess
+import sys
+from io import StringIO
 
 from pathlib import Path, PurePath
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from yalafi.tex2txt import Options, get_line_starts, tex2txt, translate_numbers
 
@@ -152,6 +155,8 @@ def detex_path(file_to_detex: Path) -> Path:
     return detexed_file
 
 
+location_re = re.compile(r'line (\d+), column (\d+)')
+
 
 def yalafi_detex(file_to_detex: Path) -> Tuple[
     Path,
@@ -165,8 +170,30 @@ def yalafi_detex(file_to_detex: Path) -> Tuple[
 ]:
     tex = file_to_detex.read_text()
     opts = Options()
-    plain, charmap = tex2txt(tex, opts)  # TODO: save charmap somewhere
 
+    # parse output of tex2txt to err variable
+    my_stderr = StringIO()
+    sys.stderr = my_stderr
+    plain, charmap = tex2txt(tex, opts)  # TODO: save charmap somewhere
+    sys.stderr = sys.__stderr__
+    out = my_stderr.getvalue()
+    my_stderr.close()
+
+    out_split = out.split("*** LaTeX error: ")
+    err = []
+
+    for yalafi_error in out_split[1:]:
+        location_str, _, reason = yalafi_error.partition("***")
+
+        location_match = location_re.match(location_str)
+        if location_match:
+            location = (int(location_match.group(1)), int(location_match.group(2)))
+        else:
+            location = None
+
+        err.append((location, reason.strip()))
+
+    # write to detexed file
     detexed_file = Path(file_to_detex).with_suffix(".detexed")  # TODO: use tempfile
     detexed_file.write_text(plain)
 
@@ -180,23 +207,25 @@ def find_char_position(
     position in detex'ed file.
 
     :param original_file: path to the original tex file
-    :param detexed_file:
+    :param detexed_file: path to the detex'ed version of that file
     :param charmap: the charmap to resolve the position
-    :param char_pos: absolute position of char in detexed file. \n counts as one char. starts counting with 1
+    :param char_pos: absolute position of char in detexed file. \n counts as one char. Starts counting with 1
     """
     tex = original_file.read_text()
     plain = detexed_file.read_text()
-    line_starts = get_line_starts(plain)
+    line_starts = get_line_starts(plain)  # [0, ...]
     line = 0
-    while char_pos > line_starts[line]:
+    while char_pos >= line_starts[line]:
         line += 1
     start = line_starts[line - 1]
-    char = char_pos - start
+    char = char_pos - start + 1
 
+    # translate_numbers() need 1-basd line and char numbers
+    # line_starts has 0-based numbers
     aux = translate_numbers(tex, plain, charmap, line_starts, line, char)
 
     if aux is None:
-        return -1
+        return None
         # raise Exception("File parsing error while converting tex to txt.")
 
     return aux.lin, aux.col

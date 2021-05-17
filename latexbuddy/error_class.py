@@ -1,5 +1,6 @@
 """This module describes the LaTeXBuddy Error class and its properties."""
-from typing import List
+from typing import List, Optional, Tuple
+
 
 
 class Error:
@@ -17,7 +18,7 @@ class Error:
         error_type: str,
         error_id: str,
         text: str,
-        start,  # TODO: is this a string? please make this into an int
+        start: Optional[Tuple[int, int]],  # TODO: is this a string? please make this into an int
         length,
         suggestions: List[str],
         warning: bool,  # TODO: make this a string/enum with values error/warning/info

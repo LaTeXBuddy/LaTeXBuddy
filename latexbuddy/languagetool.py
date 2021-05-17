@@ -137,7 +137,7 @@ class LanguageToolModule:
         elif self.mode == Mode.COMMANDLINE:
             raw_errors = self.execute_commandline_request(detex_file)
 
-        self.format_errors(raw_errors, detex_file)
+        self.format_errors(raw_errors, Path(detex_file))
 
     # TODO: rename method; current name unclear
     # TODO: use pathlib.Path
@@ -204,12 +204,12 @@ class LanguageToolModule:
 
             error.Error(
                 self.buddy,
-                PurePath(detex_file).stem,
+                str(self.buddy.file_to_check),
                 tool_name,
                 error_type,
                 match["rule"]["id"],
-                match["context"]["text"][offset:offset_end],
-                match["offset"],
+                text,
+                location,
                 match["length"],
                 LanguageToolModule.parse_error_replacements(match["replacements"]),
                 False,
