@@ -27,7 +27,7 @@ def run(buddy, file: str):
     """
     # TODO: get settings (mode etc.) from buddy instance (config needed)
 
-    ltm = LanguageToolModule(buddy, language=_LANGUAGES[buddy.get_lang()])
+    ltm = LanguageToolModule(buddy, language=_LANGUAGES[buddy.lang])
     ltm.check_tex(file)
 
 
@@ -118,7 +118,7 @@ class LanguageToolModule:
             self.lt_console_command.append("--autoDetect")
 
     # TODO: use pathlib.Path
-    def check_tex(self, detex_file: str):
+    def check_tex(self, detex_file: Path):
         """Runs the LanguageTool checks on a file.
 
         :param detex_file: the detexed file to run checks on
@@ -160,7 +160,7 @@ class LanguageToolModule:
         return response.json()
 
     # TODO: use pathlib.Path
-    def execute_commandline_request(self, detex_file: str) -> Optional[Dict]:
+    def execute_commandline_request(self, detex_file: Path) -> Optional[Dict]:
         """Execute the LanguageTool command line app to check the text.
 
         :param detex_file: path to the detex'ed file
@@ -172,7 +172,7 @@ class LanguageToolModule:
 
         # TODO: is that needed here? lt_console_command is already a list
         cmd = list(self.lt_console_command)
-        cmd.append(detex_file)
+        cmd.append(str(detex_file))
 
         output = tools.execute_no_errors(*cmd, encoding="utf_8")
 
@@ -189,10 +189,13 @@ class LanguageToolModule:
 
         for match in raw_errors["matches"]:
 
-            offset = match["context"]["offset"]
-            offset = tools.find_char_position(self.buddy.file_to_check, Path(detex_file),
-                                              self.buddy.charmap, offset)
-            offset_end = offset + match["context"]["length"]
+            context = match["context"]
+            context_offset = context["offset"]
+            context_end = context["length"] + context_offset
+            text = context["text"][context_offset:context_end]
+            location = tools.find_char_position(self.buddy.file_to_check,
+                                                detex_file,
+                                                self.buddy.charmap, match["offset"])
 
             error_type = "grammar"
 

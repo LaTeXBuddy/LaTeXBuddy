@@ -152,7 +152,17 @@ def detex_path(file_to_detex: Path) -> Path:
     return detexed_file
 
 
-def yalafi_detex(file_to_detex: Path) -> Tuple[Path, List[int]]:
+
+def yalafi_detex(file_to_detex: Path) -> Tuple[
+    Path,
+    List[int],
+    List[
+        Tuple[
+            Optional[Tuple[int, int]],
+            str
+        ]
+    ]
+]:
     tex = file_to_detex.read_text()
     opts = Options()
     plain, charmap = tex2txt(tex, opts)  # TODO: save charmap somewhere
@@ -160,13 +170,14 @@ def yalafi_detex(file_to_detex: Path) -> Tuple[Path, List[int]]:
     detexed_file = Path(file_to_detex).with_suffix(".detexed")  # TODO: use tempfile
     detexed_file.write_text(plain)
 
-    return detexed_file, charmap
+    return detexed_file, charmap, err
 
 
 def find_char_position(
-    original_file: Path, detexed_file: Path, charmap: List[int], char_pos
-) -> int:
-    """Calculates line and col position of a character in the original file based on its position in detexed file.
+    original_file: Path, detexed_file: Path, charmap: List[int], char_pos: int
+) -> Optional[Tuple[int, int]]:
+    """Calculates line and col position of a character in the original file based on its
+    position in detex'ed file.
 
     :param original_file: path to the original tex file
     :param detexed_file:
@@ -188,8 +199,13 @@ def find_char_position(
         return -1
         # raise Exception("File parsing error while converting tex to txt.")
 
-    tex_lines = get_line_starts(tex)
-    return tex_lines[aux.lin - 1] + aux.col
+    return aux.lin, aux.col
+
+
+if __name__ == '__main__':
+    orig = Path("../tests/test.tex")
+    detexed, charmap = yalafi_detex(orig)
+    find_char_position(orig, detexed, charmap, 9)
 
 
 def start_char(line: int, offset: int, line_lengths: List[int]) -> int:

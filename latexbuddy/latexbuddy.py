@@ -36,6 +36,7 @@ class LatexBuddy:
         self.whitelist_file = whitelist_file
         self.file_to_check = file_to_check
         self.lang = lang
+        self.check_successful = False
 
     def add_error(self, error: Error):
         """Adds the error to the errors dictionary.
@@ -118,11 +119,16 @@ class LatexBuddy:
         # check_preprocessor
         # check_config
 
-        detexed_file, self.charmap = tools.yalafi_detex(self.file_to_check)
+        detexed_file, self.charmap, detex_err = tools.yalafi_detex(self.file_to_check)
+        self.check_successful = True if len(detex_err) < 1 else False
+
+        for err in detex_err:
+            self.add_error(
+                Error(self, str(self.file_to_check), 'YALaFi', 'latex', 'TODO', err[1],
+                      err[0], 0, [], False, "TODO"))
 
         chktex = abstract.Chktex()
         chktex.run(self, self.file_to_check)
-        detexed_file = tools.detex(self.file_to_check)
         aspell = abstract.Aspell()
         aspell.run(self, detexed_file)
         languagetool = abstract.Languagetool()

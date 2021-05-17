@@ -8,9 +8,10 @@ from typing import List
 import latexbuddy.error_class as error_class
 import latexbuddy.tools as tools
 
+_LANGUAGES = {"de": "de-DE", "en": "en"}
+
 
 # TODO: rewrite this using the Abstract Module API
-
 def run(buddy, file: Path):
     """Runs the aspell checks on a file and saves the results in a LaTeXBuddy
     instance.
@@ -20,7 +21,7 @@ def run(buddy, file: Path):
     :param buddy: the LaTeXBuddy instance
     :param file: the file to run checks on
     """
-    language = buddy.get_lang()
+    language = _LANGUAGES[buddy.lang]
     language = shlex.quote(language)
     langs = tools.execute("aspell", "dump dicts")
     check_language(language, langs)
@@ -93,12 +94,12 @@ def format_errors(out: List[str], buddy, file: Path):
             else:  # there are no suggestions
                 location = int(meta[1])
 
-            location = line_offsets[line_number + 1] + location  # absolute pos in detex
-            # location = tools.start_char(line_number, location, line_lengths)
+            # location = line_offsets[line_number + 1] + location  # absolute pos in detex
 
-            location = tools.find_char_position(buddy.file_to_check, Path(file),
-                                                buddy.charmap,
-                                                location)  # absolute pos in tex
+            # location = tools.find_char_position(buddy.file_to_check, Path(file),
+            #                                    buddy.charmap,
+            #                                    location)  # absolute pos in tex
+            location = None
 
             error_class.Error(
                 buddy,
