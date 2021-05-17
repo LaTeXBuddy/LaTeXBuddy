@@ -5,7 +5,10 @@ import os
 
 from pathlib import Path
 
-import latexbuddy.abstractmodules as abstract
+import latexbuddy.abs_module as abstract
+import latexbuddy.aspell as aspell
+import latexbuddy.chktex as chktex
+import latexbuddy.languagetool as languagetool
 import latexbuddy.tools as tools
 
 from latexbuddy.config_loader import ConfigLoader
@@ -127,20 +130,11 @@ class LatexBuddy:
         # check_preprocessor
         # check_config
 
-        # with abstractmodules
-        chktex = abstract.Chktex()
+        # without abstractmodules
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
-        aspell = abstract.Aspell()
         aspell.run(self, detexed_file)
-        languagetool = abstract.Languagetool()
-        languagetool.run(self, Path(detexed_file))
-
-        # without abstractmodules
-        # chktex.run(self, self.file_to_check)
-        # detexed_file = tools.detex(self.file_to_check)
-        # aspell.run(self, detexed_file)
-        # languagetool.run(self, detexed_file)
+        languagetool.run(self, detexed_file)
 
         # FOR TESTING ONLY
         # self.check_whitelist()
