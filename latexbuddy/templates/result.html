@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ file_name }} | LaTeXBuddy</title>
+    <style>
+        {% include "modern-normalize.css" %}
+        {% include "style.css" %}
+    </style>
+</head>
+<body>
+<header>
+    <h1>LaTeXBuddy</h1>
+    <h2><small>Results for</small> {{ file_name }}</h2>
+</header>
+<main>
+    <section id="file-contents">
+        <pre><code>{{ highlighted_file_text|safe }}</code></pre>
+    </section>
+    <section id="errors-list">
+        <h3>Errors</h3>
+        <ol>
+            {% for error in errors %}
+                <li class="error {% if error.warning %}is-warning{% else %}is-error{% endif %}">
+                    <h4 class="error-title monospaced">
+                        {{ error.text }}
+                    </h4>
+                    <span class="error-meta">
+                        {{ error.error_type }} error
+                        in character {{ error.start }}
+                        <i>({{ error.src }}#{{ error.error_id }})</i>
+                    </span>
+                    {% if error.suggestions|length <= 1 %}
+                        {{ "".join(error.suggestions) }}
+                    {% else %}
+                        <strong>Suggestions:</strong>
+                        <br>
+                        {{ ", ".join(error['suggestions']) }}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ol>
+    </section>
+</main>
+</body>
+</html>

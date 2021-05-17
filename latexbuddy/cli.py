@@ -1,3 +1,6 @@
+"""This module contains code for the command-line interface used to run and manage
+LaTeXBuddy."""
+
 import argparse
 
 from pathlib import Path
@@ -27,6 +30,7 @@ parser.add_argument(
 parser.add_argument(
     "--whitelist",
     "-w",
+    # TODO: why a new file format? if it's JSON, use .json. If not, don't use one.
     type=Path,
     default=None,
     help="Location of the whitelist file.",
@@ -41,6 +45,7 @@ parser.add_argument(
 
 
 def main():
+    """Parses CLI arguments and launches the LaTeXBuddy instance."""
     args = parser.parse_args()
 
     config_loader = ConfigLoader(args)
@@ -53,3 +58,4 @@ def main():
     buddy.run_tools()
     buddy.check_whitelist()
     buddy.parse_to_json()
+    buddy.output_html()

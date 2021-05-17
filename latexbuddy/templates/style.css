@@ -1,0 +1,79 @@
+.monospaced {
+    font-family: ui-monospace,
+        SFMono-Regular,
+        Consolas,
+        'Liberation Mono',
+        Menlo,
+        monospace;
+}
+
+body {
+    font-size: 14px;
+    padding: 1rem 2rem 0;
+}
+
+pre {
+    background-color: #eeeeee;
+    padding: 1rem;
+    border-radius: .5rem;
+    white-space: pre-wrap;
+}
+
+main {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+@media (max-width: 1200px) {
+    main {
+        flex-wrap: wrap;
+    }
+}
+
+main > section {
+    padding: .5rem;
+}
+
+#file-contents {
+    flex: 1 0 min(100%, 80ch);
+}
+
+#errors-list {
+    flex: 0 1 80ch;
+}
+
+.error {
+    padding-bottom: .5rem;
+    border-bottom: 1px solid #eeeeee;
+    margin-bottom: .5rem;
+}
+
+.error.is-warning .error-title,
+.error.is-error .error-title {
+    text-decoration-style: wavy;
+    text-decoration-line: underline;
+    text-decoration-thickness: .07em;
+}
+
+.error.is-warning .error-title {
+    text-decoration-color: orange ;
+}
+
+.error.is-error .error-title {
+    text-decoration-color: red;
+}
+
+.error-title {
+    margin: 0 0 .25rem;
+}
+
+.error-meta {
+    display: block;
+    font-size: smaller;
+    font-weight: normal;
+    margin: 0 0 .5rem;
+}
