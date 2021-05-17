@@ -3,10 +3,13 @@
 import json
 import os
 
+from pathlib import Path
+
 import latexbuddy.abstractmodules as abstract
 import latexbuddy.tools as tools
 
 from latexbuddy.error_class import Error
+from latexbuddy.output import render_html
 
 
 # FIXME: rename this file (e.g. to 'buddy') because it's confusing
