@@ -3,15 +3,15 @@
 import json
 import os
 
-from pathlib import Path
 
 import latexbuddy.abs_module as abstract
-import latexbuddy.tools as tools
-from latexbuddy import aspell, chktex, languagetool
-
+import latexbuddy.aspell as aspell
+import latexbuddy.chktex as chktex
 from latexbuddy.error_class import Error
+import latexbuddy.languagetool as languagetool
+from pathlib import Path
 from latexbuddy.output import render_html
-
+import latexbuddy.tools as tools
 
 # FIXME: rename this file (e.g. to 'buddy') because it's confusing
 
