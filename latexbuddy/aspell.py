@@ -2,17 +2,18 @@
 
 import shlex
 
-from pathlib import PurePath
+from pathlib import Path, PurePath
 from typing import List
 
 import latexbuddy.error_class as error_class
 import latexbuddy.tools as tools
 
 
-# TODO: rewrite this using the Abstract Module API
+_LANGUAGES = {"de": "de-DE", "en": "en"}
 
-# TODO: use pathlib.Path
-def run(buddy, file: str):
+
+# TODO: rewrite this using the Abstract Module API
+def run(buddy, file: Path):
     """Runs the aspell checks on a file and saves the results in a LaTeXBuddy
     instance.
 
@@ -21,12 +22,12 @@ def run(buddy, file: str):
     :param buddy: the LaTeXBuddy instance
     :param file: the file to run checks on
     """
-    language = buddy.get_lang()
+    language = _LANGUAGES[buddy.lang]
     language = shlex.quote(language)
     langs = tools.execute("aspell", "dump dicts")
     check_language(language, langs)
     # execute aspell on given file and collect output
-    error_list = tools.execute(f"cat {file} | aspell -a --lang={language}")
+    error_list = tools.execute(f"cat {str(file)} | aspell -a --lang={language}")
 
     # format aspell output
     out = error_list.splitlines()[1:]  # the first line specifies aspell version
@@ -59,7 +60,7 @@ def check_language(language: str, langs: str):
 
 
 # TODO: use pathlib.Path
-def format_errors(out: List[str], buddy, file: str):
+def format_errors(out: List[str], buddy, file: Path):
     """Parses Aspell errors and converts them to LaTeXBuddy Error objects.
 
     :param out: line-split output of the aspell command
@@ -76,7 +77,9 @@ def format_errors(out: List[str], buddy, file: str):
             continue
 
         if error[0] in ("&", "#"):
-            meta_str, suggestions_str = error[1:].strip().split(": ", 1)
+
+            tmp = error[1:].strip().split(": ", 1)
+            meta_str, suggestions_str = tmp if len(tmp) > 1 else (tmp[0], [])
 
             # & original count offset
             # # original
@@ -91,13 +94,12 @@ def format_errors(out: List[str], buddy, file: str):
             else:  # there are no suggestions
                 location = int(meta[1])
 
-            print(f"Word is {text}")
-            print(f"Offset in line is {location}")
-            print(f"Line {line_number} begins at character {line_offsets[line_number]}")
+            # location = line_offsets[line_number + 1] + location  # absolute pos in detex
 
-            location = str(line_offsets[line_number] + location)
-
-            print(f"Offset in file is {location}")
+            # location = tools.find_char_position(buddy.file_to_check, Path(file),
+            #                                    buddy.charmap,
+            #                                    location)  # absolute pos in tex
+            location = None
 
             error_class.Error(
                 buddy,

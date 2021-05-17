@@ -4,8 +4,19 @@ from jinja2 import Environment, PackageLoader
 env = Environment(loader=PackageLoader("latexbuddy"))
 
 
+def error_key(err):
+    if err.src.lower() == "yalafi":
+        return -2
+    if not err.start:
+        return -1
+    if isinstance(err.start, tuple):
+        return err.start[0]
+
+    return err.start
+
+
 def render_html(file_name, file_text, errors):
-    err_values = sorted(errors.values(), key=lambda e: int(e.start))
+    err_values = sorted(errors.values(), key=error_key)
     template = env.get_template("result.html")
     # highlighted_file_text = highlight_code(file_text, errors)
     return template.render(

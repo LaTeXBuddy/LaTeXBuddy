@@ -5,7 +5,6 @@ import os
 
 from pathlib import Path
 
-import latexbuddy.abs_module as abstract
 import latexbuddy.aspell as aspell
 import latexbuddy.chktex as chktex
 import latexbuddy.languagetool as languagetool
@@ -48,6 +47,7 @@ class LatexBuddy:
         self.lang = self.cfg.get_config_option_or_default(
             "latexbuddy", "language", "en"
         )
+        self.check_successful = False
 
     def add_error(self, error: Error):
         """Adds the error to the errors dictionary.
@@ -130,11 +130,31 @@ class LatexBuddy:
         # check_preprocessor
         # check_config
 
-        # without abstractmodules
+        detexed_file, self.charmap, detex_err = tools.yalafi_detex(self.file_to_check)
+        self.check_successful = True if len(detex_err) < 1 else False
+
+        for err in detex_err:
+            self.add_error(
+                Error(
+                    self,
+                    str(self.file_to_check),
+                    "YALaFi",
+                    "latex",
+                    "TODO",
+                    err[1],
+                    err[0],
+                    0,
+                    [],
+                    False,
+                    "TODO",
+                )
+            )
+
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
         aspell.run(self, detexed_file)
         languagetool.run(self, detexed_file)
+        chktex.run(self, self.file_to_check)
 
         # FOR TESTING ONLY
         # self.check_whitelist()

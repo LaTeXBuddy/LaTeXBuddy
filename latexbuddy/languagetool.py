@@ -28,6 +28,7 @@ def run(buddy, file: Path):
     :param buddy: the LaTeXBuddy instance
     :param file: the file to run checks on
     """
+    # TODO: get settings (mode etc.) from buddy instance (config needed)
 
     cfg_mode = buddy.cfg.get_config_option_or_default(
         "languagetool", "mode", "COMMANDLINE"
@@ -169,7 +170,7 @@ class LanguageToolModule:
         elif self.mode == Mode.COMMANDLINE:
             raw_errors = self.execute_commandline_request(detex_file)
 
-        self.format_errors(raw_errors, detex_file)
+        self.format_errors(raw_errors, Path(detex_file))
 
     def lt_post_request(self, detex_file: Path, server_url: str) -> Optional[Dict]:
         """Send a POST request to the LanguageTool server to check the text.
@@ -227,8 +228,16 @@ class LanguageToolModule:
 
         for match in raw_errors["matches"]:
 
-            offset = match["context"]["offset"]
-            offset_end = offset + match["context"]["length"]
+            context = match["context"]
+            context_offset = context["offset"]
+            context_end = context["length"] + context_offset
+            text = context["text"][context_offset:context_end]
+            location = tools.find_char_position(
+                self.buddy.file_to_check,
+                detex_file,
+                self.buddy.charmap,
+                match["offset"],
+            )
 
             error_type = "grammar"
 
@@ -237,12 +246,12 @@ class LanguageToolModule:
 
             error.Error(
                 self.buddy,
-                detex_file.stem,
+                str(self.buddy.file_to_check),
                 tool_name,
                 error_type,
                 match["rule"]["id"],
-                match["context"]["text"][offset:offset_end],
-                match["offset"],
+                text,
+                location,
                 match["length"],
                 LanguageToolModule.parse_error_replacements(match["replacements"]),
                 False,
