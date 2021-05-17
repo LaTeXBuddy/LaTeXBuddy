@@ -6,14 +6,11 @@ import os
 from pathlib import Path
 
 import latexbuddy.abstractmodules as abstract
-from pathlib import Path
-
 import latexbuddy.tools as tools
 
+from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.error_class import Error
 from latexbuddy.output import render_html
-
-from latexbuddy.config_loader import ConfigLoader
 
 
 # FIXME: rename this file (e.g. to 'buddy') because it's confusing
@@ -24,7 +21,6 @@ from latexbuddy.config_loader import ConfigLoader
 class LatexBuddy:
     """The main instance of the applications that controls all the internal tools."""
 
-    # TODO: use pathlib.Path
     def __init__(self, config_loader: ConfigLoader, file_to_check: Path):
         """Initializes the LaTeXBuddy instance.
 
