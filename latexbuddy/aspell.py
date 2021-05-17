@@ -69,7 +69,6 @@ def format_errors(out: List[str], buddy, file: Path):
     """
     line_number = 1
     line_offsets = tools.calculate_line_offsets(file)
-    # line_lengths = tools.calculate_line_lengths(file)
 
     for error in out:
         if error.strip() == "":
