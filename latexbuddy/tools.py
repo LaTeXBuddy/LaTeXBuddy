@@ -124,8 +124,8 @@ def detex(file_to_detex: Path) -> Path:
 
         raise FileNotFoundError("Unable to find detex installation!")
 
-    detexed_file = file_to_detex + ".detexed"
-    execute("detex", file_to_detex, " > ", detexed_file)
+    detexed_file = file_to_detex.with_suffix(".detexed")
+    execute("detex", str(file_to_detex), " > ", str(detexed_file))
     return detexed_file
 
 

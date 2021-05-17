@@ -32,7 +32,6 @@ def run(buddy, file: str):
     )
 
     command_output = tools.execute("chktex", "-f", f"'{format_str}'", "-q", filename)
-    print(command_output)
     out = command_output.split("\n")
     save_output(out, buddy)
 
