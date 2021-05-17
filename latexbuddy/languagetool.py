@@ -13,8 +13,8 @@ from typing import Dict, List, Optional
 
 import requests
 
-import latexbuddy.tools as tools
 import latexbuddy.latexbuddy as ltb
+import latexbuddy.tools as tools
 
 from latexbuddy.abs_module import Module
 from latexbuddy.error_class import Error
@@ -54,13 +54,13 @@ class LanguageToolModule(Module):
 
     def run_module(self, buddy: ltb.LatexBuddy, file_path: Path):
         """Runs the LanguageTool checks on a file and saves the results in a LaTeXBuddy
-            instance.
+        instance.
 
-            Requires LanguageTool (server) to be set up.
-            Local or global servers can be used.
+        Requires LanguageTool (server) to be set up.
+        Local or global servers can be used.
 
-            :param buddy: the LaTeXBuddy instance
-            :param file_path: the file to run checks on
+        :param buddy: the LaTeXBuddy instance
+        :param file_path: the file to run checks on
         """
 
         try:
@@ -108,9 +108,7 @@ class LanguageToolModule(Module):
             traceback.print_exc(file=sys.stderr)
 
     def save_errors(self):
-        """Passes the accumulated errors on to the main LaTeXBuddy instance.
-
-        """
+        """Passes the accumulated errors on to the main LaTeXBuddy instance."""
 
         for error in self.errors:
             self.buddy.add_error(error)
