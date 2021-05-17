@@ -10,6 +10,6 @@ modules = {
         "output": "errors.json"
     },
     "languagetool": {
-        "mode": "LOCAL_SERVER",
+        "mode": "LOCAL_SERVER"
     },
 }

@@ -55,7 +55,7 @@ class ConfigLoader:
 
             print(
                 f"An error occurred while loading config file at "
-                f"'{self.config_file_path}':\n",
+                f"'{config_file_path}':\n",
                 f"{e.__class__.__name__}: {getattr(e, 'message', e)}",
                 file=sys.stderr,
             )
