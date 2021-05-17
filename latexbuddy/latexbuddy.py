@@ -7,7 +7,7 @@ from pathlib import Path
 
 import latexbuddy.abs_module as abstract
 import latexbuddy.tools as tools
-from latexbuddy import chktex, aspell, languagetool
+from latexbuddy import aspell, chktex, languagetool
 
 from latexbuddy.error_class import Error
 from latexbuddy.output import render_html
