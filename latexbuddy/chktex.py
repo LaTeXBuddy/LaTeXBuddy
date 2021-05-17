@@ -9,6 +9,7 @@ import latexbuddy.tools as tools
 
 
 filename = ""
+DELIMITER = "\\0"
 line_lengths = []  # TODO: please don't use global variables. Like, anywhere.
 
 
@@ -26,9 +27,10 @@ def run(buddy, file: str):
     global filename
     filename = file
     line_lengths = tools.calculate_line_lengths(filename)
-    out = tools.execute(
-        "chktex", '-f "%f:%l:%c:%d:%n:%s:%m:%k\n"', "-q", filename
-    ).split("\n")
+    format_str = (
+        DELIMITER.join(["%f", "%l", "%c", "%d", "%n", "%s", "%m", "%k"]) + "\\n"
+    )
+    out = tools.execute("chktex", "-f", f'"{format_str}"', "-q", filename).split("\n")
     save_output(out, buddy)
 
 
@@ -40,7 +42,7 @@ def save_output(out: List[str], buddy):
     :param buddy: the LaTeXBuddy instance
     """
     for error in out:
-        s_arr = error.split(":")
+        s_arr = error.split(DELIMITER)
         if len(s_arr) < 5:
             continue
         warning = True if s_arr[7] == "Warning" else False

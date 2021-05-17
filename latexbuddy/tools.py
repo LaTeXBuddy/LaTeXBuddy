@@ -7,6 +7,8 @@ import subprocess
 from pathlib import Path, PurePath
 from typing import List, Tuple
 
+from yalafi.tex2txt import Options, get_line_starts, tex2txt, translate_numbers
+
 
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     """Executes a terminal command with subprocess.
@@ -145,9 +147,76 @@ def detex_path(file_to_detex: Path) -> Path:
 
         raise FileNotFoundError("Unable to find detex installation!")
 
-    detexed_file = Path(PurePath(file_to_detex).with_suffix(".detexed"))
-    execute("detex", file_to_detex.resolve(), " > ", detexed_file.resolve())
-    return detexed_file.resolve()
+    detexed_file = Path(file_to_detex).with_suffix(".detexed")
+    execute("detex", "-s", str(file_to_detex.absolute()), " > ", str(detexed_file))
+    return detexed_file
+
+
+def yalafi_detex(file_to_detex: Path) -> Tuple[Path, List[int]]:
+    tex = file_to_detex.read_text()
+    opts = Options()
+    plain, charmap = tex2txt(tex, opts)  # TODO: save charmap somewhere
+
+    detexed_file = Path(file_to_detex).with_suffix(".detexed")  # TODO: use tempfile
+    detexed_file.write_text(plain)
+
+    return detexed_file, charmap
+
+
+def find_char_position(
+    original_file: Path, detexed_file: Path, charmap: List[int], char_pos
+) -> int:
+    """Calculates line and col position of a character in the original file based on its position in detexed file.
+
+    :param original_file: path to the original tex file
+    :param detexed_file:
+    :param charmap: the charmap to resolve the position
+    :param char_pos: absolute position of char in detexed file. \n counts as one char. starts counting with 1
+    """
+    tex = original_file.read_text()
+    plain = detexed_file.read_text()
+    line_starts = get_line_starts(plain)
+    line = 0
+    while char_pos > line_starts[line]:
+        line += 1
+    start = line_starts[line - 1]
+    char = char_pos - start
+
+    aux = translate_numbers(tex, plain, charmap, line_starts, line, char)
+
+    if aux is None:
+        raise Exception("File parsing error while converting tex to txt.")
+
+    tex_lines = get_line_starts(tex)
+    return tex_lines[aux.lin - 1] + aux.col
+
+
+def start_char(line: int, offset: int, line_lengths: List[int]) -> int:
+    """Calculates the absolute char offset in a file from line-based char offset.
+
+    :param line: line number
+    :param offset: character offset in line
+    :param line_lengths: line lengths list, e.g. from calculate_line_lengths
+    :return: absolute character offset
+    """
+    start = 0
+    for line_length in line_lengths[:line]:
+        start += line_length
+    return start + offset
+
+
+def calculate_line_lengths(filename: str) -> List[int]:
+    """Calculates line lengths for each line in a file.
+
+    :param filename: path to the inspected file
+    :return: list of line lengths with indices representing 1-based line numbers
+    """
+
+    lines = Path(filename).read_text().splitlines(keepends=True)
+    result = [0]
+    for line in lines:
+        result.append(len(line))
+    return result
 
 
 def calculate_line_offsets(filename: str) -> List[int]:
@@ -167,34 +236,6 @@ def calculate_line_offsets(filename: str) -> List[int]:
         result.append(offset)
         offset += len(line)
     return result
-
-
-def calculate_line_lengths(filename: str) -> List[int]:
-    """Calculates line lengths for each line in a file.
-
-    :param filename: path to the inspected file
-    :return: list of line lengths with indices representing 1-based line numbers
-    """
-
-    lines = Path(filename).read_text().splitlines(keepends=True)
-    result = [0]
-    for line in lines:
-        result.append(len(line))
-    return result
-
-
-def start_char(line: int, offset: int, line_lengths: List[int]) -> int:
-    """Calculates the absolute char offset in a file from line-based char offset.
-
-    :param line: line number
-    :param offset: character offset in line
-    :param line_lengths: line lengths list, e.g. from calculate_line_lengths
-    :return: absolute character offset
-    """
-    start = 0
-    for line_length in line_lengths[:line]:
-        start += line_length
-    return start + offset
 
 
 def format_input_file(file):
