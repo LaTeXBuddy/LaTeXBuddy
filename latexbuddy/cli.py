@@ -3,35 +3,58 @@ LaTeXBuddy."""
 
 import argparse
 
+from pathlib import Path
+
+from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.latexbuddy import LatexBuddy
 
 
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
-parser.add_argument("file", help="File that will be processed.")
+
+parser.add_argument("file", type=Path, help="File that will be processed.")
 parser.add_argument(
-    "--language", "-l", default="en", help="Target language of the file."
+    "--config",
+    "-c",
+    type=Path,
+    default=Path("config.py"),
+    help="Location of the config file.",
+)
+
+parser.add_argument(
+    "--language",
+    "-l",
+    type=str,
+    default=None,
+    help="Target language of the file.",
 )
 parser.add_argument(
     "--whitelist",
     "-w",
     # TODO: why a new file format? if it's JSON, use .json. If not, don't use one.
-    default="whitelist.wlist",
+    type=Path,
+    default=None,
     help="Location of the whitelist file.",
 )
 parser.add_argument(
-    "--output", "-o", default="errors.json", help="Where to output the errors file."
+    "--output",
+    "-o",
+    type=Path,
+    default=None,
+    help="Where to output the errors file.",
 )
 
 
 def main():
     """Parses CLI arguments and launches the LaTeXBuddy instance."""
     args = parser.parse_args()
+
+    config_loader = ConfigLoader(args)
+
     buddy = LatexBuddy(
-        error_file=args.output,
-        whitelist_file=args.whitelist,
+        config_loader=config_loader,
         file_to_check=args.file,
-        lang=args.language,
     )
+
     buddy.run_tools()
     buddy.check_whitelist()
     buddy.parse_to_json()

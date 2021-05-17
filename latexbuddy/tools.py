@@ -99,8 +99,7 @@ def find_executable(name: str) -> str:
         return result.splitlines()[0]
 
 
-# TODO: use pathlib.Path instead of strings
-def detex(file_to_detex: str) -> str:
+def detex(file_to_detex: Path) -> Path:
     """Strips TeX control structures from a file.
 
     Using OpenDetex, removes TeX code from the file, leaving only the content behind.
@@ -120,8 +119,8 @@ def detex(file_to_detex: str) -> str:
 
         raise FileNotFoundError("Unable to find detex installation!")
 
-    detexed_file = file_to_detex + ".detexed"
-    execute("detex", file_to_detex, " > ", detexed_file)
+    detexed_file = Path(str(file_to_detex) + ".detexed")
+    execute("detex", str(file_to_detex), " > ", str(detexed_file))
     return detexed_file
 
 

@@ -11,6 +11,7 @@ import latexbuddy.chktex as chktex
 import latexbuddy.languagetool as languagetool
 import latexbuddy.tools as tools
 
+from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.error_class import Error
 from latexbuddy.output import render_html
 
@@ -23,22 +24,30 @@ from latexbuddy.output import render_html
 class LatexBuddy:
     """The main instance of the applications that controls all the internal tools."""
 
-    # TODO: use pathlib.Path
-    def __init__(
-        self, error_file: str, whitelist_file: str, file_to_check: str, lang: str
-    ):
+    def __init__(self, config_loader: ConfigLoader, file_to_check: Path):
         """Initializes the LaTeXBuddy instance.
 
-        :param error_file: path to the file where the error should be saved
-        :param whitelist_file: path to the whitelist file
+        :param config_loader: ConfigLoader object to manage config options
         :param file_to_check: file that will be checked
-        :param lang: language of the file
         """
         self.errors = {}  # all current errors
-        self.error_file = error_file
-        self.whitelist_file = whitelist_file
-        self.file_to_check = file_to_check
-        self.lang = lang
+        self.cfg = config_loader  # configuration
+        self.file_to_check = file_to_check  # .tex file that is to be error checked
+
+        # file where the error should be saved
+        self.error_file = self.cfg.get_config_option_or_default(
+            "latexbuddy", "output", Path("errors.json")
+        )
+
+        # file that represents the whitelist
+        self.whitelist_file = self.cfg.get_config_option_or_default(
+            "latexbuddy", "whitelist", Path("whitelist.wlist")
+        )
+
+        # current language
+        self.lang = self.cfg.get_config_option_or_default(
+            "latexbuddy", "language", "en"
+        )
 
     def add_error(self, error: Error):
         """Adds the error to the errors dictionary.

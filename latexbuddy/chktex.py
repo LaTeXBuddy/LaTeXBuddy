@@ -1,4 +1,5 @@
 """This module defines the connection between LaTeXBuddy and ChkTeX."""
+from pathlib import Path
 from typing import List
 
 import latexbuddy.error_class as error_class
@@ -12,8 +13,7 @@ filename = ""
 line_lengths = []  # TODO: please don't use global variables. Like, anywhere.
 
 
-# TODO: use pathlib.Path instead of strings
-def run(buddy, file: str):
+def run(buddy, file: Path):
     """Runs the chktex checks on a file and saves the results in a LaTeXBuddy
     instance.
 
@@ -25,9 +25,9 @@ def run(buddy, file: str):
     global line_lengths
     global filename
     filename = file
-    line_lengths = tools.calculate_line_lengths(filename)
+    line_lengths = tools.calculate_line_lengths(str(filename))
     out = tools.execute(
-        "chktex", '-f "%f:%l:%c:%d:%n:%s:%m:%k\n"', "-q", filename
+        "chktex", '-f "%f:%l:%c:%d:%n:%s:%m:%k\n"', "-q", str(filename)
     ).split("\n")
     save_output(out, buddy)
 
