@@ -6,7 +6,7 @@ import sys
 import time
 
 from contextlib import closing
-from enum import Enum, auto
+from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -28,10 +28,17 @@ def run(buddy, file: Path):
     :param buddy: the LaTeXBuddy instance
     :param file: the file to run checks on
     """
-    # TODO: get settings (mode etc.) from buddy instance (config needed)
+
+    cfg_mode = buddy.cfg.get_config_option_or_default(
+        "languagetool", "mode", "COMMANDLINE"
+    )
+    try:
+        cfg_mode = Mode(cfg_mode)
+    except ValueError:
+        cfg_mode = Mode.COMMANDLINE
 
     try:
-        ltm = LanguageToolModule(buddy, language=_LANGUAGES[buddy.lang])
+        ltm = LanguageToolModule(buddy, language=_LANGUAGES[buddy.lang], mode=cfg_mode)
         ltm.check_tex(file)
     except ConnectionError as e:
         print("LanguageTool server: " + str(e), file=sys.stderr)
@@ -44,9 +51,9 @@ class Mode(Enum):
     server.
     """
 
-    COMMANDLINE = auto()
-    LOCAL_SERVER = auto()
-    REMOTE_SERVER = auto()
+    COMMANDLINE = "COMMANDLINE"
+    LOCAL_SERVER = "LOCAL_SERVER"
+    REMOTE_SERVER = "REMOTE_SERVER"
 
 
 # TODO: rewrite this using the Abstract Module API
