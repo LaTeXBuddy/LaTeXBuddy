@@ -10,6 +10,33 @@ pre {
     white-space: pre-wrap;
 }
 
+main {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+@media (max-width: 1200px) {
+    main {
+        flex-wrap: wrap;
+    }
+}
+
+main > section {
+    padding: .5em;
+}
+
+#file-contents {
+    flex: 1 0 80ch;
+}
+
+#errors-list {
+    flex: 0 1 auto;
+}
+
 .line-number {
     font-size: 12px;
 }
