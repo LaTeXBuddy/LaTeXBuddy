@@ -190,6 +190,8 @@ class LanguageToolModule:
         for match in raw_errors["matches"]:
 
             offset = match["context"]["offset"]
+            offset = tools.find_char_position(self.buddy.file_to_check, Path(detex_file),
+                                              self.buddy.charmap, offset)
             offset_end = offset + match["context"]["length"]
 
             error_type = "grammar"
