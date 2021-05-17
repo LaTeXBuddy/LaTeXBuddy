@@ -15,11 +15,11 @@
 <h1>LatexBuddy</h1>
 <h2>{{ file_name }}</h2>
 <main>
-    <div>
+    <section id="file-contents">
         <pre><code>{{ highlighted_file_text|safe }}</code></pre>
-    </div>
-    <div>
-        <h3>Error list</h3>
+    </section>
+    <section id="errors-list">
+        <h3>Errors</h3>
         <ol>
             {% for error in errors %}
                 <li class="error">
@@ -41,7 +41,7 @@
                 </li>
             {% endfor %}
         </ol>
-    </div>
+    </section>
 </main>
 </body>
 </html>
