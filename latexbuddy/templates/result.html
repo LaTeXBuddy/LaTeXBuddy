@@ -12,8 +12,10 @@
     </style>
 </head>
 <body>
-<h1>LatexBuddy</h1>
-<h2>{{ file_name }}</h2>
+<header>
+    <h1>LaTeXBuddy</h1>
+    <h2><small>Results for</small> {{ file_name }}</h2>
+</header>
 <main>
     <section id="file-contents">
         <pre><code>{{ highlighted_file_text|safe }}</code></pre>
