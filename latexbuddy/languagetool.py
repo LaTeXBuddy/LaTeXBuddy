@@ -235,16 +235,22 @@ class LanguageToolModule:
             )
 
     @staticmethod
-    def parse_error_replacements(json_replacements: List[Dict]) -> List[str]:
+    def parse_error_replacements(
+        json_replacements: List[Dict], max_elements: int = 5
+    ) -> List[str]:
         """Converts LanguageTool's replacements to LaTeXBuddy suggestions list.
 
         :param json_replacements: list of LT's replacements for a particular word
+        :param max_elements: Caps the number of replacements for the given error
         :return: list of string values of said replacements
         """
         output = []
 
         for entry in json_replacements:
             output.append(entry["value"])
+
+            if len(output) >= max_elements:
+                break
 
         return output
 
