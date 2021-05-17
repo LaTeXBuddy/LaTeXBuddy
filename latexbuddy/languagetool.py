@@ -13,7 +13,6 @@ from typing import Dict, List, Optional
 import requests
 
 import latexbuddy.error_class as error
-import latexbuddy.languagetool_local_server as lt_server
 import latexbuddy.tools as tools
 
 
@@ -79,7 +78,7 @@ class LanguageToolModule:
         self.lt_console_command = None
 
         if self.mode == Mode.LOCAL_SERVER:
-            self.local_server = lt_server.LanguageToolLocalServer()
+            self.local_server = LanguageToolLocalServer()
             self.local_server.start_local_server()
 
         elif self.mode == Mode.REMOTE_SERVER:
@@ -105,19 +104,39 @@ class LanguageToolModule:
             raise FileNotFoundError("Unable to find Java runtime environment!")
 
         try:
-            result = tools.find_executable("languagetool-commandline.jar")
+            result = tools.find_executable("languagetool")
+            executable_source = "native"
         except FileNotFoundError:
-            print("Could not find languagetool-commandline.jar in your system's PATH.")
-            print("Please make sure you installed languagetool properly and added the ")
-            print("directory to your system's PATH variable. Also make sure to make ")
-            print("the jar-files executable.")
 
-            print("For more information check the LaTeXBuddy manual.")
+            try:
+                result = tools.find_executable("languagetool-commandline.jar")
+                executable_source = "java"
+            except FileNotFoundError:
+                print(
+                    "Could not find languagetool-commandline.jar in your system's PATH."
+                )
+                print(
+                    "Please make sure you installed languagetool properly and added the"
+                )
+                print(
+                    "directory to your system's PATH variable. Also make sure to make"
+                )
+                print("the jar-files executable.")
 
-            raise FileNotFoundError("Unable to find languagetool installation!")
+                print("For more information check the LaTeXBuddy manual.")
+
+                raise FileNotFoundError("Unable to find languagetool installation!")
 
         lt_path = result
-        self.lt_console_command = ["java", "-jar", lt_path, "--json"]
+        self.lt_console_command = []
+
+        if executable_source == "java":
+            self.lt_console_command.append("java")
+            self.lt_console_command.append("-jar")
+
+        self.lt_console_command.append(lt_path)
+        self.lt_console_command.append("--json")
+
         if self.language:
             self.lt_console_command.append("-l")
             self.lt_console_command.append(self.language)
@@ -262,26 +281,45 @@ class LanguageToolLocalServer:
             raise FileNotFoundError("Unable to find Java runtime environment!")
 
         try:
-            result = tools.find_executable("languagetool-server.jar")
+            result = tools.find_executable("languagetool-server")
+            executable_source = "native"
         except FileNotFoundError:
-            print("Could not find languagetool-commandline.jar in your system's PATH.")
-            print("Please make sure you installed languagetool properly and added the ")
-            print("directory to your system's PATH variable. Also make sure to make ")
-            print("the jar-files executable.")
+            try:
+                result = tools.find_executable("languagetool-server.jar")
+                executable_source = "java"
+            except FileNotFoundError:
+                print(
+                    "Could not find languagetool-commandline.jar in your system's PATH."
+                )
+                print(
+                    "Please make sure you installed languagetool properly and added the"
+                )
+                print(
+                    "directory to your system's PATH variable. Also make sure to make"
+                )
+                print("the jar-files executable.")
 
-            print("For more information check the LaTeXBuddy manual.")
+                print("For more information check the LaTeXBuddy manual.")
 
-            raise FileNotFoundError("Unable to find languagetool installation!")
+                raise FileNotFoundError("Unable to find languagetool installation!")
 
         self.lt_path = result
-        self.lt_server_command = [
-            "java",
-            "-cp",
-            self.lt_path,
-            "org.languagetool.server.HTTPServer",
-            "--port",
-            str(self.port),
-        ]
+
+        if executable_source == "java":
+            self.lt_server_command = [
+                "java",
+                "-cp",
+                self.lt_path,
+                "org.languagetool.server.HTTPServer",
+            ]
+
+        elif executable_source == "native":
+            self.lt_server_command = [
+                self.lt_path,
+            ]
+
+        self.lt_server_command.append("--port")
+        self.lt_server_command.append(str(self.port))
 
     def start_local_server(self, port: int = _DEFAULT_PORT) -> int:
         """Starts the LanguageTool server locally.
