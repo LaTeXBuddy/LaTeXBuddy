@@ -13,6 +13,7 @@ before_script:
 
 stages:
     - Lint
+    - Smoke Test
 
 isort:
     stage: Lint
@@ -31,3 +32,23 @@ black:
     only:
         - master
         - merge_requests
+
+.smoke: &smoke_base
+    stage: Smoke Test
+    before_script:
+        - pip install poetry
+    script:
+        - poetry install
+        - poetry run latexbuddy --help
+    only:
+        - master
+        - merge_requests
+
+smoke-py36:
+  <<: *smoke_base
+  image: python:3.6
+
+smoke-py39:
+  <<: *smoke_base
+  image: python:3.9
+
