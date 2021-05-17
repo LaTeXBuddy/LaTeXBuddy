@@ -2,7 +2,7 @@
 
 import shlex
 
-from pathlib import Path, PurePath
+from pathlib import Path
 from typing import List
 
 import latexbuddy.error_class as error_class
@@ -14,8 +14,7 @@ _LANGUAGES = {"de": "de-DE", "en": "en"}
 
 # TODO: rewrite this using the Abstract Module API
 def run(buddy, file: Path):
-    """Runs the aspell checks on a file and saves the results in a LaTeXBuddy
-    instance.
+    """Runs the aspell checks on a file and saves the results in a LaTeXBuddy instance.
 
     Requires aspell to be separately installed
 
@@ -59,7 +58,6 @@ def check_language(language: str, langs: str):
         raise Exception("Spell check Failed")  # TODO: write a better Exception message
 
 
-# TODO: use pathlib.Path
 def format_errors(out: List[str], buddy, file: Path):
     """Parses Aspell errors and converts them to LaTeXBuddy Error objects.
 
@@ -68,7 +66,7 @@ def format_errors(out: List[str], buddy, file: Path):
     :param file: the file path
     """
     line_number = 1
-    line_offsets = tools.calculate_line_offsets(file)
+    # line_offsets = tools.calculate_line_offsets(file)
 
     for error in out:
         if error.strip() == "":
@@ -89,21 +87,21 @@ def format_errors(out: List[str], buddy, file: Path):
             suggestions = []
 
             if error[0] == "&":  # there are suggestions
-                location = int(meta[2])  # meta[1] is suggestion count
+                # location = int(meta[2])  # meta[1] is suggestion count
                 suggestions = suggestions_str.split(", ")
-            else:  # there are no suggestions
-                location = int(meta[1])
+            # else:  # there are no suggestions
+            # location = int(meta[1])
 
             # location = line_offsets[line_number + 1] + location  # absolute pos in detex
 
             # location = tools.find_char_position(buddy.file_to_check, Path(file),
             #                                    buddy.charmap,
             #                                    location)  # absolute pos in tex
-            location = None
+            location = None  # aspell's locations are funky
 
             error_class.Error(
                 buddy,
-                PurePath(file).stem,
+                file.stem,
                 "aspell",
                 "spelling",
                 "0",
