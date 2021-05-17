@@ -5,7 +5,6 @@ import os
 
 from pathlib import Path
 
-import latexbuddy.abs_module as abstract
 import latexbuddy.aspell as aspell
 import latexbuddy.chktex as chktex
 import latexbuddy.languagetool as languagetool
@@ -29,7 +28,6 @@ class LatexBuddy:
 
         :param config_loader: ConfigLoader object to manage config options
         :param file_to_check: file that will be checked
-        :param lang: language of the file
         """
         self.errors = {}  # all current errors
         self.cfg = config_loader  # configuration
@@ -140,11 +138,11 @@ class LatexBuddy:
                 Error(self, str(self.file_to_check), 'YALaFi', 'latex', 'TODO', err[1],
                       err[0], 0, [], False, "TODO"))
 
-        chktex = abstract.Chktex()
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
         aspell.run(self, detexed_file)
-        languagetool.run(self, detexed_file)        ch
+        languagetool.run(self, detexed_file)
+        chktex.run(self, self.file_to_check)
 
         # FOR TESTING ONLY
         # self.check_whitelist()

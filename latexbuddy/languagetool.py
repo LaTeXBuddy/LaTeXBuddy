@@ -1,6 +1,9 @@
 """This module defines the connection between LaTeXBuddy and LanguageTool."""
 
 import json
+import sys
+import socket
+import time
 
 from contextlib import closing
 from enum import Enum
@@ -10,9 +13,7 @@ from typing import Dict, List, Optional
 import requests
 
 import latexbuddy.error_class as error
-import latexbuddy.languagetool_local_server as lt_server
 import latexbuddy.tools as tools
-
 
 _LANGUAGES = {"de": "de-DE", "en": "en-GB"}
 
@@ -84,7 +85,7 @@ class LanguageToolModule:
         self.lt_console_command = None
 
         if self.mode == Mode.LOCAL_SERVER:
-            self.local_server = lt_server.LanguageToolLocalServer()
+            self.local_server = LanguageToolLocalServer()
             self.local_server.start_local_server()
 
         elif self.mode == Mode.REMOTE_SERVER:
@@ -149,8 +150,6 @@ class LanguageToolModule:
         else:
             self.lt_console_command.append("--autoDetect")
 
-    # TODO: use pathlib.Path
-    def check_tex(self, detex_file: Path):
     def check_tex(self, detex_file: Path):
         """Runs the LanguageTool checks on a file.
 
