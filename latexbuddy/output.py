@@ -5,7 +5,7 @@ env = Environment(loader=PackageLoader("latexbuddy"))
 
 
 def error_key(err):
-    if err.src.lower() == 'yalafi':
+    if err.src.lower() == "yalafi":
         return -2
     if not err.start:
         return -1

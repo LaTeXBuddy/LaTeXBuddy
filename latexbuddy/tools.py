@@ -5,10 +5,10 @@ import re
 import signal
 import subprocess
 import sys
-from io import StringIO
 
+from io import StringIO
 from pathlib import Path, PurePath
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 from yalafi.tex2txt import Options, get_line_starts, tex2txt, translate_numbers
 
@@ -154,19 +154,12 @@ def detex_path(file_to_detex: Path) -> Path:
     return detexed_file
 
 
-location_re = re.compile(r'line (\d+), column (\d+)')
+location_re = re.compile(r"line (\d+), column (\d+)")
 
 
-def yalafi_detex(file_to_detex: Path) -> Tuple[
-    Path,
-    List[int],
-    List[
-        Tuple[
-            Optional[Tuple[int, int]],
-            str
-        ]
-    ]
-]:
+def yalafi_detex(
+    file_to_detex: Path,
+) -> Tuple[Path, List[int], List[Tuple[Optional[Tuple[int, int]], str]]]:
     tex = file_to_detex.read_text()
     opts = Options()
 
@@ -230,7 +223,7 @@ def find_char_position(
     return aux.lin, aux.col
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     orig = Path("../tests/test.tex")
     detexed, charmap = yalafi_detex(orig)
     find_char_position(orig, detexed, charmap, 9)

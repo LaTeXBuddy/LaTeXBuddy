@@ -1,8 +1,8 @@
 """This module defines the connection between LaTeXBuddy and LanguageTool."""
 
 import json
-import sys
 import socket
+import sys
 import time
 
 from contextlib import closing
@@ -14,6 +14,7 @@ import requests
 
 import latexbuddy.error_class as error
 import latexbuddy.tools as tools
+
 
 _LANGUAGES = {"de": "de-DE", "en": "en-GB"}
 
@@ -231,9 +232,12 @@ class LanguageToolModule:
             context_offset = context["offset"]
             context_end = context["length"] + context_offset
             text = context["text"][context_offset:context_end]
-            location = tools.find_char_position(self.buddy.file_to_check,
-                                                detex_file,
-                                                self.buddy.charmap, match["offset"])
+            location = tools.find_char_position(
+                self.buddy.file_to_check,
+                detex_file,
+                self.buddy.charmap,
+                match["offset"],
+            )
 
             error_type = "grammar"
 

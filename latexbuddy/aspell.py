@@ -2,11 +2,12 @@
 
 import shlex
 
-from pathlib import PurePath, Path
+from pathlib import Path, PurePath
 from typing import List
 
 import latexbuddy.error_class as error_class
 import latexbuddy.tools as tools
+
 
 _LANGUAGES = {"de": "de-DE", "en": "en"}
 

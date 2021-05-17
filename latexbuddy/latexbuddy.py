@@ -135,8 +135,20 @@ class LatexBuddy:
 
         for err in detex_err:
             self.add_error(
-                Error(self, str(self.file_to_check), 'YALaFi', 'latex', 'TODO', err[1],
-                      err[0], 0, [], False, "TODO"))
+                Error(
+                    self,
+                    str(self.file_to_check),
+                    "YALaFi",
+                    "latex",
+                    "TODO",
+                    err[1],
+                    err[0],
+                    0,
+                    [],
+                    False,
+                    "TODO",
+                )
+            )
 
         chktex.run(self, self.file_to_check)
         detexed_file = tools.detex(self.file_to_check)
