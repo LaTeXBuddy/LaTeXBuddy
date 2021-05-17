@@ -16,7 +16,7 @@ import latexbuddy.error_class as error
 import latexbuddy.tools as tools
 
 
-_LANGUAGES = {"de": "de-DE", "en": "en-GB"}
+_LANGUAGE_MAP = {"de": "de-DE", "en": "en-GB"}
 
 
 def run(buddy, file: Path):
@@ -39,7 +39,9 @@ def run(buddy, file: Path):
         cfg_mode = Mode.COMMANDLINE
 
     try:
-        ltm = LanguageToolModule(buddy, language=_LANGUAGES[buddy.lang], mode=cfg_mode)
+        ltm = LanguageToolModule(
+            buddy, language=_LANGUAGE_MAP[buddy.lang], mode=cfg_mode
+        )
         ltm.check_tex(file)
     except ConnectionError as e:
         print("LanguageTool server: " + str(e), file=sys.stderr)
