@@ -40,7 +40,7 @@ black:
     script:
         - poetry export -o requirements.txt
         - pip install -r requirements.txt
-        - python -m compileall ./latexbuddy/**/*.py
+        - python -m compileall ./latexbuddy/
     only:
         - master
         - merge_requests
