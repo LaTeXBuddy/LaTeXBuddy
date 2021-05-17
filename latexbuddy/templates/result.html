@@ -5,41 +5,45 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Result</title>
+    <title>{{ file_name }} | LaTeXBuddy</title>
     <style>
+        {% include "modern-normalize.css" %}
         {% include "style.css" %}
     </style>
 </head>
 <body>
-<h1>LatexBuddy</h1>
-<h2>{{file_name}}</h2>
+<header>
+    <h1>LaTeXBuddy</h1>
+    <h2><small>Results for</small> {{ file_name }}</h2>
+</header>
 <main>
-    <div>
-        <pre><code>{{highlighted_file_text|safe}}</code></pre>
-    </div>
-    <div>
-        <h3>Error list</h3>
+    <section id="file-contents">
+        <pre><code>{{ highlighted_file_text|safe }}</code></pre>
+    </section>
+    <section id="errors-list">
+        <h3>Errors</h3>
         <ol>
             {% for error in errors %}
-            <li class="error">
-                <ul>
-                    <li class="error-description">
-                        {{error['src']}}: {{error['error_type']}}: <b>{{error['text']}}</b>
-                    </li>
-                    <!-- <li class="line-number">
-
-                     </li>-->
-                    <li class="error-id">
-                        Character: {{error['start']}}
-                    </li>
-                    <li class="error-suggestions">
-                        Suggestions: {{", ".join(error['suggestions'])}}
-                    </li>
-                </ul>
-            </li>
+                <li class="error {% if error.warning %}is-warning{% else %}is-error{% endif %}">
+                    <h4 class="error-title monospaced">
+                        {{ error.text }}
+                    </h4>
+                    <span class="error-meta">
+                        {{ error.error_type }} error
+                        in character {{ error.start }}
+                        <i>({{ error.src }}#{{ error.error_id }})</i>
+                    </span>
+                    {% if error.suggestions|length <= 1 %}
+                        {{ "".join(error.suggestions) }}
+                    {% else %}
+                        <strong>Suggestions:</strong>
+                        <br>
+                        {{ ", ".join(error['suggestions']) }}
+                    {% endif %}
+                </li>
             {% endfor %}
         </ol>
-    </div>
+    </section>
 </main>
 </body>
 </html>
