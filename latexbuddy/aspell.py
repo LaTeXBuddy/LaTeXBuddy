@@ -2,7 +2,7 @@
 
 import shlex
 
-from pathlib import PurePath
+from pathlib import PurePath, Path
 from typing import List
 
 import latexbuddy.error_class as error_class
@@ -11,8 +11,7 @@ import latexbuddy.tools as tools
 
 # TODO: rewrite this using the Abstract Module API
 
-# TODO: use pathlib.Path
-def run(buddy, file: str):
+def run(buddy, file: Path):
     """Runs the aspell checks on a file and saves the results in a LaTeXBuddy
     instance.
 
@@ -26,7 +25,7 @@ def run(buddy, file: str):
     langs = tools.execute("aspell", "dump dicts")
     check_language(language, langs)
     # execute aspell on given file and collect output
-    error_list = tools.execute(f"cat {file} | aspell -a --lang={language}")
+    error_list = tools.execute(f"cat {str(file)} | aspell -a --lang={language}")
 
     # format aspell output
     out = error_list.splitlines()[1:]  # the first line specifies aspell version
@@ -59,7 +58,7 @@ def check_language(language: str, langs: str):
 
 
 # TODO: use pathlib.Path
-def format_errors(out: List[str], buddy, file: str):
+def format_errors(out: List[str], buddy, file: Path):
     """Parses Aspell errors and converts them to LaTeXBuddy Error objects.
 
     :param out: line-split output of the aspell command
@@ -68,6 +67,7 @@ def format_errors(out: List[str], buddy, file: str):
     """
     line_number = 1
     line_offsets = tools.calculate_line_offsets(file)
+    # line_lengths = tools.calculate_line_lengths(file)
 
     for error in out:
         if error.strip() == "":
@@ -93,7 +93,12 @@ def format_errors(out: List[str], buddy, file: str):
             else:  # there are no suggestions
                 location = int(meta[1])
 
-            location = str(line_offsets[line_number] + location)
+            location = line_offsets[line_number + 1] + location  # absolute pos in detex
+            # location = tools.start_char(line_number, location, line_lengths)
+
+            location = tools.find_char_position(buddy.file_to_check, Path(file),
+                                                buddy.charmap,
+                                                location)  # absolute pos in tex
 
             error_class.Error(
                 buddy,

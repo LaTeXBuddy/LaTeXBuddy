@@ -2,6 +2,7 @@
 LaTeXBuddy."""
 
 import argparse
+from pathlib import Path
 
 from latexbuddy.latexbuddy import LatexBuddy
 
@@ -29,7 +30,7 @@ def main():
     buddy = LatexBuddy(
         error_file=args.output,
         whitelist_file=args.whitelist,
-        file_to_check=args.file,
+        file_to_check=Path(args.file),
         lang=args.language,
     )
     buddy.run_tools()

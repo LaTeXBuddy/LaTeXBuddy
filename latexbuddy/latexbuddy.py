@@ -22,7 +22,7 @@ class LatexBuddy:
 
     # TODO: use pathlib.Path
     def __init__(
-        self, error_file: str, whitelist_file: str, file_to_check: str, lang: str
+        self, error_file: str, whitelist_file: str, file_to_check: Path, lang: str
     ):
         """Initializes the LaTeXBuddy instance.
 
@@ -118,9 +118,7 @@ class LatexBuddy:
         # check_preprocessor
         # check_config
 
-        # with abstractmodules
-        formated_file = tools.format_input_file(self.file_to_check)
-        detexed_formatted = tools.detex_path(formated_file)
+        detexed_file, self.charmap = tools.yalafi_detex(self.file_to_check)
 
         chktex = abstract.Chktex()
         chktex.run(self, self.file_to_check)
@@ -129,12 +127,6 @@ class LatexBuddy:
         aspell.run(self, detexed_file)
         languagetool = abstract.Languagetool()
         languagetool.run(self, detexed_file)
-
-        # without abstractmodules
-        # chktex.run(self, self.file_to_check)
-        # detexed_file = tools.detex(self.file_to_check)
-        # aspell.run(self, detexed_file)
-        # languagetool.run(self, detexed_file)
 
         # FOR TESTING ONLY
         # self.check_whitelist()

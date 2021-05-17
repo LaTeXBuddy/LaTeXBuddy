@@ -80,7 +80,7 @@ def get_command_string(cmd: Tuple[str]) -> str:
     """
     command = ""
     for arg in cmd:
-        command += arg + " "
+        command += str(arg) + " "
     return command.strip()
 
 
@@ -122,7 +122,7 @@ def detex(file_to_detex: str) -> str:
 
         raise FileNotFoundError("Unable to find detex installation!")
 
-    detexed_file = file_to_detex + ".detexed"
+    detexed_file = str(file_to_detex) + ".detexed"
     execute("detex", file_to_detex, " > ", detexed_file)
     return detexed_file
 
@@ -185,7 +185,8 @@ def find_char_position(
     aux = translate_numbers(tex, plain, charmap, line_starts, line, char)
 
     if aux is None:
-        raise Exception("File parsing error while converting tex to txt.")
+        return -1
+        # raise Exception("File parsing error while converting tex to txt.")
 
     tex_lines = get_line_starts(tex)
     return tex_lines[aux.lin - 1] + aux.col
@@ -219,17 +220,17 @@ def calculate_line_lengths(filename: str) -> List[int]:
     return result
 
 
-def calculate_line_offsets(filename: str) -> List[int]:
+def calculate_line_offsets(file: Path) -> List[int]:
     """Calculates character offsets for each line in a file.
 
     Indices correspond to the line numbers. For example, if first 4 lines
     contain 100 characters (including line breaks),result[5] will be 100.
     result[0] = result[1] = 0
 
-    :param filename: path to the inspected file
+    :param file: path to the inspected file
     :return: list of line offsets with indices representing 1-based line numbers
     """
-    lines = Path(filename).read_text().splitlines(keepends=True)
+    lines = Path(file).read_text().splitlines(keepends=True)
     offset = 0
     result = [0]
     for line in lines:

@@ -3,7 +3,7 @@
 import json
 
 from enum import Enum, auto
-from pathlib import PurePath
+from pathlib import PurePath, Path
 from typing import Dict, List, Optional
 
 import requests
@@ -11,7 +11,6 @@ import requests
 import latexbuddy.error_class as error
 import latexbuddy.languagetool_local_server as lt_server
 import latexbuddy.tools as tools
-
 
 # TODO: define for all languages or let users choose it
 _LANGUAGES = {"de": "de-DE", "en": "en-GB"}
@@ -179,8 +178,7 @@ class LanguageToolModule:
 
         return json.loads(output)
 
-    # TODO: use pathlib.Path
-    def format_errors(self, raw_errors: Dict, detex_file: str):
+    def format_errors(self, raw_errors: Dict, detex_file: Path):
         """Parses LanguageTool errors and converts them to LaTeXBuddy Error objects.
 
         :param raw_errors: LanguageTool's error output
