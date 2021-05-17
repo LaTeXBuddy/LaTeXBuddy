@@ -1,7 +1,12 @@
 image: python:latest
 
 variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
     SRC_DIR: "$CI_PROJECT_DIR/latexbuddy"
+
+cache:
+    paths:
+        - .cache/pip
 
 before_script:
     - python --version
@@ -14,9 +19,15 @@ isort:
     script:
         - pip install isort
         - isort --check --diff "$SRC_DIR"
+    only:
+        - master
+        - merge_requests
 
 black:
     stage: Lint
     script:
         - pip install black
         - black --check --diff "$SRC_DIR"
+    only:
+        - master
+        - merge_requests
