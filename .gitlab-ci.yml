@@ -34,7 +34,7 @@ black:
         - merge_requests
 
 .smoke: &smoke_base
-    stage: Test
+    stage: Smoke Test
     before_script:
         - pip install poetry
     script:
