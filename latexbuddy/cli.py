@@ -5,8 +5,8 @@ import argparse
 
 from pathlib import Path
 
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.latexbuddy import LatexBuddy
 
 
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")

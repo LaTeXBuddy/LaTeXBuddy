@@ -15,8 +15,6 @@ from latexbuddy.error_class import Error
 from latexbuddy.output import render_html
 
 
-# FIXME: rename this file (e.g. to 'buddy') because it's confusing
-
 # TODO: make this a singleton class with static methods
 
 
