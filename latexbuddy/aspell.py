@@ -77,7 +77,7 @@ def format_errors(out: List[str], buddy, file: Path):
         if error[0] in ("&", "#"):
 
             tmp = error[1:].strip().split(": ", 1)
-            meta_str, suggestions_str = tmp if len(tmp) > 1 else (tmp[0], [])
+            meta_str, suggestions_str = tmp if len(tmp) > 1 else (tmp[0], "")
 
             # & original count offset
             # # original
