@@ -43,7 +43,7 @@ class Module(ABC):
         pass
 
     @abstractmethod
-    def get_errors(self, buddy: LatexBuddy) -> List[Error]:
+    def fetch_errors(self, buddy: LatexBuddy) -> List[Error]:
         """Passes all currently accumulated errors to the caller.
 
         :param buddy: the calling LaTeXBuddy instance (for config access)
