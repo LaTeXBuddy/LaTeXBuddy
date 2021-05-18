@@ -1,107 +1,152 @@
-"""This module describes the LaTeXBuddy Error class and its properties."""
+"""This module describes the LaTeXBuddy Problem class and its properties.
+
+*Problems* are found by *Checkers*. *Checkers* are free to implement their own Problem
+types, however LaTeXBuddy will most probably not display extra metadata.
+"""
+
+from pathlib import Path
 from typing import List, Optional, Tuple
+
+from latexbuddy.abs_module import Module
+
+
+class ProblemSeverity:
+    """Defines possible problem severity grades.
+
+    Problem severity is usually preset by the checkers themselves. However, a user
+    should be able to redefine the severity of a specific problem, using either
+    category, key, or cid.
+
+    * "none" problems are not being highlighted, but are still being output.
+    * "info" problems are highlighted with light blue colour. These are suggestions;
+      problems, that aren't criticising the text.
+      Example: suggestion to use "lots" instead of "a lot"
+    * "warning" problems are highlighted with orange colour. These are warnings about
+      problematic areas in documents. The files compile and work as expected, but some
+      behaviour may be unacceptable.
+      Example: warning about using "$$" in LaTeX
+    * "error" problems are highlighted with red colour. These are errors, that prevent
+      the documents to compile correctly.
+      Example: not closed environment, or wrong LaTeX syntax
+    """
+
+    NONE = "none"
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
 
 
 class Problem:
-    """Describes an Error object.
+    """Describes a Problem object.
 
-    The Error object contains information about a single error in file. It may be wrong
-    LaTeX code or a misspelled word.
+    A Problem object contains information about a problem detected by a checker. For
+    example, it can be wrong LaTeX code or a misspelled word.
     """
 
     def __init__(
         self,
-        buddy,
-        path: str,  # TODO: use pathlib.Path
-        src: str,
-        error_type: str,
-        error_id: str,
+        position: Tuple[int, int],
         text: str,
-        start: Optional[
-            Tuple[int, int]
-        ],  # TODO: is this a string? please make this into an int
-        length,
-        suggestions: List[str],
-        warning: bool,  # TODO: make this a string/enum with values error/warning/info
-        compare_id,  # TODO: make sure all modules implement this
+        checker: Module,
+        cid: str,
+        file: Path,
+        severity: ProblemSeverity = ProblemSeverity.WARNING,
+        category: Optional[str] = None,
+        description: Optional[str] = None,
+        context: Optional[Tuple[str, str]] = None,
+        suggestions: List[str] = None,
+        key: Optional[str] = None,
     ):
-        """Creates an error object.
-
-        :param buddy: LaTeXBuddy instance the error will be added to
-        :param path: the path to the file
-        :param src: the tool that found the error (e.g. chktex, aspell, ...)
-        :param error_type: error type: "grammar", "spelling", or "latex"
-        :param error_id: tool-specific internal error ID
-        :param text: the error as text (e.g., the misspelled word)
-        :param start: the absolute position in file of the first symbol of the error
-        :param length: the length of the error
-        :param suggestions: suggestions that could solve the error
-        :param warning: True if the error is a warning, False if it's an error
-        :param compare_id: ID to compare semantically equal errors
         """
-        self.path = path
-        self.src = src
-        self.error_type = error_type
-        self.error_id = error_id
+
+        :param position: position of the problem in the source file, encoded as
+                         `(line, column)`.
+        :param text: problematic text.
+        :param checker: tool that discovered the problem.
+        :param cid: ID of the problem type, used inside the respective checker.
+        :param file: **[DEPRECATED]** path to the file where the problem was found
+        :param severity: severity of the problem.
+        :param category: category of the problem, for example "grammar".
+        :param description: description of the problem.
+        :param context: optional context of the problem, that is, text that comes before
+                        and after the problematic text.
+        :param suggestions: list of suggestions, that is, possible replacements for
+                            problematic text.
+        :param key: semi-unique string, which can be used to compare two problems.
+
+        """
+        self.position = position
         self.text = text
-        self.start = start
-        self.length = length
+        self.checker = checker
+        self.cid = cid
+        self.file = file  # FIXME: deprecated!
+        self.severity = severity
+        self.category = category
+        self.description = description
+        self.context = context
+        if suggestions is None:
+            suggestions = []
         self.suggestions = suggestions
-        self.warning = warning
-        self.compare_id = buddy.get_lang() + "_" + compare_id
+        self.key = key
 
-        self.uid = self.uid()
-        self.cut_suggestions()
+        if self.key is None:
+            self.key = self.__generate_key()
+        self.length = len(text)
+        self.uid = self.__generate_uid()
 
-        # TODO: remove this; constructors shouldn't produce side effects
-        buddy.add_error(self)
+    def __generate_key(self) -> str:
+        """Generates a key for the problem based on checker and problematic text.
 
-    def cut_suggestions(self):
-        """Cuts the suggestions list down to the first 10 elements if there are more"""
-        if len(self.suggestions) > 10:
-            self.suggestions = self.suggestions[:10]
+        This method is particularly used in the constructor for the cases when the key
+        wasn't previously supplied.
 
-    # TODO: can't we replace this with __str__()?
-    def uid(self) -> str:
-        """Calculates the UID of the Error object.
-
-        The UID is a unique ID containing all important information about the error.
-
-        :return: the UID of the Error object
+        :return: generated key
         """
-        # TODO: use f-strings
-        return "{}\0{}\0{}\0{}\0{}\0{}".format(
-            self.path, self.src, self.error_type, self.error_id, self.start, self.length
+        return f"{self.checker}/{self.cid}/{self.text}"
+
+    def __generate_uid(self) -> str:
+        """**[DEPRECATED]** Calculates the UID of the Problem object.
+
+        The UID is a unique ID containing all important information about the problem.
+
+        :return: the UID of the Problem object
+        """
+
+        return "\0".join(
+            [
+                self.file,
+                self.checker,
+                self.category,
+                self.cid,
+                self.__get_pos_str(),
+                self.length,
+            ]
         )
 
-    # TODO: why does this exist? Use the uid() method
-    def get_uid(self) -> str:
-        """Returns the UID of the Error object.
+    def __get_pos_str(self) -> str:
+        """Returns the string value of the problem's position.
 
-        The UID is a unique ID containing all important information about the error.
-
-        :return: the UID of the Error object
+        :return: string value of the position
         """
-        return self.uid
+        return f"{self.position[0]}:{self.position[1]}"
 
-    # TODO: why does this exist? Use direct access
-    def get_comp_id(self) -> str:
-        """Returns the comparing ID of the Error object.
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, Problem):
+            return False
 
-        :return: the comparing ID of the Error object
-        """
-        return self.compare_id
+        if not self.key or not o.key:
+            return False
 
-    # Ignore for now
-    # def get_hash(self, language):
-    #     string_for_hash = self.dict["error_type"] + self.dict["text"] + language
-    #     return hashlib.md5(string_for_hash).hexdigest()
+        return self.key == o.key
 
-    # TODO: can't we replace this with __eq__()?
-    def compare_with_other_comp_id(self, other_comp_id: str) -> bool:
-        """Compares this Error to another using the comparing ID.
+    def __ne__(self, o: object) -> bool:
+        return not self == o
 
-        :param other_comp_id: comparing ID of the other Error object
-        :return: True if two errors are equal, False otherwise
-        """
-        return self.compare_id == other_comp_id
+    def __str__(self) -> str:
+        return (
+            f"{self.category.capitalize()} "
+            f"{str(self.severity).lower()} "
+            f"on {self.__get_pos_str()}: "
+            f"{self.text}: "
+            f"{self.description}."
+        )
