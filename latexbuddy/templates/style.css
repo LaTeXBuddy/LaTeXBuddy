@@ -12,6 +12,10 @@ body {
     padding: 1rem 2rem 0;
 }
 
+header h1 > svg {
+    height: 2.5em;
+}
+
 pre {
     background-color: #eeeeee;
     padding: 1rem;
