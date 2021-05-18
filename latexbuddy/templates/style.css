@@ -1,15 +1,19 @@
 .monospaced {
     font-family: ui-monospace,
-        SFMono-Regular,
-        Consolas,
-        'Liberation Mono',
-        Menlo,
-        monospace;
+    SFMono-Regular,
+    Consolas,
+    'Liberation Mono',
+    Menlo,
+    monospace;
 }
 
 body {
     font-size: 14px;
     padding: 1rem 2rem 0;
+}
+
+header h1 > svg {
+    height: 2.5em;
 }
 
 pre {
@@ -60,7 +64,7 @@ main > section {
 }
 
 .error.is-warning .error-title {
-    text-decoration-color: orange ;
+    text-decoration-color: orange;
 }
 
 .error.is-error .error-title {
@@ -76,4 +80,23 @@ main > section {
     font-size: smaller;
     font-weight: normal;
     margin: 0 0 .5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    html, body {
+        background-color: #111;
+        color: #eee;
+    }
+
+    svg .color-primary {
+        fill: #eee;
+    }
+
+    pre {
+        background-color: #222;
+    }
+
+    .error {
+        border-bottom-color: #222;
+    }
 }

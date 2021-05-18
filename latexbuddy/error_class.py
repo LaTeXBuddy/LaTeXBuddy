@@ -58,7 +58,7 @@ class Error:
 
     def cut_suggestions(self):
         """Cuts the suggestions list down to the first 10 elements if there are more"""
-        if isinstance(self.suggestions, list) & len(self.suggestions) > 10:
+        if len(self.suggestions) > 10:
             self.suggestions = self.suggestions[:10]
 
     # TODO: can't we replace this with __str__()?
