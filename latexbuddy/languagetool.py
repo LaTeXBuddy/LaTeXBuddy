@@ -16,7 +16,7 @@ import requests
 import latexbuddy.latexbuddy as ltb
 import latexbuddy.tools as tools
 
-from latexbuddy.abs_module import Module
+from latexbuddy.abs_module import InputFileType, Module
 from latexbuddy.error_class import Error
 
 
@@ -52,7 +52,11 @@ class LanguageToolModule(Module):
 
         self.errors = None
 
-    def run_module(self, buddy: ltb.LatexBuddy, file_path: Path):
+    def get_input_file_type(self) -> InputFileType:
+        """Specifies the required input file type for this module."""
+        return InputFileType.DETEXED_FILE
+
+    def run_module(self, buddy: ltb.LatexBuddy, file_path: Path) -> None:
         """Runs the LanguageTool checks on a file and saves the results in a LaTeXBuddy
         instance.
 
@@ -66,11 +70,8 @@ class LanguageToolModule(Module):
         try:
             self.buddy = buddy
 
-            cfg_language = buddy.cfg.get_config_option_or_default(
-                "latexbuddy", "language", "en"
-            )
             try:
-                self.language = LanguageToolModule._LANGUAGE_MAP[cfg_language]
+                self.language = LanguageToolModule._LANGUAGE_MAP[self.buddy.lang]
             except KeyError:
                 self.language = None
 
@@ -107,15 +108,15 @@ class LanguageToolModule(Module):
             )
             traceback.print_exc(file=sys.stderr)
 
-    def save_errors(self):
+    def fetch_errors(self) -> List[Error]:
         """Passes the accumulated errors on to the main LaTeXBuddy instance."""
 
-        for error in self.errors:
-            self.buddy.add_error(error)
-
+        to_return = self.errors
         self.errors = []
 
-    def find_languagetool_command(self):
+        return to_return
+
+    def find_languagetool_command(self) -> None:
         """Searches for the LanguageTool command line app.
 
         This method also checks if Java is installed.
@@ -170,7 +171,7 @@ class LanguageToolModule(Module):
         else:
             self.lt_console_command.append("--autoDetect")
 
-    def check_tex(self, detex_file: Path):
+    def check_tex(self, detex_file: Path) -> None:
         """Runs the LanguageTool checks on a file.
 
         :param detex_file: the detexed file to run checks on
@@ -233,7 +234,7 @@ class LanguageToolModule(Module):
 
         return json_output
 
-    def format_errors(self, raw_errors: Dict, detex_file: Path):
+    def format_errors(self, raw_errors: Dict, detex_file: Path) -> None:
         """Parses LanguageTool errors and converts them to LaTeXBuddy Error objects.
 
         :param raw_errors: LanguageTool's error output
@@ -316,7 +317,7 @@ class LanguageToolLocalServer:
     def __del__(self):
         self.stop_local_server()
 
-    def get_server_run_command(self):
+    def get_server_run_command(self) -> None:
         """Searches for the LanguageTool server executable.
 
         This method also checks if Java is installed.
@@ -392,7 +393,7 @@ class LanguageToolLocalServer:
 
         return self.port
 
-    def wait_till_server_up(self):
+    def wait_till_server_up(self) -> None:
         """Waits for the LanguageTool server to start.
 
         :raises ConnectionError: if server didn't start
@@ -417,7 +418,7 @@ class LanguageToolLocalServer:
         if not up:
             raise ConnectionError("Could not connect to local server.")
 
-    def stop_local_server(self):
+    def stop_local_server(self) -> None:
         """Stops the local LanguageTool server process."""
 
         if not self.server_process:
