@@ -14,6 +14,7 @@ before_script:
 stages:
     - Lint
     - Smoke Test
+    - Build
 
 isort:
     stage: Lint
@@ -52,3 +53,17 @@ smoke-py39:
   <<: *smoke_base
   image: python:3.9
 
+build:
+    stage: Build
+    before_script:
+        - pip install poetry
+    script:
+        - poetry install
+        - poetry build
+    artifacts:
+        public: false
+        paths:
+            - dist/
+        expire_in: 1 month
+    only:
+        - tags
