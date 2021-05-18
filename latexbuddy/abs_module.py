@@ -1,6 +1,7 @@
 """This module defines the abstract module of LaTeXBuddy."""
 
 from abc import ABC, abstractmethod
+from enum import Enum, auto
 from pathlib import Path
 from typing import List
 
@@ -8,8 +9,28 @@ from latexbuddy.error_class import Error
 from latexbuddy.latexbuddy import LatexBuddy
 
 
+class InputFileType(Enum):
+    """Describes the type of input file that a module is designed to handle.
+
+    Available options:
+    - LATEX_FILE:   the unchanged LaTeX source file
+    - DETEXED_FILE: the filtered LaTeX source file without any commands etc. (just text)
+    """
+
+    LATEX_FILE = auto()
+    DETEXED_FILE = auto()
+
+
 class Module(ABC):
     """Abstract class that defines a simple LaTeXBuddy module."""
+
+    @abstractmethod
+    def get_input_file_type(self) -> InputFileType:
+        """Specifies the input file type of this module.
+
+        :return: input file type this module is designed to check
+        """
+        pass
 
     @abstractmethod
     def run_module(self, buddy: LatexBuddy, file_path: Path) -> None:
