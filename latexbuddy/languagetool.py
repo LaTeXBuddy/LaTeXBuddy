@@ -12,8 +12,9 @@ from typing import Dict, List, Optional
 
 import requests
 
-import latexbuddy.error_class as error
 import latexbuddy.tools as tools
+
+from latexbuddy.problem import Problem
 
 
 _LANGUAGES = {"de": "de-DE", "en": "en-GB"}
@@ -244,7 +245,7 @@ class LanguageToolModule:
             if match["rule"]["category"]["id"] == "TYPOS":
                 error_type = "spelling"
 
-            error.Error(
+            Problem(
                 self.buddy,
                 str(self.buddy.file_to_check),
                 tool_name,

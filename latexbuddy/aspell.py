@@ -5,8 +5,9 @@ import shlex
 from pathlib import Path
 from typing import List
 
-import latexbuddy.error_class as error_class
 import latexbuddy.tools as tools
+
+from latexbuddy.problem import Problem
 
 
 _LANGUAGES = {"de": "de-DE", "en": "en"}
@@ -99,7 +100,7 @@ def format_errors(out: List[str], buddy, file: Path):
             #                                    location)  # absolute pos in tex
             location = None  # aspell's locations are funky
 
-            error_class.Error(
+            Problem(
                 buddy,
                 file.stem,
                 "aspell",

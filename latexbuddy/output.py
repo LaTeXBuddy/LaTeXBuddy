@@ -2,13 +2,13 @@ from typing import Dict
 
 from jinja2 import Environment, PackageLoader
 
-from latexbuddy.error_class import Error
+from latexbuddy.problem import Problem
 
 
 env = Environment(loader=PackageLoader("latexbuddy"))
 
 
-def error_key(err: Error) -> int:
+def error_key(err: Problem) -> int:
     """Returns a number for each error to be able to sort them.
 
     This puts YaLaFi's errors on top, followed by errors without location.
@@ -26,7 +26,7 @@ def error_key(err: Error) -> int:
     return err.start[0]
 
 
-def render_html(file_name: str, file_text: str, errors: Dict[str, Error]) -> str:
+def render_html(file_name: str, file_text: str, errors: Dict[str, Problem]) -> str:
     """Renders an HTML page based on file contents and discovered errors.
 
     :param file_name: file name

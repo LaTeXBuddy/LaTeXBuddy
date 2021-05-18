@@ -2,7 +2,7 @@
 from typing import List, Optional, Tuple
 
 
-class Error:
+class Problem:
     """Describes an Error object.
 
     The Error object contains information about a single error in file. It may be wrong

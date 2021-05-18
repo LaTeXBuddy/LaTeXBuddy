@@ -1,12 +1,12 @@
 """This module defines the connection between LaTeXBuddy and ChkTeX."""
 from typing import List
 
-import latexbuddy.error_class as error_class
 import latexbuddy.tools as tools
+
+from latexbuddy.problem import Problem
 
 
 # TODO: rewrite this using the Abstract Module API
-
 
 filename = ""
 DELIMITER = ":"
@@ -59,7 +59,8 @@ def save_output(out: List[str], buddy):
         compare_id = "chktex_" + s_arr[1] + "_" + s_arr[5]
         tool_name = "chktex"
         error_type = "latex"
-        error_class.Error(
+
+        Problem(
             buddy,
             path,
             tool_name,
