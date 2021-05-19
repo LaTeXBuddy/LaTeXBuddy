@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import List
 
 from latexbuddy.buddy import LatexBuddy
-from latexbuddy.error_class import Error
+from latexbuddy.problem import Problem
 
 
 class InputFileType(Enum):
@@ -43,7 +43,7 @@ class Module(ABC):
         pass
 
     @abstractmethod
-    def fetch_errors(self, buddy: LatexBuddy) -> List[Error]:
+    def fetch_errors(self, buddy: LatexBuddy) -> List[Problem]:
         """Passes all currently accumulated errors to the caller.
 
         :param buddy: the calling LaTeXBuddy instance (for config access)
