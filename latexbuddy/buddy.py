@@ -128,6 +128,8 @@ class LatexBuddy:
         # importing this here to avoid circular import error
         import latexbuddy.languagetool as languagetool
 
+        from latexbuddy.abs_module import InputFileType
+
         # check_preprocessor
         # check_config
 
@@ -152,10 +154,10 @@ class LatexBuddy:
             )
 
         # without abstract module
-        chktex.run(self, self.file_to_check)
+        chktex.run(self, str(self.file_to_check))
         aspell.run(self, detexed_file)
         # languagetool.run(self, detexed_file)
-        chktex.run(self, self.file_to_check)
+        chktex.run(self, str(self.file_to_check))
 
         # with abstract module
         modules = [
@@ -163,10 +165,24 @@ class LatexBuddy:
         ]
 
         for module in modules:
-            module.run_module(self, detexed_file)
 
-            # TODO: add this line after removing the adding feature from error_class.py
-            # module.save_errors()
+            if_type = module.get_input_file_type()
+
+            if if_type == InputFileType.LATEX_FILE:
+                module.run_module(self, self.file_to_check)
+
+            elif if_type == InputFileType.DETEXED_FILE:
+                module.run_module(self, detexed_file)
+
+            else:
+                continue
+
+            errors = module.fetch_errors()
+
+            # TODO: uncomment these lines after removing the
+            #   automatic adding feature from error_class.py
+            # for error in errors:
+            #     self.add_error(error)
 
         # FOR TESTING ONLY
         # self.check_whitelist()
