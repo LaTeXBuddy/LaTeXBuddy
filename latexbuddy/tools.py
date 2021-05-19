@@ -220,6 +220,25 @@ def calculate_line_offsets(file: Path) -> List[int]:
     return result
 
 
+def absolute_to_linecol(text: str, position: int) -> Tuple[int, int, List[int]]:
+    """Calculates line and column number for an absolute character position.
+
+    :param text: text of file to find line:col position for
+    :param position: absolute 0-based character position
+    :return: line number, column number, line offsets
+    """
+    line_offsets = get_line_offsets(text)
+    line = 0  # [0, ...]
+    while position >= line_offsets[line]:
+        line += 1
+
+    # translate_numbers expects 1-based column number
+    # however, line_offsets is 0-based
+    column = position - line_offsets[line - 1] + 1
+
+    return line, column, line_offsets
+
+
 def get_line_offsets(text: str) -> List[int]:
     """Calculates character offsets for each line in the file.
 
