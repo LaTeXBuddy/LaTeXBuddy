@@ -123,9 +123,9 @@ class LatexBuddy:
         """Runs all tools in the LaTeXBuddy toolchain"""
 
         # importing these here to avoid circular import error
-        import latexbuddy.languagetool as languagetool
         import latexbuddy.aspell as aspell
         import latexbuddy.chktex as chktex
+        import latexbuddy.languagetool as languagetool
 
         from latexbuddy.abs_module import InputFileType
 
@@ -145,7 +145,6 @@ class LatexBuddy:
                     "latex",
                     self.file_to_check,
                 )
-
                 # TODO: old implementation for reference (remove when finished)
                 # Problem(
                 #    self,
@@ -159,7 +158,7 @@ class LatexBuddy:
                 #    [],
                 #    False,
                 #    "TODO",
-                #)
+                # )
             )
 
         # without abstract module

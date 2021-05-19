@@ -122,4 +122,4 @@ def format_errors(out: List[str], buddy, file: Path):
             #    suggestions,
             #    False,
             #    "spelling_" + text,
-            #)
+            # )
