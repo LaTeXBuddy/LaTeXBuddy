@@ -63,7 +63,16 @@ class LatexBuddy:
             file.write("[")
             uids = list(self.errors.keys())
             for uid in uids:
-                json.dump(self.errors[uid].__dict__, file, indent=4)
+
+                # TODO: clean up this temporary workaround by properly reworking the
+                #   JSON encoding process (Path and Enum are not JSON serializable)
+                err_data = self.errors[uid].__dict__
+                if "file" in err_data:
+                    err_data["file"] = str(err_data["file"])
+                if "severity" in err_data:
+                    err_data["severity"] = str(err_data["severity"])
+
+                json.dump(err_data, file, indent=4)
                 if not uid == uids[-1]:
                     file.write(",")
 
