@@ -16,14 +16,14 @@ def error_key(err: Problem) -> int:
     :param err: error object
     :return: error's "rating" for sorting
     """
-    if err.src.lower() == "yalafi":
+    if err.checker.lower() == "yalafi":
         return -3
-    if not err.start:
+    if not err.position:
         return -2
-    if not isinstance(err.start, tuple):
+    if not isinstance(err.position, tuple):
         return -1
 
-    return err.start[0]
+    return err.position[0]
 
 
 def render_html(file_name: str, file_text: str, errors: Dict[str, Problem]) -> str:
