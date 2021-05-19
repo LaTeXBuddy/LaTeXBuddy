@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import List
 
 from latexbuddy.error_class import Error
-from latexbuddy.latexbuddy import LatexBuddy
+from latexbuddy.buddy import LatexBuddy
 
 
 class InputFileType(Enum):

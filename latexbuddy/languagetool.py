@@ -13,7 +13,7 @@ from typing import Dict, List, Optional
 
 import requests
 
-import latexbuddy.latexbuddy as ltb
+import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
 from latexbuddy.abs_module import InputFileType, Module
