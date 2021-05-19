@@ -8,7 +8,7 @@ from pathlib import Path
 import latexbuddy.tools as tools
 
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.problem import Problem
+from latexbuddy.problem import Problem, ProblemSeverity
 
 
 # TODO: make this a singleton class with static methods
@@ -51,7 +51,7 @@ class LatexBuddy:
         :param error: error to add to the dictionary
         """
 
-        self.errors[error.get_uid()] = error
+        self.errors[error.uid] = error
 
     # TODO: rename method. Parse = read; this method writes
     # TODO: maybe remove the method completely
@@ -137,19 +137,29 @@ class LatexBuddy:
 
         for err in detex_err:
             self.add_error(
+                # TODO: Verify this is correct and maybe implement more attributes
                 Problem(
-                    self,
-                    str(self.file_to_check),
+                    err[0],
+                    err[1],
                     "YALaFi",
                     "latex",
-                    "TODO",
-                    err[1],
-                    err[0],
-                    0,
-                    [],
-                    False,
-                    "TODO",
+                    self.file_to_check,
                 )
+
+                # TODO: old implementation for reference (remove when finished)
+                # Problem(
+                #    self,
+                #    str(self.file_to_check),
+                #    "YALaFi",
+                #    "latex",
+                #    "TODO",
+                #    err[1],
+                #    err[0],
+                #    0,
+                #    [],
+                #    False,
+                #    "TODO",
+                #)
             )
 
         # without abstract module
