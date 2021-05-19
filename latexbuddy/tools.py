@@ -1,4 +1,4 @@
-"""This module contains various utilitary tools."""
+"""This module contains various utility tools."""
 
 import os
 import re
