@@ -17,7 +17,7 @@ import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
 from latexbuddy.abs_module import InputFileType, Module
-from latexbuddy.problem import Problem
+from latexbuddy.problem import Problem, ProblemSeverity
 
 
 class Mode(Enum):
@@ -265,30 +265,19 @@ class LanguageToolModule(Module):
                 problem_type = "spelling"
 
             self.problems.append(
-
-                # TODO: completely implement new Problem constructor
                 Problem(
-                    (0, 0),
+                    location,
                     text,
                     tool_name,
                     match["rule"]["id"],
                     self.buddy.file_to_check,
+                    ProblemSeverity.ERROR,
+                    problem_type,
+                    match["rule"]["description"],
+                    match["context"]["text"],
+                    LanguageToolModule.parse_error_replacements(match["replacements"]),
+                    tool_name + "_" + match["rule"]["id"],
                 )
-
-                # TODO: old implementation for reference (remove when done)
-                # Problem(
-                #    self.buddy,
-                #    str(self.buddy.file_to_check),
-                #    tool_name,
-                #    problem_type,
-                #    match["rule"]["id"],
-                #    text,
-                #    location,
-                #    match["length"],
-                #    LanguageToolModule.parse_error_replacements(match["replacements"]),
-                #    False,
-                #    tool_name + "_" + match["rule"]["id"],
-                # )
             )
 
     @staticmethod
