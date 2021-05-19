@@ -265,7 +265,6 @@ class LanguageToolModule(Module):
                 problem_type = "spelling"
 
             self.problems.append(
-
                 # TODO: completely implement new Problem constructor
                 Problem(
                     (0, 0),
@@ -274,7 +273,6 @@ class LanguageToolModule(Module):
                     match["rule"]["id"],
                     self.buddy.file_to_check,
                 )
-
                 # TODO: old implementation for reference (remove when done)
                 # Problem(
                 #    self.buddy,
