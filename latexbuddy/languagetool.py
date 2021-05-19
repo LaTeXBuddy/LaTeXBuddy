@@ -17,7 +17,7 @@ import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
 from latexbuddy.abs_module import InputFileType, Module
-from latexbuddy.error_class import Error
+from latexbuddy.problem import Problem
 
 
 class Mode(Enum):
@@ -50,7 +50,7 @@ class LanguageToolModule(Module):
         self.remote_url = None
         self.lt_console_command = None
 
-        self.errors = None
+        self.problems = None
 
     def get_input_file_type(self) -> InputFileType:
         """Specifies the required input file type for this module."""
@@ -96,7 +96,7 @@ class LanguageToolModule(Module):
             elif self.mode == Mode.COMMANDLINE:
                 self.find_languagetool_command()
 
-            self.errors = []
+            self.problems = []
             self.check_tex(file_path)
 
         except Exception as e:
@@ -108,11 +108,11 @@ class LanguageToolModule(Module):
             )
             traceback.print_exc(file=sys.stderr)
 
-    def fetch_errors(self) -> List[Error]:
+    def fetch_errors(self) -> List[Problem]:
         """Passes the accumulated errors on to the main LaTeXBuddy instance."""
 
-        to_return = self.errors
-        self.errors = []
+        to_return = self.problems
+        self.problems = []
 
         return to_return
 
@@ -177,20 +177,20 @@ class LanguageToolModule(Module):
         :param detex_file: the detexed file to run checks on
         """
 
-        raw_errors = None
+        raw_problems = None
 
         if self.mode == Mode.LOCAL_SERVER:
-            raw_errors = self.lt_post_request(
+            raw_problems = self.lt_post_request(
                 detex_file, "http://localhost:" f"{self.local_server.port}" "/v2/check"
             )
 
         elif self.mode == Mode.REMOTE_SERVER:
-            raw_errors = self.lt_post_request(detex_file, self.remote_url)
+            raw_problems = self.lt_post_request(detex_file, self.remote_url)
 
         elif self.mode == Mode.COMMANDLINE:
-            raw_errors = self.execute_commandline_request(detex_file)
+            raw_problems = self.execute_commandline_request(detex_file)
 
-        self.format_errors(raw_errors, Path(detex_file))
+        self.format_errors(raw_problems, Path(detex_file))
 
     def lt_post_request(self, detex_file: Path, server_url: str) -> Optional[Dict]:
         """Send a POST request to the LanguageTool server to check the text.
@@ -234,19 +234,19 @@ class LanguageToolModule(Module):
 
         return json_output
 
-    def format_errors(self, raw_errors: Dict, detex_file: Path) -> None:
+    def format_errors(self, raw_problems: Dict, detex_file: Path) -> None:
         """Parses LanguageTool errors and converts them to LaTeXBuddy Error objects.
 
-        :param raw_errors: LanguageTool's error output
+        :param raw_problems: LanguageTool's error output
         :param detex_file: path to the detex'ed file
         """
 
-        if len(raw_errors) == 0:
+        if len(raw_problems) == 0:
             return
 
-        tool_name = raw_errors["software"]["name"]
+        tool_name = raw_problems["software"]["name"]
 
-        for match in raw_errors["matches"]:
+        for match in raw_problems["matches"]:
 
             context = match["context"]
             context_offset = context["offset"]
@@ -259,17 +259,17 @@ class LanguageToolModule(Module):
                 match["offset"],
             )
 
-            error_type = "grammar"
+            problem_type = "grammar"
 
             if match["rule"]["category"]["id"] == "TYPOS":
-                error_type = "spelling"
+                problem_type = "spelling"
 
-            self.errors.append(
-                Error(
+            self.problems.append(
+                Problem(
                     self.buddy,
                     str(self.buddy.file_to_check),
                     tool_name,
-                    error_type,
+                    problem_type,
                     match["rule"]["id"],
                     text,
                     location,

@@ -10,8 +10,8 @@ import latexbuddy.chktex as chktex
 import latexbuddy.tools as tools
 
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.error_class import Error
 from latexbuddy.output import render_html
+from latexbuddy.problem import Problem
 
 
 # TODO: make this a singleton class with static methods
@@ -46,7 +46,7 @@ class LatexBuddy:
         )
         self.check_successful = False
 
-    def add_error(self, error: Error):
+    def add_error(self, error: Problem):
         """Adds the error to the errors dictionary.
 
         UID is used as key, the error object is used as value.
@@ -138,7 +138,7 @@ class LatexBuddy:
 
         for err in detex_err:
             self.add_error(
-                Error(
+                Problem(
                     self,
                     str(self.file_to_check),
                     "YALaFi",
