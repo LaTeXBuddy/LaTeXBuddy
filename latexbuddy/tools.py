@@ -218,3 +218,19 @@ def calculate_line_offsets(file: Path) -> List[int]:
         result.append(offset)
         offset += len(line)
     return result
+
+
+def is_binary(file_bytes: bytes) -> bool:
+    """Detects whether the bytes of a file contain binary code or not.
+
+    For correct detection, it is recommended, that at least 1024 bytes were read.
+
+    Sources:
+      * https://stackoverflow.com/a/7392391/4735420
+      * https://github.com/file/file/blob/f2a6e7cb7d/src/encoding.c#L151-L228
+
+    :param file_bytes: bytes of a file
+    :return: True, if the file is binary, False otherwise
+    """
+    textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7F})
+    return bool(file_bytes.translate(None, textchars))
