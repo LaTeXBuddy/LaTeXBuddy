@@ -104,7 +104,6 @@ def find_executable(name: str) -> str:
         return result.splitlines()[0]
 
 
-# TODO: should this be in yalafi_detex() ?
 location_re = re.compile(r"line (\d+), column (\d+)")
 
 
