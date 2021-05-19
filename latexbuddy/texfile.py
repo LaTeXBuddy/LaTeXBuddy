@@ -6,7 +6,7 @@ from pathlib import Path
 
 from chardet import detect
 
-from tools import yalafi_detex
+from tools import is_binary, yalafi_detex
 
 
 @dataclass
@@ -28,11 +28,13 @@ class TexFile:
         file_encoding = detect(file_bytes)["encoding"]
         self.source_contents = file_bytes.decode(encoding=file_encoding)
 
-        self.detexed, self.detexed_charmap, self.__detex_problems = yalafi_detex(
+        self.detexed, self.detexed_charmap, self._detex_problems = yalafi_detex(
             self.path
         )
 
         self.detexed_contents = self.detexed.read_text()
+
+        self.faulty = is_binary(file_bytes[:1024]) or len(self._detex_problems) > 0
 
     def __repr__(self) -> str:
         return f"{self.__name__}(file={str(self.path.resolve())})"
