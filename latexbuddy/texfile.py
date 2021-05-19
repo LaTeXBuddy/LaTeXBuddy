@@ -1,7 +1,6 @@
 """This module defines new TexFile class used to abstract files LaTeXBuddy is working
 with."""
 
-from dataclasses import dataclass
 from pathlib import Path
 
 from chardet import detect
@@ -9,7 +8,6 @@ from chardet import detect
 from latexbuddy.tools import is_binary, yalafi_detex
 
 
-@dataclass
 class TexFile:
     """A simple TeX file. This class reads the file, detects its encoding and saves it
     as text for future editing."""
@@ -36,5 +34,14 @@ class TexFile:
 
         self.faulty = is_binary(file_bytes[:1024]) or len(self._detex_problems) > 0
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, TexFile):
+            return False
+
+        return self.path == other.path
+
     def __repr__(self) -> str:
         return f"{self.__name__}(file={str(self.path.resolve())})"
+
+    def __str__(self) -> str:
+        return str(self.path)
