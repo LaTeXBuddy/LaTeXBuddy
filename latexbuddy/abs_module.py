@@ -5,8 +5,8 @@ from enum import Enum, auto
 from pathlib import Path
 from typing import List
 
-from latexbuddy.error_class import Error
 from latexbuddy.buddy import LatexBuddy
+from latexbuddy.error_class import Error
 
 
 class InputFileType(Enum):
