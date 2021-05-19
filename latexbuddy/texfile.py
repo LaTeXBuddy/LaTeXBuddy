@@ -6,7 +6,7 @@ from pathlib import Path
 
 from chardet import detect
 
-from tools import is_binary, yalafi_detex
+from latexbuddy.tools import is_binary, yalafi_detex
 
 
 @dataclass
