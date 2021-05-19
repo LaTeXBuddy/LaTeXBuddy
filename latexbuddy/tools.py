@@ -202,7 +202,7 @@ def calculate_line_lengths(filename: str) -> List[int]:
 
 
 def calculate_line_offsets(file: Path) -> List[int]:
-    """Calculates character offsets for each line in a file.
+    """**[DEPRECATED]** Calculates character offsets for each line in a file.
 
     Indices correspond to the line numbers. For example, if first 4 lines
     contain 100 characters (including line breaks),result[5] will be 100.
@@ -218,3 +218,61 @@ def calculate_line_offsets(file: Path) -> List[int]:
         result.append(offset)
         offset += len(line)
     return result
+
+
+def absolute_to_linecol(text: str, position: int) -> Tuple[int, int, List[int]]:
+    """Calculates line and column number for an absolute character position.
+
+    :param text: text of file to find line:col position for
+    :param position: absolute 0-based character position
+    :return: line number, column number, line offsets
+    """
+    line_offsets = get_line_offsets(text)
+    line = 0  # [0, ...]
+    while position >= line_offsets[line]:
+        line += 1
+
+    # translate_numbers expects 1-based column number
+    # however, line_offsets is 0-based
+    column = position - line_offsets[line - 1] + 1
+
+    return line, column, line_offsets
+
+
+def get_line_offsets(text: str) -> List[int]:
+    """Calculates character offsets for each line in the file.
+
+    Indices correspond to the line numbers, but are 0-based. For example, if first
+    4 lines contain 100 characters (including line breaks), `result[4]` will be 100.
+    `result[0]` = 0.
+
+    This is a port of YaLaFi's get_line_starts() function.
+
+    :param text: contents of file to find offsets for
+    :return: list of line offsets with indices representing 0-based line numbers
+    """
+    lines = text.splitlines(keepends=True)
+    offset = 0
+    result = []
+    for line in lines:
+        result.append(offset)
+        offset += len(line)
+    result.append(offset)  # last line
+
+    return result
+
+
+def is_binary(file_bytes: bytes) -> bool:
+    """Detects whether the bytes of a file contain binary code or not.
+
+    For correct detection, it is recommended, that at least 1024 bytes were read.
+
+    Sources:
+      * https://stackoverflow.com/a/7392391/4735420
+      * https://github.com/file/file/blob/f2a6e7cb7d/src/encoding.c#L151-L228
+
+    :param file_bytes: bytes of a file
+    :return: True, if the file is binary, False otherwise
+    """
+    textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7F})
+    return bool(file_bytes.translate(None, textchars))
