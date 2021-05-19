@@ -10,6 +10,7 @@ modules = {
         "output": "errors.json"
     },
     "languagetool": {
-        "mode": "LOCAL_SERVER"
+        "mode": "COMMANDLINE",
+        # "remote_url": "https://example.com/check/v2/"
     },
 }
