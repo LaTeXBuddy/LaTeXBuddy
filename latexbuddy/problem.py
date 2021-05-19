@@ -113,12 +113,12 @@ class Problem:
 
         return "\0".join(
             [
-                self.file,
+                str(self.file),
                 self.checker,
-                self.category,
+                str(self.category),
                 self.cid,
                 self.__get_pos_str(),
-                self.length,
+                str(self.length),
             ]
         )
 
