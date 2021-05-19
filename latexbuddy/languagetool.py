@@ -8,7 +8,6 @@ import traceback
 
 from contextlib import closing
 from enum import Enum
-from pathlib import Path
 from typing import Dict, List, Optional
 
 import requests
@@ -16,7 +15,8 @@ import requests
 import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
-from latexbuddy.abs_module import InputFileType, Module
+from latexbuddy import TexFile
+from latexbuddy.abs_module import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
 
@@ -42,7 +42,6 @@ class LanguageToolModule(Module):
     def __init__(self):
         """Creates a LanguageTool checking module."""
 
-        self.buddy = None
         self.mode = None
         self.language = None
 
@@ -50,28 +49,20 @@ class LanguageToolModule(Module):
         self.remote_url = None
         self.lt_console_command = None
 
-        self.problems = None
-
-    def get_input_file_type(self) -> InputFileType:
-        """Specifies the required input file type for this module."""
-        return InputFileType.DETEXED_FILE
-
-    def run_module(self, buddy: ltb.LatexBuddy, file_path: Path) -> None:
-        """Runs the LanguageTool checks on a file and saves the results in a LaTeXBuddy
-        instance.
+    def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
+        """Runs the LanguageTool checks on a file and returns the results as a list.
 
         Requires LanguageTool (server) to be set up.
         Local or global servers can be used.
 
         :param buddy: the LaTeXBuddy instance
-        :param file_path: the file to run checks on
+        :param file: the file to run checks on
         """
 
         try:
-            self.buddy = buddy
 
             try:
-                self.language = LanguageToolModule._LANGUAGE_MAP[self.buddy.lang]
+                self.language = LanguageToolModule._LANGUAGE_MAP[buddy.lang]
             except KeyError:
                 self.language = None
 
@@ -96,8 +87,7 @@ class LanguageToolModule(Module):
             elif self.mode == Mode.COMMANDLINE:
                 self.find_languagetool_command()
 
-            self.problems = []
-            self.check_tex(file_path)
+            return self.check_tex(file)
 
         except Exception as e:
 
@@ -107,14 +97,6 @@ class LanguageToolModule(Module):
                 file=sys.stderr,
             )
             traceback.print_exc(file=sys.stderr)
-
-    def fetch_errors(self) -> List[Problem]:
-        """Passes the accumulated errors on to the main LaTeXBuddy instance."""
-
-        to_return = self.problems
-        self.problems = []
-
-        return to_return
 
     def find_languagetool_command(self) -> None:
         """Searches for the LanguageTool command line app.
@@ -171,59 +153,58 @@ class LanguageToolModule(Module):
         else:
             self.lt_console_command.append("--autoDetect")
 
-    def check_tex(self, detex_file: Path) -> None:
+    def check_tex(self, file: TexFile) -> List[Problem]:
         """Runs the LanguageTool checks on a file.
 
-        :param detex_file: the detexed file to run checks on
+        :param file: the file to run checks on
         """
 
         raw_problems = None
 
         if self.mode == Mode.LOCAL_SERVER:
             raw_problems = self.lt_post_request(
-                detex_file, "http://localhost:" f"{self.local_server.port}" "/v2/check"
+                file, "http://localhost:" f"{self.local_server.port}" "/v2/check"
             )
 
         elif self.mode == Mode.REMOTE_SERVER:
-            raw_problems = self.lt_post_request(detex_file, self.remote_url)
+            raw_problems = self.lt_post_request(file, self.remote_url)
 
         elif self.mode == Mode.COMMANDLINE:
-            raw_problems = self.execute_commandline_request(detex_file)
+            raw_problems = self.execute_commandline_request(file)
 
-        self.format_errors(raw_problems, Path(detex_file))
+        return self.format_errors(raw_problems, file)
 
-    def lt_post_request(self, detex_file: Path, server_url: str) -> Optional[Dict]:
+    def lt_post_request(self, file: TexFile, server_url: str) -> Optional[Dict]:
         """Send a POST request to the LanguageTool server to check the text.
 
-        :param detex_file: path to the detex'ed file
+        :param file: TexFile object representing the file to be checked
         :param server_url: URL of the LanguageTool server
         :return: server's response
         """
-        if detex_file is None:
+        if file is None:
             return None
 
-        with open(detex_file) as file:
-            text = file.read()
+        text = file.detexed_contents
 
         response = requests.post(
             url=server_url, data={"language": self.language, "text": text}
         )
         return response.json()
 
-    def execute_commandline_request(self, detex_file: Path) -> Optional[Dict]:
+    def execute_commandline_request(self, file: TexFile) -> Optional[Dict]:
         """Execute the LanguageTool command line app to check the text.
 
-        :param detex_file: path to the detex'ed file
+        :param file: TexFile object representing the file to be checked
         :return: app's response
         """
 
-        if detex_file is None:
+        if file is None:
             return None
 
         # cloning list to in order to append the file name
         # w/o changing lt_console_command
         cmd = list(self.lt_console_command)
-        cmd.append(str(detex_file))
+        cmd.append(str(file.detexed))
 
         output = tools.execute_no_errors(*cmd, encoding="utf_8")
 
@@ -234,15 +215,18 @@ class LanguageToolModule(Module):
 
         return json_output
 
-    def format_errors(self, raw_problems: Dict, detex_file: Path) -> None:
+    @staticmethod
+    def format_errors(raw_problems: Dict, file: TexFile) -> List[Problem]:
         """Parses LanguageTool errors and converts them to LaTeXBuddy Error objects.
 
         :param raw_problems: LanguageTool's error output
-        :param detex_file: path to the detex'ed file
+        :param file: TexFile object representing the file to be checked
         """
 
-        if len(raw_problems) == 0:
-            return
+        problems = []
+
+        if raw_problems is None or len(raw_problems) == 0:
+            return problems
 
         tool_name = raw_problems["software"]["name"]
 
@@ -253,9 +237,9 @@ class LanguageToolModule(Module):
             context_end = context["length"] + context_offset
             text = context["text"][context_offset:context_end]
             location = tools.find_char_position(
-                self.buddy.file_to_check,
-                detex_file,
-                self.buddy.charmap,
+                file.path,
+                file.detexed,
+                file.detexed_charmap,
                 match["offset"],
             )
 
@@ -264,13 +248,13 @@ class LanguageToolModule(Module):
             if match["rule"]["category"]["id"] == "TYPOS":
                 problem_type = "spelling"
 
-            self.problems.append(
+            problems.append(
                 Problem(
                     location,
                     text,
                     tool_name,
                     match["rule"]["id"],
-                    self.buddy.file_to_check,
+                    file.path,
                     ProblemSeverity.ERROR,
                     problem_type,
                     match["rule"]["description"],
@@ -279,6 +263,8 @@ class LanguageToolModule(Module):
                     tool_name + "_" + match["rule"]["id"],
                 )
             )
+
+        return problems
 
     @staticmethod
     def parse_error_replacements(
@@ -376,7 +362,7 @@ class LanguageToolLocalServer:
     def start_local_server(self, port: int = _DEFAULT_PORT) -> int:
         """Starts the LanguageTool server locally.
 
-        :param port: port for the server to losten at
+        :param port: port for the server to listen at
         :return: the actual port of the server
         """
 

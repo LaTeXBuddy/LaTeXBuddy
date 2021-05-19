@@ -1,4 +1,4 @@
-"""This module descibes the main LaTeXBuddy instance class."""
+"""This module describes the main LaTeXBuddy instance class."""
 
 import json
 import os
@@ -7,8 +7,9 @@ from pathlib import Path
 
 import latexbuddy.tools as tools
 
+from latexbuddy import TexFile
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem
 
 
 # TODO: make this a singleton class with static methods
@@ -26,6 +27,7 @@ class LatexBuddy:
         self.errors = {}  # all current errors
         self.cfg = config_loader  # configuration
         self.file_to_check = file_to_check  # .tex file that is to be error checked
+        self.charmap = None  # detex charmap
 
         # file where the error should be saved
         self.error_file = self.cfg.get_config_option_or_default(
@@ -136,11 +138,12 @@ class LatexBuddy:
         import latexbuddy.chktex as chktex
         import latexbuddy.languagetool as languagetool
 
-        from latexbuddy.abs_module import InputFileType
-
         # check_preprocessor
         # check_config
 
+        tex_file = TexFile(self.file_to_check)
+
+        # TODO: phase out and replace with tex_file, if possible
         detexed_file, self.charmap, detex_err = tools.yalafi_detex(self.file_to_check)
         self.check_successful = True if len(detex_err) < 1 else False
 
@@ -174,32 +177,18 @@ class LatexBuddy:
         chktex.run(self, str(self.file_to_check))
         aspell.run(self, detexed_file)
         # languagetool.run(self, detexed_file)
-        chktex.run(self, str(self.file_to_check))
 
         # with abstract module
+        # TODO: replace with ToolLoader
         modules = [
             languagetool.LanguageToolModule(),
         ]
 
         for module in modules:
+            errors = module.run_checks(self, tex_file)
 
-            if_type = module.get_input_file_type()
-
-            if if_type == InputFileType.LATEX_FILE:
-                module.run_module(self, self.file_to_check)
-
-            elif if_type == InputFileType.DETEXED_FILE:
-                module.run_module(self, detexed_file)
-
-            else:
-                continue
-
-            errors = module.fetch_errors()
-
-            # TODO: uncomment these lines after removing the
-            #   automatic adding feature from error_class.py
-            # for error in errors:
-            #     self.add_error(error)
+            for error in errors:
+                self.add_error(error)
 
         # FOR TESTING ONLY
         # self.check_whitelist()
