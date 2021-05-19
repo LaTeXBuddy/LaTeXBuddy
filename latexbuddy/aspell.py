@@ -100,16 +100,26 @@ def format_errors(out: List[str], buddy, file: Path):
             #                                    location)  # absolute pos in tex
             location = None  # aspell's locations are funky
 
+            # TODO: verify this is correct so far and implement other attributes
             Problem(
-                buddy,
-                file.stem,
-                "aspell",
-                "spelling",
-                "0",
+                (0, 0),
                 text,
-                location,
-                len(text),
-                suggestions,
-                False,
-                "spelling_" + text,
+                "aspell",
+                "TODO",
+                file,
             )
+
+            # TODO: old implementation for reference (remove when finished)
+            # Problem(
+            #    buddy,
+            #    file.stem,
+            #    "aspell",
+            #    "spelling",
+            #    "0",
+            #    text,
+            #    location,
+            #    len(text),
+            #    suggestions,
+            #    False,
+            #    "spelling_" + text,
+            #)
