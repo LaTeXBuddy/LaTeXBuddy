@@ -4,13 +4,14 @@
 types, however LaTeXBuddy will most probably not display extra metadata.
 """
 
+from enum import Enum
 from pathlib import Path
 from typing import List, Optional, Tuple
 
 from latexbuddy.abs_module import Module
 
 
-class ProblemSeverity:
+class ProblemSeverity(Enum):
     """Defines possible problem severity grades.
 
     Problem severity is usually preset by the checkers themselves. However, a user
