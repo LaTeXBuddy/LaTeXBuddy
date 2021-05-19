@@ -8,7 +8,6 @@ from pathlib import Path
 import latexbuddy.tools as tools
 
 from latexbuddy.config_loader import ConfigLoader
-# FIXME: Circular import error
 from latexbuddy.problem import Problem
 
 

@@ -8,8 +8,6 @@ from enum import Enum
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from latexbuddy.abs_module import Module
-
 
 class ProblemSeverity(Enum):
     """Defines possible problem severity grades.
@@ -48,7 +46,7 @@ class Problem:
         self,
         position: Tuple[int, int],
         text: str,
-        checker: Module,
+        checker: str,
         cid: str,
         file: Path,
         severity: ProblemSeverity = ProblemSeverity.WARNING,
@@ -63,7 +61,7 @@ class Problem:
         :param position: position of the problem in the source file, encoded as
                          `(line, column)`.
         :param text: problematic text.
-        :param checker: tool that discovered the problem.
+        :param checker: name of the tool that discovered the problem.
         :param cid: ID of the problem type, used inside the respective checker.
         :param file: **[DEPRECATED]** path to the file where the problem was found
         :param severity: severity of the problem.
