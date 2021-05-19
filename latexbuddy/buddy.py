@@ -5,12 +5,10 @@ import os
 
 from pathlib import Path
 
-import latexbuddy.aspell as aspell
-import latexbuddy.chktex as chktex
 import latexbuddy.tools as tools
 
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.output import render_html
+# FIXME: Circular import error
 from latexbuddy.problem import Problem
 
 
@@ -125,8 +123,10 @@ class LatexBuddy:
     def run_tools(self):
         """Runs all tools in the LaTeXBuddy toolchain"""
 
-        # importing this here to avoid circular import error
+        # importing these here to avoid circular import error
         import latexbuddy.languagetool as languagetool
+        import latexbuddy.aspell as aspell
+        import latexbuddy.chktex as chktex
 
         from latexbuddy.abs_module import InputFileType
 
@@ -203,6 +203,10 @@ class LatexBuddy:
         return self.lang
 
     def output_html(self):
+
+        # importing this here to avoid circular import error
+        from latexbuddy.output import render_html
+
         html_output_path = Path(self.error_file + ".html")
         html_output_path.write_text(
             render_html(
