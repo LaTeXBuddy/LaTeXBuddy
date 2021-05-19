@@ -265,19 +265,30 @@ class LanguageToolModule(Module):
                 problem_type = "spelling"
 
             self.problems.append(
+
+                # TODO: completely implement new Problem constructor
                 Problem(
-                    self.buddy,
-                    str(self.buddy.file_to_check),
-                    tool_name,
-                    problem_type,
-                    match["rule"]["id"],
+                    (0, 0),
                     text,
-                    location,
-                    match["length"],
-                    LanguageToolModule.parse_error_replacements(match["replacements"]),
-                    False,
-                    tool_name + "_" + match["rule"]["id"],
+                    tool_name,
+                    match["rule"]["id"],
+                    self.buddy.file_to_check,
                 )
+
+                # TODO: old implementation for reference (remove when done)
+                # Problem(
+                #    self.buddy,
+                #    str(self.buddy.file_to_check),
+                #    tool_name,
+                #    problem_type,
+                #    match["rule"]["id"],
+                #    text,
+                #    location,
+                #    match["length"],
+                #    LanguageToolModule.parse_error_replacements(match["replacements"]),
+                #    False,
+                #    tool_name + "_" + match["rule"]["id"],
+                # )
             )
 
     @staticmethod
