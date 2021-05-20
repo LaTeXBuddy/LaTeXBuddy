@@ -138,6 +138,8 @@ class LatexBuddy:
         import latexbuddy.chktex as chktex
         import latexbuddy.languagetool as languagetool
 
+        from latexbuddy.tool_loader import ToolLoader
+
         # check_preprocessor
         # check_config
 
@@ -174,15 +176,14 @@ class LatexBuddy:
             )
 
         # without abstract module
-        chktex.run(self, str(self.file_to_check))
-        aspell.run(self, detexed_file)
+        # chktex.run(self, str(self.file_to_check))
+        # aspell.run(self, detexed_file)
         # languagetool.run(self, detexed_file)
 
         # with abstract module
-        # TODO: replace with ToolLoader
-        modules = [
-            languagetool.LanguageToolModule(),
-        ]
+
+        tool_ldr = ToolLoader(Path("latexbuddy/modules/"))
+        modules = tool_ldr.load_modules()
 
         for module in modules:
             errors = module.run_checks(self, tex_file)
