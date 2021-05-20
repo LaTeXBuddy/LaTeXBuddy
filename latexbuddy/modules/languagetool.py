@@ -2,9 +2,7 @@
 
 import json
 import socket
-import sys
 import time
-import traceback
 
 from contextlib import closing
 from enum import Enum
@@ -202,9 +200,13 @@ class LanguageTool(Module):
             return None
 
         request_data = {
-            "language": self.language,
             "text": file.plain,
         }
+
+        if self.language:
+            request_data["language"] = self.language
+        else:
+            request_data["language"] = "auto"
 
         if self.disabled_rules:
             request_data["disabledRules"] = self.disabled_rules
