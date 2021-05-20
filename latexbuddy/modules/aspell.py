@@ -48,7 +48,8 @@ class AspellModule(Module):
     def check_language(language: str, langs: str):
         """Checks if a language is in a list of languages.
 
-        The list of languages is actually a string; e.g., the output of a terminal command.
+        The list of languages is actually a string; e.g., the output of a terminal
+        command.
 
         :param language: language to search for
         :param langs: language list to search in
