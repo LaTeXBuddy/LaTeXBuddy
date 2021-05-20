@@ -26,7 +26,7 @@ class TestModule(Module):
                 "TestModule",
                 "TestModule",
                 "TestModule",
-                file.path,
+                file.tex_file,
             )
         ]
 

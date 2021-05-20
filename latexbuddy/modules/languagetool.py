@@ -184,7 +184,7 @@ class LanguageTool(Module):
         if file is None:
             return None
 
-        text = file.detexed_contents
+        text = file.plain
 
         response = requests.post(
             url=server_url, data={"language": self.language, "text": text}
@@ -204,7 +204,7 @@ class LanguageTool(Module):
         # cloning list to in order to append the file name
         # w/o changing lt_console_command
         cmd = list(self.lt_console_command)
-        cmd.append(str(file.detexed))
+        cmd.append(str(file.plain_file))
 
         output = tools.execute_no_errors(*cmd, encoding="utf_8")
 
@@ -236,12 +236,7 @@ class LanguageTool(Module):
             context_offset = context["offset"]
             context_end = context["length"] + context_offset
             text = context["text"][context_offset:context_end]
-            location = tools.find_char_position(
-                file.path,
-                file.detexed,
-                file.detexed_charmap,
-                match["offset"],
-            )
+            location = file.get_position_in_tex(match["offset"])
 
             problem_type = "grammar"
 
@@ -254,7 +249,7 @@ class LanguageTool(Module):
                     text,
                     tool_name,
                     match["rule"]["id"],
-                    file.path,
+                    file.tex_file,
                     ProblemSeverity.ERROR,
                     problem_type,
                     match["rule"]["description"],

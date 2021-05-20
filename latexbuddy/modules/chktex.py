@@ -28,7 +28,7 @@ class ChktexModule(Module):
             + "\n\n"
         )
         command_output = tools.execute(
-            "chktex", "-f", f"'{format_str}'", "-q", str(file.path)
+            "chktex", "-f", f"'{format_str}'", "-q", str(file.tex_file)
         )
         out_split = command_output.split("\n")
         return self.format_problems(out_split, file)
@@ -66,7 +66,7 @@ class ChktexModule(Module):
                     text,
                     self.tool_name,
                     str(internal_id),
-                    file.path,
+                    file.tex_file,
                     severity,
                     self.problem_type,
                     description,

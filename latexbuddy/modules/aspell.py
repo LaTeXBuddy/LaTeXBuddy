@@ -114,7 +114,7 @@ class AspellModule(Module):
                         text,
                         self.tool_name,
                         cid,
-                        file.path,
+                        file.tex_file,
                         severity,
                         None,
                         None,
