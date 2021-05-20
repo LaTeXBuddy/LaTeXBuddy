@@ -5,10 +5,11 @@ import re
 import signal
 import subprocess
 import sys
+import traceback
 
 from io import StringIO
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 from yalafi.tex2txt import Options, get_line_starts, tex2txt, translate_numbers
 
@@ -276,3 +277,27 @@ def is_binary(file_bytes: bytes) -> bool:
     """
     textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7F})
     return bool(file_bytes.translate(None, textchars))
+
+
+def execute_no_exceptions(
+    function_call: Callable[[], None],
+    error_message: str = "An error occurred while executing lambda function at",
+) -> None:
+    """Executes a given function call and catches any Exception that is raised during
+        execution. If an Exception is caught, the function is aborted and the error
+        is printed to stderr, but as the Exception is caught, the program won't crash.
+
+    :param function_call: function to be executed
+    :param error_message: custom error message displayed in the console
+    """
+
+    try:
+        function_call()
+    except Exception as e:
+
+        print(
+            error_message + ":\n",
+            f"{e.__class__.__name__}: {getattr(e, 'message', e)}",
+            file=sys.stderr,
+        )
+        traceback.print_exc(file=sys.stderr)
