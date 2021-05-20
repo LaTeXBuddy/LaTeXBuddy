@@ -8,7 +8,10 @@ import traceback
 from pathlib import Path
 
 import latexbuddy.tools as tools
-
+from bs4 import BeautifulSoup
+import re
+from html import unescape
+import latexbuddy.output as output
 from latexbuddy import TexFile
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.problem import Problem
@@ -215,13 +218,9 @@ class LatexBuddy:
         # importing this here to avoid circular import error
         from latexbuddy.output import render_html
 
-        html_output_path = Path(self.error_file + ".html")
-        html_output_path.write_text(
-            render_html(
-                str(self.file_to_check),
-                self.file_to_check.read_text(),
-                self.errors,
-            )
-        )
+        # err_values = sorted(self.errors.values(), key=output.error_key)
+        # html_output_path = Path(self.error_file + ".html")
+        # html = self.iwas(err_values, self.file_to_check.read_text())
+        # html_output_path.write_text(html)
 
         print(f"File output to {html_output_path}")
