@@ -187,14 +187,14 @@ def find_char_position(
     return aux.lin, aux.col
 
 
-def calculate_line_lengths(filename: str) -> List[int]:
+def calculate_line_lengths(file: Path) -> List[int]:
     """Calculates line lengths for each line in a file.
 
-    :param filename: path to the inspected file
+    :param file: path to the inspected file
     :return: list of line lengths with indices representing 1-based line numbers
     """
 
-    lines = Path(filename).read_text().splitlines(keepends=True)
+    lines = file.read_text().splitlines(keepends=True)
     result = [0]
     for line in lines:
         result.append(len(line))
