@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import List
 
 from latexbuddy.abs_module import Module
+from latexbuddy.config_loader import ConfigLoader
 
 
 class ToolLoader:
@@ -30,6 +31,23 @@ class ToolLoader:
                 modules.append(class_obj())
 
         return modules
+
+    def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
+        modules = self.load_modules()
+
+        selected = [
+            module
+            for module in modules
+            if cfg.get_config_option_or_default(
+                module.__class__.__name__,
+                "enabled",
+                cfg.get_config_option_or_default(
+                    "buddy", "enable-modules-by-default", True
+                ),
+            )
+        ]
+
+        return selected
 
     @staticmethod
     def import_py_files(py_files: List[Path]) -> List:
