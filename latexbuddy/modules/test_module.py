@@ -7,6 +7,9 @@ from latexbuddy.problem import Problem
 
 
 class TestModule(Module):
+    def __init__(self):
+        return
+
     def run_checks(self, buddy: LatexBuddy, file: TexFile) -> List[Problem]:
         return [
             Problem(
@@ -17,3 +20,8 @@ class TestModule(Module):
                 file.path,
             )
         ]
+
+
+class JustSomeRandomClass:
+    def __init__(self):
+        pass
