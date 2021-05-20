@@ -59,25 +59,35 @@ main > section {
     margin: 0 0 .5em;
 }
 
-.problem-text{
+.problem-text {
     text-decoration-style: wavy;
     text-decoration-line: underline;
     text-decoration-thickness: .07em;
 }
 
-.problem.is-none .problem-text {
+.under {
+    text-decoration-style: wavy;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+}
+
+.problem.is-none .problem-text,
+.under.is-none {
     text-decoration-color: transparent;
 }
 
-.problem.is-info .problem-text {
+.problem.is-info .problem-text,
+.under.is-info {
     text-decoration-color: steelblue;
 }
 
-.problem.is-warning .problem-text {
+.problem.is-warning .problem-text,
+.under.is-warning {
     text-decoration-color: orange;
 }
 
-.problem.is-error .problem-text {
+.problem.is-error .problem-text,
+.under.is-error {
     text-decoration-color: red;
 }
 

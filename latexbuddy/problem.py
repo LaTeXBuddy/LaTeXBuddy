@@ -43,13 +43,8 @@ class ProblemSeverity(Enum):
         return self.value == other.value
 
     def __lt__(self, other):
-        if self.__class__ is other.__class:
+        if self.__class__ is other.__class__:
             return self.value < other.value
-
-
-
-    def __str__(self):
-        return self.value
 
 
 class Problem:
