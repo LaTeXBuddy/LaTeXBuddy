@@ -3,6 +3,7 @@ from html import escape
 from typing import Dict, List, Set, Tuple
 
 from jinja2 import Environment, PackageLoader
+from markupsafe import Markup
 
 from latexbuddy.problem import Problem, ProblemSeverity
 
@@ -38,10 +39,35 @@ def render_html(file_name: str, file_text: str, problems: Dict[str, Problem]) ->
     """
     problem_values = sorted(problems.values(), key=problem_key)
     template = env.get_template("result.html")
-    highlighted = highlight(file_text, problem_values)
+    tex_res, problem_res = experiment(file_text, problem_values)
     return template.render(
-        file_name=file_name, file_text=highlighted, problems=problem_values
+        file_name=file_name,
+        file_text=tex_res,
+        problems=problem_values,
+        problem_str=problem_res,
     )
+
+
+def experiment(tex: str, problems: List[Problem]) -> Tuple[str, str]:
+
+    problem_res = ""
+    for problem in problems:
+        if problem.position == (0, 0):
+            continue
+        colors = ["transparent", "blue", "orange", "red"]
+        problem_res += (
+            f'<div style="'
+            f"position: absolute;"
+            f"background-color: {colors[problem.severity.value]};"
+            f"opacity:.5;"
+            f"top:{40+(problem.position[0]-1)*16}px;"
+            f"left:{problem.position[1]-1}ch;"
+            f"margin-left:24px;"
+            f"width:{problem.length}ch;"
+            f"height:1em;"
+            f'" title="{Markup.escape(problem.description or "")}"></div>'
+        )
+    return tex, problem_res
 
 
 class MarkedInterval:
