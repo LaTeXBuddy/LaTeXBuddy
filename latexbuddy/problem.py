@@ -48,6 +48,9 @@ class ProblemSeverity(Enum):
 
 
 
+    def __str__(self):
+        return self.value
+
 
 class Problem:
     """Describes a Problem object.
@@ -96,6 +99,8 @@ class Problem:
         self.severity = severity
         self.category = category
         self.description = description
+        if context is None:
+            context = ("", "")
         self.context = context
         if suggestions is None:
             suggestions = []

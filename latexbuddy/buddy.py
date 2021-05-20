@@ -152,11 +152,12 @@ class LatexBuddy:
             self.add_error(
                 # TODO: Verify this is correct and maybe implement more attributes
                 Problem(
-                    err[0],
-                    err[1],
-                    "YALaFi",
-                    "latex",
-                    self.file_to_check,
+                    position=err[0],
+                    text=err[1],
+                    checker="YALaFi",
+                    category="latex",
+                    file=self.file_to_check,
+                    cid="0",
                 )
                 # TODO: old implementation for reference (remove when finished)
                 # Problem(
