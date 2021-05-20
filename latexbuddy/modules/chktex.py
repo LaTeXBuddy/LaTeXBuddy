@@ -1,4 +1,7 @@
-"""This module defines the connection between LaTeXBuddy and ChkTeX."""
+"""This module defines the connection between LaTeXBuddy and ChkTeX.
+
+ChkTeX Documentation: https://www.nongnu.org/chktex/ChkTeX.pdf
+"""
 from typing import List
 
 import latexbuddy.buddy as ltb
@@ -35,7 +38,9 @@ class ChktexModule(Module):
             raise FileNotFoundError("Unable to find ChkTeX installation!")
 
         format_str = (
-            self.DELIMITER.join(["%f", "%l", "%c", "%d", "%n", "%s", "%m", "%k"])
+            self.DELIMITER.join(
+                ["%f", "%l", "%c", "%d", "%n", "%s", "%m", "%k", "%r", "%t"]
+            )
             + "\n\n"
         )
         command_output = tools.execute(
@@ -82,6 +87,7 @@ class ChktexModule(Module):
                     category=self.problem_type,
                     description=description,
                     key=key,
+                    context=(out_split[8], out_split[9]),
                 )
             )
 
