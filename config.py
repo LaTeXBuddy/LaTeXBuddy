@@ -13,7 +13,14 @@ modules = {
     "LanguageTool": {
         # "enabled": True,
         "mode": "COMMANDLINE",
-        # "remote_url": "https://example.com/check/v2/"
+        # "remote_url": "https://api.languagetoolplus.com/v2/check",
+        "disabled-rules": [
+            "WHITESPACE_RULE",
+            # "TYPOGRAFISCHE_ANFUEHRUNGSZEICHEN",
+        ],
+        "disabled-categories": [
+            # "TYPOS",
+        ],
     },
     "AspellModule": {
         # "enabled": True,
