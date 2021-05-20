@@ -5,10 +5,12 @@ types, however LaTeXBuddy will most probably not display extra metadata.
 """
 
 from enum import Enum
+from functools import total_ordering
 from pathlib import Path
 from typing import List, Optional, Tuple
 
 
+@total_ordering
 class ProblemSeverity(Enum):
     """Defines possible problem severity grades.
 
@@ -29,10 +31,22 @@ class ProblemSeverity(Enum):
       Example: not closed environment, or wrong LaTeX syntax
     """
 
-    NONE = "none"
-    INFO = "info"
-    WARNING = "warning"
-    ERROR = "error"
+    NONE = 0
+    INFO = 1
+    WARNING = 2
+    ERROR = 3
+
+    def __str__(self):
+        return self.name.lower()
+
+    def __eq__(self, other):
+        return self.value == other.value
+
+    def __lt__(self, other):
+        if self.__class__ is other.__class:
+            return self.value < other.value
+
+
 
 
 class Problem:

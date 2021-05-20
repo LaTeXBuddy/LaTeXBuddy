@@ -213,6 +213,53 @@ class LatexBuddy:
         """
         return self.lang
 
+    def iwas(self, problems: list[Problem], tex: str):
+        intervals = {}
+
+        for problem in problems:
+            line = problem.position[0]
+            new_interval = set(
+                range(problem.position[1], problem.position[1] + problem.length)
+            )
+            new_severity = problem.severity
+
+            if line not in intervals:
+                intervals[line] = [[new_interval, new_severity]]
+                continue
+
+            for lst in intervals[line]:
+                if len(new_interval.intersection(lst[0])) > 0:
+                    if lst[1] < new_severity:
+                        lst[0] = new_interval
+                        lst[1] = new_severity
+                        break
+
+        # zu diesem Zeitpunkt sieht intervals so aus:
+        #
+        # {
+        #    1: {
+        #      [3,4,5,6,...]: "warning"
+        #    }
+        # }
+
+        tex_lines = tex.splitlines(keepends=True)
+        for line, intervals_set in intervals:
+            offset = 0
+            for i, s in intervals_set:
+                old_len = len(tex_lines[line])
+                start = offset + min(i)
+                end = start + max(i)
+                opening_tag = f'<mark>'
+                closing_tag = f'</mark>'
+                string = tex_lines[line][:start] + opening_tag + tex_lines[line][start:end] + closing_tag + tex_lines[line]
+                new_len = len(string)
+                tex_lines[line] = string
+                offset += new_len - old_len
+
+        return "".join(tex_lines)
+
+
+
     def output_html(self):
 
         # importing this here to avoid circular import error
