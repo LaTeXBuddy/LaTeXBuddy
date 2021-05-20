@@ -143,7 +143,7 @@ class Problem:
 
     def __str__(self) -> str:
         return (
-            f"{self.category.capitalize()} "
+            f"{str(self.category).capitalize()} "
             f"{str(self.severity).lower()} "
             f"on {self.__get_pos_str()}: "
             f"{self.text}: "
