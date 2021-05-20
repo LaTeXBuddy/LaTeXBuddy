@@ -133,10 +133,8 @@ class LatexBuddy:
     def run_tools(self):
         """Runs all tools in the LaTeXBuddy toolchain"""
 
-        # importing these here to avoid circular import error
-        import latexbuddy.aspell as aspell
-        import latexbuddy.chktex as chktex
-        import latexbuddy.languagetool as languagetool
+        # importing this here to avoid circular import error
+        from latexbuddy.tool_loader import ToolLoader
 
         # check_preprocessor
         # check_config
@@ -173,16 +171,8 @@ class LatexBuddy:
                 # )
             )
 
-        # without abstract module
-        chktex.run(self, str(self.file_to_check))
-        aspell.run(self, detexed_file)
-        # languagetool.run(self, detexed_file)
-
-        # with abstract module
-        # TODO: replace with ToolLoader
-        modules = [
-            languagetool.LanguageToolModule(),
-        ]
+        tool_loader = ToolLoader(Path("latexbuddy/modules/"))
+        modules = tool_loader.load_modules()
 
         for module in modules:
             errors = module.run_checks(self, tex_file)
