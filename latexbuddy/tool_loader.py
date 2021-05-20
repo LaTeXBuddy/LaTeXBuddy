@@ -22,8 +22,8 @@ class ToolLoader:
 
             classes = [
                 cls_obj
-                for cls_name, cls_obj in inspect.getmembers(module)
-                if inspect.isclass(cls_obj) and Module.__class__ in cls_obj.mro()
+                for cls_name, cls_obj in inspect.getmembers(module, inspect.isclass)
+                if cls_obj.__module__ == module.__name__ and Module in cls_obj.mro()
             ]
 
             for class_obj in classes:
