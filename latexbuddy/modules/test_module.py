@@ -14,9 +14,9 @@ class TestModule(Module):
         return [
             Problem(
                 (0, 0),
-                "",
                 "TestModule",
-                "",
+                "TestModule",
+                "TestModule",
                 file.path,
             )
         ]
