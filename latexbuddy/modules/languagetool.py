@@ -82,9 +82,7 @@ class LanguageTool(Module):
 
         elif self.mode == Mode.REMOTE_SERVER:
             # must include the port and api call (e.g. /v2/check)
-            self.remote_url = buddy.cfg.get_config_option(
-                "LanguageTool", "remote_url"
-            )
+            self.remote_url = buddy.cfg.get_config_option("LanguageTool", "remote_url")
 
         elif self.mode == Mode.COMMANDLINE:
             self.find_languagetool_command()
@@ -151,19 +149,23 @@ class LanguageTool(Module):
             self.lt_console_command.append(self.disabled_rules)
 
         if self.disabled_categories:
-            print("INFO: Config option 'disabled-categories' is set, but ignored "
-                  "because the commandline version of LanguageTool doesn't support it. "
-                  "Switch to local server mode to utilize this feature.")
+            print(
+                "INFO: Config option 'disabled-categories' is set, but ignored "
+                "because the commandline version of LanguageTool doesn't support it. "
+                "Switch to local server mode to utilize this feature."
+            )
 
     def find_disabled_rules(self, config: ConfigLoader) -> None:
 
-        self.disabled_rules = ",".join(config.get_config_option_or_default(
-            "LanguageTool", "disabled-rules", []
-        ))
+        self.disabled_rules = ",".join(
+            config.get_config_option_or_default("LanguageTool", "disabled-rules", [])
+        )
 
-        self.disabled_categories = ",".join(config.get_config_option_or_default(
-            "LanguageTool", "disabled-categories", []
-        ))
+        self.disabled_categories = ",".join(
+            config.get_config_option_or_default(
+                "LanguageTool", "disabled-categories", []
+            )
+        )
 
         if self.disabled_rules == "":
             self.disabled_rules = None
@@ -213,9 +215,7 @@ class LanguageTool(Module):
         if self.disabled_categories:
             request_data["disabledCategories"] = self.disabled_categories
 
-        response = requests.post(
-            url=server_url, data=request_data
-        )
+        response = requests.post(url=server_url, data=request_data)
         return response.json()
 
     def execute_commandline_request(self, file: TexFile) -> Optional[Dict]:
