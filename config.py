@@ -4,13 +4,18 @@ out-of-the-box. You may move this file and specify its path using the --config f
 """
 
 modules = {
-    "latexbuddy": {
+    "buddy": {
         "language": "en",
         "whitelist": "whitelist.wlist",
-        "output": "errors.json"
+        "output": "errors.json",
+        "enable-modules-by-default": True,
     },
-    "languagetool": {
+    "LanguageTool": {
+        "enabled": True,
         "mode": "COMMANDLINE",
         # "remote_url": "https://example.com/check/v2/"
     },
+    "TestModule": {
+        "enabled": False,
+    }
 }
