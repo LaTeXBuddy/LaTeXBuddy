@@ -53,16 +53,16 @@ class ConfigLoader:
 
         :param args: commandline arguments specified at the start of LaTeXBuddy
         :return: a formatted dictionary containing all cli flags as config entries with
-            the label "latexbuddy"
+            the label "buddy"
         """
         # filter out none-parameters
-        parsed = {"latexbuddy": {}}
+        parsed = {"buddy": {}}
 
         args_dict = vars(args)
 
         for key in args_dict:
             if args_dict[key]:
-                parsed["latexbuddy"][key] = args_dict[key]
+                parsed["buddy"][key] = args_dict[key]
 
         return parsed
 
