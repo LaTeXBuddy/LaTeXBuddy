@@ -7,6 +7,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import List
 
+import latexbuddy.tools as tools
+
 from latexbuddy.abs_module import Module
 from latexbuddy.config_loader import ConfigLoader
 
@@ -84,23 +86,17 @@ class ToolLoader:
 
         for py_file in py_files:
 
-            try:
-
+            def lambda_function() -> None:
                 spec = importutil.spec_from_file_location(py_file.stem, py_file)
                 module = importutil.module_from_spec(spec)
                 spec.loader.exec_module(module)
 
                 loaded_modules.append(module)
 
-            except Exception as e:
-
-                print(
-                    f"An error occurred while loading module file at "
-                    f"'{str(py_file)}':\n",
-                    f"{e.__class__.__name__}: {getattr(e, 'message', e)}",
-                    file=sys.stderr,
-                )
-                traceback.print_exc(file=sys.stderr)
+            tools.execute_no_exceptions(
+                lambda_function,
+                f"An error occurred while loading module file at {str(py_file)}",
+            )
 
         return loaded_modules
 
