@@ -18,7 +18,7 @@ class AspellModule(Module):
         self.language = None
         self.tool_name = "aspell"
 
-    def run_checks(self, buddy: ltb.Latexbuddy, file: TexFile) -> List[Problem]:
+    def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
         """Runs the Aspell checks on a file and returns the results as a list.
 
         Requires Aspell to be set up.
@@ -70,7 +70,7 @@ class AspellModule(Module):
         :param out: line-split output of the aspell command
         :param file: the file path
         """
-        cid = 0  # aspell got not error-ids
+        cid = "0"  # aspell got not error-ids
         severity = ProblemSeverity.ERROR
         key_delimiter = "_"
         line_number = 1
