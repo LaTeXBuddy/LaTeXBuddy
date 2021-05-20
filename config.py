@@ -11,9 +11,15 @@ modules = {
         "enable-modules-by-default": True,
     },
     "LanguageTool": {
-        "enabled": True,
+        # "enabled": True,
         "mode": "COMMANDLINE",
         # "remote_url": "https://example.com/check/v2/"
+    },
+    "AspellModule": {
+        # "enabled": True,
+    },
+    "ChktexModule": {
+        # "enabled": True,
     },
     "TestModule": {
         "enabled": False,
