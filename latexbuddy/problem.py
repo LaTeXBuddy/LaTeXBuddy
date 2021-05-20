@@ -85,6 +85,8 @@ class Problem:
         self.severity = severity
         self.category = category
         self.description = description
+        if context is None:
+            context = ("", "")
         self.context = context
         if suggestions is None:
             suggestions = []
