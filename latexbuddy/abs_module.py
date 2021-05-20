@@ -12,6 +12,11 @@ class Module(ABC):
     """Abstract class that defines a simple LaTeXBuddy module."""
 
     @abstractmethod
+    def __init__(self):
+        """Creates and initializes a new instance of this module."""
+        pass
+
+    @abstractmethod
     def run_checks(self, buddy: LatexBuddy, file: TexFile) -> List[Problem]:
         """Runs the checks for the respective module and returns a list of problems
             found by the module.
