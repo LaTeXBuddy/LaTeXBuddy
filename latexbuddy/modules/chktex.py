@@ -49,7 +49,7 @@ class ChktexModule(Module):
             severity = (
                 ProblemSeverity.WARNING
                 if out_split[7] == "Warning"
-                else Problem.Severity.ERROR
+                else ProblemSeverity.ERROR
             )
             row = int(out_split[1])
             col = int(out_split[2])
