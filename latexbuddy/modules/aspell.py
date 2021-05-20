@@ -26,6 +26,17 @@ class AspellModule(Module):
         :param buddy: the LaTeXBuddy instance
         :param file: the file to run checks on
         """
+
+        try:
+            tools.find_executable("aspell")
+        except FileNotFoundError:
+            print("Could not find a valid aspell installation on your system.")
+            print("Please make sure you installed aspell correctly.")
+
+            print("For more information check the LaTeXBuddy manual.")
+
+            raise FileNotFoundError("Unable to find aspell installation!")
+
         try:
             self.language = self._LANGUAGE_MAP[buddy.lang]
         except KeyError:

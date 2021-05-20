@@ -23,6 +23,17 @@ class ChktexModule(Module):
         :param buddy: the LaTeXBuddy instance
         :param file: the file to run checks on
         """
+
+        try:
+            tools.find_executable("chktex")
+        except FileNotFoundError:
+            print("Could not find a valid ChkTeX installation on your system.")
+            print("Please make sure you installed ChkTeX correctly.")
+
+            print("For more information check the LaTeXBuddy manual.")
+
+            raise FileNotFoundError("Unable to find ChkTeX installation!")
+
         format_str = (
             self.DELIMITER.join(["%f", "%l", "%c", "%d", "%n", "%s", "%m", "%k"])
             + "\n\n"
