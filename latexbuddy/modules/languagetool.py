@@ -149,11 +149,8 @@ class LanguageTool(Module):
             self.lt_console_command.append(self.disabled_rules)
 
         if self.disabled_categories:
-            print(
-                "INFO: Config option 'disabled-categories' is set, but ignored "
-                "because the commandline version of LanguageTool doesn't support it. "
-                "Switch to local server mode to utilize this feature."
-            )
+            self.lt_console_command.append("--disablecategories")
+            self.lt_console_command.append(self.disabled_categories)
 
     def find_disabled_rules(self, config: ConfigLoader) -> None:
 
