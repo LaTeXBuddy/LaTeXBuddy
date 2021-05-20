@@ -31,18 +31,16 @@ class LatexBuddy:
 
         # file where the error should be saved
         self.error_file = self.cfg.get_config_option_or_default(
-            "latexbuddy", "output", Path("errors.json")
+            "buddy", "output", Path("errors.json")
         )
 
         # file that represents the whitelist
         self.whitelist_file = self.cfg.get_config_option_or_default(
-            "latexbuddy", "whitelist", Path("whitelist.wlist")
+            "buddy", "whitelist", Path("whitelist.wlist")
         )
 
         # current language
-        self.lang = self.cfg.get_config_option_or_default(
-            "latexbuddy", "language", "en"
-        )
+        self.lang = self.cfg.get_config_option_or_default("buddy", "language", "en")
         self.check_successful = False
 
     def add_error(self, error: Problem):
@@ -172,7 +170,7 @@ class LatexBuddy:
             )
 
         tool_loader = ToolLoader(Path("latexbuddy/modules/"))
-        modules = tool_loader.load_modules()
+        modules = tool_loader.load_selected_modules(self.cfg)
 
         for module in modules:
             errors = module.run_checks(self, tex_file)

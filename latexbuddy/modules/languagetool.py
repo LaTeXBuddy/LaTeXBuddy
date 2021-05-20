@@ -32,7 +32,7 @@ class Mode(Enum):
     REMOTE_SERVER = "REMOTE_SERVER"
 
 
-class LanguageToolModule(Module):
+class LanguageTool(Module):
     """Wraps the LanguageTool API calls to check files."""
 
     _LANGUAGE_MAP = {"de": "de-DE", "en": "en-GB"}
@@ -62,7 +62,7 @@ class LanguageToolModule(Module):
         try:
 
             try:
-                self.language = LanguageToolModule._LANGUAGE_MAP[buddy.lang]
+                self.language = LanguageTool._LANGUAGE_MAP[buddy.lang]
             except KeyError:
                 self.language = None
 
@@ -259,7 +259,7 @@ class LanguageToolModule(Module):
                     problem_type,
                     match["rule"]["description"],
                     match["context"]["text"],
-                    LanguageToolModule.parse_error_replacements(match["replacements"]),
+                    LanguageTool.parse_error_replacements(match["replacements"]),
                     tool_name + "_" + match["rule"]["id"],
                 )
             )
