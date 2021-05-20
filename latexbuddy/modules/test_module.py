@@ -7,7 +7,6 @@ from latexbuddy.problem import Problem
 
 
 class TestModule(Module):
-
     def run_checks(self, buddy: LatexBuddy, file: TexFile) -> List[Problem]:
         return [
             Problem(
