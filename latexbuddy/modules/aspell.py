@@ -110,6 +110,10 @@ class AspellModule(Module):
                     # location = int(meta[2])  # meta[1] is suggestion count
                     suggestions = suggestions_str.split(", ")
                 # else:  # there are no suggestions
+
+                if len(suggestions) > 5:
+                    suggestions = suggestions[0:5]
+
                 # location = int(meta[1])
 
                 # location = line_offsets[line_number + 1] + location  # absolute pos in detex
