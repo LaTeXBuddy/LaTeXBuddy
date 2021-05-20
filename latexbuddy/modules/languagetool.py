@@ -60,43 +60,32 @@ class LanguageTool(Module):
         """
 
         try:
+            self.language = LanguageTool._LANGUAGE_MAP[buddy.lang]
+        except KeyError:
+            self.language = None
 
-            try:
-                self.language = LanguageTool._LANGUAGE_MAP[buddy.lang]
-            except KeyError:
-                self.language = None
+        cfg_mode = buddy.cfg.get_config_option_or_default(
+            "languagetool", "mode", "COMMANDLINE"
+        )
+        try:
+            self.mode = Mode(cfg_mode)
+        except ValueError:
+            self.mode = Mode.COMMANDLINE
 
-            cfg_mode = buddy.cfg.get_config_option_or_default(
-                "languagetool", "mode", "COMMANDLINE"
+        if self.mode == Mode.LOCAL_SERVER:
+            self.local_server = LanguageToolLocalServer()
+            self.local_server.start_local_server()
+
+        elif self.mode == Mode.REMOTE_SERVER:
+            # must include the port and api call (e.g. /v2/check)
+            self.remote_url = buddy.cfg.get_config_option(
+                "languagetool", "remote_url"
             )
-            try:
-                self.mode = Mode(cfg_mode)
-            except ValueError:
-                self.mode = Mode.COMMANDLINE
 
-            if self.mode == Mode.LOCAL_SERVER:
-                self.local_server = LanguageToolLocalServer()
-                self.local_server.start_local_server()
+        elif self.mode == Mode.COMMANDLINE:
+            self.find_languagetool_command()
 
-            elif self.mode == Mode.REMOTE_SERVER:
-                # must include the port and api call (e.g. /v2/check)
-                self.remote_url = buddy.cfg.get_config_option(
-                    "languagetool", "remote_url"
-                )
-
-            elif self.mode == Mode.COMMANDLINE:
-                self.find_languagetool_command()
-
-            return self.check_tex(file)
-
-        except Exception as e:
-
-            print(
-                f"An error occurred while executing latexbuddy:\n",
-                f"{e.__class__.__name__}: {getattr(e, 'message', e)}",
-                file=sys.stderr,
-            )
-            traceback.print_exc(file=sys.stderr)
+        return self.check_tex(file)
 
     def find_languagetool_command(self) -> None:
         """Searches for the LanguageTool command line app.
