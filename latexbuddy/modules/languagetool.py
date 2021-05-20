@@ -17,6 +17,7 @@ import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
 from latexbuddy.abs_module import Module
+from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.problem import Problem, ProblemSeverity
 
 
@@ -37,13 +38,14 @@ class LanguageTool(Module):
 
     _LANGUAGE_MAP = {"de": "de-DE", "en": "en-GB"}
 
-    # TODO: implement whitelisting certain rules
-    #       (exclude multiple whitespaces error by default)
     def __init__(self):
         """Creates a LanguageTool checking module."""
 
         self.mode = None
         self.language = None
+
+        self.disabled_rules = None
+        self.disabled_categories = None
 
         self.local_server = None
         self.remote_url = None
@@ -64,8 +66,10 @@ class LanguageTool(Module):
         except KeyError:
             self.language = None
 
+        self.find_disabled_rules(buddy.cfg)
+
         cfg_mode = buddy.cfg.get_config_option_or_default(
-            "languagetool", "mode", "COMMANDLINE"
+            "LanguageTool", "mode", "COMMANDLINE"
         )
         try:
             self.mode = Mode(cfg_mode)
@@ -79,7 +83,7 @@ class LanguageTool(Module):
         elif self.mode == Mode.REMOTE_SERVER:
             # must include the port and api call (e.g. /v2/check)
             self.remote_url = buddy.cfg.get_config_option(
-                "languagetool", "remote_url"
+                "LanguageTool", "remote_url"
             )
 
         elif self.mode == Mode.COMMANDLINE:
@@ -142,6 +146,31 @@ class LanguageTool(Module):
         else:
             self.lt_console_command.append("--autoDetect")
 
+        if self.disabled_rules:
+            self.lt_console_command.append("--disable")
+            self.lt_console_command.append(self.disabled_rules)
+
+        if self.disabled_categories:
+            print("INFO: Config option 'disabled-categories' is set, but ignored "
+                  "because the commandline version of LanguageTool doesn't support it. "
+                  "Switch to local server mode to utilize this feature.")
+
+    def find_disabled_rules(self, config: ConfigLoader) -> None:
+
+        self.disabled_rules = ",".join(config.get_config_option_or_default(
+            "LanguageTool", "disabled-rules", []
+        ))
+
+        self.disabled_categories = ",".join(config.get_config_option_or_default(
+            "LanguageTool", "disabled-categories", []
+        ))
+
+        if self.disabled_rules == "":
+            self.disabled_rules = None
+
+        if self.disabled_categories == "":
+            self.disabled_categories = None
+
     def check_tex(self, file: TexFile) -> List[Problem]:
         """Runs the LanguageTool checks on a file.
 
@@ -173,10 +202,19 @@ class LanguageTool(Module):
         if file is None:
             return None
 
-        text = file.plain
+        request_data = {
+            "language": self.language,
+            "text": file.plain,
+        }
+
+        if self.disabled_rules:
+            request_data["disabledRules"] = self.disabled_rules
+
+        if self.disabled_categories:
+            request_data["disabledCategories"] = self.disabled_categories
 
         response = requests.post(
-            url=server_url, data={"language": self.language, "text": text}
+            url=server_url, data=request_data
         )
         return response.json()
 
