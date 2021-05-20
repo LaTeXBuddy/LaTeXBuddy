@@ -34,6 +34,9 @@ class ProblemSeverity(Enum):
     WARNING = "warning"
     ERROR = "error"
 
+    def __str__(self):
+        return self.value
+
 
 class Problem:
     """Describes a Problem object.

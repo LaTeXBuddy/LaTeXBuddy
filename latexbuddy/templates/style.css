@@ -63,6 +63,14 @@ main > section {
     text-decoration-thickness: .07em;
 }
 
+.error.is-none .error-title {
+    text-decoration-color: transparent;
+}
+
+.error.is-info .error-title {
+    text-decoration-color: steelblue;
+}
+
 .error.is-warning .error-title {
     text-decoration-color: orange;
 }

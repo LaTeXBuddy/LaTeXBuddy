@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ file_name }} | LaTeXBuddy</title>
+    <title>{{ file_name|e }} | LaTeXBuddy</title>
     <style>
         {% include "modern-normalize.css" %}
         {% include "style.css" %}
@@ -108,33 +108,41 @@
                     transform="matrix(576.90652 0 0 576.9048 1763.47 639.098)"/>
         </svg>
     </h1>
-    <h2><small>Results for</small> {{ file_name }}</h2>
+    <h2><small>Results for</small> {{ file_name|e }}</h2>
 </header>
 <main>
     <section id="file-contents">
         <pre><code>{{ file_text|e }}</code></pre>
     </section>
     <section id="errors-list">
-        <h3>Errors</h3>
+        <h3>Problems</h3>
         <ol>
-            {% for error in errors %}
-                <li class="error {% if error.warning %}is-warning{% else %}is-error{% endif %}">
-                    <h4 class="error-title monospaced">
-                        {{ error.text }}
+            {% for problem in problems %}
+                <li class="error is-{{ problem.severity }}">
+                    <h4 class="monospaced">
+                        {% if problem.context %}
+                            {{ problem.context[0] }}
+                        {% endif %}
+                        <span class="error-title">{{ problem.text }}</span>
+                        {% if problem.context %}
+                            {{ problem.context[1] }}
+                        {% endif %}
                     </h4>
                     <span class="error-meta">
-                        {{ error.error_type }} error
-                        {% if error.start %}
-                            at {{ error.start[0] }}:{{ error.start[1] }}
+                        {{ problem.category }} error
+                        {% if problem.position %}
+                            at {{ problem.position[0] }}:
+                            {{ problem.position[1] }}
                         {% endif %}
-                        <i>({{ error.src }}#{{ error.error_id }})</i>
+                        <i>({{ problem.checker }}#{{ problem.cid }})</i>
                     </span>
-                    {% if error.suggestions|length <= 1 %}
-                        {{ "".join(error.suggestions) }}
+                        {{ problem.description }}
+                    {% if problem.suggestions|length <= 1 %}
+                        {{ "".join(problem.suggestions) }}
                     {% else %}
                         <strong>Suggestions:</strong>
                         <br>
-                        {{ ", ".join(error['suggestions']) }}
+                        {{ ", ".join(problem['suggestions']) }}
                     {% endif %}
                 </li>
             {% endfor %}
