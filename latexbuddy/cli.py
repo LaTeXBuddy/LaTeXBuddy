@@ -43,6 +43,22 @@ parser.add_argument(
     help="Where to output the errors file.",
 )
 
+module_selection = parser.add_mutually_exclusive_group()
+module_selection.add_argument(
+    "--enable-modules",
+    type=str,
+    default=None,
+    help="Comma-separated list of module names that should be executed. "
+    "(Any other module will be implicitly disabled!)",
+)
+module_selection.add_argument(
+    "--disable-modules",
+    type=str,
+    default=None,
+    help="Comma-separated list of module names that should not be executed."
+    "(Every other module will be implicitly enabled!)",
+)
+
 
 def main():
     """Parses CLI arguments and launches the LaTeXBuddy instance."""
