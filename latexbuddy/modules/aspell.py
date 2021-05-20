@@ -42,7 +42,7 @@ class AspellModule(Module):
         out = error_list.splitlines()[1:]  # the first line specifies aspell version
 
         # cleanup error list
-        self.format_errors(out, file)
+        return self.format_errors(out, file)
 
     @staticmethod
     def check_language(language: str, langs: str):
@@ -74,6 +74,7 @@ class AspellModule(Module):
         severity = ProblemSeverity.ERROR
         key_delimiter = "_"
         line_number = 1
+        problems = []
         # line_offsets = tools.calculate_line_offsets(file)
 
         for error in out:
@@ -107,16 +108,19 @@ class AspellModule(Module):
                 location = (0, 0)  # aspell's locations are funky
                 key = self.tool_name + key_delimiter + text
 
-                Problem(
-                    location,
-                    text,
-                    self.tool_name,
-                    cid,
-                    file.path,
-                    severity,
-                    None,
-                    None,
-                    None,
-                    suggestions,
-                    key,
+                problems.append(
+                    Problem(
+                        location,
+                        text,
+                        self.tool_name,
+                        cid,
+                        file.path,
+                        severity,
+                        None,
+                        None,
+                        None,
+                        suggestions,
+                        key,
+                    )
                 )
+        return problems
