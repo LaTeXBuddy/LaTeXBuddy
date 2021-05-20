@@ -32,7 +32,6 @@ class ConfigLoader:
         :param cli_arguments: The commandline arguments specified in the LaTeXBuddy call
         """
 
-        self.flags = ConfigLoader.__parse_flags(cli_arguments)
         self.configurations = {}
 
         if not cli_arguments.config:
@@ -47,22 +46,60 @@ class ConfigLoader:
                 file=sys.stderr,
             )
 
-    @staticmethod
-    def __parse_flags(args: Namespace) -> Dict[str, Dict[str, Any]]:
+        self.flags = self.__parse_flags(cli_arguments)
+
+    def __parse_flags(self, args: Namespace) -> Dict[str, Dict[str, Any]]:
         """This private helper-function parses commandline arguments into a dictionary.
 
         :param args: commandline arguments specified at the start of LaTeXBuddy
         :return: a formatted dictionary containing all cli flags as config entries with
             the label "buddy"
         """
-        # filter out none-parameters
+
         parsed = {"buddy": {}}
 
         args_dict = vars(args)
 
         for key in args_dict:
+            # filter out none-parameters
             if args_dict[key]:
-                parsed["buddy"][key] = args_dict[key]
+
+                # mutual exclusion of enable_modules and disable_modules
+                # is guaranteed by argparse library
+                if key == "enable_modules":
+
+                    parsed["buddy"]["enable-modules-by-default"] = False
+
+                    for module_name in self.configurations.keys():
+                        if module_name not in parsed:
+                            parsed[module_name] = {}
+
+                        parsed[module_name]["enabled"] = False
+
+                    for module_name in args_dict[key].split(","):
+                        if module_name not in parsed:
+                            parsed[module_name] = {}
+
+                        parsed[module_name]["enabled"] = True
+
+                elif key == "disable_modules":
+
+                    parsed["buddy"]["enable-modules-by-default"] = True
+
+                    for module_name in self.configurations.keys():
+                        if module_name not in parsed:
+                            parsed[module_name] = {}
+
+                        parsed[module_name]["enabled"] = True
+
+                    for module_name in args_dict[key].split(","):
+                        if module_name not in parsed:
+                            parsed[module_name] = {}
+
+                        parsed[module_name]["enabled"] = False
+
+                else:
+                    parsed["buddy"][key] = args_dict[key]
 
         return parsed
 
@@ -90,8 +127,9 @@ class ConfigLoader:
             )
             traceback.print_exc(file=sys.stderr)
 
+    @staticmethod
     def __get_option(
-        self, config_dict: Dict, tool_name: str, key: str, error_indicator="config"
+        config_dict: Dict, tool_name: str, key: str, error_indicator="config"
     ) -> Any:
         """This private helper-function searches for a config entry in the specified
         dictionary (config or flags). It raises an error, if the requested config
@@ -124,11 +162,11 @@ class ConfigLoader:
         """
 
         try:
-            return self.__get_option(self.flags, tool_name, key, "flag")
+            return ConfigLoader.__get_option(self.flags, tool_name, key, "flag")
         except ConfigOptionNotFoundError:
             pass
 
-        return self.__get_option(self.configurations, tool_name, key)
+        return ConfigLoader.__get_option(self.configurations, tool_name, key)
 
     def get_config_option_or_default(
         self, tool_name: str, key: str, default_value: Any
