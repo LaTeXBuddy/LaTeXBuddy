@@ -2,6 +2,8 @@
 
 import json
 import os
+import sys
+import traceback
 
 from pathlib import Path
 
@@ -173,10 +175,22 @@ class LatexBuddy:
         modules = tool_loader.load_selected_modules(self.cfg)
 
         for module in modules:
-            errors = module.run_checks(self, tex_file)
 
-            for error in errors:
-                self.add_error(error)
+            try:
+                errors = module.run_checks(self, tex_file)
+
+                for error in errors:
+                    self.add_error(error)
+
+            except Exception as e:
+
+                print(
+                    f"An error occurred while executing checks for module "
+                    f"'{module.__class__.__name__}':\n",
+                    f"{e.__class__.__name__}: {getattr(e, 'message', e)}",
+                    file=sys.stderr,
+                )
+                traceback.print_exc(file=sys.stderr)
 
         # FOR TESTING ONLY
         # self.check_whitelist()
