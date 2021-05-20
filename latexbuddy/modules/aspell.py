@@ -111,17 +111,15 @@ class AspellModule(Module):
 
                 problems.append(
                     Problem(
-                        location,
-                        text,
-                        self.tool_name,
-                        cid,
-                        file.tex_file,
-                        severity,
-                        None,
-                        None,
-                        None,
-                        suggestions,
-                        key,
+                        position=location,
+                        text=text,
+                        checker=self.tool_name,
+                        cid=cid,
+                        file=file.tex_file,
+                        severity=severity,
+                        category="spelling",
+                        suggestions=suggestions,
+                        key=key,
                     )
                 )
         return problems

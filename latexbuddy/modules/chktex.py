@@ -62,17 +62,15 @@ class ChktexModule(Module):
 
             problems.append(
                 Problem(
-                    position,
-                    text,
-                    self.tool_name,
-                    str(internal_id),
-                    file.tex_file,
-                    severity,
-                    self.problem_type,
-                    description,
-                    None,
-                    None,
-                    key,
+                    position=position,
+                    text=text,
+                    checker=self.tool_name,
+                    cid=str(internal_id),
+                    file=file.tex_file,
+                    severity=severity,
+                    category=self.problem_type,
+                    description=description,
+                    key=key,
                 )
             )
 

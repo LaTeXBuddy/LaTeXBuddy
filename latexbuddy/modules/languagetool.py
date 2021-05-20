@@ -245,17 +245,22 @@ class LanguageTool(Module):
 
             problems.append(
                 Problem(
-                    location,
-                    text,
-                    tool_name,
-                    match["rule"]["id"],
-                    file.tex_file,
-                    ProblemSeverity.ERROR,
-                    problem_type,
-                    match["rule"]["description"],
-                    match["context"]["text"],
-                    LanguageTool.parse_error_replacements(match["replacements"]),
-                    tool_name + "_" + match["rule"]["id"],
+                    position=location,
+                    text=text,
+                    checker=tool_name,
+                    cid=match["rule"]["id"],
+                    file=file.tex_file,
+                    severity=ProblemSeverity.ERROR,
+                    category=problem_type,
+                    description=match["rule"]["description"],
+                    context=(
+                        match["context"]["text"][:context_offset],
+                        match["context"]["text"][context_end:],
+                    ),
+                    suggestions=LanguageTool.parse_error_replacements(
+                        match["replacements"]
+                    ),
+                    key=tool_name + "_" + match["rule"]["id"],
                 )
             )
 

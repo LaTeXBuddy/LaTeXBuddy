@@ -22,11 +22,11 @@ class TestModule(Module):
         """
         return [
             Problem(
-                (0, 0),
-                "TestModule",
-                "TestModule",
-                "TestModule",
-                file.tex_file,
+                position=(0, 0),
+                text="TestModule",
+                checker="TestModule",
+                cid="TestModule",
+                file=file.tex_file,
             )
         ]
 
