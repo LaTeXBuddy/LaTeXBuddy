@@ -123,11 +123,11 @@
                         {{ error.text }}
                     </h4>
                     <span class="error-meta">
-                        {{ error.error_type }} error
-                        {% if error.start %}
-                            at {{ error.start[0] }}:{{ error.start[1] }}
+                        {{ error.category }} error
+                        {% if error.position %}
+                            at {{ error.position[0] }}:{{ error.position[1] }}
                         {% endif %}
-                        <i>({{ error.src }}#{{ error.error_id }})</i>
+                        <i>({{ error.checker }}#{{ error.cid }})</i>
                     </span>
                     {% if error.suggestions|length <= 1 %}
                         {{ "".join(error.suggestions) }}

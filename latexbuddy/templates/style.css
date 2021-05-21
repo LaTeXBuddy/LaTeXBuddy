@@ -82,6 +82,20 @@ main > section {
     margin: 0 0 .5rem;
 }
 
+.spelling {
+    text-decoration-style: wavy;
+    text-decoration-line: underline;
+    text-decoration-color: red;
+    text-decoration-thickness: .07em;
+}
+
+.grammar {
+    background-color:#FFFF00;
+}
+
+.latex {
+    background-color:#00bdbb;;
+}
 @media (prefers-color-scheme: dark) {
     html, body {
         background-color: #111;
