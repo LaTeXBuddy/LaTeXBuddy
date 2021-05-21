@@ -1,12 +1,14 @@
+import os
 from pathlib import Path
 from typing import List
-
-import latexbuddy.buddy as ltb
-import latexbuddy.tools as tools
+from unidecode import unidecode
 
 from latexbuddy.abs_module import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
+
+import latexbuddy.buddy as ltb
+import latexbuddy.tools as tools
 
 
 class DictionModule(Module):
@@ -16,18 +18,33 @@ class DictionModule(Module):
 
     def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
         self.language = "de"
+
+        #replace umlauts so error position is correct
+        lines = Path(file.plain_file).read_text()
+        lines = unidecode(lines)
+
+        #write cleaned text to tempfile
+        cleaned_file = Path(file.plain_file).with_suffix(".cleaned")
+        cleaned_file.write_text(lines)
+
+        #execute diction and collect output
         errors = tools.execute(
-            f"diction --suggest --language {self.language} {str(file.plain_file)}"
+            f"diction --suggest --language {self.language} {str(cleaned_file)}"
         )
 
-        errors = errors[: len(errors) - 35]  # remove unnecessary information
+        # remove unnecessary information and split lines
+        errors = errors[: len(errors) - 35]
         errors = errors.split("\n")
 
+        #remove empty lines
         cleaned_errors = []
         for error in errors:
             if len(error) > 0:  # remove empty lines
                 cleaned_errors.append(error.strip())
                 print(error)
+
+        # remove temp file
+        os.remove(cleaned_file)
 
         return self.format_errors(cleaned_errors, file.plain_file)
 
