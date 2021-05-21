@@ -1,14 +1,16 @@
 import os
+
 from pathlib import Path
 from typing import List
+
 from unidecode import unidecode
+
+import latexbuddy.buddy as ltb
+import latexbuddy.tools as tools
 
 from latexbuddy.abs_module import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
-
-import latexbuddy.buddy as ltb
-import latexbuddy.tools as tools
 
 
 class DictionModule(Module):
@@ -19,15 +21,15 @@ class DictionModule(Module):
     def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
         self.language = "de"
 
-        #replace umlauts so error position is correct
+        # replace umlauts so error position is correct
         lines = Path(file.plain_file).read_text()
         lines = unidecode(lines)
 
-        #write cleaned text to tempfile
+        # write cleaned text to tempfile
         cleaned_file = Path(file.plain_file).with_suffix(".cleaned")
         cleaned_file.write_text(lines)
 
-        #execute diction and collect output
+        # execute diction and collect output
         errors = tools.execute(
             f"diction --suggest --language {self.language} {str(cleaned_file)}"
         )
@@ -36,7 +38,7 @@ class DictionModule(Module):
         errors = errors[: len(errors) - 35]
         errors = errors.split("\n")
 
-        #remove empty lines
+        # remove empty lines
         cleaned_errors = []
         for error in errors:
             if len(error) > 0:  # remove empty lines
@@ -65,7 +67,9 @@ class DictionModule(Module):
                 splitted_chars_int = [int(a) for a in splitted_chars]
                 start_line, end_line = splitted_lines_int[0], splitted_lines_int[1]
                 start_char, end_char = splitted_chars_int[0], splitted_chars_int[1]
-                print(f"Double word error: src={src}, start_line={start_line},end_line={end_line},start_char={start_char}, end_char={end_char}, sugg={sugg}")
+                print(
+                    f"Double word error: src={src}, start_line={start_line},end_line={end_line},start_char={start_char}, end_char={end_char}, sugg={sugg}"
+                )
                 location = (start_line, start_char)
             else:
                 src, location, sugg = error.split(":", maxsplit=2)
