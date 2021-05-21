@@ -15,7 +15,7 @@ class DictionModule(Module):
         self.tool_name = "diction"
 
     def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
-        self.language = buddy.lang
+        self.language = "de"
         errors = tools.execute(
             f"diction --suggest --language {self.language} {str(file)}"
         )
@@ -42,10 +42,8 @@ class DictionModule(Module):
             src, location, sugg = error.split(":", maxsplit=2)
             print(f"src={src}, loc={location}, sugg={sugg}")
 
-            line = location.split(".")[0]
-            print("line=" + line)
-            num = location.split(".")[1].split("-")[0]
-            print("num=" + num)
+            line = int(location.split(".")[0])
+            num = int(location.split(".")[1].split("-")[0])
 
             problems.append(
                 Problem(
@@ -56,9 +54,9 @@ class DictionModule(Module):
                     file=file.tex_file,
                     severity=ProblemSeverity.INFO,
                     category="wording/ phrasing",
-                    suggestions=sugg,
+                    suggestions=[sugg],
                     key="diction_" + "wip",
                 )
             )
 
-            return problems
+        return problems
