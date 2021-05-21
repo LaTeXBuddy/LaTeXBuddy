@@ -43,10 +43,8 @@ class ProblemSeverity(Enum):
         return self.value == other.value
 
     def __lt__(self, other):
-        if self.__class__ is other.__class:
+        if self.__class__ is other.__class__:
             return self.value < other.value
-
-
 
 
 class Problem:
@@ -96,6 +94,8 @@ class Problem:
         self.severity = severity
         self.category = category
         self.description = description
+        if context is None:
+            context = ("", "")
         self.context = context
         if suggestions is None:
             suggestions = []

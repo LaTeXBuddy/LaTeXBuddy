@@ -265,8 +265,7 @@ class LatexBuddy:
         # importing this here to avoid circular import error
         from latexbuddy.output import render_html
 
-        err_values = sorted(sorted(self.errors.values(), key=output.error_key),
-                            key=lambda e: e.position[1])
+        err_values = sorted(self.errors.values(), key=output.error_key)
         html_output_path = Path(self.error_file + ".html")
         # html = self.iwas(err_values, self.file_to_check.read_text())
         html = self.mark_output(self.file_to_check, self.file_to_check.read_text(),

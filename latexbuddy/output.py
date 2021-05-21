@@ -1,39 +1,159 @@
-from typing import Dict
+from functools import reduce
+from html import escape
+from typing import Dict, List, Set, Tuple
 
 from jinja2 import Environment, PackageLoader
+from markupsafe import Markup
 
-from latexbuddy.problem import Problem
+from latexbuddy.problem import Problem, ProblemSeverity
 
 
 env = Environment(loader=PackageLoader("latexbuddy"))
 
 
-def error_key(err: Problem) -> int:
-    """Returns a number for each error to be able to sort them.
+def problem_key(problem: Problem) -> int:
+    """Returns a number for each problem to be able to sort them.
 
-    This puts YaLaFi's errors on top, followed by errors without location.
+    This puts YaLaFi's problems on top, followed by errors without location.
 
-    :param err: error object
+    :param problem: problem object
     :return: error's "rating" for sorting
     """
-    if err.checker.lower() == "yalafi":
+    if problem.checker.lower() == "yalafi":
         return -3
-    if not err.position:
+    if not problem.position:
         return -2
-    if not isinstance(err.position, tuple):
+    if not isinstance(problem.position, tuple):
         return -1
 
-    return err.position[0]
+    return problem.position[0]
 
 
-def render_html(file_name: str, file_text: str, errors: Dict[str, Problem]) -> str:
-    """Renders an HTML page based on file contents and discovered errors.
+def render_html(file_name: str, file_text: str, problems: Dict[str, Problem]) -> str:
+    """Renders an HTML page based on file contents and discovered problems.
 
     :param file_name: file name
     :param file_text: contents of the file
-    :param errors: dictionary of errors returned from latexbuddy
+    :param problems: dictionary of errors returned from latexbuddy
     :return: generated HTML
     """
-    err_values = sorted(errors.values(), key=error_key)
+    problem_values = sorted(problems.values(), key=problem_key)
     template = env.get_template("result.html")
-    return template.render(file_name=file_name, file_text=file_text, errors=err_values)
+    tex_res, problem_res = experiment(file_text, problem_values)
+    return template.render(
+        file_name=file_name,
+        file_text=tex_res,
+        problems=problem_values,
+        problem_str=problem_res,
+    )
+
+
+def experiment(tex: str, problems: List[Problem]) -> Tuple[str, str]:
+
+    problem_res = ""
+    for problem in problems:
+        if problem.position == (0, 0):
+            continue
+        colors = ["transparent", "blue", "orange", "red"]
+        problem_res += (
+            f'<div style="'
+            f"position: absolute;"
+            f"background-color: {colors[problem.severity.value]};"
+            f"opacity:.5;"
+            f"top:{40+(problem.position[0]-1)*16}px;"
+            f"left:{problem.position[1]-1}ch;"
+            f"margin-left:24px;"
+            f"width:{problem.length}ch;"
+            f"height:1em;"
+            f'" title="{Markup.escape(problem.description or "")}"></div>'
+        )
+    return tex, problem_res
+
+
+class MarkedInterval:
+    def __init__(self, problem: Problem) -> None:
+        self.start = problem.position[1] - 1
+        self.end = problem.position[1] + problem.length - 1
+        self.problem = problem
+
+    def intersects(self, other: "MarkedInterval") -> bool:
+        return (
+            other.start <= self.end <= other.end
+            or self.start <= other.end <= self.end
+            or (self.start <= other.start and other.end <= self.end)
+            or (other.start <= self.start and self.end <= other.end)
+        )
+
+    def merge(self, other: "MarkedInterval") -> "List[MarkedInterval]":
+        if not self.intersects(other):
+            return [self, other]
+
+        if self.problem.severity < other.problem.severity:
+            return [other]
+
+        return [self]
+
+    def __str__(self) -> str:
+        return f"{self.start}:{self.end}"
+
+    def __repr__(self):
+        return f"<{str(self)}>"
+
+
+def highlight(tex: str, problems: List[Problem]) -> str:
+    line_intervals: List[List[MarkedInterval]] = []
+    tex_lines = tex.splitlines(keepends=True)
+    for _ in tex_lines:
+        line_intervals.append([])
+    line_intervals.append([])
+
+    for problem in problems:
+        if problem.position == (0, 0):
+            continue
+        lin = problem.position[0] - 1
+        p_int = MarkedInterval(problem)
+
+        if p_int.problem.length == 0:
+            continue
+
+        line_intervals[lin].append(p_int)
+
+    def reducer(mil: List[MarkedInterval], mi2: MarkedInterval):
+        if len(mil) == 0:
+            return [mi2]
+
+        result = []
+        for mi1 in mil:
+            merge_res = mi1.merge(mi2)
+            result += merge_res
+            if mi2 in merge_res:
+                break
+
+        return result
+
+    for i in range(len(line_intervals)):
+        line = line_intervals[i]
+        if len(line) == 0:
+            continue
+
+        reduced_line = reduce(reducer, line, [])
+
+        offset = 0
+        for interval in reduced_line:
+            old_len = len(tex_lines[i])
+            start = offset + interval.start
+            end = offset + interval.end
+            opening_tag = f'<span class="under is-{str(interval.problem.severity)}" title="{escape(interval.problem.description or "")}">'
+            closing_tag = f"</span>"
+            string = (
+                tex_lines[i][:start]
+                + opening_tag
+                + tex_lines[i][start:end]
+                + closing_tag
+                + tex_lines[i][end:]
+            )
+            new_len = len(string)
+            tex_lines[i] = string
+            offset += new_len - old_len
+
+    return "".join(tex_lines)
