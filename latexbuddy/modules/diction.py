@@ -35,15 +35,15 @@ class DictionModule(Module):
         )
 
         # remove unnecessary information and split lines
-        errors = errors[: len(errors) - 35]
         errors = errors.split("\n")
+        errors.pop()
+        errors.pop()
 
         # remove empty lines
         cleaned_errors = []
         for error in errors:
             if len(error) > 0:  # remove empty lines
                 cleaned_errors.append(error.strip())
-                print(error)
 
         # remove temp file
         os.remove(cleaned_file)
@@ -67,13 +67,13 @@ class DictionModule(Module):
                 splitted_chars_int = [int(a) for a in splitted_chars]
                 start_line, end_line = splitted_lines_int[0], splitted_lines_int[1]
                 start_char, end_char = splitted_chars_int[0], splitted_chars_int[1]
-                print(
-                    f"Double word error: src={src}, start_line={start_line},end_line={end_line},start_char={start_char}, end_char={end_char}, sugg={sugg}"
-                )
+                # print(
+                #    f"Double word error: src={src}, start_line={start_line},end_line={end_line},start_char={start_char}, end_char={end_char}, sugg={sugg}"
+                # )
                 location = (start_line, start_char)
             else:
                 src, location, sugg = error.split(":", maxsplit=2)
-                print(f"Wording error: src={src}, loc={location}, sugg={sugg}")
+                # print(f"Wording error: src={src}, loc={location}, sugg={sugg}")
                 line = int(location.split(".")[0])
                 num = int(location.split(".")[1].split("-")[0])
                 location = (line, num)
