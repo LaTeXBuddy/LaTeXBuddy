@@ -17,7 +17,7 @@ class DictionModule(Module):
     def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
         self.language = "de"
         errors = tools.execute(
-            f"diction --suggest --language {self.language} {str(file)}"
+            f"diction --suggest --language {self.language} {str(file.plain_file)}"
         )
 
         errors = errors[: len(errors) - 35]  # remove unnecessary information
@@ -27,8 +27,9 @@ class DictionModule(Module):
         for error in errors:
             if len(error) > 0:  # remove empty lines
                 cleaned_errors.append(error.strip())
+                print(error)
 
-        return self.format_errors(cleaned_errors, file)
+        return self.format_errors(cleaned_errors, file.plain_file)
 
     def format_errors(self, out: List[str], file) -> List[Problem]:
         """Parses diction errors and returns list of Problems.
@@ -38,20 +39,31 @@ class DictionModule(Module):
         """
         problems = []
         for error in out:
-            print(error)
-            src, location, sugg = error.split(":", maxsplit=2)
-            print(f"src={src}, loc={location}, sugg={sugg}")
 
-            line = int(location.split(".")[0])
-            num = int(location.split(".")[1].split("-")[0])
+            if "Double word" in error:
+                src, lines, chars, sugg = error.split(":", maxsplit=3)
+                splitted_lines = lines.split("-")
+                splitted_chars = chars.split("-")
+                splitted_lines_int = [int(a) for a in splitted_lines]
+                splitted_chars_int = [int(a) for a in splitted_chars]
+                start_line, end_line = splitted_lines_int[0], splitted_lines_int[1]
+                start_char, end_char = splitted_chars_int[0], splitted_chars_int[1]
+                print(f"Double word error: src={src}, start_line={start_line},end_line={end_line},start_char={start_char}, end_char={end_char}, sugg={sugg}")
+                location = (start_line, start_char)
+            else:
+                src, location, sugg = error.split(":", maxsplit=2)
+                print(f"Wording error: src={src}, loc={location}, sugg={sugg}")
+                line = int(location.split(".")[0])
+                num = int(location.split(".")[1].split("-")[0])
+                location = (line, num)
 
             problems.append(
                 Problem(
-                    position=(line, num),
+                    position=location,
                     text=sugg,
                     checker="diction",
                     cid="0",
-                    file=file.tex_file,
+                    file=file,
                     severity=ProblemSeverity.INFO,
                     category="wording/ phrasing",
                     suggestions=[sugg],
