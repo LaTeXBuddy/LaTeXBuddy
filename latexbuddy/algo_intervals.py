@@ -14,7 +14,8 @@ def get_best_intervals(interval_tuples):
 
 def max_no_overlap(i, sorted_intervals):
     """Calculates the optimal set of intervals
-    with maximum sum of severities for the first i-1 intervals up to the index i"""
+    with maximum sum of severities for the first i-1 intervals up to the index i.
+    Can later be optimized with DP to make less recursive calls if needed"""
 
     n = len(sorted_intervals)
     if i == -1:
@@ -22,6 +23,7 @@ def max_no_overlap(i, sorted_intervals):
     if i <= n:
         minus_one = max_no_overlap(i-1, sorted_intervals)
         pre = max_no_overlap(pred(i, sorted_intervals), sorted_intervals)
+        
         if minus_one[1] > pre[1] + sorted_intervals[i][2]:
             return max_no_overlap(i-1, sorted_intervals)
         else:
