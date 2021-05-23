@@ -7,7 +7,7 @@ authors = [
     "Nikita Karamov <n.karamov@tu-braunschweig.de>"
 ]
 readme = "README.md"
-include = ["CHANGELOG.md"]
+include = ["CHANGELOG.md", "NOTICE"]
 
 [tool.poetry.dependencies]
 python = "^3.6"

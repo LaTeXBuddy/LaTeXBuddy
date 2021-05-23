@@ -1,0 +1,44 @@
+LaTeXBuddy
+Copyright (c) 2021, Institut für Betriebssysteme und Rechnerverbund
+
+================================================================================
+
+This product contains source code from 'modern-normalize', licenced under the
+MIT Licence.
+
+https://github.com/sindresorhus/modern-normalize
+
+Copyright (c) Nicolas Gallagher
+Copyright (c) Jonathan Neal
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished
+to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+================================================================================
+
+This product depends on following open-source programs and libraries:
+
+  * chardet - https://github.com/chardet/chardet
+    Copyright (c) 2011-2020 Mark Pilgrim et al.
+  * ChkTeX - https://www.nongnu.org/chktex/
+    Copyright (c) 1995-96 Jens T. Berger Thielemann
+  * GNU Aspell - http://aspell.net/
+    Copyright (c) 2001 by Kevin Atkinson
+  * GNU Diction - https://www.gnu.org/software/diction/
+    Copyright (c) 1997-2007 Michael Haardt <michael@moria.de>
+  * Jinja2 - https://palletsprojects.com/p/jinja/
+    Copyright (c) 2007 Pallets
+  * LanguageTool - https://languagetool.org/
+    Copyright (C) 2005 Daniel Naber (http://www.danielnaber.de)
+  * requests - https://requests.readthedocs.io/
+    Copyright (c) 2017 by Kenneth Reitz.
+  * yalafi - https://github.com/matze-dd/YaLafi
+    Copyright (c) 2020 Matthias Baumann
