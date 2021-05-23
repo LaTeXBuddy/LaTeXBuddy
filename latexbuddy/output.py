@@ -1,11 +1,11 @@
-from functools import reduce
+from copy import deepcopy
 from html import escape
-from typing import Dict, List, Set, Tuple
+from operator import attrgetter
+from typing import Dict, List
 
 from jinja2 import Environment, PackageLoader
-from markupsafe import Markup
 
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem
 
 
 env = Environment(loader=PackageLoader("latexbuddy"))
@@ -39,121 +39,151 @@ def render_html(file_name: str, file_text: str, problems: Dict[str, Problem]) ->
     """
     problem_values = sorted(problems.values(), key=problem_key)
     template = env.get_template("result.html")
-    tex_res, problem_res = experiment(file_text, problem_values)
+    higlighted_tex = highlight(file_text, problem_values)
     return template.render(
         file_name=file_name,
-        file_text=tex_res,
+        file_text=higlighted_tex,
         problems=problem_values,
-        problem_str=problem_res,
     )
 
 
-def experiment(tex: str, problems: List[Problem]) -> Tuple[str, str]:
-
-    problem_res = ""
-    for problem in problems:
-        if problem.position == (0, 0):
-            continue
-        colors = ["transparent", "blue", "orange", "red"]
-        problem_res += (
-            f'<div style="'
-            f"position: absolute;"
-            f"background-color: {colors[problem.severity.value]};"
-            f"opacity:.5;"
-            f"top:{40+(problem.position[0]-1)*16}px;"
-            f"left:{problem.position[1]-1}ch;"
-            f"margin-left:24px;"
-            f"width:{problem.length}ch;"
-            f"height:1em;"
-            f'" title="{Markup.escape(problem.description or "")}"></div>'
-        )
-    return tex, problem_res
-
-
-class MarkedInterval:
+class Interval:
     def __init__(self, problem: Problem) -> None:
-        self.start = problem.position[1] - 1
-        self.end = problem.position[1] + problem.length - 1
         self.problem = problem
 
-    def intersects(self, other: "MarkedInterval") -> bool:
-        return (
-            other.start <= self.end <= other.end
-            or self.start <= other.end <= self.end
-            or (self.start <= other.start and other.end <= self.end)
-            or (other.start <= self.start and self.end <= other.end)
-        )
+    @property
+    def start(self) -> int:
+        return self.problem.position[1]
 
-    def merge(self, other: "MarkedInterval") -> "List[MarkedInterval]":
-        if not self.intersects(other):
-            return [self, other]
+    @property
+    def end(self) -> int:
+        return self.start + self.problem.length
 
-        if self.problem.severity < other.problem.severity:
-            return [other]
-
-        return [self]
+    @property
+    def severity(self) -> int:
+        return self.problem.severity.value
 
     def __str__(self) -> str:
-        return f"{self.start}:{self.end}"
+        return f"({self.start}, {self.end}, {self.severity})"
 
-    def __repr__(self):
-        return f"<{str(self)}>"
+
+def find_best_intervals(intervals: List[Interval]) -> List[Interval]:
+    """Returns a list of non-overlapping intervals with the maximal sum of severities.
+
+    In other words, it filters out less important intervals to find the most optimal set
+    of non-overlapping intervals that are to be highlighted.
+
+    Dynamic programming algorithm composed by David Meyer <da.meyer@tu-braunsschweig.de>
+
+    :param intervals: original list of (possibly overlapping) intervals
+    :return: list of non-overlapping intervals
+    """
+    if len(intervals) == 0:
+        return []
+
+    if len(intervals) == 1:
+        return intervals
+
+    sorted_intervals = sorted(intervals, key=attrgetter("end"))
+    n = len(sorted_intervals)
+
+    def find_predecessor(idx: int) -> int:
+        """Calculates the index of the closest predecessor to the interval with index i.
+
+        :param idx: index of the inspected interval
+        :return: index of the closest predecessor
+        """
+        i_start = sorted_intervals[idx].start
+        j = idx - 1
+        while j >= 0:
+            if sorted_intervals[j].end <= i_start:
+                return j  # j'th interval is the closest predecessor
+            j -= 1
+
+        return -1  # no predecessor exists
+
+    # dictionary for storing intermediate results
+    calculated = {-1: ([], 0)}
+
+    for i in range(n):
+        if i == 0:
+            # always add first interval
+            calculated[i] = (
+                [sorted_intervals[i]],
+                sorted_intervals[i].severity,
+            )
+            continue
+
+        pred_i = find_predecessor(i)
+        if calculated[i - 1][1] > calculated[pred_i][1] + sorted_intervals[i].severity:
+            calculated[i] = calculated[i - 1]
+        else:
+            copy_tuples = deepcopy(calculated[pred_i][0])
+            copy_tuples.append(sorted_intervals[i])
+            calculated[i] = (
+                copy_tuples,
+                calculated[pred_i][1] + sorted_intervals[i].severity,
+            )
+
+    return calculated[n - 1][0]
 
 
 def highlight(tex: str, problems: List[Problem]) -> str:
-    line_intervals: List[List[MarkedInterval]] = []
+    """Highlights the TeX code using the problems' data.
+
+    :param tex: TeX source
+    :param problems: list of problems
+    :return: HTML string with highlighted errors, ready to be put inside <pre>
+    """
+    line_intervals: List[List[Interval]] = []
     tex_lines = tex.splitlines(keepends=True)
     for _ in tex_lines:
         line_intervals.append([])
+
+    # when parsing, yalafi often marks the n+1'th line as erroneous
     line_intervals.append([])
 
     for problem in problems:
-        if problem.position == (0, 0):
+        # we don't care about problems with no position
+        if problem.position == (0, 0):  # TODO: make position Optional for aspell
             continue
+
+        # we don't care about problems without length (for now)
+        if problem.length == 0:
+            continue
+
         lin = problem.position[0] - 1
-        p_int = MarkedInterval(problem)
-
-        if p_int.problem.length == 0:
-            continue
-
-        line_intervals[lin].append(p_int)
-
-    def reducer(mil: List[MarkedInterval], mi2: MarkedInterval):
-        if len(mil) == 0:
-            return [mi2]
-
-        result = []
-        for mi1 in mil:
-            merge_res = mi1.merge(mi2)
-            result += merge_res
-            if mi2 in merge_res:
-                break
-
-        return result
+        line_intervals[lin].append(Interval(problem))
 
     for i in range(len(line_intervals)):
-        line = line_intervals[i]
-        if len(line) == 0:
+        intervals = line_intervals[i]
+        if len(intervals) == 0:
             continue
 
-        reduced_line = reduce(reducer, line, [])
+        best_intervals = find_best_intervals(intervals)
 
         offset = 0
-        for interval in reduced_line:
+        for interval in best_intervals:
             old_len = len(tex_lines[i])
-            start = offset + interval.start
-            end = offset + interval.end
-            opening_tag = f'<span class="under is-{str(interval.problem.severity)}" title="{escape(interval.problem.description or "")}">'
-            closing_tag = f"</span>"
-            string = (
-                tex_lines[i][:start]
-                + opening_tag
-                + tex_lines[i][start:end]
-                + closing_tag
-                + tex_lines[i][end:]
+            start = offset + interval.start - 1
+            end = offset + interval.end - 1
+            opening_tag = (
+                f"<span "
+                f'class="under is-{str(interval.problem.severity)}" '
+                f'title="{escape(interval.problem.description or "")}"'
+                f">"
             )
-            new_len = len(string)
+            closing_tag = f"</span>"
+
+            # TODO: figure out HTML escaping
+            string = (
+                f"{tex_lines[i][:start]}"
+                f"{opening_tag}"
+                f"{tex_lines[i][start:end]}"
+                f"{closing_tag}"
+                f"{tex_lines[i][end:]}"
+            )
             tex_lines[i] = string
-            offset += new_len - old_len
+            offset += len(string) - old_len
 
     return "".join(tex_lines)
