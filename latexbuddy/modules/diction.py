@@ -66,7 +66,6 @@ class DictionModule(Module):
         for error in out:
 
             print(error)
-
             o_line = ""
             if "Double word" in error:
                 pattern = re.escape("[") + ".*" + re.escape("->") + ".*" + re.escape("]")
