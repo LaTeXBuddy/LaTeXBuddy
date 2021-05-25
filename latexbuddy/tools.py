@@ -301,3 +301,25 @@ def execute_no_exceptions(
             file=sys.stderr,
         )
         traceback.print_exc(file=sys.stderr)
+
+
+def add_whitelist_console(whitelist_file, to_add):
+    """
+    TODO
+    """
+    with whitelist_file.open("a+") as file:
+        file.write(to_add)
+        file.write("\n")
+
+
+def add_whitelist_from_file(whitelist_file, file_to_parse):
+    """
+    TODO
+    """
+    lines = file_to_parse.read_text().splitlines(keepends=False)
+    with whitelist_file.open("a+") as file:
+        for line in lines:
+            if line == "":
+                continue
+            file.write("spelling_" + line)
+            file.write("\n")

@@ -6,7 +6,7 @@ out-of-the-box. You may move this file and specify its path using the --config f
 modules = {
     "buddy": {
         "language": "en",
-        "whitelist": "whitelist.wlist",
+        "whitelist": "whitelist",
         "output": "errors.json",
         "enable-modules-by-default": True,
     },

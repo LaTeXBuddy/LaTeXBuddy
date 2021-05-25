@@ -7,10 +7,10 @@ from pathlib import Path
 
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.tools import add_whitelist_console, add_whitelist_from_file
 
 
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
-module_selection = parser.add_mutually_exclusive_group()
 
 parser.add_argument("file", type=Path, help="File that will be processed.")
 parser.add_argument(
@@ -30,7 +30,7 @@ parser.add_argument(
 parser.add_argument(
     "--whitelist",
     "-w",
-    # TODO: why a new file format? if it's JSON, use .json. If not, don't use one.
+    # Not JSON so I removed file ending.
     type=Path,
     default=None,
     help="Location of the whitelist file.",
@@ -43,14 +43,14 @@ parser.add_argument(
     help="Where to output the errors file.",
 )
 parser.add_argument(
-    "--whitelist-word",
+    "--wl_add_word",
     "-ww",
     type=str,
     default=None,
     help="TODO"
 )
 parser.add_argument(
-    "--whitelist-file",
+    "--wl_from_file",
     "-wf",
     type=Path,
     default=None,
@@ -77,6 +77,19 @@ module_selection.add_argument(
 def main():
     """Parses CLI arguments and launches the LaTeXBuddy instance."""
     args = parser.parse_args()
+
+    # if we want to add word(s) to the whitelist only do that. Don't check.
+    # TODO: no file has to be specified in the call in the next block
+    if args.wl_add_word or args.wl_from_file:
+        if args.whitelist:
+            wl_file = Path(args.whitelist)
+        else:
+            wl_file = Path("whitelist")
+        if args.wl_add_word:
+            add_whitelist_console(wl_file, args.wl_add_word)
+        if args.wl_from_file:
+            add_whitelist_from_file(wl_file, Path(args.wl_from_file))
+        return
 
     config_loader = ConfigLoader(args)
 

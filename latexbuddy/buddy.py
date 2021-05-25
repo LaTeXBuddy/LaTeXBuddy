@@ -38,7 +38,7 @@ class LatexBuddy:
 
         # file that represents the whitelist
         self.whitelist_file = self.cfg.get_config_option_or_default(
-            "buddy", "whitelist", Path("whitelist.wlist")
+            "buddy", "whitelist", Path("whitelist")
         )
 
         # current language
@@ -83,6 +83,7 @@ class LatexBuddy:
     def check_whitelist(self):
         """Remove errors that are whitelisted."""
         if not os.path.isfile(self.whitelist_file):
+            print("No Whitelist found at: " + self.whitelist_file)
             return  # if no whitelist yet, don't have to check
 
         with open(self.whitelist_file, "r") as file:
@@ -91,7 +92,7 @@ class LatexBuddy:
         for whitelist_element in whitelist:
             uids = list(self.errors.keys())
             for uid in uids:
-                if self.errors[uid].compare_with_other_comp_id(whitelist_element):
+                if self.errors[uid].better_eq(whitelist_element):
                     del self.errors[uid]
 
     def add_to_whitelist(self, uid):
