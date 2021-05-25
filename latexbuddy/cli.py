@@ -10,6 +10,7 @@ from latexbuddy.config_loader import ConfigLoader
 
 
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
+module_selection = parser.add_mutually_exclusive_group()
 
 parser.add_argument("file", type=Path, help="File that will be processed.")
 parser.add_argument(
@@ -19,7 +20,6 @@ parser.add_argument(
     default=Path("config.py"),
     help="Location of the config file.",
 )
-
 parser.add_argument(
     "--language",
     "-l",
@@ -41,6 +41,20 @@ parser.add_argument(
     type=Path,
     default=None,
     help="Where to output the errors file.",
+)
+parser.add_argument(
+    "--whitelist-word",
+    "-ww",
+    type=str,
+    default=None,
+    help="TODO"
+)
+parser.add_argument(
+    "--whitelist-file",
+    "-wf",
+    type=Path,
+    default=None,
+    help="TODO"
 )
 
 module_selection = parser.add_mutually_exclusive_group()
