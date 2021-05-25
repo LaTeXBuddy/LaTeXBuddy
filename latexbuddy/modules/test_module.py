@@ -1,8 +1,8 @@
 from typing import List
 
 from latexbuddy import TexFile
-from latexbuddy.abs_module import Module
 from latexbuddy.buddy import LatexBuddy
+from latexbuddy.modules import Module
 from latexbuddy.problem import Problem
 
 

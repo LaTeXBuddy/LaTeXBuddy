@@ -9,8 +9,8 @@ from typing import List
 
 import latexbuddy.tools as tools
 
-from latexbuddy.abs_module import Module
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.modules import Module
 
 
 class ToolLoader:

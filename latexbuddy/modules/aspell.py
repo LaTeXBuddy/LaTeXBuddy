@@ -7,7 +7,7 @@ from typing import List
 import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
-from latexbuddy.abs_module import Module
+from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 
