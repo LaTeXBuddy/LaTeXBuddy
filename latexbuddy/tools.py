@@ -189,3 +189,33 @@ def execute_no_exceptions(
             file=sys.stderr,
         )
         traceback.print_exc(file=sys.stderr)
+
+
+def get_all_paths_in_document(file_path):
+    """Checks files that are included in a file.
+
+    If the file includes more files, these files will also be checked.
+
+    :param file_path:path of included files
+    """
+
+    unchecked_files = []  # Holds all unchecked files
+    checked_files = []  # Holds all checked file
+
+    unchecked_files.append(file_path)  # add first path
+    while len(unchecked_files) > 0:
+        checked_files.append(unchecked_files[0])
+        new_files = []
+
+        try:
+            lines = Path(unchecked_files.pop(0)).read_text().splitlines(keepends=False)
+        except Exception as e:  # If the file cannot be found
+            print(e)
+
+        for line in lines:
+            if "\include" in line:
+                path = line[9:]
+                path = path.strip("}")
+                new_files.append(os.path.abspath(path))
+        unchecked_files.extend(new_files)  # add new paths
+    return checked_files

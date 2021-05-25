@@ -45,6 +45,15 @@ class LatexBuddy:
         # current language
         self.lang = self.cfg.get_config_option_or_default("buddy", "language", "en")
 
+    def change_file(self, file):
+        """Method to change the current file. Used for multi check files included
+            in other files
+
+        :param file: the new file to check next
+        """
+        self.file_to_check = file  # .tex file that is to be error checked
+        self.tex_file: TexFile = TexFile(file)
+
     def add_error(self, error: Problem):
         """Adds the error to the errors dictionary.
 

@@ -7,6 +7,7 @@ from pathlib import Path
 
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
+import latexbuddy.tools as tool
 
 
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
@@ -64,13 +65,19 @@ def main():
     args = parser.parse_args()
 
     config_loader = ConfigLoader(args)
+    paths = tool.get_all_paths_in_document(args.file)
 
     buddy = LatexBuddy(
         config_loader=config_loader,
-        file_to_check=args.file,
+        file_to_check=Path(paths.pop(0)),
     )
 
     buddy.run_tools()
+
+    for path in paths:
+        buddy.change_file(Path(path))
+        buddy.run_tools()
+
     buddy.check_whitelist()
     buddy.parse_to_json()
     buddy.output_html()
