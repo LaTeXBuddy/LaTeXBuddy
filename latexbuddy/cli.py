@@ -30,7 +30,6 @@ parser.add_argument(
 parser.add_argument(
     "--whitelist",
     "-w",
-    # TODO: why a new file format? if it's JSON, use .json. If not, don't use one.
     type=Path,
     default=None,
     help="Location of the whitelist file.",
@@ -41,6 +40,22 @@ parser.add_argument(
     type=Path,
     default=None,
     help="Where to output the errors file.",
+)
+
+module_selection = parser.add_mutually_exclusive_group()
+module_selection.add_argument(
+    "--enable-modules",
+    type=str,
+    default=None,
+    help="Comma-separated list of module names that should be executed. "
+    "(Any other module will be implicitly disabled!)",
+)
+module_selection.add_argument(
+    "--disable-modules",
+    type=str,
+    default=None,
+    help="Comma-separated list of module names that should not be executed."
+    "(Every other module will be implicitly enabled!)",
 )
 
 

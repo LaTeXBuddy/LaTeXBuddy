@@ -2,38 +2,40 @@ from typing import Dict
 
 from jinja2 import Environment, PackageLoader
 
-from latexbuddy.error_class import Error
+from latexbuddy.problem import Problem, ProblemSeverity
 
 
 env = Environment(loader=PackageLoader("latexbuddy"))
 
 
-def error_key(err: Error) -> int:
-    """Returns a number for each error to be able to sort them.
+def problem_key(problem: Problem) -> int:
+    """Returns a number for each problem to be able to sort them.
 
-    This puts YaLaFi's errors on top, followed by errors without location.
+    This puts YaLaFi's problems on top, followed by errors without location.
 
-    :param err: error object
+    :param problem: problem object
     :return: error's "rating" for sorting
     """
-    if err.src.lower() == "yalafi":
+    if problem.checker.lower() == "yalafi":
         return -3
-    if not err.start:
+    if not problem.position:
         return -2
-    if not isinstance(err.start, tuple):
+    if not isinstance(problem.position, tuple):
         return -1
 
-    return err.start[0]
+    return problem.position[0]
 
 
-def render_html(file_name: str, file_text: str, errors: Dict[str, Error]) -> str:
-    """Renders an HTML page based on file contents and discovered errors.
+def render_html(file_name: str, file_text: str, problems: Dict[str, Problem]) -> str:
+    """Renders an HTML page based on file contents and discovered problems.
 
     :param file_name: file name
     :param file_text: contents of the file
-    :param errors: dictionary of errors returned from latexbuddy
+    :param problems: dictionary of errors returned from latexbuddy
     :return: generated HTML
     """
-    err_values = sorted(errors.values(), key=error_key)
+    problem_values = sorted(problems.values(), key=problem_key)
     template = env.get_template("result.html")
-    return template.render(file_name=file_name, file_text=file_text, errors=err_values)
+    return template.render(
+        file_name=file_name, file_text=file_text, problems=problem_values
+    )

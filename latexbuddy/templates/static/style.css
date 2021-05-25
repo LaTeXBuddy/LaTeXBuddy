@@ -46,40 +46,52 @@ main > section {
     flex: 1 0 min(100%, 80ch);
 }
 
-#errors-list {
+#problems-list {
     flex: 0 1 80ch;
 }
 
-.error {
-    padding-bottom: .5rem;
+.problem {
+    padding: .666rem 0;
     border-bottom: 1px solid #eeeeee;
-    margin-bottom: .5rem;
 }
 
-.error.is-warning .error-title,
-.error.is-error .error-title {
+.problem-context {
+    margin: 0 0 .5em;
+}
+
+.problem-text{
     text-decoration-style: wavy;
     text-decoration-line: underline;
     text-decoration-thickness: .07em;
 }
 
-.error.is-warning .error-title {
+.problem.is-none .problem-text {
+    text-decoration-color: transparent;
+}
+
+.problem.is-info .problem-text {
+    text-decoration-color: steelblue;
+}
+
+.problem.is-warning .problem-text {
     text-decoration-color: orange;
 }
 
-.error.is-error .error-title {
+.problem.is-error .problem-text {
     text-decoration-color: red;
 }
 
-.error-title {
-    margin: 0 0 .25rem;
+.problem p {
+    margin: 0 0 .5rem;
 }
 
-.error-meta {
-    display: block;
+.problem p:last-child {
+    margin: 0;
+}
+
+.problem-meta {
     font-size: smaller;
     font-weight: normal;
-    margin: 0 0 .5rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -96,7 +108,7 @@ main > section {
         background-color: #222;
     }
 
-    .error {
+    .problem {
         border-bottom-color: #222;
     }
 }

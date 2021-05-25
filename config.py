@@ -4,12 +4,31 @@ out-of-the-box. You may move this file and specify its path using the --config f
 """
 
 modules = {
-    "latexbuddy": {
+    "buddy": {
         "language": "en",
         "whitelist": "whitelist.wlist",
-        "output": "errors.json"
+        "output": "errors.json",
+        "enable-modules-by-default": True,
     },
-    "languagetool": {
-        "mode": "LOCAL_SERVER"
+    "LanguageTool": {
+        # "enabled": True,
+        "mode": "COMMANDLINE",
+        # "remote_url": "https://api.languagetoolplus.com/v2/check",
+        "disabled-rules": [
+            "WHITESPACE_RULE",
+            # "TYPOGRAFISCHE_ANFUEHRUNGSZEICHEN",
+        ],
+        "disabled-categories": [
+            # "TYPOS",
+        ],
     },
+    "AspellModule": {
+        # "enabled": True,
+    },
+    "ChktexModule": {
+        # "enabled": True,
+    },
+    "TestModule": {
+        "enabled": False,
+    }
 }

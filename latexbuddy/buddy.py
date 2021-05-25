@@ -1,18 +1,17 @@
-"""This module descibes the main LaTeXBuddy instance class."""
+"""This module describes the main LaTeXBuddy instance class."""
 
 import json
 import os
+import sys
+import traceback
 
 from pathlib import Path
 
-import latexbuddy.aspell as aspell
-import latexbuddy.chktex as chktex
-import latexbuddy.languagetool as languagetool
 import latexbuddy.tools as tools
 
+from latexbuddy import TexFile
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.error_class import Error
-from latexbuddy.output import render_html
+from latexbuddy.problem import Problem, ProblemSeverity
 
 
 # TODO: make this a singleton class with static methods
@@ -28,26 +27,25 @@ class LatexBuddy:
         :param file_to_check: file that will be checked
         """
         self.errors = {}  # all current errors
-        self.cfg = config_loader  # configuration
+        self.cfg: ConfigLoader = config_loader  # configuration
         self.file_to_check = file_to_check  # .tex file that is to be error checked
+        self.tex_file: TexFile = TexFile(file_to_check)
 
         # file where the error should be saved
         self.error_file = self.cfg.get_config_option_or_default(
-            "latexbuddy", "output", Path("errors.json")
+            "buddy", "output", Path("errors.json")
         )
 
         # file that represents the whitelist
+        # TODO: why a new file format? if it's JSON, use .json. If not, don't use one.
         self.whitelist_file = self.cfg.get_config_option_or_default(
-            "latexbuddy", "whitelist", Path("whitelist.wlist")
+            "buddy", "whitelist", Path("whitelist.wlist")
         )
 
         # current language
-        self.lang = self.cfg.get_config_option_or_default(
-            "latexbuddy", "language", "en"
-        )
-        self.check_successful = False
+        self.lang = self.cfg.get_config_option_or_default("buddy", "language", "en")
 
-    def add_error(self, error: Error):
+    def add_error(self, error: Problem):
         """Adds the error to the errors dictionary.
 
         UID is used as key, the error object is used as value.
@@ -55,7 +53,7 @@ class LatexBuddy:
         :param error: error to add to the dictionary
         """
 
-        self.errors[error.get_uid()] = error
+        self.errors[error.uid] = error
 
     # TODO: rename method. Parse = read; this method writes
     # TODO: maybe remove the method completely
@@ -67,7 +65,16 @@ class LatexBuddy:
             file.write("[")
             uids = list(self.errors.keys())
             for uid in uids:
-                json.dump(self.errors[uid].__dict__, file, indent=4)
+
+                # TODO: clean up this temporary workaround by properly reworking the
+                #   JSON encoding process (Path and Enum are not JSON serializable)
+                err_data = self.errors[uid].__dict__
+                if "file" in err_data:
+                    err_data["file"] = str(err_data["file"])
+                if "severity" in err_data:
+                    err_data["severity"] = str(err_data["severity"])
+
+                json.dump(err_data, file, indent=4)
                 if not uid == uids[-1]:
                     file.write(",")
 
@@ -125,33 +132,43 @@ class LatexBuddy:
 
     def run_tools(self):
         """Runs all tools in the LaTeXBuddy toolchain"""
+
+        # importing this here to avoid circular import error
+        from latexbuddy.tool_loader import ToolLoader
+
         # check_preprocessor
         # check_config
 
-        detexed_file, self.charmap, detex_err = tools.yalafi_detex(self.file_to_check)
-        self.check_successful = True if len(detex_err) < 1 else False
-
-        for err in detex_err:
-            self.add_error(
-                Error(
-                    self,
-                    str(self.file_to_check),
-                    "YALaFi",
-                    "latex",
-                    "TODO",
-                    err[1],
-                    err[0],
-                    0,
-                    [],
-                    False,
-                    "TODO",
+        if self.tex_file.is_faulty:
+            for raw_err in self.tex_file._parse_problems:
+                self.add_error(
+                    Problem(
+                        position=raw_err[0],
+                        text=raw_err[1],
+                        checker="YaLafi",
+                        cid="tex2txt",
+                        file=self.tex_file.tex_file,
+                        severity=ProblemSeverity.ERROR,
+                        category="latex",
+                    )
                 )
-            )
 
-        chktex.run(self, self.file_to_check)
-        aspell.run(self, detexed_file)
-        languagetool.run(self, detexed_file)
-        chktex.run(self, self.file_to_check)
+        tool_loader = ToolLoader(Path("latexbuddy/modules/"))
+        modules = tool_loader.load_selected_modules(self.cfg)
+
+        for module in modules:
+
+            def lambda_function() -> None:
+                errors = module.run_checks(self, self.tex_file)
+
+                for error in errors:
+                    self.add_error(error)
+
+            tools.execute_no_exceptions(
+                lambda_function,
+                f"An error occurred while executing checks for module "
+                f"'{module.__class__.__name__}'",
+            )
 
         # FOR TESTING ONLY
         # self.check_whitelist()
@@ -159,9 +176,6 @@ class LatexBuddy:
         # for key in keys:
         #     self.add_to_whitelist(key)
         #     return
-
-        # TODO: use tempfile.TemporaryFile instead
-        os.remove(detexed_file)
 
     # TODO: why does this exist? Use direct access
     def get_lang(self) -> str:
@@ -172,11 +186,15 @@ class LatexBuddy:
         return self.lang
 
     def output_html(self):
+
+        # importing this here to avoid circular import error
+        from latexbuddy.output import render_html
+
         html_output_path = Path(self.error_file + ".html")
         html_output_path.write_text(
             render_html(
-                str(self.file_to_check),
-                self.file_to_check.read_text(),
+                str(self.tex_file.tex_file),
+                self.tex_file.tex,
                 self.errors,
             )
         )

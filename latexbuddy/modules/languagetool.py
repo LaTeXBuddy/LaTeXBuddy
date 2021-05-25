@@ -2,47 +2,21 @@
 
 import json
 import socket
-import sys
 import time
 
 from contextlib import closing
 from enum import Enum
-from pathlib import Path
 from typing import Dict, List, Optional
 
 import requests
 
-import latexbuddy.error_class as error
+import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
-
-_LANGUAGES = {"de": "de-DE", "en": "en-GB"}
-
-
-def run(buddy, file: Path):
-    """Runs the LanguageTool checks on a file and saves the results in a LaTeXBuddy
-    instance.
-
-    Requires LanguageTool server to be set up. Local or global servers can be used.
-
-    :param buddy: the LaTeXBuddy instance
-    :param file: the file to run checks on
-    """
-    # TODO: get settings (mode etc.) from buddy instance (config needed)
-
-    cfg_mode = buddy.cfg.get_config_option_or_default(
-        "languagetool", "mode", "COMMANDLINE"
-    )
-    try:
-        cfg_mode = Mode(cfg_mode)
-    except ValueError:
-        cfg_mode = Mode.COMMANDLINE
-
-    try:
-        ltm = LanguageToolModule(buddy, language=_LANGUAGES[buddy.lang], mode=cfg_mode)
-        ltm.check_tex(file)
-    except ConnectionError as e:
-        print("LanguageTool server: " + str(e), file=sys.stderr)
+from latexbuddy import TexFile
+from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.modules import Module
+from latexbuddy.problem import Problem, ProblemSeverity
 
 
 class Mode(Enum):
@@ -57,33 +31,48 @@ class Mode(Enum):
     REMOTE_SERVER = "REMOTE_SERVER"
 
 
-# TODO: rewrite this using the Abstract Module API
-class LanguageToolModule:
+class LanguageTool(Module):
     """Wraps the LanguageTool API calls to check files."""
 
-    # TODO: implement whitelisting certain rules
-    #       (exclude multiple whitespaces error by default)
-    def __init__(
-        self,
-        buddy,
-        mode: Mode = Mode.COMMANDLINE,
-        remote_url: str = None,
-        language: str = None,
-    ):
-        """Creates a LanguageTool checking module.
+    _LANGUAGE_MAP = {"de": "de-DE", "en": "en-GB"}
 
-        :param buddy: the LaTeXBuddy instance
-        :param mode: LT mode
-        :param remote_url: URL of the LT server
-        :param language: language to run checks with
-        """
-        self.buddy = buddy
-        self.mode = mode
-        self.language = language
+    def __init__(self):
+        """Creates a LanguageTool checking module."""
+
+        self.mode = None
+        self.language = None
+
+        self.disabled_rules = None
+        self.disabled_categories = None
 
         self.local_server = None
         self.remote_url = None
         self.lt_console_command = None
+
+    def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
+        """Runs the LanguageTool checks on a file and returns the results as a list.
+
+        Requires LanguageTool (server) to be set up.
+        Local or global servers can be used.
+
+        :param buddy: the LaTeXBuddy instance
+        :param file: the file to run checks on
+        """
+
+        try:
+            self.language = LanguageTool._LANGUAGE_MAP[buddy.lang]
+        except KeyError:
+            self.language = None
+
+        self.find_disabled_rules(buddy.cfg)
+
+        cfg_mode = buddy.cfg.get_config_option_or_default(
+            "LanguageTool", "mode", "COMMANDLINE"
+        )
+        try:
+            self.mode = Mode(cfg_mode)
+        except ValueError:
+            self.mode = Mode.COMMANDLINE
 
         if self.mode == Mode.LOCAL_SERVER:
             self.local_server = LanguageToolLocalServer()
@@ -91,12 +80,14 @@ class LanguageToolModule:
 
         elif self.mode == Mode.REMOTE_SERVER:
             # must include the port and api call (e.g. /v2/check)
-            self.remote_url = remote_url
+            self.remote_url = buddy.cfg.get_config_option("LanguageTool", "remote_url")
 
         elif self.mode == Mode.COMMANDLINE:
             self.find_languagetool_command()
 
-    def find_languagetool_command(self):
+        return self.check_tex(file)
+
+    def find_languagetool_command(self) -> None:
         """Searches for the LanguageTool command line app.
 
         This method also checks if Java is installed.
@@ -151,59 +142,95 @@ class LanguageToolModule:
         else:
             self.lt_console_command.append("--autoDetect")
 
-    def check_tex(self, detex_file: Path):
+        if self.disabled_rules:
+            self.lt_console_command.append("--disable")
+            self.lt_console_command.append(self.disabled_rules)
+
+        if self.disabled_categories:
+            self.lt_console_command.append("--disablecategories")
+            self.lt_console_command.append(self.disabled_categories)
+
+    def find_disabled_rules(self, config: ConfigLoader) -> None:
+
+        self.disabled_rules = ",".join(
+            config.get_config_option_or_default("LanguageTool", "disabled-rules", [])
+        )
+
+        self.disabled_categories = ",".join(
+            config.get_config_option_or_default(
+                "LanguageTool", "disabled-categories", []
+            )
+        )
+
+        if self.disabled_rules == "":
+            self.disabled_rules = None
+
+        if self.disabled_categories == "":
+            self.disabled_categories = None
+
+    def check_tex(self, file: TexFile) -> List[Problem]:
         """Runs the LanguageTool checks on a file.
 
-        :param detex_file: the detexed file to run checks on
+        :param file: the file to run checks on
         """
 
-        raw_errors = None
+        raw_problems = None
 
         if self.mode == Mode.LOCAL_SERVER:
-            raw_errors = self.lt_post_request(
-                detex_file, "http://localhost:" f"{self.local_server.port}" "/v2/check"
+            raw_problems = self.lt_post_request(
+                file, "http://localhost:" f"{self.local_server.port}" "/v2/check"
             )
 
         elif self.mode == Mode.REMOTE_SERVER:
-            raw_errors = self.lt_post_request(detex_file, self.remote_url)
+            raw_problems = self.lt_post_request(file, self.remote_url)
 
         elif self.mode == Mode.COMMANDLINE:
-            raw_errors = self.execute_commandline_request(detex_file)
+            raw_problems = self.execute_commandline_request(file)
 
-        self.format_errors(raw_errors, Path(detex_file))
+        return self.format_errors(raw_problems, file)
 
-    def lt_post_request(self, detex_file: Path, server_url: str) -> Optional[Dict]:
+    def lt_post_request(self, file: TexFile, server_url: str) -> Optional[Dict]:
         """Send a POST request to the LanguageTool server to check the text.
 
-        :param detex_file: path to the detex'ed file
+        :param file: TexFile object representing the file to be checked
         :param server_url: URL of the LanguageTool server
         :return: server's response
         """
-        if detex_file is None:
+        if file is None:
             return None
 
-        with open(detex_file) as file:
-            text = file.read()
+        request_data = {
+            "text": file.plain,
+        }
 
-        response = requests.post(
-            url=server_url, data={"language": self.language, "text": text}
-        )
+        if self.language:
+            request_data["language"] = self.language
+        else:
+            request_data["language"] = "auto"
+
+        if self.disabled_rules:
+            request_data["disabledRules"] = self.disabled_rules
+
+        if self.disabled_categories:
+            request_data["disabledCategories"] = self.disabled_categories
+
+        response = requests.post(url=server_url, data=request_data)
         return response.json()
 
-    def execute_commandline_request(self, detex_file: Path) -> Optional[Dict]:
+    def execute_commandline_request(self, file: TexFile) -> Optional[Dict]:
         """Execute the LanguageTool command line app to check the text.
 
-        :param detex_file: path to the detex'ed file
+        :param file: TexFile object representing the file to be checked
         :return: app's response
         """
 
-        if detex_file is None:
+        if file is None:
             return None
 
         # cloning list to in order to append the file name
         # w/o changing lt_console_command
         cmd = list(self.lt_console_command)
-        cmd.append(str(detex_file))
+        cmd.append(str(file.plain_file))
 
         output = tools.execute_no_errors(*cmd, encoding="utf_8")
 
@@ -214,49 +241,56 @@ class LanguageToolModule:
 
         return json_output
 
-    def format_errors(self, raw_errors: Dict, detex_file: Path):
+    @staticmethod
+    def format_errors(raw_problems: Dict, file: TexFile) -> List[Problem]:
         """Parses LanguageTool errors and converts them to LaTeXBuddy Error objects.
 
-        :param raw_errors: LanguageTool's error output
-        :param detex_file: path to the detex'ed file
+        :param raw_problems: LanguageTool's error output
+        :param file: TexFile object representing the file to be checked
         """
 
-        if len(raw_errors) == 0:
-            return
+        problems = []
 
-        tool_name = raw_errors["software"]["name"]
+        if raw_problems is None or len(raw_problems) == 0:
+            return problems
 
-        for match in raw_errors["matches"]:
+        tool_name = raw_problems["software"]["name"]
+
+        for match in raw_problems["matches"]:
 
             context = match["context"]
             context_offset = context["offset"]
             context_end = context["length"] + context_offset
             text = context["text"][context_offset:context_end]
-            location = tools.find_char_position(
-                self.buddy.file_to_check,
-                detex_file,
-                self.buddy.charmap,
-                match["offset"],
-            )
+            location = file.get_position_in_tex(match["offset"])
 
-            error_type = "grammar"
+            problem_type = "grammar"
 
             if match["rule"]["category"]["id"] == "TYPOS":
-                error_type = "spelling"
+                problem_type = "spelling"
 
-            error.Error(
-                self.buddy,
-                str(self.buddy.file_to_check),
-                tool_name,
-                error_type,
-                match["rule"]["id"],
-                text,
-                location,
-                match["length"],
-                LanguageToolModule.parse_error_replacements(match["replacements"]),
-                False,
-                tool_name + "_" + match["rule"]["id"],
+            problems.append(
+                Problem(
+                    position=location,
+                    text=text,
+                    checker=tool_name,
+                    cid=match["rule"]["id"],
+                    file=file.tex_file,
+                    severity=ProblemSeverity.ERROR,
+                    category=problem_type,
+                    description=match["rule"]["description"],
+                    context=(
+                        match["context"]["text"][:context_offset],
+                        match["context"]["text"][context_end:],
+                    ),
+                    suggestions=LanguageTool.parse_error_replacements(
+                        match["replacements"]
+                    ),
+                    key=tool_name + "_" + match["rule"]["id"],
+                )
             )
+
+        return problems
 
     @staticmethod
     def parse_error_replacements(
@@ -295,7 +329,7 @@ class LanguageToolLocalServer:
     def __del__(self):
         self.stop_local_server()
 
-    def get_server_run_command(self):
+    def get_server_run_command(self) -> None:
         """Searches for the LanguageTool server executable.
 
         This method also checks if Java is installed.
@@ -354,7 +388,7 @@ class LanguageToolLocalServer:
     def start_local_server(self, port: int = _DEFAULT_PORT) -> int:
         """Starts the LanguageTool server locally.
 
-        :param port: port for the server to losten at
+        :param port: port for the server to listen at
         :return: the actual port of the server
         """
 
@@ -371,7 +405,7 @@ class LanguageToolLocalServer:
 
         return self.port
 
-    def wait_till_server_up(self):
+    def wait_till_server_up(self) -> None:
         """Waits for the LanguageTool server to start.
 
         :raises ConnectionError: if server didn't start
@@ -396,7 +430,7 @@ class LanguageToolLocalServer:
         if not up:
             raise ConnectionError("Could not connect to local server.")
 
-    def stop_local_server(self):
+    def stop_local_server(self) -> None:
         """Stops the local LanguageTool server process."""
 
         if not self.server_process:
