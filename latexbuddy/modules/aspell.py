@@ -50,7 +50,7 @@ class AspellModule(Module):
         counter = 1  # counts the lines
 
         # execute aspell on given file and collect output
-        lines = Path(file.plain_file).read_text().splitlines(keepends=False)
+        lines = file.plain.splitlines(keepends=False)
         for line in lines:  # check every line
             if len(line) > 0:
                 output = tools.execute(f"echo {line} | aspell -a")
