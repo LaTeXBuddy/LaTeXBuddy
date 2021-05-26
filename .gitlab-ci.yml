@@ -15,6 +15,7 @@ stages:
   - Lint
   - Smoke Test
   - Build
+  - Publish
 
 isort:
   stage: Lint
@@ -64,6 +65,19 @@ build:
     public: false
     paths:
       - dist/
-    expire_in: 1 month
+    expire_in: 1 week
   only:
     - tags
+
+publish:
+  stage: Publish
+  before_script:
+    - pip install poetry
+    - poetry config repositories.gitz "https://git.rz.tu-bs.de/api/v4/projects/${CI_PROJECT_ID}/packages/pypi"
+  script:
+    - poetry publish --repository gitz -u gitlab-ci-token -p ${CI_JOB_TOKEN}
+  only:
+    - tags
+  dependencies:
+    - build
+
