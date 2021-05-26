@@ -53,14 +53,14 @@ class AspellModule(Module):
         lines = file.plain.splitlines(keepends=False)
         for line in lines:  # check every line
             if len(line) > 0:
-                output = tools.execute(f"echo {line} | aspell -a")
+                escaped_line = line.replace("'", "\\'")
+                output = tools.execute(f"echo '{escaped_line}' | aspell -a")
                 out = output.splitlines()[1:]  # the first line specifies aspell version
                 if len(out) > 0:  # only if the list inst empty
                     out.pop()  # remove last element
                 error_list.extend(self.format_errors(out, counter, file))
-                counter += 1
-            else:
-                counter += 1  # if there is an empty line, just increase the counter
+
+            counter += 1  # if there is an empty line, just increase the counter
 
         return error_list
 
@@ -118,11 +118,15 @@ class AspellModule(Module):
                 # calculate the char location
                 tmp_split = tmp[0].split(" ")
                 if error[0] in "&":  # if there are sugestions
-                    char_location = int(tmp_split[2])
+                    char_location = int(tmp_split[2]) + 1
                 else:  # if there are no suggestions
-                    char_location = int(tmp_split[1])
+                    char_location = int(tmp_split[1]) + 1
 
                 location = (line_number, char_location)  # meta[1] is the char position
+
+                location = file.get_position_in_tex_from_linecol(
+                    line_number, char_location
+                )
                 key = self.tool_name + key_delimiter + text
 
                 problems.append(
