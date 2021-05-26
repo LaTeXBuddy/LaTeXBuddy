@@ -108,119 +108,6 @@ def find_executable(name: str) -> str:
 location_re = re.compile(r"line (\d+), column (\d+)")
 
 
-def yalafi_detex(
-    file_to_detex: Path,
-) -> Tuple[Path, List[int], List[Tuple[Optional[Tuple[int, int]], str]]]:
-    """Strips TeX control structures from a file.
-
-    Using YaLaFi's tex2txt, removes TeX code from the file, leaving only the content
-    behind. It also creates a character map to later remap removed characters to their
-    original locations.
-
-    :param file_to_detex: path to the file to be detex'ed
-    :return: path to the detex'ed file, it's character map and list of errors, if any
-    """
-    tex = file_to_detex.read_text()
-    opts = Options()  # use default options
-
-    # parse output of tex2txt to err variable
-    my_stderr = StringIO()
-    sys.stderr = my_stderr
-
-    plain, charmap = tex2txt(tex, opts)
-
-    sys.stderr = sys.__stderr__  # back to default stderr
-    out = my_stderr.getvalue()
-    my_stderr.close()
-
-    out_split = out.split("*** LaTeX error: ")
-    err = []
-
-    # first "error" is a part of yalafi's output
-    for yalafi_error in out_split[1:]:
-        location_str, _, reason = yalafi_error.partition("***")
-
-        location_match = location_re.match(location_str)
-        if location_match:
-            location = (int(location_match.group(1)), int(location_match.group(2)))
-        else:
-            location = None
-
-        err.append((location, reason.strip()))
-
-    # write to detexed file
-    detexed_file = Path(file_to_detex).with_suffix(".detexed")  # TODO: use tempfile
-    detexed_file.write_text(plain)
-
-    return detexed_file, charmap, err
-
-
-def find_char_position(
-    original_file: Path, detexed_file: Path, charmap: List[int], char_pos: int
-) -> Optional[Tuple[int, int]]:
-    """Calculates line and col position of a character in the original file based on its
-    position in detex'ed file.
-
-    Makes use of YaLaFi's character map, which can be obtained from yalafi_detex().
-
-    :param original_file: path to the original tex file
-    :param detexed_file: path to the detex'ed version of that file
-    :param charmap: the charmap to resolve the position
-    :param char_pos: absolute, 0-based position of char in detexed file
-    """
-    tex = original_file.read_text()
-    plain = detexed_file.read_text()
-    line_starts = get_line_starts(plain)  # [0, ...]
-    line = 0
-    while char_pos >= line_starts[line]:
-        line += 1
-
-    # translate_numbers expects 1-based column number
-    # however, line_starts is 0-based
-    char = char_pos - line_starts[line - 1] + 1
-
-    aux = translate_numbers(tex, plain, charmap, line_starts, line, char)
-
-    if aux is None:
-        return None
-        # raise Exception("File parsing error while converting tex to txt.")
-
-    return aux.lin, aux.col
-
-
-def calculate_line_lengths(file: Path) -> List[int]:
-    """Calculates line lengths for each line in a file.
-
-    :param file: path to the inspected file
-    :return: list of line lengths with indices representing 1-based line numbers
-    """
-
-    lines = file.read_text().splitlines(keepends=True)
-    result = [0]
-    for line in lines:
-        result.append(len(line))
-    return result
-
-
-def calculate_line_offsets(file: Path) -> List[int]:
-    """**[DEPRECATED]** Calculates character offsets for each line in a file.
-
-    Indices correspond to the line numbers. For example, if first 4 lines
-    contain 100 characters (including line breaks),result[5] will be 100.
-    result[0] = result[1] = 0
-
-    :param file: path to the inspected file
-    :return: list of line offsets with indices representing 1-based line numbers
-    """
-    lines = Path(file).read_text().splitlines(keepends=True)
-    offset = 0
-    result = [0]
-    for line in lines:
-        result.append(offset)
-        offset += len(line)
-    return result
-
-
 def absolute_to_linecol(text: str, position: int) -> Tuple[int, int, List[int]]:
     """Calculates line and column number for an absolute character position.
 
@@ -283,9 +170,10 @@ def execute_no_exceptions(
     function_call: Callable[[], None],
     error_message: str = "An error occurred while executing lambda function at",
 ) -> None:
-    """Executes a given function call and catches any Exception that is raised during
-        execution. If an Exception is caught, the function is aborted and the error
-        is printed to stderr, but as the Exception is caught, the program won't crash.
+    """Calls a function and catches any Exception that is raised during this.
+
+    If an Exception is caught, the function is aborted and the error is printed to
+    stderr, but as the Exception is caught, the program won't crash.
 
     :param function_call: function to be executed
     :param error_message: custom error message displayed in the console

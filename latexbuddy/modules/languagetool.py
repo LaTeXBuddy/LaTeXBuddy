@@ -14,8 +14,8 @@ import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
-from latexbuddy.abs_module import Module
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
 
