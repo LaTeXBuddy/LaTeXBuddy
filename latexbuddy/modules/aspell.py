@@ -85,8 +85,9 @@ class AspellModule(Module):
             )
             raise Exception("Aspell: Language not found on system.")
 
-    def format_errors(self, out: List[str], line_number: int, file: TexFile) -> List[
-        Problem]:
+    def format_errors(
+        self, out: List[str], line_number: int, file: TexFile
+    ) -> List[Problem]:
         """Parses Aspell errors and returns list of Problems.
 
         :param line_number: the line_number for the location
