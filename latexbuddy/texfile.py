@@ -11,7 +11,7 @@ from typing import Optional, Tuple
 from chardet import detect
 from yalafi.tex2txt import Options, tex2txt, translate_numbers
 
-from latexbuddy.tools import absolute_to_linecol, is_binary
+from latexbuddy.tools import absolute_to_linecol, get_line_offsets, is_binary
 
 
 # regex to parse out error location from tex2txt output
@@ -83,6 +83,17 @@ class TexFile:
         """
         line, col, offsets = absolute_to_linecol(self.plain, char_pos)
 
+        aux = translate_numbers(self.tex, self.plain, self._charmap, offsets, line, col)
+
+        if aux is None:
+            return None
+
+        return aux.lin, aux.col
+
+    def get_position_in_tex_from_linecol(
+        self, line: int, col: int
+    ) -> Optional[Tuple[int, int]]:
+        offsets = get_line_offsets(self.plain)
         aux = translate_numbers(self.tex, self.plain, self._charmap, offsets, line, col)
 
         if aux is None:
