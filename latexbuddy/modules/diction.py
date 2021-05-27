@@ -1,3 +1,4 @@
+import hashlib
 import os
 import re
 
@@ -132,7 +133,7 @@ class DictionModule(Module):
                     severity=ProblemSeverity.INFO,
                     category="wording/ phrasing",
                     suggestions=[sugg],
-                    key="diction_" + "wip",
+                    key="diction_" + str(hashlib.md5(o_line.encode())),
                 )
             )
 
