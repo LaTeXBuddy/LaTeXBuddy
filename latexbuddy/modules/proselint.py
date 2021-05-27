@@ -58,4 +58,4 @@ class ProseLintModule(Module):
     @staticmethod
     def get_text(start_char: int, length: int, file: TexFile):
         text = file.plain
-        return text[start_char:start_char + length]
+        return text[start_char : start_char + length]
