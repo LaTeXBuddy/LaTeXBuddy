@@ -9,7 +9,7 @@ from unidecode import unidecode
 import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
-from latexbuddy.abs_module import Module
+from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 
@@ -46,7 +46,6 @@ class DictionModule(Module):
         # remove empty lines
         cleaned_errors = []
         for error in errors:
-            print(error)
             if len(error) > 0:  # remove empty lines
                 cleaned_errors.append(error.strip())
 
@@ -60,17 +59,15 @@ class DictionModule(Module):
         """Parses diction errors and returns list of Problems.
 
         :param original: lines of file to check as list
-        :param out: line stripped output of the diction command with empty lines removed
+        :param out: line splitted output of the diction command with empty lines removed
         :param file: the file path
         """
         problems = []
         for error in out:
 
-            print(error)
             o_line = ""
 
             splitted_error = error.split(" ")
-            print(splitted_error)
             double_world = False
 
             for i in range(0, len(splitted_error)):
@@ -79,7 +76,6 @@ class DictionModule(Module):
                         break
                     if (
                         splitted_error[i + 1] == "Double"
-                        and splitted_error[i + 2] == "word.]"
                     ):
                         double_world = True
                     else:
@@ -105,16 +101,10 @@ class DictionModule(Module):
                             o_line = o_line + original[x - 1][start_char:]
                         else:
                             o_line = o_line + original[x - 1]
-                print("oline double world= " + o_line)
-                print(
-                    f"Double word error: src={src}, start_line={start_line},end_line={end_line},start_char={start_char}, end_char={end_char}, sugg={sugg}, o_line={o_line}"
-                )
                 location = (start_line, start_char)
 
             else:
-                # TODO: will be replaced by regex soon
                 src, location, sugg = error.split(":", maxsplit=2)
-                print(f"Wording error: src={src}, loc={location}, sugg={sugg}")
                 start_line = int(location.split(".")[0])
                 start_char = int(location.split(".")[1].split("-")[0])
                 end_line = int(location.split("-")[1].split(".")[0])
