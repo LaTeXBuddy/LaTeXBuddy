@@ -2,7 +2,6 @@ from latexbuddy.buddy import LatexBuddy
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
-from pathlib import Path
 import re
 
 
