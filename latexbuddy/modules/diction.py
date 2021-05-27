@@ -74,9 +74,7 @@ class DictionModule(Module):
                 if splitted_error[i] == "->":
                     if i == len(splitted_error) - 2:
                         break
-                    if (
-                        splitted_error[i + 1] == "Double"
-                    ):
+                    if splitted_error[i + 1] == "Double":
                         double_world = True
                     else:
                         break
@@ -92,7 +90,7 @@ class DictionModule(Module):
                 start_line, end_line = splitted_lines_int[0], splitted_lines_int[1]
                 start_char, end_char = splitted_chars_int[0] - 1, splitted_chars_int[1]
                 if start_line == end_line:
-                    o_line = original[start_line - 1][start_char: end_char]
+                    o_line = original[start_line - 1][start_char:end_char]
                 else:
                     for x in range(start_line, end_line + 1):
                         if x == end_line:
