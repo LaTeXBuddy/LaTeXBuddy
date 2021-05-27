@@ -8,7 +8,7 @@ import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
-from latexbuddy.abs_module import Module
+from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
 
@@ -21,7 +21,7 @@ class ChktexModule(Module):
     def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
         """Runs the chktex checks on a file and converts them to a list of Problems
 
-        Requires chktex to be installed seperately
+        Requires chktex to be installed separately
 
         :param buddy: the LaTeXBuddy instance
         :param file: the file to run checks on
@@ -60,7 +60,7 @@ class ChktexModule(Module):
 
         for problem in out:
             out_split = problem.split(self.DELIMITER)
-            if len(out_split) < 5:
+            if len(out_split) < 10:
                 continue
             severity = (
                 ProblemSeverity.WARNING

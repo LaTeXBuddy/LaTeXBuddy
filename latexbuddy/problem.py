@@ -48,6 +48,7 @@ class Problem:
     def __init__(
         self,
         position: Tuple[int, int],
+        length: int,
         text: str,
         checker: str,
         cid: str,
@@ -63,6 +64,7 @@ class Problem:
 
         :param position: position of the problem in the source file, encoded as
                          `(line, column)`.
+        :param length: the length of the problematic text.
         :param text: problematic text.
         :param checker: name of the tool that discovered the problem.
         :param cid: ID of the problem type, used inside the respective checker.
@@ -78,6 +80,7 @@ class Problem:
 
         """
         self.position = position
+        self.length = length
         self.text = text
         self.checker = checker
         self.cid = cid
