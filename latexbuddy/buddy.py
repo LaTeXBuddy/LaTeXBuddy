@@ -2,16 +2,18 @@
 
 import json
 import os
+import re
 import sys
 import traceback
 
+from html import unescape
 from pathlib import Path
 
-import latexbuddy.tools as tools
 from bs4 import BeautifulSoup
-import re
-from html import unescape
+
 import latexbuddy.output as output
+import latexbuddy.tools as tools
+
 from latexbuddy import TexFile
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.problem import Problem
@@ -249,11 +251,15 @@ class LatexBuddy:
                 old_len = len(tex_lines[line])
                 start = offset + min(i)
                 end = start + max(i)
-                opening_tag = f'<mark>'
-                closing_tag = f'</mark>'
-                string = tex_lines[line][:start] + opening_tag + tex_lines[line][
-                                                                 start:end] + closing_tag + \
-                         tex_lines[line]
+                opening_tag = f"<mark>"
+                closing_tag = f"</mark>"
+                string = (
+                    tex_lines[line][:start]
+                    + opening_tag
+                    + tex_lines[line][start:end]
+                    + closing_tag
+                    + tex_lines[line]
+                )
                 new_len = len(string)
                 tex_lines[line] = string
                 offset += new_len - old_len
@@ -268,43 +274,55 @@ class LatexBuddy:
         err_values = sorted(self.errors.values(), key=output.problem_key)
         html_output_path = Path(self.error_file + ".html")
         # html = self.iwas(err_values, self.file_to_check.read_text())
-        html = self.mark_output(self.file_to_check, self.file_to_check.read_text(),
-                                err_values)
+        html = self.mark_output(
+            self.file_to_check, self.file_to_check.read_text(), err_values
+        )
         html_output_path.write_text(html)
 
         print(f"File output to {html_output_path}")
 
     def mark_output(self, file, text, problems) -> str:
         html = output.render_html(file, text, self.errors)  # gets html
-        lines_problems = self.get_line_problems(problems,
-                                                text)  # gets problems per line
-        lines = text.split('\n')
+        lines_problems = self.get_line_problems(
+            problems, text
+        )  # gets problems per line
+        lines = text.split("\n")
         line_count = len(lines)
         charmap = self.generate_charmap(line_count, lines_problems)
         lines = self.mark_text(line_count, lines_problems, lines, charmap)
-        content = ''
+        content = ""
         for line in lines:
-            content += line + '\n'
+            content += line + "\n"
 
-        soup = BeautifulSoup(html, 'html.parser')
-        new_code = soup.new_tag('code')
+        soup = BeautifulSoup(html, "html.parser")
+        new_code = soup.new_tag("code")
         new_code.string = unescape(content)
-        soup.find('section', id='file-contents').pre.code.replace_with(new_code)
-        new_soup = BeautifulSoup(unescape(str(soup)), 'html.parser')
+        soup.find("section", id="file-contents").pre.code.replace_with(new_code)
+        new_soup = BeautifulSoup(unescape(str(soup)), "html.parser")
 
         return unescape(str(new_soup))
         # return unescape(str(soup))
 
-    def mark_text(self, line_count: int, lines_problems: dict, lines: list[str], charmap: list[dict]) -> list[str]:
+    def mark_text(
+        self,
+        line_count: int,
+        lines_problems: dict,
+        lines: list[str],
+        charmap: list[dict],
+    ) -> list[str]:
         for line in range(line_count):
             for problem in lines_problems[line]:
                 # removes unwanted problems
-                if problem.checker == 'aspell' or problem.category is None or problem.category == '':
+                if (
+                    problem.checker == "aspell"
+                    or problem.category is None
+                    or problem.category == ""
+                ):
                     continue
                 # gets new start, end based on original position
                 original_start = problem.position[1] - 1
                 original_end = original_start + problem.length
-                print(str(line), ':', original_start, original_end)
+                print(str(line), ":", original_start, original_end)
                 print(charmap)
                 print(line_count)
                 print(len(charmap))
@@ -322,7 +340,14 @@ class LatexBuddy:
         return lines
 
     @staticmethod
-    def update_charmap(charmap: list[dict], tag: str, end_tag: str, line: int, changed_start: int, changed_end: int) -> list[dict]:
+    def update_charmap(
+        charmap: list[dict],
+        tag: str,
+        end_tag: str,
+        line: int,
+        changed_start: int,
+        changed_end: int,
+    ) -> list[dict]:
         line_map = charmap[line]
         s_offset = len(tag)
         e_offset = len(end_tag)
@@ -364,12 +389,12 @@ class LatexBuddy:
     @staticmethod
     def get_line_problems(problems, text) -> dict[int, list[Problem]]:
         problem_dict = {}
-        line_count = len(text.split('\n'))
+        line_count = len(text.split("\n"))
         for line in range(line_count):
             problem_dict[line] = []
 
         for problem in problems:
-            if problem.checker == 'aspell':
+            if problem.checker == "aspell":
                 continue
             problem_dict[problem.position[0] - 1].append(problem)
 
@@ -377,12 +402,13 @@ class LatexBuddy:
 
     @staticmethod
     def get_tag(problem) -> tuple:
-        tag = 'span'
-        if problem.category == 'spelling':
-            tag = 'u'
-        elif problem.category == 'grammar':
-            tag = 'mark'
-        elif problem.category == 'latex':
-            tag = 'span'
-        return unescape('<' + tag + ' class="' + problem.category + '">'), unescape(
-            '</' + tag + '>')
+        tag = "span"
+        if problem.category == "spelling":
+            tag = "u"
+        elif problem.category == "grammar":
+            tag = "mark"
+        elif problem.category == "latex":
+            tag = "span"
+        return unescape("<" + tag + ' class="' + problem.category + '">'), unescape(
+            "</" + tag + ">"
+        )
