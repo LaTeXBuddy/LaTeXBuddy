@@ -48,12 +48,12 @@ class Problem:
     def __init__(
         self,
         position: Tuple[int, int],
-        length: Optional[int] = None,
         text: str,
         checker: str,
         cid: str,
         file: Path,
         severity: ProblemSeverity = ProblemSeverity.WARNING,
+        length: Optional[int] = None,
         category: Optional[str] = None,
         description: Optional[str] = None,
         context: Optional[Tuple[str, str]] = None,
