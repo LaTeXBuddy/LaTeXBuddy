@@ -55,7 +55,9 @@ class DictionModule(Module):
         # return list of Problems
         return self.format_errors(cleaned_errors, original_lines, file.plain_file, file)
 
-    def format_errors(self, out: List[str], original: List[str], file, texfile) -> List[Problem]:
+    def format_errors(
+        self, out: List[str], original: List[str], file, texfile
+    ) -> List[Problem]:
         """Parses diction errors and returns list of Problems.
 
         :param original: lines of file to check as list
@@ -117,9 +119,9 @@ class DictionModule(Module):
                             o_line = o_line + original[x - 1][start_char:]
                         else:
                             o_line = o_line + original[x - 1]
-                location = texfile.get_position_in_tex_from_linecol(start_line, start_char)
-
-
+                location = texfile.get_position_in_tex_from_linecol(
+                    start_line, start_char
+                )
 
             problems.append(
                 Problem(
