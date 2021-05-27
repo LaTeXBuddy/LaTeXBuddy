@@ -28,6 +28,9 @@ modules = {
     "ChktexModule": {
         # "enabled": True,
     },
+    "ProseLintModule": {
+        "enabled": True
+    },
     "TestModule": {
         "enabled": False,
     }
