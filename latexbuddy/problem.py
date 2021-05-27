@@ -48,7 +48,7 @@ class Problem:
     def __init__(
         self,
         position: Tuple[int, int],
-        length: int,
+        length: Optional[int] = None,
         text: str,
         checker: str,
         cid: str,
@@ -80,6 +80,8 @@ class Problem:
 
         """
         self.position = position
+        if length is None:
+            length = 0
         self.length = length
         self.text = text
         self.checker = checker
