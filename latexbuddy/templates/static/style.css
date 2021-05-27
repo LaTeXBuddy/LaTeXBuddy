@@ -107,16 +107,16 @@ main > section {
 .spelling {
     text-decoration-style: wavy;
     text-decoration-line: underline;
-    text-decoration-color: red;
+    text-decoration-color: lightcoral;
     text-decoration-thickness: .07em;
 }
 
 .grammar {
-    background-color:#FFFF00;
+    background-color:lightyellow;
 }
 
 .latex {
-    background-color:#00bdbb;;
+    background-color:lightblue;;
 }
 @media (prefers-color-scheme: dark) {
     html, body {
