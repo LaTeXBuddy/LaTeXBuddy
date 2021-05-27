@@ -83,7 +83,6 @@ class DictionModule(Module):
 
             if double_world:
 
-                # TODO: will be replaced by regex soon
                 src, lines, chars, sugg = error.split(":", maxsplit=3)
                 splitted_lines = lines.split("-")
                 splitted_chars = chars.split("-")
