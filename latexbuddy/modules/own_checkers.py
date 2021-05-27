@@ -198,7 +198,7 @@ class SiUnitxModule(Module):
 
         used_units = []
         for unit in units:
-            pattern = rf"[0-9]+\s*{unit}"
+            pattern = rf"[0-9]+\s*{unit}\s"
             used_unit = re.findall(pattern, text)
             used_units.append(used_unit)
 
