@@ -2,9 +2,7 @@
 
 import json
 import socket
-import sys
 import time
-import traceback
 
 from contextlib import closing
 from enum import Enum
@@ -16,8 +14,8 @@ import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
-from latexbuddy.abs_module import Module
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
 
@@ -149,11 +147,8 @@ class LanguageTool(Module):
             self.lt_console_command.append(self.disabled_rules)
 
         if self.disabled_categories:
-            print(
-                "INFO: Config option 'disabled-categories' is set, but ignored "
-                "because the commandline version of LanguageTool doesn't support it. "
-                "Switch to local server mode to utilize this feature."
-            )
+            self.lt_console_command.append("--disablecategories")
+            self.lt_console_command.append(self.disabled_categories)
 
     def find_disabled_rules(self, config: ConfigLoader) -> None:
 
@@ -205,9 +200,13 @@ class LanguageTool(Module):
             return None
 
         request_data = {
-            "language": self.language,
             "text": file.plain,
         }
+
+        if self.language:
+            request_data["language"] = self.language
+        else:
+            request_data["language"] = "auto"
 
         if self.disabled_rules:
             request_data["disabledRules"] = self.disabled_rules

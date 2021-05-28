@@ -1,49 +1,50 @@
 image: python:latest
 
 variables:
-    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-    SRC_DIR: "$CI_PROJECT_DIR/latexbuddy"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  SRC_DIR: "$CI_PROJECT_DIR/latexbuddy"
 
 cache:
-    paths:
-        - .cache/pip
+  paths:
+    - .cache/pip
 
 before_script:
-    - python --version
+  - python --version
 
 stages:
-    - Lint
-    - Smoke Test
-    - Build
+  - Lint
+  - Smoke Test
+  - Build
+  - Publish
 
 isort:
-    stage: Lint
-    script:
-        - pip install isort
-        - isort --check --diff "$SRC_DIR"
-    only:
-        - master
-        - merge_requests
+  stage: Lint
+  script:
+    - pip install isort
+    - isort --check --diff "$SRC_DIR"
+  only:
+    - master
+    - merge_requests
 
 black:
-    stage: Lint
-    script:
-        - pip install black
-        - black --check --diff "$SRC_DIR"
-    only:
-        - master
-        - merge_requests
+  stage: Lint
+  script:
+    - pip install black
+    - black --check --diff "$SRC_DIR"
+  only:
+    - master
+    - merge_requests
 
 .smoke: &smoke_base
-    stage: Smoke Test
-    before_script:
-        - pip install poetry
-    script:
-        - poetry install
-        - poetry run latexbuddy --help
-    only:
-        - master
-        - merge_requests
+  stage: Smoke Test
+  before_script:
+    - pip install poetry
+  script:
+    - poetry install
+    - poetry run latexbuddy --help
+  only:
+    - master
+    - merge_requests
 
 smoke-py36:
   <<: *smoke_base
@@ -54,16 +55,29 @@ smoke-py39:
   image: python:3.9
 
 build:
-    stage: Build
-    before_script:
-        - pip install poetry
-    script:
-        - poetry install
-        - poetry build
-    artifacts:
-        public: false
-        paths:
-            - dist/
-        expire_in: 1 month
-    only:
-        - tags
+  stage: Build
+  before_script:
+    - pip install poetry
+  script:
+    - poetry install
+    - poetry build
+  artifacts:
+    public: false
+    paths:
+      - dist/
+    expire_in: 1 week
+  only:
+    - tags
+
+publish:
+  stage: Publish
+  before_script:
+    - pip install poetry
+    - poetry config repositories.gitz "https://git.rz.tu-bs.de/api/v4/projects/${CI_PROJECT_ID}/packages/pypi"
+  script:
+    - poetry publish --repository gitz -u gitlab-ci-token -p ${CI_JOB_TOKEN}
+  only:
+    - tags
+  dependencies:
+    - build
+

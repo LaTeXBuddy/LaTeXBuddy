@@ -16,7 +16,7 @@ import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.problem import Problem
+from latexbuddy.problem import Problem, ProblemSeverity
 
 
 # TODO: make this a singleton class with static methods
@@ -32,9 +32,9 @@ class LatexBuddy:
         :param file_to_check: file that will be checked
         """
         self.errors = {}  # all current errors
-        self.cfg = config_loader  # configuration
+        self.cfg: ConfigLoader = config_loader  # configuration
         self.file_to_check = file_to_check  # .tex file that is to be error checked
-        self.charmap = None  # detex charmap
+        self.tex_file: TexFile = TexFile(file_to_check)
 
         # file where the error should be saved
         self.error_file = self.cfg.get_config_option_or_default(
@@ -42,13 +42,13 @@ class LatexBuddy:
         )
 
         # file that represents the whitelist
+        # TODO: why a new file format? if it's JSON, use .json. If not, don't use one.
         self.whitelist_file = self.cfg.get_config_option_or_default(
             "buddy", "whitelist", Path("whitelist.wlist")
         )
 
         # current language
         self.lang = self.cfg.get_config_option_or_default("buddy", "language", "en")
-        self.check_successful = False
 
     def add_error(self, error: Problem):
         """Adds the error to the errors dictionary.
@@ -144,58 +144,36 @@ class LatexBuddy:
         # check_preprocessor
         # check_config
 
-        tex_file = TexFile(self.file_to_check)
-
-        # TODO: phase out and replace with tex_file, if possible
-        detexed_file, self.charmap, detex_err = tools.yalafi_detex(self.file_to_check)
-        self.check_successful = True if len(detex_err) < 1 else False
-
-        # for err in detex_err:
-        #     self.add_error(
-        #         # TODO: Verify this is correct and maybe implement more attributes
-        #         Problem(
-        #             err[0],
-        #             err[1],
-        #             "YALaFi",
-        #             "latex",
-        #             self.file_to_check,
-        #         )
-        #         # TODO: old implementation for reference (remove when finished)
-        #         # Problem(
-        #         #    self,
-        #         #    str(self.file_to_check),
-        #         #    "YALaFi",
-        #         #    "latex",
-        #         #    "TODO",
-        #         #    err[1],
-        #         #    err[0],
-        #         #    0,
-        #         #    [],
-        #         #    False,
-        #         #    "TODO",
-        #         # )
-        #     )
+        if self.tex_file.is_faulty:
+            for raw_err in self.tex_file._parse_problems:
+                self.add_error(
+                    Problem(
+                        position=raw_err[0],
+                        text=raw_err[1],
+                        checker="YaLafi",
+                        cid="tex2txt",
+                        file=self.tex_file.tex_file,
+                        severity=ProblemSeverity.ERROR,
+                        category="latex",
+                    )
+                )
 
         tool_loader = ToolLoader(Path("latexbuddy/modules/"))
         modules = tool_loader.load_selected_modules(self.cfg)
 
         for module in modules:
 
-            try:
-                errors = module.run_checks(self, tex_file)
+            def lambda_function() -> None:
+                errors = module.run_checks(self, self.tex_file)
 
                 for error in errors:
                     self.add_error(error)
 
-            except Exception as e:
-
-                print(
-                    f"An error occurred while executing checks for module "
-                    f"'{module.__class__.__name__}':\n",
-                    f"{e.__class__.__name__}: {getattr(e, 'message', e)}",
-                    file=sys.stderr,
-                )
-                traceback.print_exc(file=sys.stderr)
+            tools.execute_no_exceptions(
+                lambda_function,
+                f"An error occurred while executing checks for module "
+                f"'{module.__class__.__name__}'",
+            )
 
         # FOR TESTING ONLY
         # self.check_whitelist()
@@ -203,9 +181,6 @@ class LatexBuddy:
         # for key in keys:
         #     self.add_to_whitelist(key)
         #     return
-
-        # TODO: use tempfile.TemporaryFile instead
-        os.remove(detexed_file)
 
     # TODO: why does this exist? Use direct access
     def get_lang(self) -> str:
@@ -271,11 +246,13 @@ class LatexBuddy:
         # importing this here to avoid circular import error
         from latexbuddy.output import render_html
 
-        err_values = sorted(self.errors.values(), key=output.problem_key)
-        html_output_path = Path(self.error_file + ".html")
-        # html = self.iwas(err_values, self.file_to_check.read_text())
-        html = self.mark_output(
-            self.file_to_check, self.file_to_check.read_text(), err_values
+        html_output_path = Path(str(self.error_file) + ".html")
+        html_output_path.write_text(
+            render_html(
+                str(self.tex_file.tex_file),
+                self.tex_file.tex,
+                self.errors,
+            )
         )
         html_output_path.write_text(html)
 

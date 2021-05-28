@@ -1,11 +1,12 @@
 """This module describes the LaTeXBuddy config loader and its properties."""
 import importlib.util as importutil
 import sys
-import traceback
 
 from argparse import Namespace
 from pathlib import Path
 from typing import Any, Dict
+
+import latexbuddy.tools as tools
 
 
 class ConfigOptionNotFoundError(Exception):
@@ -110,22 +111,17 @@ class ConfigLoader:
         :return: None
         """
 
-        try:
+        def lambda_function() -> None:
             spec = importutil.spec_from_file_location("config", config_file_path)
             config = importutil.module_from_spec(spec)
             spec.loader.exec_module(config)
 
             self.configurations = config.modules
 
-        except Exception as e:
-
-            print(
-                f"An error occurred while loading config file at "
-                f"'{config_file_path}':\n",
-                f"{e.__class__.__name__}: {getattr(e, 'message', e)}",
-                file=sys.stderr,
-            )
-            traceback.print_exc(file=sys.stderr)
+        tools.execute_no_exceptions(
+            lambda_function,
+            f"An error occurred while loading config file at '{str(config_file_path)}'",
+        )
 
     @staticmethod
     def __get_option(

@@ -62,6 +62,7 @@ class Problem:
         cid: str,
         file: Path,
         severity: ProblemSeverity = ProblemSeverity.WARNING,
+        length: Optional[int] = None,
         category: Optional[str] = None,
         description: Optional[str] = None,
         context: Optional[Tuple[str, str]] = None,
@@ -72,6 +73,7 @@ class Problem:
 
         :param position: position of the problem in the source file, encoded as
                          `(line, column)`.
+        :param length: the length of the problematic text.
         :param text: problematic text.
         :param checker: name of the tool that discovered the problem.
         :param cid: ID of the problem type, used inside the respective checker.
@@ -87,6 +89,9 @@ class Problem:
 
         """
         self.position = position
+        if length is None:
+            length = 0
+        self.length = length
         self.text = text
         self.checker = checker
         self.cid = cid
