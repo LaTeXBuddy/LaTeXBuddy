@@ -10,7 +10,6 @@ from typing import Dict, List, Optional
 
 import requests
 
-import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
@@ -49,24 +48,26 @@ class LanguageTool(Module):
         self.remote_url = None
         self.lt_console_command = None
 
-    def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the LanguageTool checks on a file and returns the results as a list.
 
         Requires LanguageTool (server) to be set up.
         Local or global servers can be used.
 
-        :param buddy: the LaTeXBuddy instance
+        :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
 
         try:
-            self.language = LanguageTool._LANGUAGE_MAP[buddy.lang]
+            self.language = LanguageTool._LANGUAGE_MAP[
+                config.get_config_option_or_default("buddy", "language", None)
+            ]
         except KeyError:
             self.language = None
 
-        self.find_disabled_rules(buddy.cfg)
+        self.find_disabled_rules(config)
 
-        cfg_mode = buddy.cfg.get_config_option_or_default(
+        cfg_mode = config.get_config_option_or_default(
             "LanguageTool", "mode", "COMMANDLINE"
         )
         try:
@@ -80,7 +81,7 @@ class LanguageTool(Module):
 
         elif self.mode == Mode.REMOTE_SERVER:
             # must include the port and api call (e.g. /v2/check)
-            self.remote_url = buddy.cfg.get_config_option("LanguageTool", "remote_url")
+            self.remote_url = config.get_config_option("LanguageTool", "remote_url")
 
         elif self.mode == Mode.COMMANDLINE:
             self.find_languagetool_command()

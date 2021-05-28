@@ -39,7 +39,15 @@ parser.add_argument(
     "-o",
     type=Path,
     default=None,
-    help="Where to output the errors file.",
+    help="Directory, in which to put the output file.",
+)
+parser.add_argument(
+    "--format",
+    "-f",
+    type=str,
+    choices=["HTML", "html", "JSON", "json"],
+    default="HTML",
+    help="Format of the output file (either HTML or JSON).",
 )
 
 module_selection = parser.add_mutually_exclusive_group()
@@ -72,5 +80,4 @@ def main():
 
     buddy.run_tools()
     buddy.check_whitelist()
-    # buddy.parse_to_json()
-    buddy.output_html()
+    buddy.output_file()

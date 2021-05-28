@@ -4,9 +4,9 @@ import shlex
 
 from typing import List
 
-import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
+from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
@@ -18,12 +18,12 @@ class AspellModule(Module):
         self.language = "en"  # FIXME: use config's language
         self.tool_name = "aspell"
 
-    def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the Aspell checks on a file and returns the results as a list.
 
         Requires Aspell to be set up.
 
-        :param buddy: the LaTeXBuddy instance
+        :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
 
@@ -38,9 +38,14 @@ class AspellModule(Module):
             raise FileNotFoundError("Unable to find aspell installation!")
 
         try:
-            self.language = self._LANGUAGE_MAP[buddy.lang]
+
+            self.language = self._LANGUAGE_MAP[
+                config.get_config_option_or_default("buddy", "language", None)
+            ]
+
         except KeyError:
             self.language = None
+
         language_quote = shlex.quote(self.language)
         languages = tools.execute("aspell", "dump dicts")
         AspellModule.check_language(language_quote, languages)
@@ -118,7 +123,7 @@ class AspellModule(Module):
 
                 # calculate the char location
                 tmp_split = tmp[0].split(" ")
-                if error[0] in "&":  # if there are sugestions
+                if error[0] in "&":  # if there are suggestions
                     char_location = int(tmp_split[2]) + 1
                 else:  # if there are no suggestions
                     char_location = int(tmp_split[1]) + 1

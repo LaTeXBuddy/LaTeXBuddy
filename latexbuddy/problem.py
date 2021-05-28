@@ -6,8 +6,9 @@ types, however LaTeXBuddy will most probably not display extra metadata.
 
 from enum import Enum
 from functools import total_ordering
+from json import JSONEncoder
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 
 @total_ordering
@@ -168,3 +169,29 @@ class Problem:
             f"{self.text}: "
             f"{self.description}."
         )
+
+
+class ProblemJSONEncoder(JSONEncoder):
+    """Provides JSON serializability for class Problem"""
+
+    def default(self, obj: Any):
+
+        if type(obj) == Problem:
+
+            return {
+                "position": obj.position,
+                "text": obj.text,
+                "checker": obj.checker,
+                "cid": obj.cid,
+                "file": str(obj.file),
+                "severity": str(obj.severity),
+                "length": obj.length,
+                "category": obj.category,
+                "description": obj.description,
+                "context": obj.context,
+                "suggestions": obj.suggestions,
+                "key": obj.key,
+            }
+
+        else:
+            return JSONEncoder.default(self, obj)
