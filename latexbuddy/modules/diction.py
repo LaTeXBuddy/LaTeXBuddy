@@ -1,14 +1,13 @@
 import hashlib
 import os
-import re
 
 from pathlib import Path
 from typing import List
 
 from unidecode import unidecode
 
-import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
+from latexbuddy.config_loader import ConfigLoader
 
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -20,7 +19,12 @@ class DictionModule(Module):
         self.language = None
         self.tool_name = "diction"
 
-    def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+
+        # TODO: make this dynamic/configurable using
+        #  config.get_config_option_or_default(
+        #       "buddy", "language", "<default language>"
+        #  )
         self.language = "de"
 
         # replace umlauts so error position is correct
