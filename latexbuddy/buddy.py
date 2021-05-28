@@ -2,8 +2,6 @@
 
 import json
 import os
-import sys
-import traceback
 
 from pathlib import Path
 
@@ -41,9 +39,6 @@ class LatexBuddy:
         self.whitelist_file = self.cfg.get_config_option_or_default(
             "buddy", "whitelist", Path("whitelist.wlist")
         )
-
-        # current language
-        self.lang = self.cfg.get_config_option_or_default("buddy", "language", "en")
 
     def add_error(self, error: Problem):
         """Adds the error to the errors dictionary.
@@ -159,7 +154,7 @@ class LatexBuddy:
         for module in modules:
 
             def lambda_function() -> None:
-                errors = module.run_checks(self, self.tex_file)
+                errors = module.run_checks(self.cfg, self.tex_file)
 
                 for error in errors:
                     self.add_error(error)
@@ -176,14 +171,6 @@ class LatexBuddy:
         # for key in keys:
         #     self.add_to_whitelist(key)
         #     return
-
-    # TODO: why does this exist? Use direct access
-    def get_lang(self) -> str:
-        """Returns the set LaTeXBuddy language.
-
-        :returns: language code
-        """
-        return self.lang
 
     def output_html(self):
 
