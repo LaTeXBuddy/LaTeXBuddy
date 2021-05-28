@@ -4,10 +4,10 @@ ChkTeX Documentation: https://www.nongnu.org/chktex/ChkTeX.pdf
 """
 from typing import List
 
-import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
+from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
@@ -18,12 +18,12 @@ class ChktexModule(Module):
         self.tool_name = "chktex"
         self.problem_type = "latex"
 
-    def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the chktex checks on a file and converts them to a list of Problems
 
         Requires chktex to be installed separately
 
-        :param buddy: the LaTeXBuddy instance
+        :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
 
