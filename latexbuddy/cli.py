@@ -5,14 +5,16 @@ import argparse
 
 from pathlib import Path
 
+import latexbuddy.tools as tool
+
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
-import latexbuddy.tools as tool
 
 
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
 
-parser.add_argument("file", type=Path, help="File that will be processed.")
+# nargs="#" marks the beginning of a list
+parser.add_argument("file", nargs="+", type=Path, help="File that will be processed.")
 parser.add_argument(
     "--config",
     "-c",
@@ -65,6 +67,7 @@ def main():
     args = parser.parse_args()
 
     config_loader = ConfigLoader(args)
+    # args.file is a list
     paths = tool.get_all_paths_in_document(args.file)
 
     buddy = LatexBuddy(

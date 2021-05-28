@@ -191,18 +191,21 @@ def execute_no_exceptions(
         traceback.print_exc(file=sys.stderr)
 
 
-def get_all_paths_in_document(file_path):
+def get_all_paths_in_document(file_paths):
     """Checks files that are included in a file.
 
     If the file includes more files, these files will also be checked.
 
-    :param file_path:path of included files
+    :param file_paths:a list, containing file paths
     """
 
     unchecked_files = []  # Holds all unchecked files
     checked_files = []  # Holds all checked file
 
-    unchecked_files.append(file_path)  # add first path
+    # add all paths to list
+    for file_path in file_paths:
+        unchecked_files.append(file_path)  # add path
+
     while len(unchecked_files) > 0:
         checked_files.append(unchecked_files[0])
         new_files = []
