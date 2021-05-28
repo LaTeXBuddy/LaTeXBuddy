@@ -9,7 +9,7 @@ import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem, ProblemJSONEncoder, ProblemSeverity
 
 
 # TODO: make this a singleton class with static methods
@@ -30,9 +30,24 @@ class LatexBuddy:
         self.tex_file: TexFile = TexFile(file_to_check)
 
         # file where the error should be saved
-        self.error_file = self.cfg.get_config_option_or_default(
-            "buddy", "output", Path("errors.json")
+        self.output_dir = Path(
+            self.cfg.get_config_option_or_default("buddy", "output", Path("./"))
         )
+
+        if not self.output_dir.is_dir():
+            print(
+                f"Specified path '{str(self.output_dir)}' is not a directory. "
+                f"Reverting to default value..."
+            )
+            self.output_dir = Path("./")
+
+        self.output_format = str(
+            self.cfg.get_config_option_or_default("buddy", "format", "HTML")
+        ).upper()
+
+        if self.output_format not in ["HTML", "JSON"]:
+            print("Unknown output file format. Reverting to HTML as default...")
+            self.output_format = "HTML"
 
         # file that represents the whitelist
         # TODO: why a new file format? if it's JSON, use .json. If not, don't use one.
@@ -49,31 +64,6 @@ class LatexBuddy:
         """
 
         self.errors[error.uid] = error
-
-    # TODO: rename method. Parse = read; this method writes
-    # TODO: maybe remove the method completely
-    def parse_to_json(self):
-        """Writes all the current error objects into the error file."""
-
-        # TODO: extend JSONEncoder to get rid of such hacks
-        with open(self.error_file, "w+") as file:
-            file.write("[")
-            uids = list(self.errors.keys())
-            for uid in uids:
-
-                # TODO: clean up this temporary workaround by properly reworking the
-                #   JSON encoding process (Path and Enum are not JSON serializable)
-                err_data = self.errors[uid].__dict__
-                if "file" in err_data:
-                    err_data["file"] = str(err_data["file"])
-                if "severity" in err_data:
-                    err_data["severity"] = str(err_data["severity"])
-
-                json.dump(err_data, file, indent=4)
-                if not uid == uids[-1]:
-                    file.write(",")
-
-            file.write("]")
 
     def check_whitelist(self):
         """Remove errors that are whitelisted."""
@@ -172,12 +162,26 @@ class LatexBuddy:
         #     self.add_to_whitelist(key)
         #     return
 
+    def output_json(self):
+        """Writes all the current problem objects to the output file."""
+
+        list_of_problems = []
+
+        for problem_uid in self.errors.keys():
+            list_of_problems.append(self.errors[problem_uid])
+
+        json_output_path = Path(str(self.output_dir) + "/latexbuddy_output.json")
+
+        with open(json_output_path, "w") as file:
+            json.dump(list_of_problems, file, indent=4, cls=ProblemJSONEncoder)
+
     def output_html(self):
+        """Renders all current problem objects as HTML and writes the file."""
 
         # importing this here to avoid circular import error
         from latexbuddy.output import render_html
 
-        html_output_path = Path(str(self.error_file) + ".html")
+        html_output_path = Path(str(self.output_dir) + "/latexbuddy_output.html")
         html_output_path.write_text(
             render_html(
                 str(self.tex_file.tex_file),
@@ -187,3 +191,12 @@ class LatexBuddy:
         )
 
         print(f"File output to {html_output_path}")
+
+    def output_file(self):
+        """Writes all current problems to the specified output file."""
+
+        if self.output_format == "JSON":
+            self.output_json()
+
+        else:  # using HTML as default
+            self.output_html()
