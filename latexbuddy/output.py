@@ -169,7 +169,7 @@ def highlight(tex: str, problems: List[Problem]) -> str:
             end = offset + interval.end - 1
             opening_tag = (
                 f"<span "
-                f'class="under is-{str(interval.problem.severity)}" '
+                f'class="marked-problem is-{str(interval.problem.severity)}" '
                 f'title="{escape(interval.problem.description or "")}"'
                 f">"
             )
