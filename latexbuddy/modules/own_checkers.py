@@ -23,7 +23,6 @@ class UnreferencedFiguresModule(Module):
         """
         tex = file.tex
         problems = []
-        # key = self.tool_name + '_' + fig_num
         pattern = r"\\begin{figure}[\w\W]*?\\end{figure}"
         figures = re.findall(pattern, tex)
         len_label = len("label{")
@@ -223,4 +222,44 @@ class SiUnitxModule(Module):
                     )
                 )
 
+        return problems
+
+
+class EmptySectionsModule(Module):
+    def __init__(self):
+        self.tool_name = "emptysection"
+        self.category = "latex"
+        self.severity = ProblemSeverity.INFO
+
+    def run_checks(self, buddy: LatexBuddy, file: TexFile) -> list[Problem]:
+        tex = file.tex
+        problems = []
+        pattern = r"\\section{.*}\s+\\subsection"
+        empty_sections = re.findall(pattern, tex)
+        for section in empty_sections:
+            print(section)
+            match = re.search(re.escape(section), tex)
+            start, end = match.span()
+            length = end - start
+            line, col, offset = tools.absolute_to_linecol(tex, start)
+            sec_len = len("\\section{")
+            rest_pattern = r"}\s+\\subsection"
+            rest_match = re.findall(rest_pattern, section)
+            rest_len = len(rest_match[0])
+            text = section[sec_len : len(section) - rest_len]
+            problems.append(
+                Problem(
+                    position=(line, col),
+                    text=text,
+                    checker=self.tool_name,
+                    category=self.category,
+                    cid="0",
+                    file=file.tex_file,
+                    severity=self.severity,
+                    description=f"Sections may not be empty.",
+                    key=self.tool_name + "_" + "",
+                    length=length,
+                    context=("\\section{", "}"),
+                )
+            )
         return problems
