@@ -13,7 +13,7 @@ from latexbuddy.config_loader import ConfigLoader
 
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
 
-# nargs="#" marks the beginning of a list
+# nargs="+" marks the beginning of a list
 parser.add_argument("file", nargs="+", type=Path, help="File that will be processed.")
 parser.add_argument(
     "--config",
