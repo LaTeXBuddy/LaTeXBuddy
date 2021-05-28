@@ -46,7 +46,10 @@ class LatexBuddy:
         ).upper()
 
         if self.output_format not in ["HTML", "JSON"]:
-            print("Unknown output file format. Reverting to HTML as default...")
+            print(
+                f"Unknown output file format '{self.output_format}'. "
+                f"Reverting to HTML as default..."
+            )
             self.output_format = "HTML"
 
         # file that represents the whitelist
