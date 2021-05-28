@@ -7,7 +7,8 @@ modules = {
     "buddy": {
         "language": "en",
         "whitelist": "whitelist.wlist",
-        "output": "errors.json",
+        "output": "./",
+        "format": "HTML",
         "enable-modules-by-default": True,
     },
     "LanguageTool": {
