@@ -1,8 +1,9 @@
 import re
+from typing import List
 
 import latexbuddy.tools as tools
 
-from latexbuddy.buddy import LatexBuddy
+from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
@@ -15,9 +16,9 @@ class UnreferencedFiguresModule(Module):
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 
-    def run_checks(self, buddy: LatexBuddy, file: TexFile) -> list[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Finds unreferenced figures.
-        :param: buddy: the buddy instance
+        :param: config: configurations of the buddy instance
         :param: file: the file to check
         :return: a list of found problems
         """
@@ -70,9 +71,9 @@ class SiUnitxModule(Module):
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
-    def run_checks(self, buddy: LatexBuddy, file: TexFile) -> list[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Finds units and long numbers used without siunitx package.
-        :param: buddy: the buddy instance
+        :param: config: configurations of the buddy instance
         :param: file: the file to check
         :return: a list of found problems
         """
@@ -84,7 +85,7 @@ class SiUnitxModule(Module):
             problems.append(problem)
         return problems
 
-    def find_long_numbers(self, file: TexFile) -> list[Problem]:
+    def find_long_numbers(self, file: TexFile) -> List[Problem]:
         """Finds long numbers used without siunitx package.
         :param: file: the file to check
         :return: a list of found problems
@@ -120,7 +121,7 @@ class SiUnitxModule(Module):
             )
         return problems
 
-    def find_units(self, file: TexFile) -> list[Problem]:
+    def find_units(self, file: TexFile) -> List[Problem]:
         """Finds units used without siunitx package.
         :param: file: the file to check
         :return: a list of found problems
@@ -231,7 +232,7 @@ class EmptySectionsModule(Module):
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
-    def run_checks(self, buddy: LatexBuddy, file: TexFile) -> list[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         tex = file.tex
         problems = []
         pattern = r"\\section{.*}\s+\\subsection"
@@ -270,7 +271,7 @@ class URLModule(Module):
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
-    def run_checks(self, buddy: LatexBuddy, file: TexFile) -> list[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         tex = file.tex
         problems = []
         # https://stackoverflow.com/questions/6038061/regular-expression-to-find-urls-within-a-string
