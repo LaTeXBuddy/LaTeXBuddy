@@ -7,11 +7,7 @@ import subprocess
 import sys
 import traceback
 
-from io import StringIO
-from pathlib import Path
-from typing import Callable, List, Optional, Tuple
-
-from yalafi.tex2txt import Options, get_line_starts, tex2txt, translate_numbers
+from typing import Callable, List, Tuple
 
 
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:

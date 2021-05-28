@@ -79,7 +79,6 @@ class SiUnitxModule(Module):
         :return: a list of found problems
         """
         problems = []
-        text = file.tex
         for problem in self.find_long_numbers(file):
             problems.append(problem)
         for problem in self.find_units(file):
