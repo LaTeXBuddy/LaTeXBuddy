@@ -1,6 +1,5 @@
 import hashlib
 import os
-import re
 
 from pathlib import Path
 from typing import List
@@ -21,7 +20,7 @@ class DictionModule(Module):
         self.tool_name = "diction"
 
     def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
-        self.language = "de"
+        self.language = "en"
 
         # replace umlauts so error position is correct
         lines = Path(file.plain_file).read_text()
