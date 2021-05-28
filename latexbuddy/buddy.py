@@ -2,16 +2,9 @@
 
 import json
 import os
-import re
-import sys
-import traceback
 
-from html import unescape
 from pathlib import Path
 
-from bs4 import BeautifulSoup
-
-import latexbuddy.output as output
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
@@ -190,57 +183,6 @@ class LatexBuddy:
         """
         return self.lang
 
-    def iwas(self, problems: list[Problem], tex: str):
-        intervals = {}
-
-        for problem in problems:
-            line = problem.position[0]
-            new_interval = set(
-                range(problem.position[1], problem.position[1] + problem.length)
-            )
-            new_severity = problem.severity
-
-            if line not in intervals:
-                intervals[line] = [[new_interval, new_severity]]
-                continue
-
-            for lst in intervals[line]:
-                if len(new_interval.intersection(lst[0])) > 0:
-                    if lst[1] < new_severity:
-                        lst[0] = new_interval
-                        lst[1] = new_severity
-                        break
-
-        # zu diesem Zeitpunkt sieht intervals so aus:
-        #
-        # {
-        #    1: {
-        #      [3,4,5,6,...]: "warning"
-        #    }
-        # }
-
-        tex_lines = tex.splitlines(keepends=True)
-        for line, intervals_set in intervals:
-            offset = 0
-            for i, s in intervals_set:
-                old_len = len(tex_lines[line])
-                start = offset + min(i)
-                end = start + max(i)
-                opening_tag = f"<mark>"
-                closing_tag = f"</mark>"
-                string = (
-                    tex_lines[line][:start]
-                    + opening_tag
-                    + tex_lines[line][start:end]
-                    + closing_tag
-                    + tex_lines[line]
-                )
-                new_len = len(string)
-                tex_lines[line] = string
-                offset += new_len - old_len
-
-        return "".join(tex_lines)
-
     def output_html(self):
 
         # importing this here to avoid circular import error
@@ -254,138 +196,5 @@ class LatexBuddy:
                 self.errors,
             )
         )
-        html_output_path.write_text(html)
 
         print(f"File output to {html_output_path}")
-
-    def mark_output(self, file, text, problems) -> str:
-        html = output.render_html(file, text, self.errors)  # gets html
-        lines_problems = self.get_line_problems(
-            problems, text
-        )  # gets problems per line
-        lines = text.split("\n")
-        line_count = len(lines)
-        charmap = self.generate_charmap(line_count, lines_problems)
-        lines = self.mark_text(line_count, lines_problems, lines, charmap)
-        content = ""
-        for line in lines:
-            content += line + "\n"
-
-        soup = BeautifulSoup(html, "html.parser")
-        new_code = soup.new_tag("code")
-        new_code.string = unescape(content)
-        soup.find("section", id="file-contents").pre.code.replace_with(new_code)
-        new_soup = BeautifulSoup(unescape(str(soup)), "html.parser")
-
-        return unescape(str(new_soup))
-        # return unescape(str(soup))
-
-    def mark_text(
-        self,
-        line_count: int,
-        lines_problems: dict,
-        lines: list[str],
-        charmap: list[dict],
-    ) -> list[str]:
-        for line in range(line_count):
-            for problem in lines_problems[line]:
-                # removes unwanted problems
-                if (
-                    problem.checker == "aspell"
-                    or problem.category is None
-                    or problem.category == ""
-                ):
-                    continue
-                # gets new start, end based on original position
-                original_start = problem.position[1] - 1
-                original_end = original_start + problem.length
-                print(str(line), ":", original_start, original_end)
-                print(charmap)
-                print(line_count)
-                print(len(charmap))
-                start, end = charmap[line + 1][(original_start, original_end)]
-
-                tag, end_tag = self.get_tag(problem)
-
-                # replaces string with string wrapped in tag
-                left = lines[line][:start]
-                middle = tag + lines[line][start:end] + end_tag
-                right = lines[line][end:]
-                lines[line] = left + middle + right
-                charmap = self.update_charmap(charmap, tag, end_tag, line, start, end)
-
-        return lines
-
-    @staticmethod
-    def update_charmap(
-        charmap: list[dict],
-        tag: str,
-        end_tag: str,
-        line: int,
-        changed_start: int,
-        changed_end: int,
-    ) -> list[dict]:
-        line_map = charmap[line]
-        s_offset = len(tag)
-        e_offset = len(end_tag)
-        offset = s_offset + e_offset
-        for old in line_map:
-            original_start, original_end = (old[0], old[1])
-            start, end = line_map[(original_start, original_end)]
-            if (changed_end + e_offset + s_offset) <= start:
-                start += offset
-                end += offset
-            elif changed_start + s_offset <= start <= changed_end + offset <= end:
-                start += s_offset
-                end += offset
-            elif changed_start + s_offset <= start and end <= changed_end + offset:
-                start += s_offset
-                end += s_offset
-            elif start <= changed_start + s_offset <= end <= changed_end + offset:
-                end += s_offset
-            elif start <= changed_start + s_offset and changed_end + offset <= end:
-                end += offset
-            charmap[line][(original_start, original_end)] = (start, end)
-
-        return charmap
-
-    @staticmethod
-    def generate_charmap(line_count: int, lines_problems: dict) -> list[dict]:
-        charmap = [{}]
-        # maps each position to itself in charmap
-        for line in range(line_count):
-            dict = {}
-            for problem in lines_problems[line]:
-                start = problem.position[1] - 1
-                end = start + problem.length
-                dict[(start, end)] = (start, end)
-            charmap.append(dict)
-
-        return charmap
-
-    @staticmethod
-    def get_line_problems(problems, text) -> dict[int, list[Problem]]:
-        problem_dict = {}
-        line_count = len(text.split("\n"))
-        for line in range(line_count):
-            problem_dict[line] = []
-
-        for problem in problems:
-            if problem.checker == "aspell":
-                continue
-            problem_dict[problem.position[0] - 1].append(problem)
-
-        return problem_dict
-
-    @staticmethod
-    def get_tag(problem) -> tuple:
-        tag = "span"
-        if problem.category == "spelling":
-            tag = "u"
-        elif problem.category == "grammar":
-            tag = "mark"
-        elif problem.category == "latex":
-            tag = "span"
-        return unescape("<" + tag + ' class="' + problem.category + '">'), unescape(
-            "</" + tag + ">"
-        )
