@@ -1,8 +1,8 @@
 from typing import List
 
 import proselint
-from latexbuddy.config_loader import ConfigLoader
 
+from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile

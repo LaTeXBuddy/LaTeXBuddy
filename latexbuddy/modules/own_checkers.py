@@ -1,4 +1,5 @@
 import re
+
 from typing import List
 
 import latexbuddy.tools as tools
