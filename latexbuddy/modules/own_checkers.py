@@ -257,9 +257,49 @@ class EmptySectionsModule(Module):
                     file=file.tex_file,
                     severity=self.severity,
                     description=f"Sections may not be empty.",
-                    key=self.tool_name + "_" + "",
+                    key=self.tool_name + "_" + text,
                     length=length,
                     context=("\\section{", "}"),
+                )
+            )
+        return problems
+
+
+class URLModule(Module):
+    def __init__(self):
+        self.tool_name = "urlcheck"
+        self.category = "latex"
+        self.severity = ProblemSeverity.INFO
+
+    def run_checks(self, buddy: LatexBuddy, file: TexFile) -> list[Problem]:
+        tex = file.tex
+        problems = []
+        # https://stackoverflow.com/questions/6038061/regular-expression-to-find-urls-within-a-string
+        pattern = "(http|ftp|https)(:\/\/)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
+        urls = re.findall(pattern, tex)
+        for url_list in urls:
+            url = ""
+            for u in url_list:
+                url += u
+            match = re.search(re.escape(url), tex)
+            start, end = match.span()
+            length = end - start
+            command_len = len("\\url{")
+            if tex[start - command_len : start] == "\\url{":
+                continue
+            line, col, offset = tools.absolute_to_linecol(tex, start)
+            problems.append(
+                Problem(
+                    position=(line, col),
+                    text=url,
+                    checker=self.tool_name,
+                    category=self.category,
+                    cid="0",
+                    file=file.tex_file,
+                    severity=self.severity,
+                    description=f"For URLs use \\url.",
+                    key=self.tool_name + "_" + url,
+                    length=length,
                 )
             )
         return problems
