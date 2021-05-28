@@ -4,10 +4,11 @@ LaTeXBuddy."""
 import argparse
 
 from pathlib import Path
+
 import latexbuddy.tools as tool
+
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
-
 
 
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
