@@ -25,7 +25,7 @@ class DictionModule(Module):
         #  config.get_config_option_or_default(
         #       "buddy", "language", "<default language>"
         #  )
-        self.language = "de"
+        self.language = "en"
 
         # replace umlauts so error position is correct
         lines = Path(file.plain_file).read_text()

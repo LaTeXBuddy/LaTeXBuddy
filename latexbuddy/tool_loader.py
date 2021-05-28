@@ -1,7 +1,5 @@
 import importlib.util as importutil
 import inspect
-import sys
-import traceback
 
 from pathlib import Path
 from types import ModuleType
