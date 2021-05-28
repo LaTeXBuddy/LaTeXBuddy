@@ -237,7 +237,6 @@ class EmptySectionsModule(Module):
         pattern = r"\\section{.*}\s+\\subsection"
         empty_sections = re.findall(pattern, tex)
         for section in empty_sections:
-            print(section)
             match = re.search(re.escape(section), tex)
             start, end = match.span()
             length = end - start
