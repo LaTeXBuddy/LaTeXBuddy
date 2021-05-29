@@ -8,6 +8,7 @@ import latexbuddy.tools as tools
 
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
@@ -34,10 +35,7 @@ class AspellModule(Module):
         try:
             tools.find_executable("aspell")
         except FileNotFoundError:
-            print("Could not find a valid aspell installation on your system.")
-            print("Please make sure you installed aspell correctly.")
-
-            print("For more information check the LaTeXBuddy manual.")
+            self.__logger.error(not_found("aspell", "GNU Aspell"))
 
             raise FileNotFoundError("Unable to find aspell installation!")
 
@@ -52,7 +50,7 @@ class AspellModule(Module):
 
         language_quote = shlex.quote(self.language)
         languages = tools.execute("aspell", "dump dicts")
-        AspellModule.check_language(language_quote, languages)
+        self.check_language(language_quote, languages)
 
         error_list = []
         counter = 1  # counts the lines
@@ -77,8 +75,7 @@ class AspellModule(Module):
         )
         return error_list
 
-    @staticmethod
-    def check_language(language: str, langs: str):
+    def check_language(self, language: str, langs: str):
         """Checks if a language is in a list of languages.
 
         The list of languages is actually a string; e.g., the output of a terminal
@@ -90,12 +87,12 @@ class AspellModule(Module):
         """
         # error if language dict not installed
         if language not in langs:
-            print(f'Dictionary for language "{language}" not found')
-            print("Install dictionary (e.g. via package manager)")
-            print(
-                "check available dictionaries "
-                "at https://ftp.gnu.org/gnu/aspell/dict/0index.html"
+            self.__logger.error(
+                not_found(f"Language for {language}", "the dictionary")
+                + "\nYou can check available dictionaries at "
+                + "https://ftp.gnu.org/gnu/aspell/dict/0index.html"
             )
+
             raise Exception("Aspell: Language not found on system.")
 
     def format_errors(

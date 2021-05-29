@@ -10,6 +10,7 @@ import latexbuddy.tools as tools
 from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
@@ -35,10 +36,7 @@ class ChktexModule(Module):
         try:
             tools.find_executable("chktex")
         except FileNotFoundError:
-            print("Could not find a valid ChkTeX installation on your system.")
-            print("Please make sure you installed ChkTeX correctly.")
-
-            print("For more information check the LaTeXBuddy manual.")
+            self.__logger.error(not_found("chktex", "ChkTeX"))
 
             raise FileNotFoundError("Unable to find ChkTeX installation!")
 

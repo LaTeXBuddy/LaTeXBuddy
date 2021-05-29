@@ -15,6 +15,7 @@ import latexbuddy.tools as tools
 from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
@@ -105,34 +106,19 @@ class LanguageTool(Module):
         try:
             tools.find_executable("java")
         except FileNotFoundError:
-            print("Could not find a Java runtime environment on your system.")
-            print("Please make sure you installed Java correctly.")
-
-            print("For more information check the LaTeXBuddy manual.")
-
-            raise FileNotFoundError("Unable to find Java runtime environment!")
+            self.__logger.error(not_found("java", "JRE (Java Runtime Environment)"))
 
         try:
             result = tools.find_executable("languagetool")
             executable_source = "native"
         except FileNotFoundError:
-
             try:
                 result = tools.find_executable("languagetool-commandline.jar")
                 executable_source = "java"
             except FileNotFoundError:
-                print(
-                    "Could not find languagetool-commandline.jar in your system's PATH."
+                self.__logger.error(
+                    not_found("languagetool-commandline.jar", "LanguageTool CLI")
                 )
-                print(
-                    "Please make sure you installed languagetool properly and added the"
-                )
-                print(
-                    "directory to your system's PATH variable. Also make sure to make"
-                )
-                print("the jar-files executable.")
-
-                print("For more information check the LaTeXBuddy manual.")
 
                 raise FileNotFoundError("Unable to find languagetool installation!")
 
@@ -347,10 +333,7 @@ class LanguageToolLocalServer:
         try:
             tools.find_executable("java")
         except FileNotFoundError:
-            print("Could not find a Java runtime environment on your system.")
-            print("Please make sure you installed Java correctly.")
-
-            print("For more information check the LaTeXBuddy manual.")
+            self.__logger.error(not_found("java", "JRE (Java Runtime Environment)"))
 
             raise FileNotFoundError("Unable to find Java runtime environment!")
 
@@ -362,18 +345,9 @@ class LanguageToolLocalServer:
                 result = tools.find_executable("languagetool-server.jar")
                 executable_source = "java"
             except FileNotFoundError:
-                print(
-                    "Could not find languagetool-commandline.jar in your system's PATH."
+                self.__logger.error(
+                    not_found("languagetool-server.jar", "LanguageTool Server")
                 )
-                print(
-                    "Please make sure you installed languagetool properly and added the"
-                )
-                print(
-                    "directory to your system's PATH variable. Also make sure to make"
-                )
-                print("the jar-files executable.")
-
-                print("For more information check the LaTeXBuddy manual.")
 
                 raise FileNotFoundError("Unable to find languagetool installation!")
 
