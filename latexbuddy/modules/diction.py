@@ -2,12 +2,14 @@ import hashlib
 import os
 
 from pathlib import Path
+from time import perf_counter
 from typing import List
 
 from unidecode import unidecode
 
 import latexbuddy.tools as tools
 
+from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -15,11 +17,14 @@ from latexbuddy.texfile import TexFile
 
 
 class DictionModule(Module):
+    __logger = root_logger.getChild("DictionModule")
+
     def __init__(self):
         self.language = None
         self.tool_name = "diction"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+        start_time = perf_counter()
 
         # TODO: make this dynamic/configurable using
         #  config.get_config_option_or_default(
@@ -57,8 +62,16 @@ class DictionModule(Module):
         # remove temp file
         os.remove(cleaned_file)
 
+        result = self.format_errors(
+            cleaned_errors, original_lines, file.plain_file, file
+        )
+
+        self.__logger.debug(
+            f"Diction finished after {round(perf_counter() - start_time, 2)} seconds"
+        )
+
         # return list of Problems
-        return self.format_errors(cleaned_errors, original_lines, file.plain_file, file)
+        return result
 
     def format_errors(
         self, out: List[str], original: List[str], file, texfile

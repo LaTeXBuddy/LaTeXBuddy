@@ -13,6 +13,7 @@ import requests
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
+from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -32,6 +33,8 @@ class Mode(Enum):
 
 class LanguageTool(Module):
     """Wraps the LanguageTool API calls to check files."""
+
+    __logger = root_logger.getChild("LanguageTool")
 
     _LANGUAGE_MAP = {"de": "de-DE", "en": "en-GB"}
 
@@ -57,6 +60,7 @@ class LanguageTool(Module):
         :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
+        start_time = time.perf_counter()
 
         try:
             self.language = LanguageTool._LANGUAGE_MAP[
@@ -86,7 +90,12 @@ class LanguageTool(Module):
         elif self.mode == Mode.COMMANDLINE:
             self.find_languagetool_command()
 
-        return self.check_tex(file)
+        result = self.check_tex(file)
+
+        self.__logger.debug(
+            f"LanguageTool finished after {round(time.perf_counter() - start_time, 2)} seconds"
+        )
+        return result
 
     def find_languagetool_command(self) -> None:
         """Searches for the LanguageTool command line app.

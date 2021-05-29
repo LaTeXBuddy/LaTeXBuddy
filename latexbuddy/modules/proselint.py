@@ -1,7 +1,9 @@
+from time import perf_counter
 from typing import List
 
 import proselint
 
+from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -9,11 +11,14 @@ from latexbuddy.texfile import TexFile
 
 
 class ProseLintModule(Module):
+    __logger = root_logger.getChild("ProseLintModule")
+
     def __init__(self):
         self.tool_name = "proselint"
         self.problem_type = "grammar"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+        start_time = perf_counter()
 
         lang = config.get_config_option_or_default("buddy", "language", None)
 
@@ -21,7 +26,13 @@ class ProseLintModule(Module):
             return []
 
         suggestions = proselint.tools.lint(file.plain)
-        return self.format_errors(suggestions, file)
+
+        result = self.format_errors(suggestions, file)
+
+        self.__logger.debug(
+            f"ProseLint finished after {round(perf_counter() - start_time, 2)} seconds"
+        )
+        return result
 
     def format_errors(self, suggestions: List, file: TexFile):
         problems = []
