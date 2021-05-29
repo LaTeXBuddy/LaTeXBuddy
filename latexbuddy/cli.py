@@ -5,8 +5,10 @@ import argparse
 
 from pathlib import Path
 
+from latexbuddy import __logger as root_logger
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.log import __setup_root_logger
 
 
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
@@ -71,6 +73,7 @@ def main():
     """Parses CLI arguments and launches the LaTeXBuddy instance."""
     args = parser.parse_args()
 
+    __setup_root_logger(root_logger)
     config_loader = ConfigLoader(args)
 
     buddy = LatexBuddy(
