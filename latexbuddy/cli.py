@@ -4,6 +4,7 @@ LaTeXBuddy."""
 import argparse
 
 from pathlib import Path
+from time import perf_counter
 
 from latexbuddy import __logger as root_logger
 from latexbuddy.buddy import LatexBuddy
@@ -71,9 +72,15 @@ module_selection.add_argument(
 
 def main():
     """Parses CLI arguments and launches the LaTeXBuddy instance."""
+    start = perf_counter()
+
     args = parser.parse_args()
 
     __setup_root_logger(root_logger)
+    logger = root_logger.getChild("cli")
+
+    logger.debug(f"Parsed CLI args: {str(args)}")
+
     config_loader = ConfigLoader(args)
 
     buddy = LatexBuddy(
@@ -84,3 +91,5 @@ def main():
     buddy.run_tools()
     buddy.check_whitelist()
     buddy.output_file()
+
+    logger.debug(f"Execution finished in {round(perf_counter()-start, 2)}s")
