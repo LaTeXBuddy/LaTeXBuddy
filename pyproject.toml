@@ -4,10 +4,19 @@ version = "0.1.0"
 description = ""
 license = "Proprietary"
 authors = [
-    "Nikita Karamov <n.karamov@tu-braunschweig.de>"
+    "Niklas Pieninck <n.pieninck@tu-braunschweig.de>",
+    "Levi Elsner <levi.elsner@tu-braunschweig.de>",
+    "Paul Franke <paul.franke@tu-braunschweig.de>",
+    "Jana Haupt <jana.haupt@tu-braunschweig.de>",
+    "Hendrik Hentschel <h.hentschel@tu-braunschweig.de>",
+    "Nikita Karamov <n.karamov@tu-braunschweig.de>",
+    "Lennart Lutz <l.lutz@tu-braunschweig.de>",
+    "David Meyer <da.meyer@tu-braunschweig.de>",
+    "Paul Nowitzki <p.nowitzki@tu-braunschweig.de>",
+    "Maik Weber <maik.weber@tu-braunschweig.de>"
 ]
 readme = "README.md"
-include = ["CHANGELOG.md"]
+include = ["CHANGELOG.md", "NOTICE"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
@@ -15,6 +24,8 @@ requests = "^2.25.1"
 Jinja2 = "^2.11.3"
 yalafi = "^1.3.0"
 chardet = "^4.0.0"
+proselint = "^0.10.2"
+Unidecode = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 black = { version = "^21.5b1", python = ">=3.6.2,<4.0" }

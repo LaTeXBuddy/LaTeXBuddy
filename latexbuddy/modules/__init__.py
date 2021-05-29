@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from latexbuddy import TexFile
-from latexbuddy.buddy import LatexBuddy
+from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.problem import Problem
 
 
@@ -19,11 +19,10 @@ class Module(ABC):
         pass
 
     @abstractmethod
-    def run_checks(self, buddy: LatexBuddy, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the checks and returns a list of discovered problems.
 
-        # TODO: vllt einfach selbst Config nehmen statt des "dicken" buddy-Attributes?
-        :param buddy: the calling LaTeXBuddy instance (for config access)
+        :param config: the configuration options of the calling LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex option)
         """
         pass

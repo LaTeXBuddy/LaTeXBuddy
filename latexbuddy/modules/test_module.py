@@ -1,7 +1,7 @@
 from typing import List
 
 from latexbuddy import TexFile
-from latexbuddy.buddy import LatexBuddy
+from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem
 
@@ -13,10 +13,10 @@ class TestModule(Module):
         """Empty constructor."""
         return
 
-    def run_checks(self, buddy: LatexBuddy, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Dummy implementation that simply returns one problem without meaning.
 
-        :param buddy: LatexBuddy instance
+        :param config: configurations of the LatexBuddy instance
         :param file: file to be checked
         :return: a list of problems of length one
         """
