@@ -6,7 +6,11 @@ import argparse
 from pathlib import Path
 from time import perf_counter
 
+from colorama import Fore
+
+from latexbuddy import __app_name__
 from latexbuddy import __logger as root_logger
+from latexbuddy import __version__
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
@@ -78,6 +82,8 @@ def main():
 
     __setup_root_logger(root_logger)
     logger = root_logger.getChild("cli")
+
+    print(f"{Fore.CYAN}{__app_name__}{Fore.RESET} v{__version__}")
 
     logger.debug(f"Parsed CLI args: {str(args)}")
 
