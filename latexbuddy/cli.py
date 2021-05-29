@@ -2,6 +2,8 @@
 LaTeXBuddy."""
 
 import argparse
+import logging
+import os
 
 from pathlib import Path
 from time import perf_counter
@@ -26,7 +28,13 @@ parser.add_argument(
     default=Path("config.py"),
     help="Location of the config file.",
 )
-
+parser.add_argument(
+    "--verbose",
+    "-v",
+    action="store_true",
+    default=False,
+    help="Display debug output",
+)
 parser.add_argument(
     "--language",
     "-l",
@@ -80,7 +88,9 @@ def main():
 
     args = parser.parse_args()
 
-    __setup_root_logger(root_logger)
+    display_debug = args.verbose or os.environ.get("LATEXBUDDY_DEBUG", False)
+
+    __setup_root_logger(root_logger, logging.DEBUG if display_debug else logging.INFO)
     logger = root_logger.getChild("cli")
 
     print(f"{Fore.CYAN}{__app_name__}{Fore.RESET} v{__version__}")

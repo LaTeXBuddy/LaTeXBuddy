@@ -73,7 +73,7 @@ def __setup_root_logger(logger: Logger, console_level: int = INFO) -> None:
     )
 
     ch = DoubleStreamHandler()
-    ch.setLevel(console_level)  # TODO: change via config
+    ch.setLevel(console_level)
     ch.setFormatter(ConsoleFormatter())
 
     logger.addHandler(fh)
