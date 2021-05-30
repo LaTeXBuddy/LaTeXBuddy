@@ -8,6 +8,7 @@ from pathlib import Path
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
+from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.problem import Problem, ProblemJSONEncoder, ProblemSeverity
 
@@ -17,6 +18,8 @@ from latexbuddy.problem import Problem, ProblemJSONEncoder, ProblemSeverity
 
 class LatexBuddy:
     """The main instance of the applications that controls all the internal tools."""
+
+    __logger = root_logger.getChild("buddy")
 
     def __init__(self, config_loader: ConfigLoader, file_to_check: Path):
         """Initializes the LaTeXBuddy instance.
@@ -35,20 +38,20 @@ class LatexBuddy:
         )
 
         if not self.output_dir.is_dir():
-            print(
-                f"Specified path '{str(self.output_dir)}' is not a directory. "
-                f"Reverting to default value..."
+            self.__logger.warning(
+                f"'{str(self.output_dir)}' is not a directory. "
+                f"Current directory will be used instead."
             )
-            self.output_dir = Path("./")
+            self.output_dir = Path.cwd()
 
         self.output_format = str(
             self.cfg.get_config_option_or_default("buddy", "format", "HTML")
         ).upper()
 
         if self.output_format not in ["HTML", "JSON"]:
-            print(
-                f"Unknown output file format '{self.output_format}'. "
-                f"Reverting to HTML as default..."
+            self.__logger.warning(
+                f"Unknown output format: {self.output_format}. "
+                "HTML will be used instead."
             )
             self.output_format = "HTML"
 
@@ -92,10 +95,9 @@ class LatexBuddy:
         """
 
         if uid not in self.errors.keys():
-            print(
-                "Error: invalid UID, error object with ID: "
-                + uid
-                + "not found and not added to whitelist"
+            self.__logger.error(
+                f"UID not found: {uid}. "
+                "Specified problem will not be added to whitelist."
             )
             return
 
@@ -175,8 +177,10 @@ class LatexBuddy:
 
         json_output_path = Path(str(self.output_dir) + "/latexbuddy_output.json")
 
-        with open(json_output_path, "w") as file:
+        with json_output_path.open("w") as file:
             json.dump(list_of_problems, file, indent=4, cls=ProblemJSONEncoder)
+
+        self.__logger.info(f"Output saved to {json_output_path.resolve()}")
 
     def output_html(self):
         """Renders all current problem objects as HTML and writes the file."""
@@ -193,7 +197,7 @@ class LatexBuddy:
             )
         )
 
-        print(f"File output to {html_output_path}")
+        self.__logger.info(f"Output saved to {html_output_path.resolve()}")
 
     def output_file(self):
         """Writes all current problems to the specified output file."""

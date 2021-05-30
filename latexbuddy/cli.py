@@ -2,11 +2,20 @@
 LaTeXBuddy."""
 
 import argparse
+import logging
+import os
 
 from pathlib import Path
+from time import perf_counter
 
+from colorama import Fore
+
+from latexbuddy import __app_name__
+from latexbuddy import __logger as root_logger
+from latexbuddy import __version__
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.log import __setup_root_logger
 
 
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
@@ -19,7 +28,13 @@ parser.add_argument(
     default=Path("config.py"),
     help="Location of the config file.",
 )
-
+parser.add_argument(
+    "--verbose",
+    "-v",
+    action="store_true",
+    default=False,
+    help="Display debug output",
+)
 parser.add_argument(
     "--language",
     "-l",
@@ -69,7 +84,18 @@ module_selection.add_argument(
 
 def main():
     """Parses CLI arguments and launches the LaTeXBuddy instance."""
+    start = perf_counter()
+
     args = parser.parse_args()
+
+    display_debug = args.verbose or os.environ.get("LATEXBUDDY_DEBUG", False)
+
+    __setup_root_logger(root_logger, logging.DEBUG if display_debug else logging.INFO)
+    logger = root_logger.getChild("cli")
+
+    print(f"{Fore.CYAN}{__app_name__}{Fore.RESET} v{__version__}")
+
+    logger.debug(f"Parsed CLI args: {str(args)}")
 
     config_loader = ConfigLoader(args)
 
@@ -81,3 +107,5 @@ def main():
     buddy.run_tools()
     buddy.check_whitelist()
     buddy.output_file()
+
+    logger.debug(f"Execution finished in {round(perf_counter()-start, 2)}s")

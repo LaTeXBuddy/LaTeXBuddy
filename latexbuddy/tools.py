@@ -7,6 +7,7 @@ import subprocess
 import sys
 import traceback
 
+from pathlib import Path
 from typing import Callable, List, Tuple
 
 
@@ -185,3 +186,46 @@ def execute_no_exceptions(
             file=sys.stderr,
         )
         traceback.print_exc(file=sys.stderr)
+
+
+def get_app_dir() -> Path:
+    """Finds the directory for storing application data (mostly logs).
+
+    This is a lightweight port of Click's mononymous function:
+    https://github.com/pallets/click/blob/af0af571cbbd921d3974a0ff9cf58a4b26bb852b/src/click/utils.py#L412-L458
+
+    :return: path of the application directory
+    """
+
+    from latexbuddy import __app_name__ as proper_name
+    from latexbuddy import __name__ as unix_name
+
+    # Windows
+    if sys.platform.startswith("win"):
+        localappdata = os.environ.get("LOCALAPPDATA")
+        if localappdata is not None:
+            config_home = Path(localappdata)
+        else:
+            config_home = Path.home()
+
+        app_dir = config_home / proper_name
+
+    # macOS
+    elif sys.platform.startswith("darwin"):
+        config_home = Path.home() / "Library" / "Application Support"
+
+        app_dir = config_home / proper_name
+
+    # *nix
+    else:
+        xdg_config_home = os.environ.get("XDG_CONFIG_HOME")
+        if xdg_config_home is not None:
+            config_home = Path(xdg_config_home)
+        else:
+            config_home = Path.home() / ".config"
+
+        app_dir = config_home / unix_name
+
+    app_dir.mkdir(parents=True, exist_ok=True)
+
+    return app_dir
