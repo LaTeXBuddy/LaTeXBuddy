@@ -135,7 +135,7 @@ class AspellModule(Module):
                 location = file.get_position_in_tex_from_linecol(
                     line_number, char_location
                 )
-                key = self.tool_name + key_delimiter + text
+                key = "spelling" + key_delimiter + text
 
                 problems.append(
                     Problem(
