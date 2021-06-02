@@ -9,6 +9,7 @@
     <style>
         {% include "static/modern-normalize.css" %}
         {% include "static/style.css" %}
+        {% include "static/dropdown.css" %}
     </style>
 </head>
 <body>
@@ -27,7 +28,24 @@
         <h3>Problems</h3>
         <ol>
             {% for problem in problems %}
-                <li class="problem is-{{ problem.severity }}">
+                <li class="problem is-{{ problem.severity }}" >
+
+                    <div onclick="dropdown()" class="dropdown">
+                        <div id="2143" class="dropdown-content">
+                            <a onclick="alert(1)">Add to whitelist</a>
+                        </div>
+                    </div>
+                    <script>
+                        function dropdown() {
+                            document.getElementById("2143").classList.toggle("show");
+                        }
+                        // Close the dropdown if the user clicks outside of it
+                        window.onclick = function(event) {
+                          if (!event.target.matches('.dropdown')) {
+                            document.getElementById("2143").classList.toggle('show');
+                          }
+                        }
+                    </script>
                     <h4 class="problem-context monospaced">
                         {{ problem.context[0] }}
                         <span class="problem-text">{{ problem.text }}</span>
