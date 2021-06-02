@@ -1,10 +1,10 @@
 """This module describes the LaTeXBuddy config loader and its properties."""
 import importlib.util as importutil
-import sys
+import re
 
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, AnyStr, Dict, Optional, Type
 
 import latexbuddy.tools as tools
 
@@ -147,18 +147,33 @@ class ConfigLoader:
 
     @staticmethod
     def __get_option(
-        config_dict: Dict, tool_name: str, key: str, error_indicator="config"
+        config_dict: Dict,
+        tool_name: str,
+        key: str,
+        verify_type: Type = Any,
+        verify_regex: Optional[str] = None,
+        error_indicator: str = "config",
     ) -> Any:
         """This private helper-function searches for a config entry in the specified
         dictionary (config or flags). It raises an error, if the requested config
-        option is not specified in the specified dictionary.
+        option is not specified in the specified dictionary or the retrieved entry does
+        not match a specified verification criterion.
 
         :param config_dict: dictionary to be searched
         :param tool_name: name of the tool owning the config option
         :param key: key of the config option
+        :param verify_type: typing type that the config entry is required to be an
+                            instance of (otherwise ConfigOptionVerificationError is
+                            raised)
+        :param verify_regex: regular expression that the config entry is required to
+                             match fully (otherwise ConfigOptionVerificationError is
+                             raised)
+                             Note: this overrides verify_type with 'AnyStr'
         :param error_indicator: custom string displayed in the error message on failure
         :return: the value of the requested config option, if it exists
         :raises: ConfigOptionNotFoundError, if the requested config option doesn't exist
+        :raises: ConfigOptionVerificationError, if the requested config option does not
+                 meet the specified criteria
         """
 
         if tool_name not in config_dict or key not in config_dict[tool_name]:
@@ -166,9 +181,40 @@ class ConfigLoader:
                 f"Tool: {tool_name}, key: {key} ({error_indicator})"
             )
 
-        return config_dict[tool_name][key]
+        entry = config_dict[tool_name][key]
 
-    def get_config_option(self, tool_name: str, key: str) -> Any:
+        # assert that entry type is a string, if regex check is applied
+        if verify_regex is not None:
+            verify_type = AnyStr
+
+        if verify_type is not Any:
+
+            if not isinstance(entry, verify_type):
+                raise ConfigOptionVerificationError(
+                    f"config entry '{key}' for module '{tool_name}' is of "
+                    f"type '{str(type(entry))}' (expected '{str(verify_type)}')"
+                )
+
+        if verify_regex is not None:
+
+            pattern = re.compile(verify_regex)
+
+            if pattern.fullmatch(entry) is None:
+                raise ConfigOptionVerificationError(
+                    f"config entry '{key}' for module '{tool_name}' does not match the"
+                    f"provided regular expression: entry: '{entry}', "
+                    f"regex: '{verify_regex}'"
+                )
+
+        return entry
+
+    def get_config_option(
+        self,
+        tool_name: str,
+        key: str,
+        verify_type: Type = Any,
+        verify_regex: Optional[str] = None,
+    ) -> Any:
         """This method fetches the value of the config entry with the specified key for
         the specified tool or raises a ConfigOptionNotFoundError, if such an entry
         doesn't exist.
