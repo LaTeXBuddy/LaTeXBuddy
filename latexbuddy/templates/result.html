@@ -31,18 +31,18 @@
                 <li class="problem is-{{ problem.severity }}" >
 
                     <div onclick="dropdown()" class="dropdown">
-                        <div id="2143" class="dropdown-content">
+                        <div id="{{ problem.uid }}" class="dropdown-content">
                             <a onclick="alert(1)">Add to whitelist</a>
                         </div>
                     </div>
                     <script>
                         function dropdown() {
-                            document.getElementById("2143").classList.toggle("show");
+                            document.getElementById("{{ problem.uid }}").classList.toggle("show");
                         }
                         // Close the dropdown if the user clicks outside of it
                         window.onclick = function(event) {
                           if (!event.target.matches('.dropdown')) {
-                            document.getElementById("2143").classList.toggle('show');
+                            document.getElementById("{{ problem.uid }}").classList.toggle('show');
                           }
                         }
                     </script>
