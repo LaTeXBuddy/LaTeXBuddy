@@ -142,8 +142,13 @@ class LanguageTool(Module):
         self.find_disabled_rules(config)
 
         cfg_mode = config.get_config_option_or_default(
-            "LanguageTool", "mode", "COMMANDLINE"
+            "LanguageTool",
+            "mode",
+            "COMMANDLINE",
+            verify_type=AnyStr,
+            verify_choices=[e.value for e in Mode],
         )
+
         try:
             self.mode = Mode(cfg_mode)
         except ValueError:
@@ -155,7 +160,12 @@ class LanguageTool(Module):
 
         elif self.mode == Mode.REMOTE_SERVER:
             # must include the port and api call (e.g. /v2/check)
-            self.remote_url = config.get_config_option("LanguageTool", "remote_url")
+            self.remote_url = config.get_config_option(
+                "LanguageTool",
+                "remote_url",
+                verify_type=AnyStr,
+                verify_regex="http(s?)://(\\S*)",
+            )
 
         elif self.mode == Mode.COMMANDLINE:
             self.find_languagetool_command()
@@ -218,12 +228,14 @@ class LanguageTool(Module):
     def find_disabled_rules(self, config: ConfigLoader) -> None:
 
         self.disabled_rules = ",".join(
-            config.get_config_option_or_default("LanguageTool", "disabled-rules", [])
+            config.get_config_option_or_default(
+                "LanguageTool", "disabled-rules", [], verify_type=List[str]
+            )
         )
 
         self.disabled_categories = ",".join(
             config.get_config_option_or_default(
-                "LanguageTool", "disabled-categories", []
+                "LanguageTool", "disabled-categories", [], verify_type=List[str]
             )
         )
 
