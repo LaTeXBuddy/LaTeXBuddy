@@ -31,8 +31,5 @@ modules = {
     },
     "ProseLintModule": {
         "enabled": True
-    },
-    "TestModule": {
-        "enabled": False,
     }
 }
