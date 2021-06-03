@@ -6,7 +6,7 @@ import time
 
 from contextlib import closing
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import AnyStr, Dict, List, Optional
 
 import requests
 
@@ -37,7 +37,75 @@ class LanguageTool(Module):
 
     __logger = root_logger.getChild("LanguageTool")
 
-    _LANGUAGE_MAP = {"de": "de-DE", "en": "en-GB"}
+    __SUPPORTED_LANGUAGES = [
+        "ar",
+        "ast",
+        "ast-ES",
+        "be",
+        "be-BY",
+        "br",
+        "br-FR",
+        "ca",
+        "ca-ES",
+        "ca-ES-valencia",
+        "zh",
+        "zh-CN",
+        "da",
+        "da-DK",
+        "nl",
+        "nl-BE",
+        "en",
+        "en-AU",
+        "en-CA",
+        "en-GB",
+        "en-NZ",
+        "en-ZA",
+        "en-US",
+        "eo",
+        "fr",
+        "gl",
+        "gl-ES",
+        "de",
+        "de-AT",
+        "de-DE",
+        "de-CH",
+        "de-DE-x-simple-language",
+        "el",
+        "el-GR",
+        "ga",
+        "ga-IE",
+        "it",
+        "ja",
+        "ja-JP",
+        "km",
+        "km-KH",
+        "nb",
+        "no",
+        "fa",
+        "pl",
+        "pl-PL",
+        "pt",
+        "pt-AO",
+        "pt-BR",
+        "pt-MZ",
+        "pt-PT",
+        "ro",
+        "ro-RO",
+        "ru",
+        "ru-RU",
+        "sk",
+        "sk-SK",
+        "sl",
+        "sl-SI",
+        "es",
+        "sv",
+        "tl",
+        "tl-PH",
+        "ta",
+        "ta-IN",
+        "uk",
+        "uk-UA",
+    ]
 
     def __init__(self):
         """Creates a LanguageTool checking module."""
@@ -63,12 +131,13 @@ class LanguageTool(Module):
         """
         start_time = time.perf_counter()
 
-        try:
-            self.language = LanguageTool._LANGUAGE_MAP[
-                config.get_config_option_or_default("buddy", "language", None)
-            ]
-        except KeyError:
-            self.language = None
+        self.language = config.get_config_option_or_default(
+            "buddy",
+            "language",
+            None,
+            verify_type=AnyStr,
+            verify_choices=LanguageTool.__SUPPORTED_LANGUAGES,
+        )
 
         self.find_disabled_rules(config)
 
