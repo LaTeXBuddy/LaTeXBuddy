@@ -173,7 +173,8 @@ class LanguageTool(Module):
         result = self.check_tex(file)
 
         self.__logger.debug(
-            f"LanguageTool finished after {round(time.perf_counter() - start_time, 2)} seconds"
+            f"LanguageTool finished after {round(time.perf_counter() - start_time, 2)} "
+            f"seconds"
         )
         return result
 
@@ -393,9 +394,11 @@ class LanguageTool(Module):
 class LanguageToolLocalServer:
     """Defines an instance of a local LanguageTool deployment."""
 
-    _DEFAULT_PORT = 8081
-    _SERVER_REQUEST_TIMEOUT = 1  # in seconds
-    _SERVER_MAX_ATTEMPTS = 20
+    __logger = root_logger.getChild("LanguageTool")
+
+    __DEFAULT_PORT = 8081
+    __SERVER_REQUEST_TIMEOUT = 1  # in seconds
+    __SERVER_MAX_ATTEMPTS = 20
 
     def __init__(self):
         self.lt_path = None
@@ -450,7 +453,7 @@ class LanguageToolLocalServer:
         self.lt_server_command.append("--port")
         self.lt_server_command.append(str(self.port))
 
-    def start_local_server(self, port: int = _DEFAULT_PORT) -> int:
+    def start_local_server(self, port: int = __DEFAULT_PORT) -> int:
         """Starts the LanguageTool server locally.
 
         :param port: port for the server to listen at
@@ -479,11 +482,11 @@ class LanguageToolLocalServer:
         attempts = 0
         up = False
 
-        while not up and attempts < self._SERVER_MAX_ATTEMPTS:
+        while not up and attempts < self.__SERVER_MAX_ATTEMPTS:
             try:
                 requests.post(
                     f"http://localhost:{self.port}/v2/check",
-                    timeout=self._SERVER_REQUEST_TIMEOUT,
+                    timeout=self.__SERVER_REQUEST_TIMEOUT,
                 )
                 up = True
 
