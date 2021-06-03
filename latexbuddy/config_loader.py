@@ -318,5 +318,18 @@ class ConfigLoader:
                 verify_regex=verify_regex,
                 verify_choices=verify_choices,
             )
-        except ConfigOptionError:
+
+        except ConfigOptionNotFoundError:
+            self.__logger.info(
+                f"Config entry '{key}' for module '{tool_name}' not found. Using "
+                f"default value '{str(default_value)}' instead...")
+
+            return default_value
+
+        except ConfigOptionVerificationError as e:
+            self.__logger.warning(
+                f"Config entry invalid. Using default value '{str(default_value)}' "
+                f"instead. Details: {str(e)}"
+            )
+
             return default_value
