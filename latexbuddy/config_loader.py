@@ -322,7 +322,8 @@ class ConfigLoader:
         except ConfigOptionNotFoundError:
             self.__logger.info(
                 f"Config entry '{key}' for module '{tool_name}' not found. Using "
-                f"default value '{str(default_value)}' instead...")
+                f"default value '{str(default_value)}' instead..."
+            )
 
             return default_value
 
