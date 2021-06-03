@@ -4,7 +4,9 @@ import re
 
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, AnyStr, Dict, Optional, Type
+from typing import Any, AnyStr, Dict, List, Optional, Set, Tuple, Type, Union
+
+from pydantic import BaseModel, ValidationError
 
 import latexbuddy.tools as tools
 
@@ -152,6 +154,7 @@ class ConfigLoader:
         key: str,
         verify_type: Type = Any,
         verify_regex: Optional[str] = None,
+        verify_choices: Optional[Union[List[Any], Tuple[Any], Set[Any]]] = None,
         error_indicator: str = "config",
     ) -> Any:
         """This private helper-function searches for a config entry in the specified
@@ -169,6 +172,8 @@ class ConfigLoader:
                              match fully (otherwise ConfigOptionVerificationError is
                              raised)
                              Note: this overrides verify_type with 'AnyStr'
+        :param verify_choices: a list/tuple/set of valid values in which the config
+                               entry needs to be contained in order to be valid
         :param error_indicator: custom string displayed in the error message on failure
         :return: the value of the requested config option, if it exists
         :raises: ConfigOptionNotFoundError, if the requested config option doesn't exist
@@ -189,7 +194,13 @@ class ConfigLoader:
 
         if verify_type is not Any:
 
-            if not isinstance(entry, verify_type):
+            class TypeVerifier(BaseModel):
+                cfg_entry: verify_type
+
+            try:
+                TypeVerifier(cfg_entry=entry)
+            except ValidationError:
+
                 raise ConfigOptionVerificationError(
                     f"config entry '{key}' for module '{tool_name}' is of "
                     f"type '{str(type(entry))}' (expected '{str(verify_type)}')"
@@ -201,9 +212,18 @@ class ConfigLoader:
 
             if pattern.fullmatch(entry) is None:
                 raise ConfigOptionVerificationError(
-                    f"config entry '{key}' for module '{tool_name}' does not match the"
+                    f"config entry '{key}' for module '{tool_name}' does not match the "
                     f"provided regular expression: entry: '{entry}', "
                     f"regex: '{verify_regex}'"
+                )
+
+        if verify_choices is not None:
+
+            if entry not in verify_choices:
+                raise ConfigOptionVerificationError(
+                    f"value '{str(entry)}' of config entry '{key}' for "
+                    f"module '{tool_name}' is not contained in the specified list of "
+                    f"valid values: {str(verify_choices)}"
                 )
 
         return entry
@@ -214,6 +234,7 @@ class ConfigLoader:
         key: str,
         verify_type: Type = Any,
         verify_regex: Optional[str] = None,
+        verify_choices: Optional[Union[List[Any], Tuple[Any], Set[Any]]] = None,
     ) -> Any:
         """This method fetches the value of the config entry with the specified key for
         the specified tool or raises a ConfigOptionNotFoundError, if such an entry
@@ -229,6 +250,8 @@ class ConfigLoader:
                              match fully (otherwise ConfigOptionVerificationError is
                              raised)
                              Note: this overrides verify_type with 'AnyStr'
+        :param verify_choices: a list/tuple/set of valid values in which the config
+                               entry needs to be contained in order to be valid
         :return: the value of the requested config option, if it exists
         :raises: ConfigOptionNotFoundError, if the requested config option doesn't exist
         :raises: ConfigOptionVerificationError, if the requested config option does not
@@ -243,6 +266,7 @@ class ConfigLoader:
                 error_indicator="flag",
                 verify_type=verify_type,
                 verify_regex=verify_regex,
+                verify_choices=verify_choices,
             )
         except ConfigOptionNotFoundError:
             pass
@@ -253,6 +277,7 @@ class ConfigLoader:
             key,
             verify_type=verify_type,
             verify_regex=verify_regex,
+            verify_choices=verify_choices,
         )
 
     def get_config_option_or_default(
@@ -262,6 +287,7 @@ class ConfigLoader:
         default_value: Any,
         verify_type: Type = Any,
         verify_regex: Optional[str] = None,
+        verify_choices: Optional[Union[List[Any], Tuple[Any], Set[Any]]] = None,
     ) -> Any:
         """This method fetches the value of the config entry with the specified key for
         the specified tool or returns the specified default value, if such an entry
@@ -278,13 +304,19 @@ class ConfigLoader:
                              match fully (otherwise ConfigOptionVerificationError is
                              raised)
                              Note: this overrides verify_type with 'AnyStr'
+        :param verify_choices: a list/tuple/set of valid values in which the config
+                               entry needs to be contained in order to be valid
         :return: the value of the requested config option or default_value, if the
             config option doesn't exist
         """
 
         try:
             return self.get_config_option(
-                tool_name, key, verify_type=verify_type, verify_regex=verify_regex
+                tool_name,
+                key,
+                verify_type=verify_type,
+                verify_regex=verify_regex,
+                verify_choices=verify_choices,
             )
         except ConfigOptionError:
             return default_value
