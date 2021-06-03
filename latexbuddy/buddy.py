@@ -4,6 +4,7 @@ import json
 import os
 
 from pathlib import Path
+from typing import AnyStr
 
 import latexbuddy.tools as tools
 
@@ -34,7 +35,9 @@ class LatexBuddy:
 
         # file where the error should be saved
         self.output_dir = Path(
-            self.cfg.get_config_option_or_default("buddy", "output", Path("./"))
+            self.cfg.get_config_option_or_default(
+                "buddy", "output", Path("./"), verify_type=AnyStr
+            )
         )
 
         if not self.output_dir.is_dir():
@@ -45,20 +48,19 @@ class LatexBuddy:
             self.output_dir = Path.cwd()
 
         self.output_format = str(
-            self.cfg.get_config_option_or_default("buddy", "format", "HTML")
-        ).upper()
-
-        if self.output_format not in ["HTML", "JSON"]:
-            self.__logger.warning(
-                f"Unknown output format: {self.output_format}. "
-                "HTML will be used instead."
+            self.cfg.get_config_option_or_default(
+                "buddy",
+                "format",
+                "HTML",
+                verify_type=AnyStr,
+                verify_choices=["HTML", "html", "JSON", "json"],
             )
-            self.output_format = "HTML"
+        ).upper()
 
         # file that represents the whitelist
         # TODO: why a new file format? if it's JSON, use .json. If not, don't use one.
         self.whitelist_file = self.cfg.get_config_option_or_default(
-            "buddy", "whitelist", Path("whitelist.wlist")
+            "buddy", "whitelist", Path("whitelist.wlist"), verify_type=AnyStr
         )
 
     def add_error(self, error: Problem):
