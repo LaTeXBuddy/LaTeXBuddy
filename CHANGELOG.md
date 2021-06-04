@@ -25,11 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - better logging (!73)
   - clearer, colourful console output
   - file log containing more verbose information
+- verification options for config entries (!76)
 
 ### Changed
 
 - modules now adhere to the Abstract Module API (!22, !46)
 - errors renamed to problems and now use new API (!42, !46)
+- all modules that use the config now validate the config entries (!76)
 
 ### Fixed
 
