@@ -30,9 +30,8 @@
             {% for problem in problems %}
                 <li class="problem is-{{ problem.severity }}" >
 
-
+                    <button id="button{{ problem.uid }}" onclick=clicked("button{{ problem.uid }}")></button>
                     <h4 class="problem-context-monospaced">
-                        <button type="button" onclick=clicked("{{ problem.uid }}")>+</button>
                         {{ problem.context[0] }}
                         <span class="problem-text">{{ problem.text }}</span>
                         {{ problem.context[1] }}
@@ -73,7 +72,11 @@
 
 <script>
     function clicked(uid) {
-        alert(uid);
+        let button = document.getElementById(uid);
+        button.className = "onclic";
+        setTimeout(function() {
+
+        })
     }
 
 </script>
