@@ -30,9 +30,6 @@
             {% for problem in problems %}
                 <li class="problem is-{{ problem.severity }}" >
 
-                    <div class="button-div">
-
-                    </div>
 
                     <h4 class="problem-context monospaced">
                         {{ problem.context[0] }}
@@ -74,8 +71,8 @@
 </main>
 
 <script>
-    function click(uid) {
-
+    function clicked(uid) {
+        alert(uid);
     }
 </script>
 </body>

@@ -1,1 +1,7 @@
 
+.problem-context-monospaced button {
+    background: #fff;
+    outline-color: #fff;
+    border-color: #fff;
+    box-shadow: none;
+}
