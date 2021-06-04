@@ -30,23 +30,12 @@
             {% for problem in problems %}
                 <li class="problem is-{{ problem.severity }}" >
 
-                    <div onclick="dropdown()" class="dropdown">
+                    <div onclick="dropdown('{{ problem.uid }}')" class="dropdown">
                         <div id="{{ problem.uid }}" class="dropdown-content">
                             <a onclick="alert(1)">Add to whitelist</a>
                         </div>
                     </div>
-                    <script>
-                        function dropdown() {
-                            document.getElementById("{{ problem.uid }}").classList.toggle("show");
-                        }
-                        // Close the dropdown if the user clicks outside of it
-                        window.onclick = function(event) {
-                          if (!event.target.matches('.dropdown')) {
-                            document.getElementById("{{ problem.uid }}").classList.toggle('show');
-                          }
-                        }
-                    </script>
-                    <h4 class="problem-context monospaced">
+                    <h4 onclick="dropdown('{{ problem.uid }}')" class="problem-context monospaced">
                         {{ problem.context[0] }}
                         <span class="problem-text">{{ problem.text }}</span>
                         {{ problem.context[1] }}
@@ -84,5 +73,17 @@
         </ol>
     </section>
 </main>
+
+<script>
+    function dropdown(uid) {
+        document.getElementById(uid).classList.toggle("show");
+    }
+    // Close the dropdown if the user clicks outside of it
+    window.onclick = function(event) {
+      if (!event.target.matches('.dropdown')) {
+        document.getElementById("").classList.toggle('show');
+      }
+    }
+</script>
 </body>
 </html>
