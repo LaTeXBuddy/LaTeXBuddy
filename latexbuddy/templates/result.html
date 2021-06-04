@@ -63,9 +63,11 @@
                         {% endif %}
                         <i>({{ problem.checker }}#{{ problem.cid }})</i>
                     </p>
+
                     <div class="roboto-font">
-                        <button id="button{{ problem.uid }}" onclick=clicked("button{{ problem.uid }}")></button>
+                        <button id="button{{ problem.uid }}" onclick=clicked('button{{ problem.uid }}','{{ problem.text }}')></button>
                     </div>
+
                 </li>
             {% endfor %}
         </ol>
@@ -73,12 +75,13 @@
 </main>
 
 <script>
-    function clicked(uid) {
+    function clicked(uid, prob) {
         let button = document.getElementById(uid);
         if (button.className != "validate") {
             button.className = "onclic";
             setTimeout(function() {
                 button.className = "validate";
+                alert(prob);
             }, 2000);
         }
     }
