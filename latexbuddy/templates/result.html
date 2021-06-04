@@ -31,7 +31,8 @@
                 <li class="problem is-{{ problem.severity }}" >
 
 
-                    <h4 class="problem-context monospaced">
+                    <h4 class="problem-context-monospaced">
+                        <button type="button" onclick=clicked("{{ problem.uid }}")>+</button>
                         {{ problem.context[0] }}
                         <span class="problem-text">{{ problem.text }}</span>
                         {{ problem.context[1] }}
