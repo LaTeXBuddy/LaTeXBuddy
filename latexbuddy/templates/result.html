@@ -30,7 +30,6 @@
             {% for problem in problems %}
                 <li class="problem is-{{ problem.severity }}" >
 
-                    <button id="button{{ problem.uid }}" onclick=clicked("button{{ problem.uid }}")></button>
                     <h4 class="problem-context-monospaced">
                         {{ problem.context[0] }}
                         <span class="problem-text">{{ problem.text }}</span>
@@ -64,6 +63,9 @@
                         {% endif %}
                         <i>({{ problem.checker }}#{{ problem.cid }})</i>
                     </p>
+                    <div class="roboto-font">
+                        <button id="button{{ problem.uid }}" onclick=clicked("button{{ problem.uid }}")></button>
+                    </div>
                 </li>
             {% endfor %}
         </ol>
@@ -73,10 +75,12 @@
 <script>
     function clicked(uid) {
         let button = document.getElementById(uid);
-        button.className = "onclic";
-        setTimeout(function() {
-
-        })
+        if (button.className != "validate") {
+            button.className = "onclic";
+            setTimeout(function() {
+                button.className = "validate";
+            }, 2000);
+        }
     }
 
 </script>

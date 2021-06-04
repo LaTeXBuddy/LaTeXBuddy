@@ -1,15 +1,15 @@
-* {
+.roboto-font {
 	 font-family: 'Roboto', sans-serif;
 }
  button {
 	 outline: none;
-	 height: 40px;
+	 height: 30px;
 	 text-align: center;
-	 width: 130px;
+	 width: 30px;
 	 border-radius: 40px;
 	 background: #fff;
-	 border: 2px solid #1ecd97;
-	 color: #1ecd97;
+	 border: 2px solid #009694;
+	 color: #009694;
 	 letter-spacing: 1px;
 	 text-shadow: 0;
 	 font-size: 12px;
@@ -19,36 +19,35 @@
 }
  button:hover {
 	 color: white;
-	 background: #1ecd97;
+	 background: #009694;
 }
  button:active {
 	 letter-spacing: 2px;
 }
  button:after {
-	 content: "x";
+	 content: "w";
 }
  .onclic {
-	 width: 40px;
 	 border-color: #bbb;
 	 border-width: 3px;
 	 font-size: 0;
-	 border-left-color: #1ecd97;
-	 animation: rotating 2s 0.25s linear infinite;
+	 border-left-color: #009694;
+	 animation: rotating .5s 0.125s linear infinite;
 }
  .onclic:after {
 	 content: "";
 }
  .onclic:hover {
-	 background: #1ecd97;
+	 background: #009694;
 	 background: white;
 }
  .validate {
 	 font-size: 13px;
 	 color: white;
-	 background: #1ecd97;
+	 background: #009694;
 }
  .validate:after {
-	 font-family: 'FontAwesome';
+     font-family:'FontAwesome';
 	 content: "\f00c";
 }
  @keyframes rotating {
