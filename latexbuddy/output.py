@@ -1,7 +1,8 @@
 from copy import deepcopy
-from html import escape
+from html import escape, unescape
 from operator import attrgetter
 from typing import Dict, List
+from bs4 import BeautifulSoup
 
 from jinja2 import Environment, PackageLoader
 
@@ -39,12 +40,21 @@ def render_html(file_name: str, file_text: str, problems: Dict[str, Problem]) ->
     """
     problem_values = sorted(problems.values(), key=problem_key)
     template = env.get_template("result.html")
-    higlighted_tex = highlight(file_text, problem_values)
-    return template.render(
+    html = template.render(
         file_name=file_name,
-        file_text=higlighted_tex,
+        file_text=file_text,
         problems=problem_values,
     )
+    soup = BeautifulSoup(html, "html.parser")
+    new_code = soup.new_tag("code")
+
+    highlighted_tex = highlight(file_text, problem_values)
+
+    new_code.string = unescape(highlighted_tex)
+    soup.find("section", id="file-contents").pre.code.replace_with(new_code)
+    new_soup = BeautifulSoup(unescape(str(soup)), "html.parser")
+
+    return unescape(str(new_soup))
 
 
 class Interval:

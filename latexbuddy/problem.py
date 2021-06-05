@@ -9,6 +9,7 @@ from functools import total_ordering
 from json import JSONEncoder
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
+import html
 
 
 @total_ordering
@@ -93,7 +94,7 @@ class Problem:
         if length is None:
             length = 0
         self.length = length
-        self.text = text
+        self.text = html.escape(text)
         self.checker = checker
         self.cid = cid
         self.file = file  # FIXME: deprecated!
@@ -102,7 +103,7 @@ class Problem:
         self.description = description
         if context is None:
             context = ("", "")
-        self.context = context
+        self.context = (html.escape(context[0]), html.escape(context[1]))
         if suggestions is None:
             suggestions = []
         self.suggestions = suggestions
