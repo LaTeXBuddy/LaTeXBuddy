@@ -63,15 +63,23 @@ class Preprocessor:
 
             if len(args) < 1:
 
-                Preprocessor.__logger.debug(f"Created LineProblemFilter from line {line + 1} to {line + 1}")
+                Preprocessor.__logger.debug(
+                    f"Created LineProblemFilter from line {line + 1} to {line + 1}"
+                )
                 return LineProblemFilter(line + 1, line + 1)
 
             elif len(args) == 1 and not args[0].isnumeric() and args[0] == "line":
 
-                Preprocessor.__logger.debug(f"Created LineProblemFilter from line {line + 1} to {line + 1}")
+                Preprocessor.__logger.debug(
+                    f"Created LineProblemFilter from line {line + 1} to {line + 1}"
+                )
                 return LineProblemFilter(line + 1, line + 1)
 
-            elif len(args) == 2 and args[0].isnumeric() and (args[1] == "line" or args[1] == "lines"):
+            elif (
+                len(args) == 2
+                and args[0].isnumeric()
+                and (args[1] == "line" or args[1] == "lines")
+            ):
 
                 Preprocessor.__logger.debug(
                     f"Created LineProblemFilter from line {line + 1} to {line + int(args[0])}"
@@ -111,7 +119,9 @@ class Preprocessor:
 
                     for module in args:
 
-                        open_ended_filter = self.__get_open_ended_filter(ModuleProblemFilter(module, 0))
+                        open_ended_filter = self.__get_open_ended_filter(
+                            ModuleProblemFilter(module, 0)
+                        )
 
                         if open_ended_filter is not None:
                             return None
@@ -153,7 +163,9 @@ class Preprocessor:
         else:
             return None
 
-    def __get_open_ended_filter(self, reference_filter: ProblemFilter) -> Optional[ProblemFilter]:
+    def __get_open_ended_filter(
+        self, reference_filter: ProblemFilter
+    ) -> Optional[ProblemFilter]:
 
         for f in self.filters:
             if f.end_line is None and f.custom_parameters_equal(reference_filter):
@@ -228,7 +240,9 @@ class ModuleProblemFilter(ProblemFilter):
 
     def custom_parameters_equal(self, other: ProblemFilter) -> bool:
 
-        return type(other) == ModuleProblemFilter and other.module_name == self.module_name
+        return (
+            type(other) == ModuleProblemFilter and other.module_name == self.module_name
+        )
 
 
 class SeverityProblemFilter(ProblemFilter):
