@@ -33,22 +33,56 @@ class ProblemFilter(ABC):
 
 
 class Preprocessor:
+
+    __COMMAND_PATTERN = re.compile(
+        r"%(\s?)buddy (ignore-next|begin-ignore|end-ignore)( (\S+))*"
+    )
+
     def __init__(self):
         self.filters: List[ProblemFilter] = []
 
-    command_pattern = re.compile(
-        "%(\\s?)buddy\\s(ignore-next|begin-ignore|end-ignore)(\\s(\\S)+)*(\\s*)"
-    )
-
     def parse_preprocessor_comments(self, file: TexFile):
 
-        line_num = 1
+        line_num = 0  # lines are 1-based
         for line in file.tex.splitlines():
 
-            if Preprocessor.command_pattern.match(line):
-                pass
+            line_num += 1  # lines are 1-based
 
-            line_num += 1
+            if Preprocessor.__COMMAND_PATTERN.match(line):
+
+                args = re.sub(r"%(\s?)buddy ", "", line).split(" ")
+
+                resulting_filter = self.__parse_cmd_args_to_filter(args, line_num)
+
+                if resulting_filter is None:
+                    continue
+
+                self.filters.append(resulting_filter)
+
+    @staticmethod
+    def __parse_cmd_args_to_filter(
+        args: List[str], line: int
+    ) -> Optional[ProblemFilter]:
+
+        if len(args) < 1:
+            return None
+
+        command = args.pop()
+
+        if command == "ignore-next":
+
+            return None
+
+        elif command == "begin-ignore":
+
+            return None
+
+        elif command == "end-ignore":
+
+            return None
+
+        else:
+            return None
 
     def matches_preprocessor_filter(self, problem: Problem) -> bool:
 
