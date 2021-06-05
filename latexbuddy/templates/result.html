@@ -76,31 +76,37 @@
 <!--Popup section-->
 <div id="popup" class="popup">
     <div class="popup-content">
+        <h3>Hello</h3>
         <span class="close">&times;</span>
-        <p>Some text in the Modal..</p>
     </div>
 </div>
 <script>
-    function clicked(uid, prob) {
+    function clicked(uid, problem_key) {
         let button = document.getElementById(uid);
         if (button.className != "validate") {
             button.className = "onclic";
             setTimeout(function() {
                 button.className = "validate";
-                showMessage();
-            }, 2000);
+                showMessage(problem_key); //show Popup
+            }, 500);
         } else {
             //showMessage(); //alert second time
         }
     }
-    //Button
+    //get popup content
     var popup = document.getElementById("popup");
     var span = document.getElementsByClassName("close")[0];
-    function showMessage() {
-        popup.style.display = "block";
+    var popupcontent = document.getElementsByClassName("popup-content")[0];
+    function showMessage(problem_key) {
+        var p = document.createElement("p"); //paragraph
+        var text = document.createTextNode(problem_key);
+        p.appendChild(text);
+        popupcontent.appendChild(p);
+        popup.style.display = "block"; //show popup
     }
     span.onclick = function() {
-        popup.style.display = "none";
+        popupcontent.removeChild(popupcontent.lastChild); //remove last child: aka text node
+        popup.style.display = "none"; //hide popup
     }
 </script>
 </body>

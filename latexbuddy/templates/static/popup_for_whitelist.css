@@ -3,7 +3,7 @@
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
+  padding-top: 400px; /* Location of the box */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -15,24 +15,25 @@
 
 /* Modal Content */
 .popup-content {
+  border-radius: 5px 5px 5px 5px;
   background-color: #fefefe;
   margin: auto;
   padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
+  border: 2px solid #888;
+  width: 50%;
 }
 
 /* The Close Button */
 .close {
   color: #aaaaaa;
   float: right;
-  font-size: 28px;
+  font-size: 40px;
   font-weight: bold;
 }
 
 .close:hover,
 .close:focus {
-  color: #ff0000;
+  color: #f86a6a;
   text-decoration: none;
   cursor: pointer;
 }
