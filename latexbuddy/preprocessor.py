@@ -41,7 +41,11 @@ class LineProblemFilter(ProblemFilter):
         super().__init__(start_line, end_line)
 
     def match(self, problem: Problem) -> bool:
-        return self.start_line <= problem.position[0] <= self.end_line
+
+        if self.end_line is None:
+            return self.start_line <= problem.position[0]
+        else:
+            return self.start_line <= problem.position[0] <= self.end_line
 
 
 class ModuleProblemFilter(ProblemFilter):
