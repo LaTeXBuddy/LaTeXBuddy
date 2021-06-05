@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - modules now adhere to the Abstract Module API (!22, !46)
 - errors renamed to problems and now use new API (!42, !46)
 - removed test_module.py (!77)
+- improved spacing and sizing of the logo (!82)
 
 ### Fixed
 
