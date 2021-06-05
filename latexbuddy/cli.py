@@ -12,14 +12,19 @@ from colorama import Fore
 
 from latexbuddy import __app_name__
 from latexbuddy import __logger as root_logger
+from latexbuddy import __name__ as name
 from latexbuddy import __version__
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
 
 
-parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
-
+parser = argparse.ArgumentParser(
+    prog=name, description="The one-stop-shop for LaTeX checking."
+)
+parser.add_argument(
+    "--version", "-V", action="version", version=f"{__app_name__} v{__version__}"
+)
 parser.add_argument("file", type=Path, help="File that will be processed.")
 parser.add_argument(
     "--config",
