@@ -17,7 +17,6 @@ class Preprocessor:
 
 
 class ProblemFilter(ABC):
-
     def __init__(self, start_line: int, end_line: Optional[int] = None):
         self.start_line = start_line
         self.end_line = end_line
@@ -43,7 +42,6 @@ class ProblemFilter(ABC):
 
 
 class LineProblemFilter(ProblemFilter):
-
     def __init__(self, start_line: int, end_line: Optional[int] = None):
         super().__init__(start_line, end_line)
 
@@ -53,8 +51,9 @@ class LineProblemFilter(ProblemFilter):
 
 
 class ModuleProblemFilter(ProblemFilter):
-
-    def __init__(self, module_name: str, start_line: int, end_line: Optional[int] = None):
+    def __init__(
+        self, module_name: str, start_line: int, end_line: Optional[int] = None
+    ):
         super().__init__(start_line, end_line)
 
         self.module_name = module_name
@@ -65,8 +64,9 @@ class ModuleProblemFilter(ProblemFilter):
 
 
 class SeverityProblemFilter(ProblemFilter):
-
-    def __init__(self, severity: ProblemSeverity, start_line: int, end_line: Optional[int] = None):
+    def __init__(
+        self, severity: ProblemSeverity, start_line: int, end_line: Optional[int] = None
+    ):
         super().__init__(start_line, end_line)
         self.severity = severity
 
@@ -76,7 +76,6 @@ class SeverityProblemFilter(ProblemFilter):
 
 
 class WhitelistKeyProblemFilter(ProblemFilter):
-
     def __init__(self, wl_key: str, start_line: int, end_line: Optional[int] = None):
         super().__init__(start_line, end_line)
         self.wl_key = wl_key
