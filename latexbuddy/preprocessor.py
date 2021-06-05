@@ -60,7 +60,8 @@ class ModuleProblemFilter(ProblemFilter):
         self.module_name = module_name
 
     def match(self, problem: Problem) -> bool:
-        pass
+
+        return self.__match_line(problem) and problem.checker == self.module_name
 
 
 class SeverityProblemFilter(ProblemFilter):
