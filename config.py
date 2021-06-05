@@ -12,7 +12,7 @@ modules = {
         "enable-modules-by-default": True,
     },
     "LanguageTool": {
-        "enabled": False,
+        "enabled": True,
         "mode": "COMMANDLINE",
         # "remote_url": "https://api.languagetoolplus.com/v2/check",
         "disabled-rules": [
