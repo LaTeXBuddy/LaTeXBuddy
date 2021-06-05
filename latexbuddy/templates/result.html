@@ -10,6 +10,7 @@
         {% include "static/modern-normalize.css" %}
         {% include "static/style.css" %}
         {% include "static/whitelist_button.css" %}
+        {% include "static/popup_for_whitelist.css" %}
     </style>
 </head>
 <body>
@@ -63,17 +64,22 @@
                         {% endif %}
                         <i>({{ problem.checker }}#{{ problem.cid }})</i>
                     </p>
-
+                    <!--Button section-->
                     <div class="roboto-font">
                         <button id="button{{ problem.uid }}" onclick=clicked('button{{ problem.uid }}','{{ problem.key }}')></button>
                     </div>
-
                 </li>
             {% endfor %}
         </ol>
     </section>
 </main>
-
+<!--Popup section-->
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <span class="close">&times;</span>
+        <p>Some text in the Modal..</p>
+    </div>
+</div>
 <script>
     function clicked(uid, prob) {
         let button = document.getElementById(uid);
@@ -81,13 +87,21 @@
             button.className = "onclic";
             setTimeout(function() {
                 button.className = "validate";
-                alert(prob);
+                showMessage();
             }, 2000);
         } else {
-            alert(prob);
+            //showMessage(); //alert second time
         }
     }
-
+    //Button
+    var popup = document.getElementById("popup");
+    var span = document.getElementsByClassName("close")[0];
+    function showMessage() {
+        popup.style.display = "block";
+    }
+    span.onclick = function() {
+        popup.style.display = "none";
+    }
 </script>
 </body>
 </html>
