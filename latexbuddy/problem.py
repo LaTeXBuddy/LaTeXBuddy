@@ -4,12 +4,13 @@
 types, however LaTeXBuddy will most probably not display extra metadata.
 """
 
+import time
+
 from enum import Enum
 from functools import total_ordering
 from json import JSONEncoder
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
-import time
 
 
 @total_ordering
