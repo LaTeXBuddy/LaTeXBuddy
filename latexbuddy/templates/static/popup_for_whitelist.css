@@ -33,7 +33,7 @@
 /* The Close Button */
 .close {
   color: #aaaaaa;
-  font-size: 35px;
+  font-size: 55px;
   font-weight: bold;
   float: right;
 }
@@ -41,6 +41,21 @@
 .close:hover,
 .close:focus {
   color: #f86a6a;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* The Accept Button */
+.accept {
+  color: #aaaaaa;
+  font-size: 55px;
+  font-weight: bold;
+  float: right;
+}
+
+.accept:hover,
+.accept:focus {
+  color: #7ff86a;
   text-decoration: none;
   cursor: pointer;
 }

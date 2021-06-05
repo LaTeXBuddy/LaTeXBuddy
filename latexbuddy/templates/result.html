@@ -66,7 +66,7 @@
                     </p>
                     <!--Button section-->
                     <div class="roboto-font">
-                        <button id="button{{ problem.uid }}" onclick=clicked('button{{ problem.uid }}','{{ problem.key }}')></button>
+                        <button class="but" id="button{{ problem.uid }}" onclick=clicked('button{{ problem.uid }}','{{ problem.key }}')></button>
                     </div>
                 </li>
             {% endfor %}
@@ -76,8 +76,10 @@
 <!--Popup section-->
 <div id="popup" class="popup">
     <div class="popup-content">
+        <!---->
         <a class="close">&times;</a>
-        <h2 class="text">Add this to you'r Whitelist:</h2>
+        <a class="accept">&check;</a>
+        <h2 class="text">Add this to your Whitelist:</h2>
         <div class="header-box">
             <h3 class="logo">{% include "static/logomark.svg" %}</h3>
         </div>
@@ -85,22 +87,18 @@
     </div>
 </div>
 <script>
+    var uid;
     function clicked(uid, problem_key) {
         let button = document.getElementById(uid);
-        if (button.className != "validate") {
-            button.className = "onclic";
-            setTimeout(function() {
-                button.className = "validate";
-                showMessage(problem_key); //call Popup
-            }, 500);
-        } else {
-            showMessage(problem_key); //call again!
-        }
+        button.className = "onclic"; //activate rotation
+        setUID(uid);
+        showMessage(problem_key); //call Popup
     }
-    //TODO: passe den button so an, dass er das Häkchen nur zeigt wenn akzeptiert wurde
+    function setUID(uid) {
+        this.uid = uid;
+    }
     //for the Popup
     var popup = document.getElementById("popup");
-    var span = document.getElementsByClassName("close")[0];
     var popupcontent = document.getElementsByClassName("popup-content")[0];
     function showMessage(problem_key) {
         var p = document.createElement("p"); //paragraph
@@ -109,9 +107,17 @@
         popupcontent.appendChild(p);
         popup.style.display = "block"; //show popup
     }
-    span.onclick = function() {
+    document.getElementsByClassName("close")[0].onclick = function() {
         popupcontent.removeChild(popupcontent.lastChild); //remove last child: aka text node
         popup.style.display = "none"; //hide popup
+        let button = document.getElementById(uid);
+        button.className = "button";
+    }
+    document.getElementsByClassName("accept")[0].onclick = function() {
+        popupcontent.removeChild(popupcontent.lastChild); //remove last child: aka text node
+        popup.style.display = "none"; //hide popup
+        let button = document.getElementById(uid);
+        button.className = "validate";
     }
 </script>
 </body>
