@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - better logging (!73)
   - clearer, colourful console output
   - file log containing more verbose information
+- `--version`/`-v` option to the CLI (!83)
 
 ### Changed
 
