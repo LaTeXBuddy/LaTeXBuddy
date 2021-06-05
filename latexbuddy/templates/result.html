@@ -76,8 +76,12 @@
 <!--Popup section-->
 <div id="popup" class="popup">
     <div class="popup-content">
-        <h3>Hello</h3>
-        <span class="close">&times;</span>
+        <a class="close">&times;</a>
+        <div class="header-box">
+            <h3 class="logo">{% include "static/logomark.svg" %}</h3>
+            <h3 class="text">Add this to Whitelist:</h3>
+        </div>
+        <!--Text-->
     </div>
 </div>
 <script>
@@ -87,13 +91,14 @@
             button.className = "onclic";
             setTimeout(function() {
                 button.className = "validate";
-                showMessage(problem_key); //show Popup
+                showMessage(problem_key); //call Popup
             }, 500);
         } else {
-            //showMessage(); //alert second time
+            //TODO: Call again!
         }
     }
-    //get popup content
+
+    //for the Popup
     var popup = document.getElementById("popup");
     var span = document.getElementsByClassName("close")[0];
     var popupcontent = document.getElementsByClassName("popup-content")[0];
