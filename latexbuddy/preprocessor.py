@@ -71,7 +71,8 @@ class SeverityProblemFilter(ProblemFilter):
         self.severity = severity
 
     def match(self, problem: Problem) -> bool:
-        pass
+
+        return self.__match_line(problem) and problem.severity == self.severity
 
 
 class WhitelistKeyProblemFilter(ProblemFilter):
