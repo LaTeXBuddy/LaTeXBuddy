@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- button, to add to whitelist (!87)
 - configuration files (!30)
 - abstraction around the checked file using `TexFile` class (!45, !46)
 - tool loader (!47)
