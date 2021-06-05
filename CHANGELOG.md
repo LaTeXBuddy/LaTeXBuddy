@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - HTML output not working properly with new APIs (!56)
 - ChkTeX working incorrectly with text containing `:` (!70)
 - Minor inconsistency in typing for Problem constructor's parameters (!75)
+- unwanted spaces arounf problem text in HTML output (!80)
 
 ## [0.1.0] - 18 May 2021
 
