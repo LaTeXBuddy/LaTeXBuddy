@@ -48,16 +48,16 @@ class Preprocessor:
 
             line_num += 1  # lines are 1-based
 
-            if Preprocessor.__COMMAND_PATTERN.match(line):
+            if not Preprocessor.__COMMAND_PATTERN.match(line):
+                continue
 
-                args = re.sub(r"%(\s?)buddy ", "", line).split(" ")
+            args = re.sub(r"%(\s?)buddy ", "", line).split(" ")
+            resulting_filter = self.__parse_cmd_args_to_filter(args, line_num)
 
-                resulting_filter = self.__parse_cmd_args_to_filter(args, line_num)
+            if resulting_filter is None:
+                continue
 
-                if resulting_filter is None:
-                    continue
-
-                self.filters.append(resulting_filter)
+            self.filters.append(resulting_filter)
 
     @staticmethod
     def __parse_cmd_args_to_filter(
