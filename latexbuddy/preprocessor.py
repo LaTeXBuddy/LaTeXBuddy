@@ -30,6 +30,13 @@ class ProblemFilter(ABC):
         else:
             return False
 
+    def __match_line(self, problem: Problem) -> bool:
+
+        if self.end_line is None:
+            return self.start_line <= problem.position[0]
+        else:
+            return self.start_line <= problem.position[0] <= self.end_line
+
     @abstractmethod
     def match(self, problem: Problem) -> bool:
         pass
@@ -42,10 +49,7 @@ class LineProblemFilter(ProblemFilter):
 
     def match(self, problem: Problem) -> bool:
 
-        if self.end_line is None:
-            return self.start_line <= problem.position[0]
-        else:
-            return self.start_line <= problem.position[0] <= self.end_line
+        return self.__match_line(problem)
 
 
 class ModuleProblemFilter(ProblemFilter):
