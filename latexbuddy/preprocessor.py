@@ -6,14 +6,22 @@ from latexbuddy.problem import Problem, ProblemSeverity
 
 
 class Preprocessor:
+
     def __init__(self):
-        pass
+        self.filters: List[ProblemFilter] = []
 
     def parse_preprocessor_comments(self, file: TexFile):
         pass
 
     def apply_preprocessor_filter(self, problems: List[Problem]) -> List[Problem]:
-        pass
+
+        def filter_function(prob: Problem):
+            for f in self.filters:
+                if f.match(prob):
+                    return False
+            return True
+
+        return list(filter(filter_function, problems))
 
 
 class ProblemFilter(ABC):
@@ -55,7 +63,6 @@ class ModuleProblemFilter(ProblemFilter):
         self, module_name: str, start_line: int, end_line: Optional[int] = None
     ):
         super().__init__(start_line, end_line)
-
         self.module_name = module_name
 
     def match(self, problem: Problem) -> bool:
