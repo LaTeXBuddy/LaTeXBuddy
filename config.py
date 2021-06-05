@@ -31,5 +31,8 @@ modules = {
     },
     "ProseLintModule": {
         "enabled": True
-    }
+    },
+    "YaLafi": {
+        "enabled": True
+    },
 }
