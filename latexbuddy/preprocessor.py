@@ -7,6 +7,31 @@ from latexbuddy import TexFile
 from latexbuddy.problem import Problem, ProblemSeverity
 
 
+class ProblemFilter(ABC):
+    def __init__(self, start_line: int, end_line: Optional[int] = None):
+        self.start_line = start_line
+        self.end_line = end_line
+
+    def end(self, end_line: int) -> bool:
+
+        if self.end_line is None:
+            self.end_line = end_line
+            return True
+        else:
+            return False
+
+    def __match_line(self, problem: Problem) -> bool:
+
+        if self.end_line is None:
+            return self.start_line <= problem.position[0]
+        else:
+            return self.start_line <= problem.position[0] <= self.end_line
+
+    @abstractmethod
+    def match(self, problem: Problem) -> bool:
+        pass
+
+
 class Preprocessor:
     def __init__(self):
         self.filters: List[ProblemFilter] = []
@@ -35,31 +60,6 @@ class Preprocessor:
     def apply_preprocessor_filter(self, problems: List[Problem]) -> List[Problem]:
 
         return list(filter(self.matches_preprocessor_filter, problems))
-
-
-class ProblemFilter(ABC):
-    def __init__(self, start_line: int, end_line: Optional[int] = None):
-        self.start_line = start_line
-        self.end_line = end_line
-
-    def end(self, end_line: int) -> bool:
-
-        if self.end_line is None:
-            self.end_line = end_line
-            return True
-        else:
-            return False
-
-    def __match_line(self, problem: Problem) -> bool:
-
-        if self.end_line is None:
-            return self.start_line <= problem.position[0]
-        else:
-            return self.start_line <= problem.position[0] <= self.end_line
-
-    @abstractmethod
-    def match(self, problem: Problem) -> bool:
-        pass
 
 
 class LineProblemFilter(ProblemFilter):
