@@ -17,11 +17,71 @@ class Preprocessor:
     __logger = root_logger.getChild("Preprocessor")
 
     __COMMAND_PATTERN = re.compile(
-        r"%(\s?)buddy (ignore-next|begin-ignore|end-ignore)( (\S+))*"
+        r"%\s?buddy (ignore-next|begin-ignore|end-ignore)( (\S+))*"
     )
+
+    __COMMAND_PATTERN_IGNORE_NEXT_ONE_LINE = re.compile(
+        r"%\s?buddy ignore-next(?:(?: 1)? line)?"
+    )
+    __COMMAND_PATTERN_IGNORE_NEXT_N_LINES = re.compile(
+        r"%\s?buddy ignore-next (\d+) lines"
+    )
+
+    __COMMAND_PATTERN_BEGIN_IGNORE_ANYTHING = re.compile(r"%\s?buddy begin-ignore")
+    __COMMAND_PATTERN_BEGIN_IGNORE_MODULES = re.compile(
+        r"%\s?buddy begin-ignore (?:module|modules)((?: \S+)+)"
+    )
+    # to be continued
 
     def __init__(self):
         self.filters: List[ProblemFilter] = []
+
+    def regex_parse_preprocessor_comments(self, file: TexFile):
+
+        line_num = 0  # lines are 1-based
+        for line in file.tex.splitlines():
+
+            line_num += 1  # lines are 1-based
+
+            if not Preprocessor.__COMMAND_PATTERN.fullmatch(line):
+                continue
+
+            resulting_filter = self.__regex_parse_cmd_args_to_filter(line, line_num)
+
+            if resulting_filter is not None:
+                self.filters.append(resulting_filter)
+
+    def __regex_parse_cmd_args_to_filter(
+        self, line: str, line_num: int
+    ) -> Optional[ProblemFilter]:
+
+        match = Preprocessor.__COMMAND_PATTERN_IGNORE_NEXT_ONE_LINE.fullmatch(line)
+        if match is not None:
+            print(f"line '{line}' filters the next line ({line_num + 1})")
+
+        match = Preprocessor.__COMMAND_PATTERN_IGNORE_NEXT_N_LINES.fullmatch(line)
+        if match is not None:
+            n = int(match.group(1))
+            print(
+                f"line '{line}' filters the next {n} lines ({line_num + 1} - {line_num + n})"
+            )
+
+        match = Preprocessor.__COMMAND_PATTERN_BEGIN_IGNORE_ANYTHING.fullmatch(line)
+        if match is not None:
+            print(
+                f"line '{line}' ignores anything in all lines starting from {line_num + 1}"
+            )
+
+        match = Preprocessor.__COMMAND_PATTERN_BEGIN_IGNORE_MODULES.fullmatch(line)
+        if match is not None:
+            modules = match.group(1).strip().split(" ")
+            print(
+                f"line '{line}' ignores module(s) '{modules}' in all lines starting from {line_num + 1}"
+            )
+
+        # to be continued
+
+        return None
 
     def parse_preprocessor_comments(self, file: TexFile):
 

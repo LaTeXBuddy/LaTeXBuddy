@@ -133,7 +133,7 @@ class LatexBuddy:
 
         # check_preprocessor
         self.preprocessor = Preprocessor()
-        self.preprocessor.parse_preprocessor_comments(self.tex_file)
+        self.preprocessor.regex_parse_preprocessor_comments(self.tex_file)
 
         # TODO: extract this into a new buddy-module (or at least a new method)
         if self.tex_file.is_faulty:
