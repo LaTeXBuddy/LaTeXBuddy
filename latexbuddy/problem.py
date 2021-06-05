@@ -67,7 +67,7 @@ class Problem:
         category: Optional[str] = None,
         description: Optional[str] = None,
         context: Optional[Tuple[str, str]] = None,
-        suggestions: List[str] = None,
+        suggestions: Optional[List[str]] = None,
         key: Optional[str] = None,
     ):
         """

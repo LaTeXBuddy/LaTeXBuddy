@@ -32,12 +32,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - modules now adhere to the Abstract Module API (!22, !46)
 - errors renamed to problems and now use new API (!42, !46)
 - all modules that use the config now validate the config entries (!76)
+- removed test_module.py (!77)
 
 ### Fixed
 
 - Aspell positions of problems in source file (!53, !55)
 - HTML output not working properly with new APIs (!56)
 - ChkTeX working incorrectly with text containing `:` (!70)
+- Minor inconsistency in typing for Problem constructor's parameters (!75)
 
 ## [0.1.0] - 18 May 2021
 
