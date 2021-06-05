@@ -76,7 +76,7 @@
 <!--Popup section-->
 <div id="popup" class="popup">
     <div class="popup-content">
-        <!---->
+        <!--Buttons for accepting or rejecting-->
         <a class="close">&times;</a>
         <a class="accept">&check;</a>
         <h2 class="text">Add this to your Whitelist:</h2>
@@ -91,33 +91,36 @@
     function clicked(uid, problem_key) {
         let button = document.getElementById(uid);
         button.className = "onclic"; //activate rotation
-        setUID(uid);
+        setUID(uid); //set uid to a global param to have access to it later on
         showMessage(problem_key); //call Popup
     }
     function setUID(uid) {
         this.uid = uid;
     }
-    //for the Popup
+    //gets the popup vars
     var popup = document.getElementById("popup");
     var popupcontent = document.getElementsByClassName("popup-content")[0];
+    //appends the problem key to the popup and show it
     function showMessage(problem_key) {
-        var p = document.createElement("p"); //paragraph
-        var text = document.createTextNode(problem_key);
+        let p = document.createElement("p"); //paragraph
+        let text = document.createTextNode(problem_key);
         p.appendChild(text);
         popupcontent.appendChild(p);
         popup.style.display = "block"; //show popup
     }
+    //by clicking on the "close" button, remove the problem key and set the button back to "+" state
     document.getElementsByClassName("close")[0].onclick = function() {
         popupcontent.removeChild(popupcontent.lastChild); //remove last child: aka text node
         popup.style.display = "none"; //hide popup
         let button = document.getElementById(uid);
-        button.className = "button";
+        button.className = "button"; //normal button state
     }
+    //by clicking on the "accept" button, remove the problem key and set the button to "accepted"
     document.getElementsByClassName("accept")[0].onclick = function() {
         popupcontent.removeChild(popupcontent.lastChild); //remove last child: aka text node
         popup.style.display = "none"; //hide popup
         let button = document.getElementById(uid);
-        button.className = "validate";
+        button.className = "validate"; //button state "accepted"
     }
 </script>
 </body>
