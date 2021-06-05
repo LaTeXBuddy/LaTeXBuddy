@@ -81,7 +81,7 @@
         <div class="header-box">
             <h3 class="logo">{% include "static/logomark.svg" %}</h3>
         </div>
-        <!--Text-->
+        <!--Text, inserted by JS-->
     </div>
 </div>
 <script>
@@ -97,7 +97,7 @@
             showMessage(problem_key); //call again!
         }
     }
-
+    //TODO: passe den button so an, dass er das Häkchen nur zeigt wenn akzeptiert wurde
     //for the Popup
     var popup = document.getElementById("popup");
     var span = document.getElementsByClassName("close")[0];

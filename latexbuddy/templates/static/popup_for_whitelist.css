@@ -24,6 +24,7 @@
   width: 50%;
 }
 
+/* some padding for the text */
 .popup-content p {
   padding-top: 30px;
   padding-left: 55px;
@@ -44,6 +45,7 @@
   cursor: pointer;
 }
 
+/* contains the subheader (logo)  */
 .header-box {
     float: left;
 }
