@@ -82,7 +82,8 @@ class WhitelistKeyProblemFilter(ProblemFilter):
         self.wl_key = wl_key
 
     def match(self, problem: Problem) -> bool:
-        pass
+
+        return self.__match_line(problem) and problem.key == self.wl_key
 
 
 # % buddy ignore-next [[1] line | <N> lines]
