@@ -1,3 +1,4 @@
+import re
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
@@ -9,8 +10,19 @@ class Preprocessor:
     def __init__(self):
         self.filters: List[ProblemFilter] = []
 
+    command_pattern = re.compile(
+        "%(\\s?)buddy\\s(ignore-next|begin-ignore|end-ignore)(\\s(\\S)+)*(\\s*)"
+    )
+
     def parse_preprocessor_comments(self, file: TexFile):
-        pass
+
+        line_num = 1
+        for line in file.tex.splitlines():
+
+            if Preprocessor.command_pattern.match(line):
+                pass
+
+            line_num += 1
 
     def apply_preprocessor_filter(self, problems: List[Problem]) -> List[Problem]:
         def filter_function(prob: Problem):
