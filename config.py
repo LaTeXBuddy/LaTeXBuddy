@@ -47,7 +47,4 @@ modules = {
     "UnreferencedFiguresModule": {
         "enabled": True,
     },
-    "TestModule": {
-        "enabled": False,
-    }
 }
