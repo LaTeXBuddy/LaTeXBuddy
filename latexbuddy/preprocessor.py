@@ -51,12 +51,6 @@ class Preprocessor:
 
         command = args.pop(0)
 
-        # % buddy begin-ignore [module[s] <module_class_name> [module_class_name ...] | severet[y|ies] <severity-level> [severity-level ...] | whitelist-key[s] <key> [key ...]]
-        #   -> begins ignoring all problems (of a given module, severity level or with a given whitelist key)
-
-        # % buddy end-ignore [module[s] <module_name> [module_name ...] | severet[y|ies] <severity-level> [severity-level ...] | whitelist-key[s] <key> [key ...]]
-        #   -> ends ignoring all problems (of a given module, severity level or with a given whitelist key)
-
         if command == "ignore-next":
             # Syntax:
             # % buddy ignore-next [[1] line | <N> lines]
@@ -157,6 +151,12 @@ class Preprocessor:
                 return None
 
         elif command == "end-ignore":
+            # Syntax:
+            # % buddy end-ignore [
+            #       module[s] <module_class_name> [module_class_name ...] |
+            #       severit[y|ies] <severity-level> [severity-level ...] |
+            #       whitelist-key[s] <key> [key ...]
+            #   ]
 
             return None
 
