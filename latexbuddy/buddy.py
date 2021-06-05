@@ -71,7 +71,7 @@ class LatexBuddy:
         :param problem: problem to add to the dictionary
         """
 
-        if self.preprocessor is None or self.preprocessor.apply_preprocessor_filter(
+        if self.preprocessor is None or self.preprocessor.matches_preprocessor_filter(
             problem
         ):
             self.errors[problem.uid] = problem
