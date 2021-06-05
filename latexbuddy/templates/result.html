@@ -65,7 +65,7 @@
                     </p>
 
                     <div class="roboto-font">
-                        <button id="button{{ problem.uid }}" onclick=clicked('button{{ problem.uid }}','{{ problem.text }}')></button>
+                        <button id="button{{ problem.uid }}" onclick=clicked('button{{ problem.uid }}','{{ problem.key }}')></button>
                     </div>
 
                 </li>
@@ -83,6 +83,8 @@
                 button.className = "validate";
                 alert(prob);
             }, 2000);
+        } else {
+            alert(prob);
         }
     }
 
