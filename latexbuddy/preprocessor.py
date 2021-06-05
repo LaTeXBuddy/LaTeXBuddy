@@ -25,14 +25,16 @@ class Preprocessor:
 
             line_num += 1
 
-    def apply_preprocessor_filter(self, problems: List[Problem]) -> List[Problem]:
-        def filter_function(prob: Problem):
-            for f in self.filters:
-                if f.match(prob):
-                    return False
-            return True
+    def matches_preprocessor_filter(self, problem: Problem) -> bool:
 
-        return list(filter(filter_function, problems))
+        for f in self.filters:
+            if f.match(problem):
+                return False
+        return True
+
+    def apply_preprocessor_filter(self, problems: List[Problem]) -> List[Problem]:
+
+        return list(filter(self.matches_preprocessor_filter, problems))
 
 
 class ProblemFilter(ABC):
@@ -106,8 +108,8 @@ class WhitelistKeyProblemFilter(ProblemFilter):
 # % buddy ignore-next [[1] line | <N> lines]
 #   -> ignores all problems in the given line(s)
 
-# % buddy begin-ignore [module[s] <module_class_name> [module_class_name ...] | severety <severity-level> | wl-key[s] <key> [key ...]]
+# % buddy begin-ignore [module[s] <module_class_name> [module_class_name ...] | severet[y|ies] <severity-level> [severity-level ...] | whitelist-key[s] <key> [key ...]]
 #   -> begins ignoring all problems (of a given module, severity level or with a given whitelist key)
 
-# % buddy end-ignore [module[s] <module_name> [module_name ...] | severety <severity-level> | wl-key[s] <key> [key ...]]
+# % buddy end-ignore [module[s] <module_name> [module_name ...] | severet[y|ies] <severity-level> [severity-level ...] | whitelist-key[s] <key> [key ...]]
 #   -> ends ignoring all problems (of a given module, severity level or with a given whitelist key)
