@@ -6,7 +6,6 @@ from latexbuddy.problem import Problem, ProblemSeverity
 
 
 class Preprocessor:
-
     def __init__(self):
         self.filters: List[ProblemFilter] = []
 
@@ -14,7 +13,6 @@ class Preprocessor:
         pass
 
     def apply_preprocessor_filter(self, problems: List[Problem]) -> List[Problem]:
-
         def filter_function(prob: Problem):
             for f in self.filters:
                 if f.match(prob):
