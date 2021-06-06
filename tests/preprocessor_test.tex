@@ -1,10 +1,10 @@
-% test some preprocessor commands:
+% test preprocessor (isolated):
 
 % buddy ignore-next
 % buddy ignore-next line
 % buddy ignore-next 1 line
 % buddy ignore-next 2 lines
-% buddy ignore-next 42 lines
+% buddy ignore-next 10 lines
 
 % buddy begin-ignore
 
@@ -28,5 +28,23 @@
 
 % buddy end-ignore whitelist-key LanguageTool_SOME_OF_THE LanguageTool_SOME_OTHER_KEY
 % buddy end-ignore whitelist-keys LanguageTool_SOME_OF_THE LanguageTool_SOME_OTHER_OTHER_KEY
+
+% ==========================================================================================
+
+% test preprocessor + buddy:
+
+% buddy ignore-next
+\foo This is a error.
+%buddy begin-ignore module chktex
+So is this is \foo
+%buddy end-ignore module chktex
+\smallskip This is a not. $\foo Neither$ is this.
+% buddy begin-ignore severity ERROR
+Tesst
+% buddy end-ignore severity erROr
+Errror
+% buddy begin-ignore whitelist-key spelling_Sammmple
+Sammmple
+% buddy end-ignore whitelist-key spelling_Sammmple
 
 
