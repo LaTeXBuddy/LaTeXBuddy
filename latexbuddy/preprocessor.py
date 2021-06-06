@@ -10,6 +10,26 @@ from latexbuddy.problem import Problem, ProblemSeverity
 
 # forward-declare
 class ProblemFilter(ABC):
+    def end(self, end_line: int) -> bool:
+        pass
+
+    def _match_line(self, problem: Problem) -> bool:
+        pass
+
+
+class LineProblemFilter(ProblemFilter):
+    pass
+
+
+class ModuleProblemFilter(ProblemFilter):
+    pass
+
+
+class SeverityProblemFilter(ProblemFilter):
+    pass
+
+
+class WhitelistKeyProblemFilter(ProblemFilter):
     pass
 
 
@@ -29,9 +49,26 @@ class Preprocessor:
 
     __COMMAND_PATTERN_BEGIN_IGNORE_ANYTHING = re.compile(r"%\s?buddy begin-ignore")
     __COMMAND_PATTERN_BEGIN_IGNORE_MODULES = re.compile(
-        r"%\s?buddy begin-ignore (?:module|modules)((?: \S+)+)"
+        r"%\s?buddy begin-ignore (?:modules?)((?: \S+)+)"
     )
-    # to be continued
+    __COMMAND_PATTERN_BEGIN_IGNORE_SEVERITIES = re.compile(
+        r"%\s?buddy begin-ignore (?:severity|severities)((?: \S+)+)"
+    )
+    __COMMAND_PATTERN_BEGIN_IGNORE_WL_KEYS = re.compile(
+        r"%\s?buddy begin-ignore (?:whitelist-keys?)((?: \S+)+)"
+    )
+
+    __COMMAND_PATTERN_END_IGNORE_ANYTHING = re.compile(r"%\s?buddy end-ignore")
+    __COMMAND_PATTERN_END_IGNORE_MODULES = re.compile(
+        r"%\s?buddy end-ignore (?:modules?)((?: \S+)+)"
+    )
+    __COMMAND_PATTERN_END_IGNORE_SEVERITIES = re.compile(
+        r"%\s?buddy end-ignore (?:severity|severities)((?: \S+)+)"
+    )
+    __COMMAND_PATTERN_END_IGNORE_WL_KEYS = re.compile(
+        r"%\s?buddy end-ignore (?:whitelist-keys?)((?: \S+)+)"
+    )
+
 
     def __init__(self):
         self.filters: List[ProblemFilter] = []
@@ -46,42 +83,222 @@ class Preprocessor:
             if not Preprocessor.__COMMAND_PATTERN.fullmatch(line):
                 continue
 
-            resulting_filter = self.__regex_parse_cmd_args_to_filter(line, line_num)
+            resulting_filters = self.__regex_parse_cmd_args_to_filter(line, line_num)
 
-            if resulting_filter is not None:
+            for resulting_filter in resulting_filters:
                 self.filters.append(resulting_filter)
 
     def __regex_parse_cmd_args_to_filter(
         self, line: str, line_num: int
-    ) -> Optional[ProblemFilter]:
+    ) -> List[ProblemFilter]:
 
         match = Preprocessor.__COMMAND_PATTERN_IGNORE_NEXT_ONE_LINE.fullmatch(line)
         if match is not None:
-            print(f"line '{line}' filters the next line ({line_num + 1})")
+            Preprocessor.__logger.debug(
+                f"Created LineProblemFilter from line {line_num + 1} to {line_num + 1}"
+            )
+            return [LineProblemFilter(line_num + 1, line_num + 1)]
 
         match = Preprocessor.__COMMAND_PATTERN_IGNORE_NEXT_N_LINES.fullmatch(line)
         if match is not None:
             n = int(match.group(1))
-            print(
-                f"line '{line}' filters the next {n} lines ({line_num + 1} - {line_num + n})"
+            Preprocessor.__logger.debug(
+                f"Created LineProblemFilter from line {line_num + 1} to {line_num + n}"
             )
+            return [LineProblemFilter(line_num + 1, line_num + n)]
 
         match = Preprocessor.__COMMAND_PATTERN_BEGIN_IGNORE_ANYTHING.fullmatch(line)
         if match is not None:
-            print(
-                f"line '{line}' ignores anything in all lines starting from {line_num + 1}"
-            )
+
+            open_ended_filter = self.__get_open_ended_filter(LineProblemFilter(0))
+
+            if open_ended_filter is not None:
+                Preprocessor.__logger.info(
+                    f"Ignored duplicate command 'begin-ignore' in line {line_num}"
+                )
+                return []
+            else:
+                Preprocessor.__logger.debug(
+                    f"Created open-ended LineProblemFilter beginning in line {line_num + 1}"
+                )
+                return [LineProblemFilter(line_num + 1)]
 
         match = Preprocessor.__COMMAND_PATTERN_BEGIN_IGNORE_MODULES.fullmatch(line)
         if match is not None:
             modules = match.group(1).strip().split(" ")
-            print(
-                f"line '{line}' ignores module(s) '{modules}' in all lines starting from {line_num + 1}"
-            )
 
-        # to be continued
+            filters = []
+            for module in modules:
 
-        return None
+                open_ended_filter = self.__get_open_ended_filter(
+                    ModuleProblemFilter(module, 0)
+                )
+
+                if open_ended_filter is not None:
+                    Preprocessor.__logger.info(
+                        f"Ignored duplicate command 'begin-ignore' for module '{module}' in line {line_num}"
+                    )
+                else:
+                    Preprocessor.__logger.debug(
+                        f"Created open-ended ModuleProblemFilter for module '{module}' beginning in line {line_num + 1}"
+                    )
+                    filters.append(ModuleProblemFilter(module, line_num + 1))
+
+            return filters
+
+        match = Preprocessor.__COMMAND_PATTERN_BEGIN_IGNORE_SEVERITIES.fullmatch(line)
+        if match is not None:
+            severities = match.group(1).strip().split(" ")
+
+            filters = []
+            for severity in severities:
+
+                try:
+                    enum_severity = ProblemSeverity[severity.upper()]
+
+                    open_ended_filter = self.__get_open_ended_filter(
+                        SeverityProblemFilter(enum_severity, 0)
+                    )
+
+                    if open_ended_filter is not None:
+                        Preprocessor.__logger.info(
+                            f"Ignored duplicate command 'begin-ignore' for severity '{severity}' in line {line_num}"
+                        )
+                    else:
+                        Preprocessor.__logger.debug(
+                            f"Created open-ended ModuleProblemFilter for severity '{str(enum_severity)}' beginning in line {line_num + 1}"
+                        )
+                        filters.append(
+                            SeverityProblemFilter(enum_severity, line_num + 1))
+                except KeyError:
+                    Preprocessor.__logger.warning(
+                        f"Invalid syntax: Unknown ProblemSeverity '{severity}' in line {line_num}"
+                    )
+
+            return filters
+
+        match = Preprocessor.__COMMAND_PATTERN_BEGIN_IGNORE_WL_KEYS.fullmatch(line)
+        if match is not None:
+            keys = match.group(1).strip().split(" ")
+
+            filters = []
+            for key in keys:
+
+                open_ended_filter = self.__get_open_ended_filter(
+                    WhitelistKeyProblemFilter(key, 0)
+                )
+
+                if open_ended_filter is not None:
+                    Preprocessor.__logger.info(
+                        f"Ignored duplicate command 'begin-ignore' for whitelist-key '{key}' in line {line_num}"
+                    )
+                else:
+                    Preprocessor.__logger.debug(
+                        f"Created open-ended WhitelistKeyProblemFilter for whitelist-key '{key}' beginning in line {line_num + 1}"
+                    )
+                    filters.append(WhitelistKeyProblemFilter(key, line_num + 1))
+
+            return filters
+# =======================================================================
+#
+# end
+#
+# =======================================================================
+
+        match = Preprocessor.__COMMAND_PATTERN_END_IGNORE_ANYTHING.fullmatch(line)
+        if match is not None:
+
+            open_ended_filter = self.__get_open_ended_filter(LineProblemFilter(0))
+
+            if open_ended_filter is None:
+                Preprocessor.__logger.info(
+                    f"Ignored duplicate command 'end-ignore' in line {line_num}"
+                )
+            else:
+                Preprocessor.__logger.debug(
+                    f"Ended existing open-ended LineProblemFilter in line {line_num}"
+                )
+                open_ended_filter.end(line_num)
+
+            return []
+
+        match = Preprocessor.__COMMAND_PATTERN_END_IGNORE_MODULES.fullmatch(line)
+        if match is not None:
+            modules = match.group(1).strip().split(" ")
+
+            for module in modules:
+
+                open_ended_filter = self.__get_open_ended_filter(
+                    ModuleProblemFilter(module, 0)
+                )
+
+                if open_ended_filter is None:
+                    Preprocessor.__logger.info(
+                        f"Ignored duplicate command 'end-ignore' for module '{module}' in line {line_num}"
+                    )
+                else:
+                    Preprocessor.__logger.debug(
+                        f"Ended existing open-ended ModuleProblemFilter for module '{module}' in line {line_num + 1}"
+                    )
+                    open_ended_filter.end(line_num)
+
+            return []
+
+        match = Preprocessor.__COMMAND_PATTERN_END_IGNORE_SEVERITIES.fullmatch(line)
+        if match is not None:
+            severities = match.group(1).strip().split(" ")
+
+            for severity in severities:
+
+                try:
+                    enum_severity = ProblemSeverity[severity.upper()]
+
+                    open_ended_filter = self.__get_open_ended_filter(
+                        SeverityProblemFilter(enum_severity, 0)
+                    )
+
+                    if open_ended_filter is None:
+                        Preprocessor.__logger.info(
+                            f"Ignored duplicate command 'end-ignore' for severity '{severity}' in line {line_num}"
+                        )
+                    else:
+                        Preprocessor.__logger.debug(
+                            f"Ended existing open-ended SeverityProblemFilter for severity '{str(enum_severity)}' in line {line_num + 1}"
+                        )
+                        open_ended_filter.end(line_num)
+                except KeyError:
+                    Preprocessor.__logger.warning(
+                        f"Invalid syntax: Unknown ProblemSeverity '{severity}' in line {line_num}"
+                    )
+
+            return []
+
+        match = Preprocessor.__COMMAND_PATTERN_END_IGNORE_WL_KEYS.fullmatch(line)
+        if match is not None:
+            keys = match.group(1).strip().split(" ")
+
+            for key in keys:
+
+                open_ended_filter = self.__get_open_ended_filter(
+                    WhitelistKeyProblemFilter(key, 0)
+                )
+
+                if open_ended_filter is None:
+                    Preprocessor.__logger.info(
+                        f"Ignored duplicate command 'end-ignore' for whitelist-key '{key}' in line {line_num}"
+                    )
+                else:
+                    Preprocessor.__logger.debug(
+                        f"Ended existing open-ended WhitelistKeyProblemFilter for whitelist-key '{key}' in line {line_num + 1}"
+                    )
+                    open_ended_filter.end(line_num)
+
+            return []
+
+        Preprocessor.__logger.warning(
+            f"Invalid Syntax: Could not parse preprocessing command in line {line_num}: \n{line}"
+        )
+        return []
 
     def parse_preprocessor_comments(self, file: TexFile):
 
