@@ -10,6 +10,8 @@ then
   #sudo apt update
   sudo apt install python3-pip
 elif [$BSYS='arch']
+  #pacman -Syu
+  pacman -S python
 then
   echo arch
 else
