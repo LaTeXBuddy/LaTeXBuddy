@@ -1,7 +1,7 @@
 import re
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, Callable
+from typing import Callable, List, Optional
 
 from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
@@ -11,6 +11,7 @@ from latexbuddy.problem import Problem, ProblemSeverity
 # forward-declare
 class ProblemFilter(ABC):
     """forward-declaring ProblemFilter because type hints will break otherwise"""
+
     pass
 
 
