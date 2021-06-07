@@ -25,12 +25,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - better logging (!73)
   - clearer, colourful console output
   - file log containing more verbose information
+- `--version`/`-v` option to the CLI (!83)
 
 ### Changed
 
+- **BREAKING CHANGE:** minimal Python version set to 3.6.8 (!81)
 - modules now adhere to the Abstract Module API (!22, !46)
 - errors renamed to problems and now use new API (!42, !46)
 - removed test_module.py (!77)
+- improved spacing and sizing of the logo (!82)
 
 ### Fixed
 
@@ -38,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - HTML output not working properly with new APIs (!56)
 - ChkTeX working incorrectly with text containing `:` (!70)
 - Minor inconsistency in typing for Problem constructor's parameters (!75)
+- unwanted spaces arounf problem text in HTML output (!80)
 
 ## [0.1.0] - 18 May 2021
 
