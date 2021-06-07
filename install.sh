@@ -16,8 +16,14 @@ then
   echo arch
   #pacman -Syu
   pacman -S python
+elif[ $BSYS='redhat']
+then
+  sudo yum install python37
+elif[ $SYSB='suse']
+then
+    sudo zypper install python3-3.7
 else
-  echo OS not Supported!
+  echo 'OS not supported!'
 fi
 
 echo Done!
