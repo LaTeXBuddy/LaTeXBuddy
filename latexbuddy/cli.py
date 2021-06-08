@@ -8,9 +8,9 @@ import os
 from pathlib import Path
 from time import perf_counter
 
-import latexbuddy.tools as tool
-
 from colorama import Fore
+
+import latexbuddy.tools as tool
 
 from latexbuddy import __app_name__
 from latexbuddy import __logger as root_logger
@@ -19,7 +19,6 @@ from latexbuddy import __version__
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
-
 
 parser = argparse.ArgumentParser(
     prog=name, description="The one-stop-shop for LaTeX checking."
@@ -109,6 +108,7 @@ def main():
     logger.debug(f"Parsed CLI args: {str(args)}")
 
     config_loader = ConfigLoader(args)
+
     # args.file is a list
     paths = tool.get_all_paths_in_document(args.file)
 
@@ -126,4 +126,4 @@ def main():
     buddy.check_whitelist()
     buddy.output_file()
 
-    logger.debug(f"Execution finished in {round(perf_counter()-start, 2)}s")
+    logger.debug(f"Execution finished in {round(perf_counter() - start, 2)}s")
