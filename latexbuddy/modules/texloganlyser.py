@@ -19,4 +19,14 @@ class TexLogAnalyser(Module):
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         return []
 
+    def compile_tex(self, tex_file: Path) -> Path:
+        try:
+            tools.find_executable('latex')
+        except FileNotFoundError:
+            self.__logger.error(not_found('latex', 'texlive-core'))
 
+        directory = 'texlogs'
+        path = os.path.join(os.getcwd(), directory)
+        os.mkdir(path)
+        tools.execute_background('latex', str(tex_file), f'-output-directory={path}')
+        return Path(os.path.join(path, tex_file.stem + '.log'))
