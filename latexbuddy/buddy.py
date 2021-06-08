@@ -58,9 +58,11 @@ class LatexBuddy:
         ).upper()
 
         # file that represents the whitelist
-        self.whitelist_file = Path(self.cfg.get_config_option_or_default(
-            "buddy", "whitelist", Path("whitelist.json"), verify_type=AnyStr
-        ))
+        self.whitelist_file = Path(
+            self.cfg.get_config_option_or_default(
+                "buddy", "whitelist", Path("whitelist.json"), verify_type=AnyStr
+            )
+        )
 
     def add_error(self, error: Problem):
         """Adds the error to the errors dictionary.
