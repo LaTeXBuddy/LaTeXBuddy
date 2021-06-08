@@ -2,9 +2,10 @@
 
 import json
 import os
+import time
 
 from pathlib import Path
-from typing import AnyStr
+from typing import AnyStr, Optional
 
 import latexbuddy.tools as tools
 
@@ -31,7 +32,7 @@ class LatexBuddy:
         """
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = config_loader  # configuration
-        self.preprocessor: Preprocessor = None  # in-file preprocessing
+        self.preprocessor: Optional[Preprocessor] = None  # in-file preprocessing
         self.file_to_check = file_to_check  # .tex file that is to be error checked
         self.tex_file: TexFile = TexFile(file_to_check)
 
@@ -134,10 +135,11 @@ class LatexBuddy:
         # importing this here to avoid circular import error
         from latexbuddy.tool_loader import ToolLoader
 
-        # check_preprocessor
+        # initialize Preprocessor
         self.preprocessor = Preprocessor()
         self.preprocessor.regex_parse_preprocessor_comments(self.tex_file)
 
+        # initialize ToolLoader
         tool_loader = ToolLoader(Path("latexbuddy/modules/"))
         modules = tool_loader.load_selected_modules(self.cfg)
 
@@ -149,10 +151,17 @@ class LatexBuddy:
                 for error in errors:
                     self.add_error(error)
 
+            start_time = time.perf_counter()
+
             tools.execute_no_exceptions(
                 lambda_function,
                 f"An error occurred while executing checks for module "
                 f"'{module.__class__.__name__}'",
+            )
+
+            self.__logger.debug(
+                f"{module.__class__.__name__} finished after "
+                f"{round(time.perf_counter() - start_time, 2)} seconds"
             )
 
         # FOR TESTING ONLY
