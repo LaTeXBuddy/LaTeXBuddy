@@ -6,13 +6,13 @@ out-of-the-box. You may move this file and specify its path using the --config f
 modules = {
     "buddy": {
         "language": "en",
-        "whitelist": "whitelist.wlist",
+        "whitelist": "whitelist.json",
         "output": "./",
         "format": "HTML",
         "enable-modules-by-default": True,
     },
     "LanguageTool": {
-        # "enabled": True,
+        "enabled": False,
         "mode": "COMMANDLINE",
         # "remote_url": "https://api.languagetoolplus.com/v2/check",
         "disabled-rules": [
@@ -32,7 +32,7 @@ modules = {
     "ProseLintModule": {
         "enabled": True
     },
-    "TestModule": {
-        "enabled": False,
-    }
+    "YaLafi": {
+        "enabled": True
+    },
 }

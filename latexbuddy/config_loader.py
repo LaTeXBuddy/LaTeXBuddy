@@ -8,6 +8,8 @@ from typing import Any, Dict
 
 import latexbuddy.tools as tools
 
+from latexbuddy import __logger as root_logger
+
 
 class ConfigOptionNotFoundError(Exception):
     """Describes a ConfigOptionNotFoundError.
@@ -27,6 +29,8 @@ class ConfigLoader:
     to specify a default value on Failure.
     """
 
+    __logger = root_logger.getChild("config_loader")
+
     def __init__(self, cli_arguments: Namespace):
         """Creates a ConfigLoader module.
 
@@ -36,15 +40,17 @@ class ConfigLoader:
         self.configurations = {}
 
         if not cli_arguments.config:
-            print("No configuration file specified. Using default values...")
+            self.__logger.warning(
+                "No configuration file specified. Default values will be used."
+            )
             return
 
         if cli_arguments.config.exists():
             self.load_configurations(cli_arguments.config)
         else:
-            print(
-                "Specified config file does not exist. Using default values...",
-                file=sys.stderr,
+            self.__logger.warning(
+                f"File not found: {cli_arguments.config}. "
+                f"Default configuration values will be used."
             )
 
         self.flags = self.__parse_flags(cli_arguments)
