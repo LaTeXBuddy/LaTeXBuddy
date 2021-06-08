@@ -16,21 +16,23 @@ class TexLogAnalyser(Module):
     __logger = root_logger.getChild('texloganalyser.pl')
 
     def __init__(self):
-        self.tool_name = "texloganalyser.pl"
-        self.tex_mf = ''
+        self.tool_name = "texloganalyser"
+        self.tex_mf = self.avoid_linebreak()
 
-    def avoid_linebreak(self):
+    @staticmethod
+    def avoid_linebreak() -> str:
         """
         This method makes the log file be written correctly
         """
         # https://tex.stackexchange.com/questions/52988/avoid-linebreaks-in-latex-console-log-output-or-increase-columns-in-terminal
         # https://tex.stackexchange.com/questions/410592/texlive-personal-texmf-cnf
-        text = '\n'.join(['max_print_line=1000', 'error_line=254', 'half_error_line=238'])
+        text = '\n'.join(
+            ['max_print_line=1000', 'error_line=254', 'half_error_line=238'])
         cnf_file = 'texmf.cnf'
-        cnf_dir = mkdtemp(prefix='texloganalyser.pl')
-        cnf_path = Path(cnf_dir)/cnf_file
+        cnf_dir = mkdtemp(prefix='latexbuddy', suffix='texloganalyser')
+        cnf_path = Path(cnf_dir) / cnf_file
         cnf_path.write_text(text)
-        self.tex_mf = cnf_dir
+        return cnf_dir
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         try:
@@ -39,17 +41,14 @@ class TexLogAnalyser(Module):
             self.__logger.error(not_found('perl', 'perl'))
 
         logfile = self.compile_tex(file.tex_file)
-        self.avoid_linebreak()
-        problems = []
         warning_problems = self.check_warnings(logfile, file)
-        for problem in warning_problems:
-            problems.append(problem)
-        return problems
+        return warning_problems
 
     def check_warnings(self, logfile) -> List[Problem]:
         problems = []
-        raw_output = tools.execute('texloganalyser', '-wpn', logfile).splitlines()
+        raw_output = tools.execute('texloganalyser', '-wpnhv', str(logfile)).splitlines()
         for line in raw_output:
+            self.__logger.debug(f"Processing line: {line}")
             warning_match = warning_line_re.match(line)
             if warning_match:
                 raw_error = warning_match.group("error")
