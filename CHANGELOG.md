@@ -26,12 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - better logging (!73)
   - clearer, colourful console output
   - file log containing more verbose information
-
-### Changed
-
-- modules now adhere to the Abstract Module API (!22, !46)
-- errors renamed to problems and now use new API (!42, !46)
-- removed test_module.py (!77)
+- verification options for config entries (!76)
 - `--version`/`-v` option to the CLI (!83)
 
 ### Changed
@@ -39,9 +34,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **BREAKING CHANGE:** minimal Python version set to 3.6.8 (!81)
 - modules now adhere to the Abstract Module API (!22, !46)
 - errors renamed to problems and now use new API (!42, !46)
+- all modules that use the config now validate the config entries (!76)
 - removed test_module.py (!77)
 - improved spacing and sizing of the logo (!82)
->>>>>>> CHANGELOG.md
+- modules now adhere to the Abstract Module API (!22, !46)
+- errors renamed to problems and now use new API (!42, !46)
+- removed test_module.py (!77)
 
 ### Fixed
 
