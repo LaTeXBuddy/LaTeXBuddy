@@ -6,13 +6,25 @@ out-of-the-box. You may move this file and specify its path using the --config f
 modules = {
     "buddy": {
         "language": "en",
-        "whitelist": "whitelist.wlist",
+        "whitelist": "whitelist.json",
         "output": "./",
         "format": "HTML",
         "enable-modules-by-default": True,
     },
+    "AspellModule": {
+        "enabled": True,
+    },
+    "ChktexModule": {
+        "enabled": True,
+    },
+    "DictionModule": {
+        "enabled": True,
+    },
+    "EmptySectionsModule": {
+        "enabled": True,
+    },
     "LanguageTool": {
-        # "enabled": True,
+        "enabled": True,
         "mode": "COMMANDLINE",
         # "remote_url": "https://api.languagetoolplus.com/v2/check",
         "disabled-rules": [
@@ -23,14 +35,17 @@ modules = {
             # "TYPOS",
         ],
     },
-    "AspellModule": {
-        # "enabled": True,
-    },
-    "ChktexModule": {
-        # "enabled": True,
-    },
     "ProseLintModule": {
         "enabled": True
+    },
+    "SiUnitxModule": {
+        "enabled": True,
+    },
+    "URLModule": {
+        "enabled": True,
+    },
+    "UnreferencedFiguresModule": {
+        "enabled": True,
     },
     "YaLafi": {
         "enabled": True
