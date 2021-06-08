@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - modules now adhere to the Abstract Module API (!22, !46)
 - errors renamed to problems and now use new API (!42, !46)
 - removed test_module.py (!77)
+- moved module execution time measurements from individual modules to the main buddy instance (!93)
 
 ### Fixed
 
