@@ -11,6 +11,7 @@ import latexbuddy.tools as tools
 from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.preprocessor import Preprocessor
 from latexbuddy.problem import Problem, ProblemJSONEncoder, ProblemSeverity
 
 
@@ -30,6 +31,7 @@ class LatexBuddy:
         """
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = config_loader  # configuration
+        self.preprocessor: Preprocessor = None  # in-file preprocessing
         self.file_to_check = file_to_check  # .tex file that is to be error checked
         self.tex_file: TexFile = TexFile(file_to_check)
 
@@ -64,15 +66,18 @@ class LatexBuddy:
             )
         )
 
-    def add_error(self, error: Problem):
+    def add_error(self, problem: Problem):
         """Adds the error to the errors dictionary.
 
         UID is used as key, the error object is used as value.
 
-        :param error: error to add to the dictionary
+        :param problem: problem to add to the dictionary
         """
 
-        self.errors[error.uid] = error
+        if self.preprocessor is None or self.preprocessor.matches_preprocessor_filter(
+            problem
+        ):
+            self.errors[problem.uid] = problem
 
     def check_whitelist(self):
         """Remove errors that are whitelisted."""
@@ -130,7 +135,8 @@ class LatexBuddy:
         from latexbuddy.tool_loader import ToolLoader
 
         # check_preprocessor
-        # check_config
+        self.preprocessor = Preprocessor()
+        self.preprocessor.regex_parse_preprocessor_comments(self.tex_file)
 
         tool_loader = ToolLoader(Path("latexbuddy/modules/"))
         modules = tool_loader.load_selected_modules(self.cfg)
