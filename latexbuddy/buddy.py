@@ -82,7 +82,7 @@ class LatexBuddy:
         for whitelist_element in whitelist:
             uids = list(self.errors.keys())
             for uid in uids:
-                if self.errors[uid].compare_with_other_comp_id(whitelist_element):
+                if self.errors[uid] == whitelist_element:
                     del self.errors[uid]
 
     def add_to_whitelist(self, uid):
