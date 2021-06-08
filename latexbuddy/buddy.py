@@ -58,10 +58,9 @@ class LatexBuddy:
         ).upper()
 
         # file that represents the whitelist
-        # TODO: why a new file format? if it's JSON, use .json. If not, don't use one.
-        self.whitelist_file = self.cfg.get_config_option_or_default(
-            "buddy", "whitelist", Path("whitelist.wlist"), verify_type=AnyStr
-        )
+        self.whitelist_file = Path(self.cfg.get_config_option_or_default(
+            "buddy", "whitelist", Path("whitelist.json"), verify_type=AnyStr
+        ))
 
     def add_error(self, error: Problem):
         """Adds the error to the errors dictionary.

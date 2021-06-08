@@ -4,6 +4,8 @@
 types, however LaTeXBuddy will most probably not display extra metadata.
 """
 
+import time
+
 from enum import Enum
 from functools import total_ordering
 from json import JSONEncoder
@@ -131,7 +133,7 @@ class Problem:
         :return: the UID of the Problem object
         """
 
-        return "\0".join(
+        """return "\0".join(
             [
                 str(self.file),
                 self.checker,
@@ -140,7 +142,8 @@ class Problem:
                 self.__get_pos_str(),
                 str(self.length),
             ]
-        )
+        )"""
+        return str(time.time())
 
     def __get_pos_str(self) -> str:
         """Returns the string value of the problem's position.

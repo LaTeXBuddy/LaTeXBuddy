@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- button, to add to whitelist (!87)
 - configuration files (!30)
 - abstraction around the checked file using `TexFile` class (!45, !46)
 - tool loader (!47)
@@ -36,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - all modules that use the config now validate the config entries (!76)
 - removed test_module.py (!77)
 - improved spacing and sizing of the logo (!82)
+- modules now adhere to the Abstract Module API (!22, !46)
+- errors renamed to problems and now use new API (!42, !46)
+- removed test_module.py (!77)
 
 ### Fixed
 
