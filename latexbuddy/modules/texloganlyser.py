@@ -12,6 +12,7 @@ from latexbuddy.messages import not_found
 
 
 class TexLogAnalyser(Module):
+    __logger = root_logger.getChild('texloganalyser')
 
     def __init__(self):
         self.tool_name = "texloganalyser"
