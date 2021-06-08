@@ -29,12 +29,9 @@
         <h3>Problems</h3>
         <ol>
             {% for problem in problems %}
-                <li class="problem is-{{ problem.severity }}" >
-
-                    <h4 class="problem-context-monospaced">
-                        {{ problem.context[0] }}
-                        <span class="problem-text">{{ problem.text }}</span>
-                        {{ problem.context[1] }}
+                <li class="problem is-{{ problem.severity }}">
+                    <h4 class="problem-context monospaced">
+                        {{ problem.context[0]|e }}<span class="problem-text">{{ problem.text|e }}</span>{{ problem.context[1]|e }}
                     </h4>
 
                     <p class="problem-description">

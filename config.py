@@ -29,8 +29,10 @@ modules = {
     "ChktexModule": {
         # "enabled": True,
     },
-    "ProseLintModule": {"enabled": True},
-    "TestModule": {
-        "enabled": False,
+    "ProseLintModule": {
+        "enabled": True
+    },
+    "YaLafi": {
+        "enabled": True
     },
 }
