@@ -1,3 +1,5 @@
+import re
+
 import latexbuddy.tools as tools
 import os
 
@@ -10,6 +12,13 @@ from latexbuddy.texfile import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.messages import not_found
 from tempfile import mkdtemp
+
+# ^Page \d+: (Overfull \\hbox .* in paragraph at lines (\d+--\d+))$
+
+warning_line_re = re.compile(r'^.*(?P<severity>Warning|Error):\s(?P<error>.*)$')
+faulty_box_re = re.compile(r'(?P<error>(Under|Over)full.*)')
+lineno_re = re.compile(r'on input line (?P<lineno>\d+)\.$')
+box_lineno_re = re.compile(r'at lines (?P<lineno>\d+)--\d+$')
 
 
 class TexLogAnalyser(Module):
@@ -38,13 +47,13 @@ class TexLogAnalyser(Module):
         try:
             tools.find_executable('perl')
         except FileNotFoundError:
-            self.__logger.error(not_found('perl', 'perl'))
+            self.__logger.error(not_found('perl', 'Perl'))
 
         logfile = self.compile_tex(file.tex_file)
         warning_problems = self.check_warnings(logfile, file)
         return warning_problems
 
-    def check_warnings(self, logfile) -> List[Problem]:
+    def check_warnings(self, logfile: Path, file: TexFile) -> List[Problem]:
         problems = []
         raw_output = tools.execute('texloganalyser', '-wpnhv', str(logfile)).splitlines()
         for line in raw_output:
@@ -52,43 +61,54 @@ class TexLogAnalyser(Module):
             warning_match = warning_line_re.match(line)
             if warning_match:
                 raw_error = warning_match.group("error")
+
+                lineno_match = lineno_re.match(raw_error)
             else:
                 faulty_box_match = faulty_box_re.match(line)
 
                 if not faulty_box_match:
                     continue
 
-            raw_error = faulty_box_match.group("error")
-            lineno_match = lineno_re.match(raw_error)
+                raw_error = faulty_box_match.group("error")
+
+                lineno_match = box_lineno_re.match(raw_error)
+
             if lineno_match:
                 lineno = int(lineno_match.group("lineno"))
             else:
                 lineno = None
 
             problem_text = raw_error.rsplit('on input line', 1)[0].strip()
-            position = (lineno, None) if lineno else None
+            position = (lineno, 0) if lineno else (0, 0)  # TODO: Change to None
+            severity_str = warning_match.group(
+                "severity").upper() if warning_match else "ERROR"
+            severity = ProblemSeverity[severity_str]
 
             problem = Problem(
-                position=position,
+                position=position,  # TODO: update type if None
                 text=problem_text,
-                checker="texloganalyser",
-                cid="",  # TODO
-                file=self.
-
+                checker=self.tool_name,
+                cid="warning",  # TODO
+                file=file.tex_file,
+                severity=severity,
+                category="latex",
+                key=self.tool_name + '_' + 'warning'  # TODO
             )
             problems.append(problem)
 
-        return []
+        return problems
 
     def compile_tex(self, tex_file: Path) -> Path:
         try:
             tools.find_executable('latex')
         except FileNotFoundError:
-            self.__logger.error(not_found('latex', 'texlive-core'))
+            self.__logger.error(not_found('latex', 'LaTeX (e.g., TeXLive Core)'))
 
-        directory = 'texlogs'
-        path = os.path.join(os.getcwd(), directory)
-        os.mkdir(path)
-        tools.execute_background(f'TEXMFCNF="{self.tex_mf}";', 'latex',
-                                 str(tex_file), f'-output-directory={path}')
-        return Path(os.path.join(path, tex_file.stem + '.log'))
+        directory = mkdtemp(prefix='latexbuddy', suffix='texlogs')
+        path = Path(directory).resolve()
+        tools.execute(f'TEXMFCNF="{self.tex_mf}";',
+                      'latex',
+                      f'-output-directory={str(path)}',
+                      str(tex_file),
+                      )
+        return path / f'{tex_file.stem}.log'
