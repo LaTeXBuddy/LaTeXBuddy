@@ -2,7 +2,6 @@ import hashlib
 import os
 
 from pathlib import Path
-from time import perf_counter
 from typing import List
 
 from unidecode import unidecode
@@ -24,7 +23,6 @@ class DictionModule(Module):
         self.tool_name = "diction"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-        start_time = perf_counter()
 
         # TODO: make this dynamic/configurable using
         #  config.get_config_option_or_default(
@@ -64,10 +62,6 @@ class DictionModule(Module):
 
         result = self.format_errors(
             cleaned_errors, original_lines, file.plain_file, file
-        )
-
-        self.__logger.debug(
-            f"Diction finished after {round(perf_counter() - start_time, 2)} seconds"
         )
 
         # return list of Problems

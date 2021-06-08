@@ -129,7 +129,6 @@ class LanguageTool(Module):
         :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
-        start_time = time.perf_counter()
 
         self.language = config.get_config_option_or_default(
             "buddy",
@@ -172,10 +171,6 @@ class LanguageTool(Module):
 
         result = self.check_tex(file)
 
-        self.__logger.debug(
-            f"LanguageTool finished after {round(time.perf_counter() - start_time, 2)} "
-            f"seconds"
-        )
         return result
 
     def find_languagetool_command(self) -> None:

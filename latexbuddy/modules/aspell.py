@@ -1,7 +1,6 @@
 """This module defines the connection between LaTeXBuddy and GNU Aspell."""
 import shlex
 
-from time import perf_counter
 from typing import List
 
 import latexbuddy.tools as tools
@@ -19,7 +18,7 @@ class AspellModule(Module):
 
     def __init__(self):
         self._LANGUAGE_MAP = {"de": "de-DE", "en": "en"}
-        self.language = "en"  # FIXME: use config's language
+        self.language = "en"
         self.tool_name = "aspell"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
@@ -30,7 +29,6 @@ class AspellModule(Module):
         :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
-        start_time = perf_counter()
 
         try:
             tools.find_executable("aspell")
@@ -70,9 +68,6 @@ class AspellModule(Module):
 
             counter += 1  # if there is an empty line, just increase the counter
 
-        self.__logger.debug(
-            f"Aspell finished after {round(perf_counter() - start_time, 2)} seconds"
-        )
         return error_list
 
     def check_language(self, language: str, langs: str):
