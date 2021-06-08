@@ -1,42 +1,189 @@
 #!/bin/bash
 
 BSYS=$(uname -n)
-sudo echo $bsys
+#sudo echo $bsys
 PYVERSION=$(python3 --version)
+GITVERSION=$(git --version)
+JAVAVERSION=$(java --version)
+CURLVERSION=$(curl --version)
+MAKEVERSION=$(make --version)
+PIPVERSION=$(pip --version)
+install_homebrew() {
+    if ! [[ "$accept" == "YES" ]]; then
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    else
+        detect_screen
+        if ! [[ "$display" == "no" ]]; then
+            dialog=$(osascript \
+            -e 'on homebrew_dialog()' \
+            -e 'tell application "System Events"' \
+            -e 'activate' \
+            -e 'set dialog_result to display dialog "Do you want to get homebrew to install packages necessary for languagetool?" with title "LanguageTool Installer" buttons {"Yes","No","What is Homebrew?"} default button 1' \
+            -e 'end tell' \
+            -e 'set button to button returned of dialog_result' \
+            -e 'if the button is "What is Homebrew?" then' \
+            -e 'open location "https://brew.sh/#question"' \
+            -e 'activate' \
+            -e 'set dialog_result to display dialog "Do you want to get homebrew to install packages necessary for languagetool?" with title "LanguageTool Installer" buttons {"Yes","No"} default button 1' \
+            -e 'set button to button returned of dialog_result' \
+            -e 'end if' \
+            -e 'return button' \
+            -e 'end' \
+            -e 'homebrew_dialog()' \
+            -e 'tell application "System Events"' \
+            -e 'tell process "finder"' \
+            -e 'activate' \
+            -e 'keystroke tab using {command down}' \
+            -e 'end tell' \
+            -e 'end tell'
+            )
+        else
+            echo "No display detected"
+            read -p "Do you want to install homebrew? " -n 1 -r
+            echo    # (optional) move to a new line
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                dialog="Yes"
+            fi
+        fi
+        if [[ "$dialog" = "Yes" ]]; then
+            /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        else
+            echo "Can not install homebrew. Packages will not work."
+            echo "Exiting"
+            exit 1
+        fi
+    fi
+}
+#detect_uninstall() {
+ #   if ! [ -e "/etc/latexbuddy/uninstall.sh" ]; then
+  #      mkdir -p /etc/latexbuddy
+   #     touch /etc/latexbuddy/uninstall.sh
+    #    echo "#!/bin/bash" >> /etc/latexbuddy/uninstall.sh
+    #fi
+#}
+install_java() {
+    detect_uninstall
+    echo "Java is not installed."
+    echo "Installing java . . ."
 
+    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        apt install default-jre default-jdk -y
+       # echo "apt remove default-jre default-jdk -y" >> /etc/latexbuddy/uninstall.sh # need to test
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        if ! [ -x "$(brew -v)" ]; then
+               install_homebrew
+        fi
+        brew update
+        brew cask install java
+        #echo "brew remove java" >> /etc/latexbuddy/uninstall.sh
 
-if [ $BSYS='ubuntu' ]
-then
-  #sudo apt update
-  sudo apt install python3-pip
-  sudo pip3 install poetry
-  poetry install
-elif [ $BSYS='arch' ]
-then
-  echo arch
-  #pacman -Syu
-  pacman -S python
-#elif[ $BSYS='redhat']
-#then
-#  sudo yum install python37
-#elif[ $SYSB='SUSE']
-#then
-#    sudo zypper install python3-3.7
-else
-  echo 'OS not supported!'
-fi
-TARPATH=$HOME/diction-1.14.tar.gz
-PATH=$HOME/diction
-curl https://www.moria.de/~michael/diction/diction-1.14.tar.gz >> $TARPATH
-tar -xf $TARPATH --directory $PATH
-rm $TARPATH
-cd $PATH
-make configure
-make
-make install
-make clean
-languageTool
-#oder sudo bash installlanguagetool.sh
+    else
+            echo "Error: java is not installed and operating system detection error"
+            echo "   OS type not supported!"
+            echo "   Please install java yourself or override automatic OS detection with -o <OS> See help for more details."
+    fi
+}
+install_git() {
+    detect_uninstall
+    echo "Git is not installed."
+    echo "Installing git . . ."
+
+    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        apt install git
+        #echo "apt remove git" >> /etc/latexbuddy/uninstall.sh
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        if ! [ -x "$(brew -v)" ]; then
+               install_homebrew
+        fi
+        brew update
+        brew cask install git
+        #echo "brew remove git" >> /etc/latexbuddy/uninstall.sh
+    else
+            echo "Error: git is not installed and operating system detection error"
+            echo "   OS type not supported!"
+            echo "   Please install git yourself or override automatic OS detection with -o <OS> See help for more details."
+    fi
+}
+install_curl() {
+    detect_uninstall
+    echo "Curl is not installed."
+    echo "Installing curl . . ."
+
+    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        apt install curl
+        #echo "apt remove curl" >> /etc/latexbuddy/uninstall.sh
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        if ! [ -x "$(brew -v)" ]; then
+               install_homebrew
+        fi
+        brew update
+        brew cask install curl
+        #echo "brew remove curl" >> /etc/latexbuddy/uninstall.sh
+    else
+            echo "Error: curl is not installed and operating system detection error"
+            echo "   OS type not supported!"
+            echo "   Please install curl yourself or override automatic OS detection with -o <OS> See help for more details."
+    fi
+}
+install_make() {
+    detect_uninstall
+    echo "Make is not installed."
+    echo "Installing make . . ."
+
+    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        apt install make
+        #echo "apt remove make" >> /etc/latexbuddy/uninstall.sh
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        if ! [ -x "$(brew -v)" ]; then
+               install_homebrew
+        fi
+        brew update
+        brew cask install make
+        #echo "brew remove make" >> /etc/latexbuddy/uninstall.sh
+    else
+            echo "Error: make is not installed and operating system detection error"
+            echo "   OS type not supported!"
+            echo "   Please install make yourself or override automatic OS detection with -o <OS> See help for more details."
+    fi
+}
+install_pip() {
+    detect_uninstall
+    echo "Pip is not installed."
+    echo "Installing pip . . ."
+
+    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        apt install pip
+        #echo "apt remove pip" >> /etc/latexbuddy/uninstall.sh
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        easy_install pip
+        #echo "brew remove pip" >> /etc/latexbuddy/uninstall.sh
+    else
+            echo "Error: pip is not installed and operating system detection error"
+            echo "   OS type not supported!"
+            echo "   Please install pip yourself or override automatic OS detection with -o <OS> See help for more details."
+    fi
+}
+install_python() {
+    detect_uninstall
+    echo "Python is not installed."
+    echo "Installing python . . ."
+
+    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        apt install python3
+        #echo "apt remove python3" >> /etc/latexbuddy/uninstall.sh
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+         if ! [ -x "$(brew -v)" ]; then
+               install_homebrew
+        fi
+        brew update
+        brew install python
+        #echo "brew remove python" >> /etc/latexbuddy/uninstall.sh
+    else
+            echo "Error: python is not installed and operating system detection error"
+            echo "   OS type not supported!"
+            echo "   Please install python yourself or override automatic OS detection with -o <OS> See help for more details."
+    fi
+}
 languageTool(){
     VERSION="2.3"
 clone_depth="1"
@@ -499,3 +646,71 @@ else
     build_or_install_loud
 fi
 }
+detect_java(){
+if ! [ "$(type -t java)" ]; then
+        install_java
+fi
+}
+detect_git(){
+if ! [ "$(type -t git)" ]; then
+        install_git
+fi
+}
+detect_curl(){
+  if ! [ "$(type -t curl)" ]; then
+        install_curl
+fi
+}
+detect_make(){
+  if ! [ "$(type -t make)" ]; then
+        install_make
+fi
+}
+detect_pip(){
+  if ! [ "$(type -t pip)" ]; then
+        install_pip
+fi
+}
+detect_python(){
+  if ! [ "$(type -t python)" ]; then
+        install_java
+fi
+}
+detect_java
+detect_git
+detect_curl
+detect_make
+detect_pip
+detect_python
+#if [ $BSYS='ubuntu' ]
+#then
+  #sudo apt update
+  #sudo apt install python3-pip
+  #sudo pip3 install poetry
+ # poetry install
+#elif [ $BSYS='arch' ]
+#then
+  #echo arch
+  #pacman -Syu
+ # pacman -S python3
+#elif[ $BSYS='redhat']
+#then
+#  sudo yum install python37
+#elif[ $SYSB='SUSE']
+#then
+#    sudo zypper install python3-3.7
+#else
+ # echo 'OS not supported!'
+#fi
+TARPATH=$HOME/diction-1.14.tar.gz
+PATH=$HOME/diction
+curl https://www.moria.de/~michael/diction/diction-1.14.tar.gz >> $TARPATH
+tar -xf $TARPATH --directory $PATH
+rm $TARPATH
+cd $PATH
+make configure
+make
+make install
+make clean
+languageTool
+#oder sudo bash installlanguagetool.sh
