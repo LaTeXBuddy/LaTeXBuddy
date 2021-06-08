@@ -131,20 +131,6 @@ class LatexBuddy:
         # check_preprocessor
         # check_config
 
-        if self.tex_file.is_faulty:
-            for raw_err in self.tex_file._parse_problems:
-                self.add_error(
-                    Problem(
-                        position=raw_err[0],
-                        text=raw_err[1],
-                        checker="YaLafi",
-                        cid="tex2txt",
-                        file=self.tex_file.tex_file,
-                        severity=ProblemSeverity.ERROR,
-                        category="latex",
-                    )
-                )
-
         tool_loader = ToolLoader(Path("latexbuddy/modules/"))
         modules = tool_loader.load_selected_modules(self.cfg)
 

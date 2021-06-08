@@ -47,4 +47,7 @@ modules = {
     "UnreferencedFiguresModule": {
         "enabled": True,
     },
+    "YaLafi": {
+        "enabled": True
+    },
 }
