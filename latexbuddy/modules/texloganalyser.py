@@ -41,18 +41,43 @@ class TexLogAnalyser(Module):
         logfile = self.compile_tex(file.tex_file)
         self.avoid_linebreak()
         problems = []
-        font_problems = self.check_fonts(logfile)
-        for problem in font_problems:
+        warning_problems = self.check_warnings(logfile, file)
+        for problem in warning_problems:
             problems.append(problem)
         return problems
 
-    def check_fonts(self, logfile) -> List[Problem]:
-        raw_output = tools.execute().split('\n')
+    def check_warnings(self, logfile) -> List[Problem]:
+        problems = []
+        raw_output = tools.execute('texloganalyser', '-wpn', logfile).splitlines()
         for line in raw_output:
-            split = line.split(':')
-            if len(split) < 1:
-                continue
-            split
+            warning_match = warning_line_re.match(line)
+            if warning_match:
+                raw_error = warning_match.group("error")
+            else:
+                faulty_box_match = faulty_box_re.match(line)
+
+                if not faulty_box_match:
+                    continue
+
+            raw_error = faulty_box_match.group("error")
+            lineno_match = lineno_re.match(raw_error)
+            if lineno_match:
+                lineno = int(lineno_match.group("lineno"))
+            else:
+                lineno = None
+
+            problem_text = raw_error.rsplit('on input line', 1)[0].strip()
+            position = (lineno, None) if lineno else None
+
+            problem = Problem(
+                position=position,
+                text=problem_text,
+                checker="texloganalyser",
+                cid="",  # TODO
+                file=self.
+
+            )
+            problems.append(problem)
 
         return []
 
