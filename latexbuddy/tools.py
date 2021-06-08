@@ -1,5 +1,5 @@
 """This module contains various utility tools."""
-
+import logging
 import os
 import re
 import signal
@@ -9,6 +9,9 @@ import traceback
 
 from pathlib import Path
 from typing import Callable, List, Tuple
+
+
+__logger = logging.getLogger("latexbuddy").getChild('tools')
 
 
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
@@ -21,6 +24,8 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     :return: command output
     """
     command = get_command_string(cmd)
+
+    __logger.debug(f"Executing {command}")
 
     error_list = subprocess.Popen(
         [command], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
