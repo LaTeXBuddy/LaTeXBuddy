@@ -16,8 +16,38 @@ class TexLogAnalyser(Module):
 
     def __init__(self):
         self.tool_name = "texloganalyser"
+        self.tex_mf = ''
+
+    def avoid_linebreak(self):
+        """
+        This method makes the log file be written correctly
+        """
+        # https://tex.stackexchange.com/questions/52988/avoid-linebreaks-in-latex-console-log-output-or-increase-columns-in-terminal
+        # https://tex.stackexchange.com/questions/410592/texlive-personal-texmf-cnf
+        text = ['max_print_line=1000', 'error_line=254', 'half_error_line=238']
+        cnf_file = 'texmf.cnf'
+        cnf_dir = os.getcwd()
+        cnf_path = os.path.join(cnf_dir, cnf_file)
+        for cfg in text:
+            tools.execute(f'{cfg} >> {cnf_path}')
+        self.tex_mf = cnf_dir
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+        try:
+            tools.find_executable('perl')
+        except FileNotFoundError:
+            self.__logger.error(not_found('perl', 'perl'))
+
+        logfile = self.compile_tex(file.tex_file)
+        self.avoid_linebreak()
+        problems = []
+        font_problems = self.check_fonts(logfile)
+        for problem in font_problems:
+            problems.append(problem)
+        return problems
+
+    def check_fonts(self, logfile) -> List[Problem]:
+        raw_output = tools.execute().split('\n')
         return []
 
     def compile_tex(self, tex_file: Path) -> Path:
@@ -29,5 +59,6 @@ class TexLogAnalyser(Module):
         directory = 'texlogs'
         path = os.path.join(os.getcwd(), directory)
         os.mkdir(path)
-        tools.execute_background('latex', str(tex_file), f'-output-directory={path}')
+        tools.execute_background(f'export TEXMFCNF="{self.tex_mf}";', 'latex',
+                                 str(tex_file), f'-output-directory={path}')
         return Path(os.path.join(path, tex_file.stem + '.log'))
