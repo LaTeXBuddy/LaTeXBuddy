@@ -4,12 +4,14 @@ import json
 import os
 
 from pathlib import Path
+from typing import AnyStr
 
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.preprocessor import Preprocessor
 from latexbuddy.problem import Problem, ProblemJSONEncoder, ProblemSeverity
 
 
@@ -29,12 +31,15 @@ class LatexBuddy:
         """
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = config_loader  # configuration
+        self.preprocessor: Preprocessor = None  # in-file preprocessing
         self.file_to_check = file_to_check  # .tex file that is to be error checked
         self.tex_file: TexFile = TexFile(file_to_check)
 
         # file where the error should be saved
         self.output_dir = Path(
-            self.cfg.get_config_option_or_default("buddy", "output", Path("./"))
+            self.cfg.get_config_option_or_default(
+                "buddy", "output", Path("./"), verify_type=AnyStr
+            )
         )
 
         if not self.output_dir.is_dir():
@@ -45,31 +50,34 @@ class LatexBuddy:
             self.output_dir = Path.cwd()
 
         self.output_format = str(
-            self.cfg.get_config_option_or_default("buddy", "format", "HTML")
+            self.cfg.get_config_option_or_default(
+                "buddy",
+                "format",
+                "HTML",
+                verify_type=AnyStr,
+                verify_choices=["HTML", "html", "JSON", "json"],
+            )
         ).upper()
 
-        if self.output_format not in ["HTML", "JSON"]:
-            self.__logger.warning(
-                f"Unknown output format: {self.output_format}. "
-                "HTML will be used instead."
-            )
-            self.output_format = "HTML"
-
         # file that represents the whitelist
-        # TODO: why a new file format? if it's JSON, use .json. If not, don't use one.
-        self.whitelist_file = self.cfg.get_config_option_or_default(
-            "buddy", "whitelist", Path("whitelist.wlist")
+        self.whitelist_file = Path(
+            self.cfg.get_config_option_or_default(
+                "buddy", "whitelist", Path("whitelist.json"), verify_type=AnyStr
+            )
         )
 
-    def add_error(self, error: Problem):
+    def add_error(self, problem: Problem):
         """Adds the error to the errors dictionary.
 
         UID is used as key, the error object is used as value.
 
-        :param error: error to add to the dictionary
+        :param problem: problem to add to the dictionary
         """
 
-        self.errors[error.uid] = error
+        if self.preprocessor is None or self.preprocessor.matches_preprocessor_filter(
+            problem
+        ):
+            self.errors[problem.uid] = problem
 
     def check_whitelist(self):
         """Remove errors that are whitelisted."""
@@ -127,21 +135,8 @@ class LatexBuddy:
         from latexbuddy.tool_loader import ToolLoader
 
         # check_preprocessor
-        # check_config
-
-        if self.tex_file.is_faulty:
-            for raw_err in self.tex_file._parse_problems:
-                self.add_error(
-                    Problem(
-                        position=raw_err[0],
-                        text=raw_err[1],
-                        checker="YaLafi",
-                        cid="tex2txt",
-                        file=self.tex_file.tex_file,
-                        severity=ProblemSeverity.ERROR,
-                        category="latex",
-                    )
-                )
+        self.preprocessor = Preprocessor()
+        self.preprocessor.regex_parse_preprocessor_comments(self.tex_file)
 
         tool_loader = ToolLoader(Path("latexbuddy/modules/"))
         modules = tool_loader.load_selected_modules(self.cfg)

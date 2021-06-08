@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- button, to add to whitelist (!87)
 - configuration files (!30)
 - abstraction around the checked file using `TexFile` class (!45, !46)
 - tool loader (!47)
@@ -25,15 +26,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - better logging (!73)
   - clearer, colourful console output
   - file log containing more verbose information
+- verification options for config entries (!76)
 - `--version`/`-v` option to the CLI (!83)
+- in-file preprocessor for .tex files (!84)
 
 ### Changed
 
 - **BREAKING CHANGE:** minimal Python version set to 3.6.8 (!81)
 - modules now adhere to the Abstract Module API (!22, !46)
 - errors renamed to problems and now use new API (!42, !46)
+- all modules that use the config now validate the config entries (!76)
 - removed test_module.py (!77)
 - improved spacing and sizing of the logo (!82)
+- modules now adhere to the Abstract Module API (!22, !46)
+- errors renamed to problems and now use new API (!42, !46)
+- removed test_module.py (!77)
 
 ### Fixed
 
@@ -41,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - HTML output not working properly with new APIs (!56)
 - ChkTeX working incorrectly with text containing `:` (!70)
 - Minor inconsistency in typing for Problem constructor's parameters (!75)
-- unwanted spaces arounf problem text in HTML output (!80)
+- unwanted spaces around problem text in HTML output (!80)
 
 ## [0.1.0] - 18 May 2021
 
