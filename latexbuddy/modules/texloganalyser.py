@@ -9,13 +9,14 @@ from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.messages import not_found
+from tempfile import mkdtemp
 
 
 class TexLogAnalyser(Module):
-    __logger = root_logger.getChild('texloganalyser')
+    __logger = root_logger.getChild('texloganalyser.pl')
 
     def __init__(self):
-        self.tool_name = "texloganalyser"
+        self.tool_name = "texloganalyser.pl"
         self.tex_mf = ''
 
     def avoid_linebreak(self):
@@ -24,12 +25,11 @@ class TexLogAnalyser(Module):
         """
         # https://tex.stackexchange.com/questions/52988/avoid-linebreaks-in-latex-console-log-output-or-increase-columns-in-terminal
         # https://tex.stackexchange.com/questions/410592/texlive-personal-texmf-cnf
-        text = ['max_print_line=1000', 'error_line=254', 'half_error_line=238']
+        text = '\n'.join(['max_print_line=1000', 'error_line=254', 'half_error_line=238'])
         cnf_file = 'texmf.cnf'
-        cnf_dir = os.getcwd()
-        cnf_path = os.path.join(cnf_dir, cnf_file)
-        for cfg in text:
-            tools.execute(f'{cfg} >> {cnf_path}')
+        cnf_dir = mkdtemp(prefix='texloganalyser.pl')
+        cnf_path = Path(cnf_dir)/cnf_file
+        cnf_path.write_text(text)
         self.tex_mf = cnf_dir
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
@@ -48,6 +48,12 @@ class TexLogAnalyser(Module):
 
     def check_fonts(self, logfile) -> List[Problem]:
         raw_output = tools.execute().split('\n')
+        for line in raw_output:
+            split = line.split(':')
+            if len(split) < 1:
+                continue
+            split
+
         return []
 
     def compile_tex(self, tex_file: Path) -> Path:
@@ -59,6 +65,6 @@ class TexLogAnalyser(Module):
         directory = 'texlogs'
         path = os.path.join(os.getcwd(), directory)
         os.mkdir(path)
-        tools.execute_background(f'export TEXMFCNF="{self.tex_mf}";', 'latex',
+        tools.execute_background(f'TEXMFCNF="{self.tex_mf}";', 'latex',
                                  str(tex_file), f'-output-directory={path}')
         return Path(os.path.join(path, tex_file.stem + '.log'))
