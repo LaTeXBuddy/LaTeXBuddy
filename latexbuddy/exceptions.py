@@ -2,6 +2,21 @@
 application-specific errors occur."""
 
 
+class ExecutableNotFoundError(Exception):
+    """This error is raised when LaTeXBuddy can not locate a third-party executable
+    dependency on the system it is running on."""
+
+    pass
+
+
+class LanguageNotSupportedError(Exception):
+    """This error is raised when LaTeXBuddy or a submodule does not support the
+    configured language.
+    """
+
+    pass
+
+
 class ConfigOptionError(Exception):
     """Base Exception for errors related to loading configurations"""
 
