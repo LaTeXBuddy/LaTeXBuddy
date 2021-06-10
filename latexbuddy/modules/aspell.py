@@ -33,12 +33,7 @@ class AspellModule(Module):
         """
         start_time = perf_counter()
 
-        try:
-            tools.find_executable("aspell")
-        except FileNotFoundError:
-            self.__logger.error(not_found("aspell", "GNU Aspell"))
-
-            raise FileNotFoundError("Unable to find aspell installation!")
+        tools.find_executable("aspell", "GNU Aspell", self.__logger)
 
         try:
 
