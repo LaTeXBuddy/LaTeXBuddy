@@ -5,6 +5,18 @@ All notable changes to LaTeXBuddy will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- centralized file for LaTeXBuddy exceptions (!94)
+
+### Changed
+- improved logging for tool-methods find_executable and execute_no_errors (!94)
+- adapted all modules using tool-methods find_executable and execute_no_errors to the new features (!94)
+
+### Fixed
+- minor issue in languagetool.py: module didn't stop execution after java-check failed in find_languagetool_command() (!94)
+
 ## [0.2.0] - 08 Jun 2021
 
 ### Added
