@@ -24,6 +24,9 @@ class DictionModule(Module):
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
 
+        # check, if diction is installed
+        tools.find_executable("diction", "Diction", self.__logger)
+
         # TODO: make this dynamic/configurable using
         #  config.get_config_option_or_default(
         #       "buddy", "language", "<default language>"
