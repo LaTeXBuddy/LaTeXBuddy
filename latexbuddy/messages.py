@@ -2,10 +2,12 @@
 as well as builders for those.
 """
 
-from latexbuddy import __app_name__
-
 
 def not_found(executable: str, to_install: str) -> str:
+
+    # importing this here to avoid circular import error
+    from latexbuddy import __app_name__
+
     return (
         f"'{executable}' not found! "
         f"Make sure you've installed {to_install} correctly. "
