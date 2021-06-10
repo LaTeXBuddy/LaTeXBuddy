@@ -8,6 +8,7 @@ import latexbuddy.tools as tools
 
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.exceptions import LanguageNotSupportedError
 from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -83,7 +84,7 @@ class AspellModule(Module):
 
         :param language: language to search for
         :param langs: language list to search in
-        :raises Exception: if the language is not on the list
+        :raises LanguageNotSupportedError: if the language is not on the list
         """
         # error if language dict not installed
         if language not in langs:
@@ -93,7 +94,9 @@ class AspellModule(Module):
                 + "https://ftp.gnu.org/gnu/aspell/dict/0index.html"
             )
 
-            raise Exception("Aspell: Language not found on system.")
+            raise LanguageNotSupportedError(
+                f"Aspell: Language '{language}' not found on system."
+            )
 
     def format_errors(
         self, out: List[str], line_number: int, file: TexFile
