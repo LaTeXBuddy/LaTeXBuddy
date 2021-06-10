@@ -7,8 +7,13 @@ import subprocess
 import sys
 import traceback
 
+from logging import Logger
 from pathlib import Path
-from typing import Callable, List, Tuple
+from typing import Callable, List, Optional, Tuple
+
+from latexbuddy import __logger as root_logger
+from latexbuddy.exceptions import ExecutableNotFoundError
+from latexbuddy.messages import not_found
 
 
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
@@ -85,21 +90,38 @@ def get_command_string(cmd: Tuple[str]) -> str:
     return command.strip()
 
 
-def find_executable(name: str) -> str:
-    """Finds path to an executable.
+def find_executable(
+    name: str,
+    to_install: Optional[str] = None,
+    logger: Logger = root_logger.getChild("Tools"),
+) -> str:
+    """Finds path to an executable. If the executable can not be located, an error
+    message is logged to the specified logger, otherwise the executable's path is logged
+    as a debug message.
 
     This uses 'which', i.e. the executable should at least be in user's $PATH
 
     :param name: executable name
+    :param to_install: correct name of the program or project which the requested
+                       executable belongs to (used in log messages)
+    :param logger: logger to be used for logging debug/error messages
     :return: path to the executable
     :raises FileNotFoundError: if the executable couldn't be found
     """
     result = execute("which", name)
 
     if not result or "not found" in result:
-        raise FileNotFoundError(f"could not find {name} in system's PATH")
+
+        logger.error(not_found(name, to_install if to_install is not None else name))
+        raise ExecutableNotFoundError(
+            f"could not find executable '{name}' in system's PATH"
+        )
+
     else:
-        return result.splitlines()[0]
+
+        path_str = result.splitlines()[0]
+        logger.debug(f"Found executable {name} at '{path_str}'.")
+        return path_str
 
 
 location_re = re.compile(r"line (\d+), column (\d+)")
