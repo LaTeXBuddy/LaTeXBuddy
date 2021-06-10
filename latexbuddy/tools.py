@@ -212,8 +212,8 @@ def execute_no_exceptions(
 ) -> None:
     """Calls a function and catches any Exception that is raised during this.
 
-    If an Exception is caught, the function is aborted and the error is printed to
-    stderr, but as the Exception is caught, the program won't crash.
+    If an Exception is caught, the function is aborted and the error is logged, but as
+    the Exception is caught, the program won't crash.
 
     :param function_call: function to be executed
     :param error_message: custom error message displayed in the console
