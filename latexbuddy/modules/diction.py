@@ -24,6 +24,10 @@ class DictionModule(Module):
         self.tool_name = "diction"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+
+        # check, if diction is installed
+        tools.find_executable("diction", "Diction", self.__logger)
+
         start_time = perf_counter()
 
         # TODO: make this dynamic/configurable using
