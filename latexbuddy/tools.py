@@ -94,6 +94,7 @@ def find_executable(
     name: str,
     to_install: Optional[str] = None,
     logger: Logger = root_logger.getChild("Tools"),
+    log_errors: bool = True,
 ) -> str:
     """Finds path to an executable. If the executable can not be located, an error
     message is logged to the specified logger, otherwise the executable's path is logged
@@ -105,6 +106,9 @@ def find_executable(
     :param to_install: correct name of the program or project which the requested
                        executable belongs to (used in log messages)
     :param logger: logger to be used for logging debug/error messages
+    :param log_errors: specifies whether or not this method should log an error message,
+                       if the executable can not be located; if this is False, a debug
+                       message will be logged instead
     :return: path to the executable
     :raises FileNotFoundError: if the executable couldn't be found
     """
@@ -112,7 +116,17 @@ def find_executable(
 
     if not result or "not found" in result:
 
-        logger.error(not_found(name, to_install if to_install is not None else name))
+        if log_errors:
+            logger.error(
+                not_found(name, to_install if to_install is not None else name)
+            )
+        else:
+            logger.debug(
+                f"could not find executable '{name}' "
+                f"({to_install if to_install is not None else name}) "
+                f"in the system's PATH"
+            )
+
         raise ExecutableNotFoundError(
             f"could not find executable '{name}' in system's PATH"
         )
