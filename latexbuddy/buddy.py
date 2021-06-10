@@ -11,6 +11,7 @@ import latexbuddy.tools as tools
 from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.messages import error_occurred_in_module
 from latexbuddy.preprocessor import Preprocessor
 from latexbuddy.problem import Problem, ProblemJSONEncoder, ProblemSeverity
 
@@ -151,8 +152,8 @@ class LatexBuddy:
 
             tools.execute_no_exceptions(
                 lambda_function,
-                f"An error occurred while executing checks for module "
-                f"'{module.__class__.__name__}'",
+                error_occurred_in_module(module.__class__.__name__),
+                "DEBUG",
             )
 
         # FOR TESTING ONLY
