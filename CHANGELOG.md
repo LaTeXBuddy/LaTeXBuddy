@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - centralized file for LaTeXBuddy exceptions (!94)
 
 ### Changed
+- moved module execution time measurements from individual modules to the main buddy instance (!93)
 - improved logging for tool-methods find_executable and execute_no_errors (!94)
 - adapted all modules using tool-methods find_executable and execute_no_errors to the new features (!94)
 
@@ -53,7 +54,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - modules now adhere to the Abstract Module API (!22, !46)
 - errors renamed to problems and now use new API (!42, !46)
 - removed test_module.py (!77)
-- moved module execution time measurements from individual modules to the main buddy instance (!93)
 
 ### Fixed
 
