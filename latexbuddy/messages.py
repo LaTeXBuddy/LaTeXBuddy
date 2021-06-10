@@ -13,3 +13,11 @@ def not_found(executable: str, to_install: str) -> str:
         f"Make sure you've installed {to_install} correctly. "
         f"Refer to the {__app_name__} manual for help."
     )
+
+
+def error_occurred_in_module(module_name: str) -> str:
+
+    return (
+        f"An error occurred while executing checks for module '{module_name}' "
+        f"resulting in the module stopping execution and not providing any results"
+    )
