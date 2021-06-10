@@ -15,7 +15,7 @@ import latexbuddy.tools as tools
 from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.messages import not_found
+from latexbuddy.exceptions import ExecutableNotFoundError
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
@@ -183,24 +183,21 @@ class LanguageTool(Module):
 
         This method also checks if Java is installed.
         """
-        try:
-            tools.find_executable("java")
-        except FileNotFoundError:
-            self.__logger.error(not_found("java", "JRE (Java Runtime Environment)"))
+
+        tools.find_executable("java", "JRE (Java Runtime Environment)", self.__logger)
 
         try:
-            result = tools.find_executable("languagetool")
+            result = tools.find_executable(
+                "languagetool", "LanguageTool (CLI)", self.__logger, log_errors=False
+            )
             executable_source = "native"
-        except FileNotFoundError:
-            try:
-                result = tools.find_executable("languagetool-commandline.jar")
-                executable_source = "java"
-            except FileNotFoundError:
-                self.__logger.error(
-                    not_found("languagetool-commandline.jar", "LanguageTool CLI")
-                )
 
-                raise FileNotFoundError("Unable to find languagetool installation!")
+        except ExecutableNotFoundError:
+
+            result = tools.find_executable(
+                "languagetool-commandline.jar", "LanguageTool (CLI)", self.__logger
+            )
+            executable_source = "java"
 
         lt_path = result
         self.lt_console_command = []
@@ -414,26 +411,24 @@ class LanguageToolLocalServer:
 
         This method also checks if Java is installed.
         """
-        try:
-            tools.find_executable("java")
-        except FileNotFoundError:
-            self.__logger.error(not_found("java", "JRE (Java Runtime Environment)"))
 
-            raise FileNotFoundError("Unable to find Java runtime environment!")
+        tools.find_executable("java", "JRE (Java Runtime Environment)", self.__logger)
 
         try:
-            result = tools.find_executable("languagetool-server")
+            result = tools.find_executable(
+                "languagetool-server",
+                "LanguageTool (local server)",
+                self.__logger,
+                log_errors=False,
+            )
             executable_source = "native"
-        except FileNotFoundError:
-            try:
-                result = tools.find_executable("languagetool-server.jar")
-                executable_source = "java"
-            except FileNotFoundError:
-                self.__logger.error(
-                    not_found("languagetool-server.jar", "LanguageTool Server")
-                )
 
-                raise FileNotFoundError("Unable to find languagetool installation!")
+        except ExecutableNotFoundError:
+
+            result = tools.find_executable(
+                "languagetool-server.jar", "LanguageTool (local server)", self.__logger
+            )
+            executable_source = "java"
 
         self.lt_path = result
 
