@@ -59,7 +59,7 @@ class Problem:
 
     def __init__(
         self,
-        position: Tuple[int, int],
+        position: Optional[Tuple[int, int]],
         text: str,
         checker: str,
         cid: str,
@@ -150,6 +150,9 @@ class Problem:
 
         :return: string value of the position
         """
+        if self.position is None:
+            return "None"
+
         return f"{self.position[0]}:{self.position[1]}"
 
     def __eq__(self, o: object) -> bool:

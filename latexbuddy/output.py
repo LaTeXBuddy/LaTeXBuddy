@@ -53,6 +53,7 @@ class Interval:
 
     @property
     def start(self) -> int:
+        # TODO: implement default behavior for None-positions
         return self.problem.position[1]
 
     @property
@@ -145,7 +146,7 @@ def highlight(tex: str, problems: List[Problem]) -> str:
 
     for problem in problems:
         # we don't care about problems with no position
-        if problem.position == (0, 0):  # TODO: make position Optional for aspell
+        if problem.position is None:
             continue
 
         # we don't care about problems without length (for now)
