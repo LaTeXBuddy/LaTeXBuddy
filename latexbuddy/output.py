@@ -53,7 +53,6 @@ class Interval:
 
     @property
     def start(self) -> int:
-        # TODO: implement default behavior for None-positions
         return self.problem.position[1]
 
     @property
