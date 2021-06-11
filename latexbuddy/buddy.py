@@ -3,17 +3,17 @@
 import json
 import multiprocessing as mp
 import os
+import time
 
 from pathlib import Path
-from typing import AnyStr, List
+from typing import AnyStr, List, Optional
 
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.modules import Module
-from latexbuddy.modules.aspell import AspellModule
+from latexbuddy.messages import error_occurred_in_module
 from latexbuddy.preprocessor import Preprocessor
 from latexbuddy.problem import Problem, ProblemJSONEncoder, ProblemSeverity
 
@@ -34,7 +34,7 @@ class LatexBuddy:
         """
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = config_loader  # configuration
-        self.preprocessor: Preprocessor = None  # in-file preprocessing
+        self.preprocessor: Optional[Preprocessor] = None  # in-file preprocessing
         self.file_to_check = file_to_check  # .tex file that is to be error checked
         self.tex_file: TexFile = TexFile(file_to_check)
 
@@ -137,12 +137,20 @@ class LatexBuddy:
 
         def lambda_function() -> None:
             nonlocal result
+
+            start_time = time.perf_counter()
+
             result = module.run_checks(self.cfg, self.tex_file)
+
+            self.__logger.debug(
+                f"{module.__class__.__name__} finished after "
+                f"{round(time.perf_counter() - start_time, 2)} seconds"
+            )
 
         tools.execute_no_exceptions(
                 lambda_function,
-                f"An error occurred while executing checks for module "
-                f"'{module.__class__.__name__}'",
+                error_occurred_in_module(module.__class__.__name__),
+                "DEBUG",
             )
 
         return result
@@ -153,10 +161,11 @@ class LatexBuddy:
         # importing this here to avoid circular import error
         from latexbuddy.tool_loader import ToolLoader
 
-        # check_preprocessor
+        # initialize Preprocessor
         self.preprocessor = Preprocessor()
         self.preprocessor.regex_parse_preprocessor_comments(self.tex_file)
 
+        # initialize ToolLoader
         tool_loader = ToolLoader(Path("latexbuddy/modules/"))
         modules = tool_loader.load_selected_modules(self.cfg)
 

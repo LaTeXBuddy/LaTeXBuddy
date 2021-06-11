@@ -1,13 +1,13 @@
 """This module defines the connection between LaTeXBuddy and GNU Aspell."""
 import shlex
 
-from time import perf_counter
 from typing import List
 
 import latexbuddy.tools as tools
 
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.exceptions import LanguageNotSupportedError
 from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -19,7 +19,7 @@ class AspellModule(Module):
 
     def __init__(self):
         self._LANGUAGE_MAP = {"de": "de-DE", "en": "en"}
-        self.language = "en"  # FIXME: use config's language
+        self.language = "en"
         self.tool_name = "aspell"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
@@ -30,14 +30,8 @@ class AspellModule(Module):
         :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
-        start_time = perf_counter()
 
-        try:
-            tools.find_executable("aspell")
-        except FileNotFoundError:
-            self.__logger.error(not_found("aspell", "GNU Aspell"))
-
-            raise FileNotFoundError("Unable to find aspell installation!")
+        tools.find_executable("aspell", "GNU Aspell", self.__logger)
 
         try:
 
@@ -70,9 +64,6 @@ class AspellModule(Module):
 
             counter += 1  # if there is an empty line, just increase the counter
 
-        self.__logger.debug(
-            f"Aspell finished after {round(perf_counter() - start_time, 2)} seconds"
-        )
         return error_list
 
     def check_language(self, language: str, langs: str):
@@ -83,7 +74,7 @@ class AspellModule(Module):
 
         :param language: language to search for
         :param langs: language list to search in
-        :raises Exception: if the language is not on the list
+        :raises LanguageNotSupportedError: if the language is not on the list
         """
         # error if language dict not installed
         if language not in langs:
@@ -93,7 +84,9 @@ class AspellModule(Module):
                 + "https://ftp.gnu.org/gnu/aspell/dict/0index.html"
             )
 
-            raise Exception("Aspell: Language not found on system.")
+            raise LanguageNotSupportedError(
+                f"Aspell: Language '{language}' not found on system."
+            )
 
     def format_errors(
         self, out: List[str], line_number: int, file: TexFile
