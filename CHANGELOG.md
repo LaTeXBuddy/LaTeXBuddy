@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - minor issue in languagetool.py: module didn't stop execution after java-check failed in find_languagetool_command() (!94)
 - import issue with proselint, because proselint.py shared the same name with the imported API (!95)
+- usage of old `compare_...` functions (#45, !97)
 
 ## [0.2.0] - 08 Jun 2021
 
