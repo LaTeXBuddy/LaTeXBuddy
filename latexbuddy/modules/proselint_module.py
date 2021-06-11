@@ -1,4 +1,3 @@
-from time import perf_counter
 from typing import List
 
 import proselint
@@ -18,7 +17,6 @@ class ProseLintModule(Module):
         self.problem_type = "grammar"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-        start_time = perf_counter()
 
         lang = config.get_config_option_or_default("buddy", "language", None)
 
@@ -29,9 +27,6 @@ class ProseLintModule(Module):
 
         result = self.format_errors(suggestions, file)
 
-        self.__logger.debug(
-            f"ProseLint finished after {round(perf_counter() - start_time, 2)} seconds"
-        )
         return result
 
     def format_errors(self, suggestions: List, file: TexFile):
