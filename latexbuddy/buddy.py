@@ -146,6 +146,7 @@ class LatexBuddy:
             nonlocal result
 
             start_time = time.perf_counter()
+            self.__logger.debug(f"{module.__class__.__name__} started checks")
 
             result = module.run_checks(self.cfg, self.tex_file)
 
