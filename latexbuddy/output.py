@@ -39,10 +39,10 @@ def render_html(file_name: str, file_text: str, problems: Dict[str, Problem]) ->
     """
     problem_values = sorted(problems.values(), key=problem_key)
     template = env.get_template("result.html")
-    higlighted_tex = highlight(file_text, problem_values)
+    highlighted_tex = highlight(file_text, problem_values)
     return template.render(
         file_name=file_name,
-        file_text=higlighted_tex,
+        file_text=highlighted_tex,
         problems=problem_values,
     )
 
