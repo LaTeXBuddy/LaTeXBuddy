@@ -14,8 +14,9 @@ from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
+from latexbuddy.modules import Module
 from latexbuddy.preprocessor import Preprocessor
-from latexbuddy.problem import Problem, ProblemJSONEncoder, ProblemSeverity
+from latexbuddy.problem import Problem, ProblemJSONEncoder
 
 
 # TODO: make this a singleton class with static methods
