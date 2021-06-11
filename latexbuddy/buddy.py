@@ -149,10 +149,10 @@ class LatexBuddy:
             )
 
         tools.execute_no_exceptions(
-                lambda_function,
-                error_occurred_in_module(module.__class__.__name__),
-                "DEBUG",
-            )
+            lambda_function,
+            error_occurred_in_module(module.__class__.__name__),
+            "DEBUG",
+        )
 
         return result
 
