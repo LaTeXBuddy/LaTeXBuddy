@@ -1,16 +1,19 @@
 """This module describes the main LaTeXBuddy instance class."""
 
 import json
+import multiprocessing as mp
 import os
 
 from pathlib import Path
-from typing import AnyStr
+from typing import AnyStr, List
 
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.modules import Module
+from latexbuddy.modules.aspell import AspellModule
 from latexbuddy.preprocessor import Preprocessor
 from latexbuddy.problem import Problem, ProblemJSONEncoder, ProblemSeverity
 
@@ -128,6 +131,22 @@ class LatexBuddy:
     # def add_to_whitelist_manually(self):
     #     return
 
+    def mapper(self, module: Module) -> List[Problem]:
+
+        result = []
+
+        def lambda_function() -> None:
+            nonlocal result
+            result = module.run_checks(self.cfg, self.tex_file)
+
+        tools.execute_no_exceptions(
+                lambda_function,
+                f"An error occurred while executing checks for module "
+                f"'{module.__class__.__name__}'",
+            )
+
+        return result
+
     def run_tools(self):
         """Runs all tools in the LaTeXBuddy toolchain"""
 
@@ -141,19 +160,17 @@ class LatexBuddy:
         tool_loader = ToolLoader(Path("latexbuddy/modules/"))
         modules = tool_loader.load_selected_modules(self.cfg)
 
-        for module in modules:
+        self.__logger.debug(
+            f"Using multiprocessing pool with {os.cpu_count()} "
+            f"threads/processes for checks."
+        )
 
-            def lambda_function() -> None:
-                errors = module.run_checks(self.cfg, self.tex_file)
+        with mp.Pool(processes=os.cpu_count()) as pool:
+            result = pool.map(self.mapper, modules)
 
-                for error in errors:
-                    self.add_error(error)
-
-            tools.execute_no_exceptions(
-                lambda_function,
-                f"An error occurred while executing checks for module "
-                f"'{module.__class__.__name__}'",
-            )
+        for problems in result:
+            for problem in problems:
+                self.add_error(problem)
 
         # FOR TESTING ONLY
         # self.check_whitelist()
