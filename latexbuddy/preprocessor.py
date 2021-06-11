@@ -70,6 +70,9 @@ class ProblemFilter(ABC):
                  ProblemFilter, False otherwise
         """
 
+        if problem.position is None:
+            return True
+
         if self.end_line is None:
             return self.start_line <= problem.position[0]
         else:

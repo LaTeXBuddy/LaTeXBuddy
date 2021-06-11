@@ -14,9 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - moved module execution time measurements from individual modules to the main buddy instance (!93)
 - improved logging for tool-methods find_executable and execute_no_errors (!94)
 - adapted all modules using tool-methods find_executable and execute_no_errors to the new features (!94)
+- changed module execution to utilize multiprocessing (!92)
+- changed Problem attribute position to be optional (!96)
 
 ### Fixed
 - minor issue in languagetool.py: module didn't stop execution after java-check failed in find_languagetool_command() (!94)
+- import issue with proselint, because proselint.py shared the same name with the imported API (!95)
 
 ## [0.2.0] - 08 Jun 2021
 
