@@ -103,7 +103,7 @@ class LatexBuddy:
         :param uid: the UID of the error to be deleted
         """
 
-        if uid not in self.errors.keys():
+        if uid not in self.errors:
             self.__logger.error(
                 f"UID not found: {uid}. "
                 "Specified problem will not be added to whitelist."
@@ -111,19 +111,19 @@ class LatexBuddy:
             return
 
         # write error in whitelist
-        with open(self.whitelist_file, "a+") as file:
-            file.write(self.errors[uid].get_comp_id())
+        with self.whitelist_file.open("a+") as file:
+            file.write(self.errors[uid].cid)
             file.write("\n")
 
         # delete error and save comp_id for further check
-        compare_id = self.errors[uid].get_comp_id()
+        compare_id = self.errors[uid].cid
         del self.errors[uid]
 
         # check if there are other errors equal to the one just added to the whitelist
-        uids = list(self.errors.keys())
-        for curr_uid in uids:
-            if self.errors[curr_uid].compare_with_other_comp_id(compare_id):
-                del self.errors[curr_uid]
+        for i_uid, problem in self.errors.items():
+            if problem.key == compare_id:
+                del self.errors[i_uid]
+                break
 
     # TODO: implement
     # def add_to_whitelist_manually(self):
