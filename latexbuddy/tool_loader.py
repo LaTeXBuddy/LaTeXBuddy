@@ -1,3 +1,4 @@
+import importlib
 import importlib.util as importutil
 import inspect
 
@@ -42,6 +43,10 @@ class ToolLoader:
             for class_obj in classes:
                 modules.append(class_obj())
 
+        for module in modules:
+
+            module.__module__ = "latexbuddy.modules." + module.__module__
+
         return modules
 
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
@@ -85,9 +90,9 @@ class ToolLoader:
         for py_file in py_files:
 
             def lambda_function() -> None:
-                spec = importutil.spec_from_file_location(py_file.stem, py_file)
-                module = importutil.module_from_spec(spec)
-                spec.loader.exec_module(module)
+
+                module_path = str(py_file.with_suffix("")).replace("/", ".")
+                module = importlib.import_module(module_path)
 
                 loaded_modules.append(module)
 
