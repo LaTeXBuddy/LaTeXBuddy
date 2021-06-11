@@ -2,7 +2,6 @@
 
 ChkTeX Documentation: https://www.nongnu.org/chktex/ChkTeX.pdf
 """
-from time import perf_counter
 from typing import List
 
 import latexbuddy.tools as tools
@@ -10,7 +9,6 @@ import latexbuddy.tools as tools
 from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
@@ -31,14 +29,8 @@ class ChktexModule(Module):
         :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
-        start_time = perf_counter()
 
-        try:
-            tools.find_executable("chktex")
-        except FileNotFoundError:
-            self.__logger.error(not_found("chktex", "ChkTeX"))
-
-            raise FileNotFoundError("Unable to find ChkTeX installation!")
+        tools.find_executable("chktex", "ChkTeX", self.__logger)
 
         format_str = (
             self.DELIMITER.join(
@@ -52,10 +44,6 @@ class ChktexModule(Module):
         out_split = command_output.split("\n")
 
         result = self.format_problems(out_split, file)
-
-        self.__logger.debug(
-            f"ChkTeX finished after {round(perf_counter() - start_time, 2)} seconds"
-        )
 
         return result
 
