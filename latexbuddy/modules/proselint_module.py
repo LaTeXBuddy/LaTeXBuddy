@@ -14,7 +14,7 @@ class ProseLintModule(Module):
     __logger = root_logger.getChild("ProseLintModule")
 
     def __init__(self):
-        self.tool_name = "proselint"
+        self.tool_name = "ProseLintModule"
         self.problem_type = "grammar"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
