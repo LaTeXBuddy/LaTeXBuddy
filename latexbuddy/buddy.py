@@ -90,7 +90,7 @@ class LatexBuddy:
 
         whitelist_entries = self.whitelist_file.read_text().splitlines()
 
-        for uid, problem in self.errors.keys():
+        for uid, problem in self.errors.items():
             if problem.key in whitelist_entries:
                 del self.errors[uid]
 
