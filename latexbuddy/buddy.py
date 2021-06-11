@@ -133,7 +133,13 @@ class LatexBuddy:
     #     return
 
     def mapper(self, module: Module) -> List[Problem]:
+        """
+        Executes checks for provided module and returns its Problems.
+        This method is used to parallelize the module execution.
 
+        :param module: module to execute
+        :return: list of resulting problems
+        """
         result = []
 
         def lambda_function() -> None:
@@ -157,7 +163,7 @@ class LatexBuddy:
         return result
 
     def run_tools(self):
-        """Runs all tools in the LaTeXBuddy toolchain"""
+        """Runs all tools in the LaTeXBuddy toolchain in parallel"""
 
         # importing this here to avoid circular import error
         from latexbuddy.tool_loader import ToolLoader
