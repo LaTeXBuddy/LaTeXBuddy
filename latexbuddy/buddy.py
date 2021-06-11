@@ -84,18 +84,15 @@ class LatexBuddy:
             self.errors[problem.uid] = problem
 
     def check_whitelist(self):
-        """Remove errors that are whitelisted."""
-        if not os.path.isfile(self.whitelist_file):
+        """Removes errors that are whitelisted."""
+        if not (self.whitelist_file.exists() and self.whitelist_file.is_file()):
             return  # if no whitelist yet, don't have to check
 
-        with open(self.whitelist_file, "r") as file:
-            whitelist = file.read().split("\n")
+        whitelist_entries = self.whitelist_file.read_text().splitlines()
 
-        for whitelist_element in whitelist:
-            uids = list(self.errors.keys())
-            for uid in uids:
-                if self.errors[uid].compare_with_other_comp_id(whitelist_element):
-                    del self.errors[uid]
+        for uid, problem in self.errors.items():
+            if problem.key in whitelist_entries:
+                del self.errors[uid]
 
     def add_to_whitelist(self, uid):
         """Adds the error identified by the given UID to the whitelist
@@ -106,7 +103,7 @@ class LatexBuddy:
         :param uid: the UID of the error to be deleted
         """
 
-        if uid not in self.errors.keys():
+        if uid not in self.errors:
             self.__logger.error(
                 f"UID not found: {uid}. "
                 "Specified problem will not be added to whitelist."
@@ -114,19 +111,19 @@ class LatexBuddy:
             return
 
         # write error in whitelist
-        with open(self.whitelist_file, "a+") as file:
-            file.write(self.errors[uid].get_comp_id())
+        with self.whitelist_file.open("a+") as file:
+            file.write(self.errors[uid].cid)
             file.write("\n")
 
         # delete error and save comp_id for further check
-        compare_id = self.errors[uid].get_comp_id()
+        compare_id = self.errors[uid].cid
         del self.errors[uid]
 
         # check if there are other errors equal to the one just added to the whitelist
-        uids = list(self.errors.keys())
-        for curr_uid in uids:
-            if self.errors[curr_uid].compare_with_other_comp_id(compare_id):
-                del self.errors[curr_uid]
+        for i_uid, problem in self.errors.items():
+            if problem.key == compare_id:
+                del self.errors[i_uid]
+                break
 
     # TODO: implement
     # def add_to_whitelist_manually(self):
