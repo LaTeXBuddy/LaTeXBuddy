@@ -2,7 +2,7 @@ import hashlib
 import os
 
 from pathlib import Path
-from typing import List
+from typing import AnyStr, List
 
 from unidecode import unidecode
 
@@ -18,6 +18,8 @@ from latexbuddy.texfile import TexFile
 class DictionModule(Module):
     __logger = root_logger.getChild("DictionModule")
 
+    __SUPPORTED_LANGUAGES = ["en", "de", "nl"]
+
     def __init__(self):
         self.language = None
         self.tool_name = "diction"
@@ -27,11 +29,13 @@ class DictionModule(Module):
         # check, if diction is installed
         tools.find_executable("diction", "Diction", self.__logger)
 
-        # TODO: make this dynamic/configurable using
-        #  config.get_config_option_or_default(
-        #       "buddy", "language", "<default language>"
-        #  )
-        self.language = "en"
+        self.language = config.get_config_option_or_default(
+            "buddy",
+            "language",
+            None,
+            verify_type=AnyStr,
+            verify_choices=DictionModule.__SUPPORTED_LANGUAGES,
+        )
 
         # replace umlauts so error position is correct
         lines = Path(file.plain_file).read_text()
