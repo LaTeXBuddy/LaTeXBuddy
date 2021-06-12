@@ -2,8 +2,7 @@ import hashlib
 import os
 
 from pathlib import Path
-from typing import List
-from typing import AnyStr
+from typing import AnyStr, List
 
 from unidecode import unidecode
 
@@ -19,11 +18,7 @@ from latexbuddy.texfile import TexFile
 class DictionModule(Module):
     __logger = root_logger.getChild("DictionModule")
 
-    __SUPPORTED_LANGUAGES = [
-        "en",
-        "de",
-        "nl"
-    ]
+    __SUPPORTED_LANGUAGES = ["en", "de", "nl"]
 
     def __init__(self):
         self.language = None
