@@ -1,3 +1,4 @@
+import os
 import re
 
 from typing import List
@@ -302,4 +303,70 @@ class URLModule(Module):
                     length=length,
                 )
             )
+        return problems
+
+
+class CheckFigureResolution(Module):
+
+    file_endings = [
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".bmp",
+        ".jpg",
+        ".jpeg",
+        ".jpe",
+        ".jif",
+        ".jfif",
+        ".jfi",
+        ".gif",
+        ".webp",
+        "tiff",
+        "tif",
+        ".psd",
+        ".dip",
+        ".heif",
+        ".heic",
+        ".jp2",
+    ]
+
+    def __init__(self):
+        self.tool_name = "resolution_check"
+        self.cid = "0"
+        self.severity = ProblemSeverity.INFO
+        self.category = "latex"
+
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+        """Finds potential low resolution figures.
+        :param: config: configurations of the buddy instance
+        :param: file: the file to check
+        :return: a list of found problems
+        """
+        search_root = os.path.dirname(file.tex_file)
+        problems = []
+        figures = []
+
+        for root, dirs, files in os.walk(search_root):
+            root_name = os.path.basename(root)
+            for current_file in files:
+                name, ending = os.path.splitext(current_file)
+                if str.lower(ending) in self.file_endings or (
+                    str.lower(root_name) == "figures" and str.lower(ending) == ".pdf"
+                ):
+                    figures.append(current_file)
+                    problems.append(
+                        Problem(
+                            position=(1, 1),
+                            text=name,
+                            checker=self.tool_name,
+                            category=self.category,
+                            cid="0",
+                            file=file.tex_file,
+                            severity=self.severity,
+                            description=f"Figure might have low resolution due to file format {ending}",
+                            key=self.tool_name + "_" + current_file,
+                            length=1,
+                        )
+                    )
+
         return problems
