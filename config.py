@@ -50,6 +50,9 @@ modules = {
     "NativeUseOfRef": {
         "enabled": True,
     },
+    "CheckFigureResolution": {
+        "enabled": True,
+    },
     "YaLafi": {
         "enabled": True
     },
