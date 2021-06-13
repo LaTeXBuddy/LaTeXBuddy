@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 declare -A osInfo;
 osInfo[/etc/debian_version]="apt-get install -y"
 osInfo[/etc/alpine-release]="apk --update add"
@@ -8,7 +8,7 @@ osInfo[/etc/redhat-release]="yum install -y"
 osInfo[/etc/arch-release]="pacman -U"
 osInfo[/etc/gentoo-release]="emerge"
 osInfo[/etc/SuSE-release]="zypper install -y"
-packages=(python3-pip git default-jdk curl make gzip)
+packages=(python3-pip git default-jdk curl make)
 
 for f in ${!osInfo[@]}
 do
@@ -17,7 +17,6 @@ do
     fi
 done
 
-#Error installung packages
 for i in ${packages[@]}
 do
     if [[ $package_manager == "apt-get" ]]; then
@@ -46,6 +45,11 @@ $CURL $url > $TARPATH
 TARPATH=$HOME/LanguageTool-5.3.zip
 FPATH=$HOME/languageTool
 url=https://languagetool.org/download/LanguageTool-5.3.zip
+$CURL $url > $TARPATH
+
+TARPATH=$HOME/chktex-1.7.6.tar.gz
+PATH=$HOME/chktex
+url=http://download.savannah.gnu.org/releases/chktex/chktex-1.7.6.tar.gz
 $CURL $url > $TARPATH
 
 TARPATH=$HOME/aspell-master.zip
