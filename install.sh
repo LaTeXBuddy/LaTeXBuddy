@@ -31,6 +31,7 @@ TARPATH=$HOME/diction-1.14.tar.gz
 PATH=$HOME/diction
 url=http://ftp.gnu.org/gnu/diction/diction-1.11.tar.gz
 $CURL $url > $TARPATH
+tar -xvzf $TARPATH --directory $PATH
 
 TARPATH=$HOME/LanguageTool-5.3.zip
 PATH=$HOME/languageTool
@@ -39,7 +40,7 @@ $CURL $url > $TARPATH
 
 TARPATH=$HOME/chktex-1.7.6.tar.gz
 PATH=$HOME/chktex
-url=http://download.savannah.gnu.org/releases/chktex/chktex-1.7.6.tar.gz
+url=http://mirror.netcologne.de/savannah/chktex/chktex-1.7.6.tar.gz
 $CURL $url > $TARPATH
 
 TARPATH=$HOME/aspell-master.zip
