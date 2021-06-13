@@ -370,3 +370,33 @@ class CheckFigureResolution(Module):
                     )
 
         return problems
+
+
+class NativeUseOfRef(Module):
+    def __init__(self):
+        self.tool_name = "native_ref_use_check"
+        self.severity = ProblemSeverity.INFO
+        self.category = "latex"
+
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+        prblm_description = "Instead of \\ref{} use more precise command e.g. \\cref{}"
+        tex = file.tex
+        problems = []
+        ref_pattern = "\\ref{"
+        problem_start = tex.find(ref_pattern)
+        while problem_start != -1:
+            line, col, offset = tools.absolute_to_linecol(tex, problem_start)
+            problems.append(
+                Problem(
+                    position=(line, col),
+                    text=ref_pattern,
+                    checker=self.tool_name,
+                    category=self.category,
+                    file=file.tex_file,
+                    severity=self.severity,
+                    description=prblm_description,
+                    key=self.tool_name + "_" + "\\ref{}",
+                    length=len(ref_pattern),
+                )
+            )
+        return problems
