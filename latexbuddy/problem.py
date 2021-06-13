@@ -111,12 +111,21 @@ class Problem:
         if suggestions is None:
             suggestions = []
         self.suggestions = suggestions
+        if key is None:
+            key = self.__generate_key()
         self.key = key
-
-        if self.key is None:
-            self.key = self.__generate_key()
         self.length = len(text)
         self.uid = self.__generate_uid()
+
+        self.__cut_suggestions(10)
+
+    def __cut_suggestions(self, n):
+        """Cuts the suggestions list down to the first n elements if there are more
+
+        :n : maximum number of suggestions that should be shown
+        """
+        if len(self.suggestions) > n:
+            self.suggestions = self.suggestions[:n]
 
     def __generate_key(self) -> str:
         """Generates a key for the problem based on checker and problematic text.
