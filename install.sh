@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 declare -A osInfo;
 osInfo[/etc/debian_version]="apt-get install -y"
 osInfo[/etc/alpine-release]="apk --update add"
@@ -8,7 +8,7 @@ osInfo[/etc/redhat-release]="yum install -y"
 osInfo[/etc/arch-release]="pacman -U"
 osInfo[/etc/gentoo-release]="emerge"
 osInfo[/etc/SuSE-release]="zypper install -y"
-packages=(python3-pip git default-jdk curl make)
+packages=(python3-pip git default-jdk curl make gzip)
 
 for f in ${!osInfo[@]}
 do
@@ -17,6 +17,7 @@ do
     fi
 done
 
+#Error installung packages
 for i in ${packages[@]}
 do
     if [[ $package_manager == "apt-get" ]]; then
@@ -26,28 +27,33 @@ do
     ${package_manager} ${i}
 done
 
-CURL='/usr/bin/curl'
+echo 'installation of tools done'
+echo $PATH
+tar --version
+
+TPATH=$HOME/chktex-1.7.6.tar.gz
+FPATH=$HOME/chktex
+TAR='/usr/bin/tar'
+url='http://download.savannah.gnu.org/releases/chktex/chktex-1.7.6.tar.gz'
+curl -L $url > TPATH
+tar -xvf TPATH -C $FPATH
+tar --version
 TARPATH=$HOME/diction-1.14.tar.gz
-PATH=$HOME/diction
+FPATH=$HOME/diction
 url=http://ftp.gnu.org/gnu/diction/diction-1.11.tar.gz
 $CURL $url > $TARPATH
 
 TARPATH=$HOME/LanguageTool-5.3.zip
-PATH=$HOME/languageTool
+FPATH=$HOME/languageTool
 url=https://languagetool.org/download/LanguageTool-5.3.zip
 $CURL $url > $TARPATH
 
-TARPATH=$HOME/chktex-1.7.6.tar.gz
-PATH=$HOME/chktex
-url=http://download.savannah.gnu.org/releases/chktex/chktex-1.7.6.tar.gz
-$CURL $url > $TARPATH
-
 TARPATH=$HOME/aspell-master.zip
-PATH=$HOME/aspell
+FPATH=$HOME/aspell
 url=https://github.com/GNUAspell/aspell/aspell-master.zip
 $CURL $url > $TARPATH
 
 TARPATH=$HOME/latexbuddy-master.tar.gz
-PATH=$HOME/latexbuddy
+FPATH=$HOME/latexbuddy
 url=https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/latexbuddy-master.tar.gz
 $CURL $url > $TARPATH
