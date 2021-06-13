@@ -386,17 +386,19 @@ class NativeUseOfRef(Module):
         curr_problem_start = tex.find(ref_pattern)
         while curr_problem_start != -1:
             line, col, offset = tools.absolute_to_linecol(tex, curr_problem_start)
+            end_command = tex.find("}", curr_problem_start) + 1
+            problem_text = tex[curr_problem_start:end_command]
             problems.append(
                 Problem(
                     position=(line, col),
-                    text=ref_pattern,
+                    text=problem_text,
                     checker=self.tool_name,
                     category=self.category,
                     cid="0",
                     file=file.tex_file,
                     severity=self.severity,
                     description=prblm_description,
-                    key=self.tool_name + "_" + "\\ref{}",  # TODO: Update key
+                    key=self.tool_name + "_" + "\\" + problem_text,
                     length=len(ref_pattern),
                 )
             )
