@@ -146,7 +146,7 @@ class DictionModule(Module):
                     position=location,
                     text=o_line,
                     checker="diction",
-                    cid="0",
+                    p_type="0",
                     file=file,
                     severity=ProblemSeverity.INFO,
                     category="wording/ phrasing",

@@ -79,7 +79,7 @@ class ChktexModule(Module):
                     position=position,
                     text=text,
                     checker=self.tool_name,
-                    cid=str(internal_id),
+                    p_type=str(internal_id),
                     file=file.tex_file,
                     severity=severity,
                     category=self.problem_type,

@@ -19,7 +19,7 @@ class ProblemSeverity(Enum):
 
     Problem severity is usually preset by the checkers themselves. However, a user
     should be able to redefine the severity of a specific problem, using either
-    category, key, or cid.
+    category, key, or p_type.
 
     * "none" problems are not being highlighted, but are still being output.
     * "info" problems are highlighted with light blue colour. These are suggestions;
@@ -62,9 +62,9 @@ class Problem:
         position: Optional[Tuple[int, int]],
         text: str,
         checker: str,
-        cid: str,
         file: Path,
         severity: ProblemSeverity = ProblemSeverity.WARNING,
+        p_type: Optional[str] = None,
         length: Optional[int] = None,
         category: Optional[str] = None,
         description: Optional[str] = None,
@@ -79,7 +79,7 @@ class Problem:
         :param length: the length of the problematic text.
         :param text: problematic text.
         :param checker: name of the tool that discovered the problem.
-        :param cid: ID of the problem type, used inside the respective checker.
+        :param p_type: ID of the problem type, used inside the respective checker.
         :param file: **[DEPRECATED]** path to the file where the problem was found
         :param severity: severity of the problem.
         :param category: category of the problem, for example "grammar".
@@ -88,7 +88,8 @@ class Problem:
                         and after the problematic text.
         :param suggestions: list of suggestions, that is, possible replacements for
                             problematic text.
-        :param key: semi-unique string, which can be used to compare two problems.
+        :param key: semi-unique string, which can be used to compare two problems. Will
+                    be used for entries in the whitelist
 
         """
         self.position = position
@@ -97,7 +98,9 @@ class Problem:
         self.length = length
         self.text = text
         self.checker = checker
-        self.cid = cid
+        if length is None:
+            self.p_type = ""
+        self.p_type = p_type
         self.file = file  # FIXME: deprecated!
         self.severity = severity
         self.category = category
@@ -123,26 +126,13 @@ class Problem:
 
         :return: generated key
         """
-        return f"{self.checker}/{self.cid}/{self.text}"
+        return f"{self.checker}/{self.p_type}/{self.text}"
 
     def __generate_uid(self) -> str:
-        """**[DEPRECATED]** Calculates the UID of the Problem object.
+        """ Creates the UID for the Problem object.
 
-        The UID is a unique ID containing all important information about the problem.
-
-        :return: the UID of the Problem object
+        :return: a unique UID for the Problem object
         """
-
-        """return "\0".join(
-            [
-                str(self.file),
-                self.checker,
-                str(self.category),
-                self.cid,
-                self.__get_pos_str(),
-                str(self.length),
-            ]
-        )"""
         return str(time.time())
 
     def __get_pos_str(self) -> str:
@@ -188,7 +178,7 @@ class ProblemJSONEncoder(JSONEncoder):
                 "position": obj.position,
                 "text": obj.text,
                 "checker": obj.checker,
-                "cid": obj.cid,
+                "p_type": obj.p_type,
                 "file": str(obj.file),
                 "severity": str(obj.severity),
                 "length": obj.length,
