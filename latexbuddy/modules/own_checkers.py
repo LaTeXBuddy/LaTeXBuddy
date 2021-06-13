@@ -13,7 +13,7 @@ from latexbuddy.texfile import TexFile
 
 class UnreferencedFiguresModule(Module):
     def __init__(self):
-        self.tool_name = "refcheck"
+        self.tool_name = "unrefed_figure_check"
         self.cid = "0"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
@@ -383,20 +383,22 @@ class NativeUseOfRef(Module):
         tex = file.tex
         problems = []
         ref_pattern = "\\ref{"
-        problem_start = tex.find(ref_pattern)
-        while problem_start != -1:
-            line, col, offset = tools.absolute_to_linecol(tex, problem_start)
+        curr_problem_start = tex.find(ref_pattern)
+        while curr_problem_start != -1:
+            line, col, offset = tools.absolute_to_linecol(tex, curr_problem_start)
             problems.append(
                 Problem(
                     position=(line, col),
                     text=ref_pattern,
                     checker=self.tool_name,
                     category=self.category,
+                    cid="0",
                     file=file.tex_file,
                     severity=self.severity,
                     description=prblm_description,
-                    key=self.tool_name + "_" + "\\ref{}",
+                    key=self.tool_name + "_" + "\\ref{}",  # TODO: Update key
                     length=len(ref_pattern),
                 )
             )
+            curr_problem_start = tex.find(ref_pattern, curr_problem_start + 1)
         return problems
