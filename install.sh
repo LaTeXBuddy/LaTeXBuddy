@@ -26,7 +26,7 @@ do
     ${package_manager} ${i}
 done
 
-echo 'installation of tools done'
+
 echo $PATH
 tar --version
 
