@@ -99,7 +99,7 @@ Black code style with isort. Everything is set up; just run the following
 command:
 
 ```sh
-scripts/lint
+script/lint
 ```
 
 and it will fix every needed file.

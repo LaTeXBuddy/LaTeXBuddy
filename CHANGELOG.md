@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - centralized file for LaTeXBuddy exceptions (!94)
+- checker to warn about low resolution in figures
+- checker to detect \ref instead of e.g. \cref
 
 ### Changed
 - moved module execution time measurements from individual modules to the main buddy instance (!93)

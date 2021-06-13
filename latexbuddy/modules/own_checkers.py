@@ -13,7 +13,7 @@ from latexbuddy.texfile import TexFile
 
 class UnreferencedFiguresModule(Module):
     def __init__(self):
-        self.tool_name = "refcheck"
+        self.tool_name = "unrefed_figure_check"
         self.cid = "0"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
@@ -368,5 +368,42 @@ class CheckFigureResolution(Module):
                             length=1,
                         )
                     )
+
+        return problems
+
+
+class NativeUseOfRef(Module):
+    def __init__(self):
+        self.tool_name = "native_ref_use_check"
+        self.severity = ProblemSeverity.INFO
+        self.category = "latex"
+
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+        description = "Instead of \\ref{} use a more precise command e.g. \\cref{}"
+        tex = file.tex
+        problems = []
+        ref_pattern = "\\ref{"
+
+        curr_problem_start = tex.find(ref_pattern)  # init
+        while curr_problem_start != -1:
+            line, col, offset = tools.absolute_to_linecol(tex, curr_problem_start)
+            end_command = tex.find("}", curr_problem_start) + 1
+            problem_text = tex[curr_problem_start:end_command]
+            problems.append(
+                Problem(
+                    position=(line, col),
+                    text=ref_pattern,
+                    checker=self.tool_name,
+                    category=self.category,
+                    cid="0",
+                    file=file.tex_file,
+                    severity=self.severity,
+                    description=description,
+                    context=("", problem_text[5:]),
+                    key=self.tool_name + "_" + "\\" + problem_text,
+                    length=len(ref_pattern),
+                )
+            )
+            curr_problem_start = tex.find(ref_pattern, curr_problem_start + 1)
 
         return problems

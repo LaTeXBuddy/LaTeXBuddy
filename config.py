@@ -47,6 +47,12 @@ modules = {
     "UnreferencedFiguresModule": {
         "enabled": True,
     },
+    "NativeUseOfRef": {
+        "enabled": True,
+    },
+    "CheckFigureResolution": {
+        "enabled": True,
+    },
     "YaLafi": {
         "enabled": True
     },
