@@ -26,38 +26,30 @@ do
     ${package_manager} ${i}
 done
 
-
-echo $PATH
-tar --version
-
 TPATH=$HOME/chktex-1.7.6.tar.gz
 FPATH=$HOME/chktex
 TAR='/usr/bin/tar'
 url='http://download.savannah.gnu.org/releases/chktex/chktex-1.7.6.tar.gz'
 curl -L $url > TPATH
 tar -xvf TPATH -C $FPATH
-tar --version
+
+
 TARPATH=$HOME/diction-1.14.tar.gz
 FPATH=$HOME/diction
 url=http://ftp.gnu.org/gnu/diction/diction-1.11.tar.gz
-$CURL $url > $TARPATH
+curl $url > $TARPATH
 
 TARPATH=$HOME/LanguageTool-5.3.zip
 FPATH=$HOME/languageTool
 url=https://languagetool.org/download/LanguageTool-5.3.zip
-$CURL $url > $TARPATH
-
-TARPATH=$HOME/chktex-1.7.6.tar.gz
-PATH=$HOME/chktex
-url=http://download.savannah.gnu.org/releases/chktex/chktex-1.7.6.tar.gz
-$CURL $url > $TARPATH
+curl $url > $TARPATH
 
 TARPATH=$HOME/aspell-master.zip
 FPATH=$HOME/aspell
 url=https://github.com/GNUAspell/aspell/aspell-master.zip
-$CURL $url > $TARPATH
+curl $url > $TARPATH
 
 TARPATH=$HOME/latexbuddy-master.tar.gz
 FPATH=$HOME/latexbuddy
 url=https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/latexbuddy-master.tar.gz
-$CURL $url > $TARPATH
+curl $url > $TARPATH
