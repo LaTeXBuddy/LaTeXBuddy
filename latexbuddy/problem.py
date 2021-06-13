@@ -98,8 +98,8 @@ class Problem:
         self.length = length
         self.text = text
         self.checker = checker
-        if length is None:
-            self.p_type = ""
+        if p_type is None:
+            p_type = ""
         self.p_type = p_type
         self.file = file  # FIXME: deprecated!
         self.severity = severity

@@ -395,15 +395,15 @@ class NativeUseOfRef(Module):
                     text=ref_pattern,
                     checker=self.tool_name,
                     category=self.category,
-                    p_type="0",
                     file=file.tex_file,
                     severity=self.severity,
                     description=description,
                     context=("", problem_text[5:]),
-                    key=self.tool_name + "_" + "\\" + problem_text,
+                    key=self.tool_name + "_" + problem_text[5:-1],
                     length=len(ref_pattern),
                 )
             )
+            # find next problem for next iteration
             curr_problem_start = tex.find(ref_pattern, curr_problem_start + 1)
 
         return problems
