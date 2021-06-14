@@ -9,8 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - centralized file for LaTeXBuddy exceptions (!94)
-- checker to warn about low resolution in figures
-- checker to detect \ref instead of e.g. \cref
+- checker to warn about low resolution in figures (!101)
+- checker to detect \ref instead of e.g. \cref (!99)
+- language support in whitelist for spelling or grammar errors (!102)
 
 ### Changed
 - moved module execution time measurements from individual modules to the main buddy instance (!93)
@@ -18,11 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - adapted all modules using tool-methods find_executable and execute_no_errors to the new features (!94)
 - changed module execution to utilize multiprocessing (!92)
 - changed Problem attribute position to be optional (!96)
+- renamed Problem attribute cid to p_type (!102)
+- whitelist file extension removed (!102)
+- number of suggestions in a problem is now capped at 10 (!102)
 
 ### Fixed
 - minor issue in languagetool.py: module didn't stop execution after java-check failed in find_languagetool_command() (!94)
 - import issue with proselint, because proselint.py shared the same name with the imported API (!95)
 - usage of old `compare_...` functions (#45, !97)
+- whitelist working again (!102)
 
 ## [0.2.0] - 08 Jun 2021
 
