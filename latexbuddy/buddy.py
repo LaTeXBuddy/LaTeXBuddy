@@ -10,7 +10,7 @@ from typing import AnyStr, List, Optional
 
 import latexbuddy.tools as tools
 
-from latexbuddy import TexFile, problem
+from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
@@ -248,5 +248,5 @@ class LatexBuddy:
 
     def clear_error_list(self):
         """Function needed for multiple files.
-           It clears the error list, for the next use"""
+        It clears the error list, for the next use"""
         self.errors.clear()
