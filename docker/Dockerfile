@@ -33,6 +33,24 @@ WORKDIR /diction-1.14
 RUN apk add build-base
 RUN ./configure && make
 
+
+
+# build chktex
+FROM alpine:latest AS build-chktex
+
+# download chktex
+RUN wget 'http://download.savannah.gnu.org/releases/chktex/chktex-1.7.6.tar.gz' \
+    && tar -xzf chktex-1.7.6.tar.gz
+
+# build chktex
+WORKDIR /chktex-1.7.6
+RUN apk add build-base
+RUN ./configure --prefix /usr/local
+RUN make
+RUN chmod 644 chktexrc
+
+
+
 # the end image itself
 FROM python:alpine
 
@@ -51,5 +69,9 @@ RUN apk add aspell aspell-de aspell-en aspell-fr aspell-ru aspell-uk
 
 # install diction
 COPY --from=build-diction /diction-1.14/diction /usr/local/bin/diction
+
+# install chktex
+COPY --from=build-chktex /chktex-1.7.6/chktex /usr/local/bin/chktex
+COPY --from=build-chktex /chktex-1.7.6/chktexrc /usr/local/etc/chktexrc
 
 ENTRYPOINT [ "latexbuddy" ]
