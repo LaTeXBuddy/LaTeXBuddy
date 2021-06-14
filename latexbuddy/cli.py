@@ -20,6 +20,7 @@ from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
 
+
 parser = argparse.ArgumentParser(
     prog=name, description="The one-stop-shop for LaTeX checking."
 )
@@ -117,15 +118,17 @@ def main():
         file_to_check=Path(paths.pop(0)),
     )
 
+    # for the first file
     buddy.run_tools()
+    buddy.check_whitelist()
+    buddy.output_file()
 
     for path in paths:
         #  need to clear the error list of the previous file
         buddy.clear_error_list()
         buddy.change_file(Path(path))
         buddy.run_tools()
-
-    buddy.check_whitelist()
-    buddy.output_file()
+        buddy.check_whitelist()
+        buddy.output_file()
 
     logger.debug(f"Execution finished in {round(perf_counter() - start, 2)}s")

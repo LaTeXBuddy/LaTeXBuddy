@@ -226,7 +226,9 @@ class LatexBuddy:
         # importing this here to avoid circular import error
         from latexbuddy.output import render_html
 
-        html_output_path = Path(str(self.output_dir) + "/latexbuddy_output.html")
+        html_output_path = Path(
+            str(self.output_dir) + "/" + str(self.file_to_check.stem) + ".html"
+        )
         html_output_path.write_text(
             render_html(
                 str(self.tex_file.tex_file),
