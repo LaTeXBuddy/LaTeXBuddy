@@ -21,6 +21,18 @@ RUN poetry install && poetry build
 
 
 
+# build diction
+FROM alpine:latest AS build-diction
+
+# download diction
+RUN wget 'http://www.moria.de/~michael/diction/diction-1.14.tar.gz' \
+    && tar -xzf diction-1.14.tar.gz
+
+# build diction
+WORKDIR /diction-1.14
+RUN apk add build-base
+RUN ./configure && make
+
 # the end image itself
 FROM python:alpine
 
@@ -36,5 +48,8 @@ RUN pip install latexbuddy*.whl \
 # install aspell
 # TODO: manually supply other dictionaries
 RUN apk add aspell aspell-de aspell-en aspell-fr aspell-ru aspell-uk
+
+# install diction
+COPY --from=build-diction /diction-1.14/diction /usr/local/bin/diction
 
 ENTRYPOINT [ "latexbuddy" ]
