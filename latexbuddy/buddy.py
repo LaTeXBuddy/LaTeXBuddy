@@ -27,12 +27,16 @@ class LatexBuddy:
 
     __logger = root_logger.getChild("buddy")
 
-    def __init__(self, config_loader: ConfigLoader, file_to_check: Path):
+    def __init__(
+        self, config_loader: ConfigLoader, file_to_check: Path, path_list: Path
+    ):
         """Initializes the LaTeXBuddy instance.
 
         :param config_loader: ConfigLoader object to manage config options
         :param file_to_check: file that will be checked
+        :param path_list: a list of the paths for the html output
         """
+        self.path_list: Path = path_list  # all paths from the files to be used in html
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = config_loader  # configuration
         self.file_to_check = file_to_check  # .tex file that is to be error checked
@@ -238,6 +242,7 @@ class LatexBuddy:
                 str(self.tex_file.tex_file),
                 self.tex_file.tex,
                 self.errors,
+                self.path_list,
             )
         )
 

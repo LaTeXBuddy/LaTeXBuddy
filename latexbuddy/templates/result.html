@@ -22,16 +22,9 @@
     <h2><small>Results for</small> {{ file_name|e }}</h2>
     <div class="menu">
         <ol>
-            <li class="list">
-                <div class="file">
-                    <a href="output_test.html">test.tex</a>
-                </div>
-            </li>
-            <li class="list">
-                <div class="file">
-                    <a href="output_pim.html">pim.tex</a>
-                </div>
-            </li>
+            {% for path in paths %}
+                <li class="list"><div class="file"><a href="output_{{ path.stem }}.html">{{ path.name }}</a></div></li>
+            {% endfor %}
         </ol>
     </div>
 </header>

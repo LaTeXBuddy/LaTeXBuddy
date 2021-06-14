@@ -322,6 +322,7 @@ def get_all_paths_in_document(file_paths):
             if "\include" in line:
                 path = line[9:]
                 path = path.strip("}")
-                new_files.append(os.path.abspath(path))
+                new_files.append(Path(os.path.abspath(path)))
         unchecked_files.extend(new_files)  # add new paths
+    print(checked_files)
     return checked_files

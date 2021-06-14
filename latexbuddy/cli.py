@@ -115,13 +115,9 @@ def main():
 
     buddy = LatexBuddy(
         config_loader=config_loader,
-        file_to_check=Path(paths.pop(0)),
+        file_to_check=Path(paths[0]),
+        path_list=paths,  # to be used later on in render html
     )
-
-    # for the first file
-    buddy.run_tools()
-    buddy.check_whitelist()
-    buddy.output_file()
 
     for path in paths:
         #  need to clear the error list of the previous file
