@@ -33,4 +33,8 @@ COPY --from=build-latexbuddy /latexbuddy/dist/latexbuddy*.whl .
 RUN pip install latexbuddy*.whl \
     && rm -rf latexbuddy*.whl
 
+# install aspell
+# TODO: manually supply other dictionaries
+RUN apk add aspell aspell-de aspell-en aspell-fr aspell-ru aspell-uk
+
 ENTRYPOINT [ "latexbuddy" ]
