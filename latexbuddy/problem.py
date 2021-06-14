@@ -12,7 +12,9 @@ from json import JSONEncoder
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
+
 language = None  # static variable used for a uniform key generation
+
 
 @total_ordering
 class ProblemSeverity(Enum):
@@ -152,14 +154,15 @@ class Problem:
             key = f"{self.checker}_{self.p_type}_{self.text.replace(space, minus)}"
 
         # add language to the key if its a spelling or grammar error
-        if language is not None and (self.category == "grammar" or
-                                     self.category == "spelling"):
+        if language is not None and (
+            self.category == "grammar" or self.category == "spelling"
+        ):
             return language + "_" + key
 
         return key
 
     def __generate_uid(self) -> str:
-        """ Creates the UID for the Problem object.
+        """Creates the UID for the Problem object.
 
         :return: a unique UID for the Problem object
         """
