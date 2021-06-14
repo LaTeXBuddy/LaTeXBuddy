@@ -227,7 +227,11 @@ class LatexBuddy:
         from latexbuddy.output import render_html
 
         html_output_path = Path(
-            str(self.output_dir) + "/" + str(self.file_to_check.stem) + ".html"
+            str(self.output_dir)
+            + "/"
+            + "output_"
+            + str(self.file_to_check.stem)
+            + ".html"
         )
         html_output_path.write_text(
             render_html(
