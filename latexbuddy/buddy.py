@@ -82,7 +82,7 @@ class LatexBuddy:
         self.file_to_check = file  # .tex file that is to be error checked
         self.tex_file: TexFile = TexFile(file)
 
-    def add_error(self, error: Problem):
+    def add_error(self, problem: Problem):
         """Adds the error to the errors dictionary.
 
         UID is used as key, the error object is used as value.
