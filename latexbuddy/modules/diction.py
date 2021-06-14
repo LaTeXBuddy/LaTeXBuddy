@@ -149,7 +149,7 @@ class DictionModule(Module):
                     p_type="0",
                     file=file,
                     severity=ProblemSeverity.INFO,
-                    category="wording/ phrasing",
+                    category="grammar",
                     suggestions=[sugg],
                     key="diction_" + str(hashlib.md5(o_line.encode())),
                 )

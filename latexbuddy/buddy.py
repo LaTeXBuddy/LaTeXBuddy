@@ -16,7 +16,7 @@ from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
 from latexbuddy.modules import Module
 from latexbuddy.preprocessor import Preprocessor
-from latexbuddy.problem import Problem, ProblemJSONEncoder
+from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
 
 
 # TODO: make this a singleton class with static methods
@@ -160,6 +160,14 @@ class LatexBuddy:
 
     def run_tools(self):
         """Runs all tools in the LaTeXBuddy toolchain in parallel"""
+
+        language = self.cfg.get_config_option_or_default(
+            "buddy",
+            "language",
+            None,
+            verify_type=AnyStr,
+        )
+        set_language(language)  # set global variable in problem.py for key generation
 
         # importing this here to avoid circular import error
         from latexbuddy.tool_loader import ToolLoader

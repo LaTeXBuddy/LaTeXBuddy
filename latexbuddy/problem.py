@@ -12,6 +12,7 @@ from json import JSONEncoder
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
+language = None  # static variable used for a uniform key generation
 
 @total_ordering
 class ProblemSeverity(Enum):
@@ -48,6 +49,15 @@ class ProblemSeverity(Enum):
     def __lt__(self, other):
         if self.__class__ is other.__class__:
             return self.value < other.value
+
+
+def set_language(lang):
+    """Sets the static variable language used for key generation
+
+    :param lang: global language that the modules currently work with
+    """
+    global language
+    language = lang
 
 
 class Problem:
@@ -92,6 +102,7 @@ class Problem:
                     be used for entries in the whitelist
 
         """
+        # TODO: maybe move the defaults to the params, or was there a specific reason?
         self.position = position
         if length is None:
             length = 0
@@ -111,9 +122,7 @@ class Problem:
         if suggestions is None:
             suggestions = []
         self.suggestions = suggestions
-        if key is None:
-            key = self.__generate_key()
-        self.key = key
+        self.key = self.__generate_key(key)
         self.length = len(text)
         self.uid = self.__generate_uid()
 
@@ -122,20 +131,32 @@ class Problem:
     def __cut_suggestions(self, n):
         """Cuts the suggestions list down to the first n elements if there are more
 
-        :n : maximum number of suggestions that should be shown
+        :param n: maximum number of suggestions that should be shown
         """
         if len(self.suggestions) > n:
             self.suggestions = self.suggestions[:n]
 
-    def __generate_key(self) -> str:
-        """Generates a key for the problem based on checker and problematic text.
+    def __generate_key(self, key) -> str:
+        """Generates a key for the problem based on language and the given key.
 
-        This method is particularly used in the constructor for the cases when the key
-        wasn't previously supplied.
+        Major difference for this method is if the module that created this problem
+        instance has supplied a key or not.
 
-        :return: generated key
+        :param key: key generated and given by the checker module, None if not supplied
+        :return: final generated key
         """
-        return f"{self.checker}/{self.p_type}/{self.text}"
+        if key is None:
+            # TODO: maybe remove automatic key generation altogether and default to None
+            space = " "
+            minus = "-"
+            key = f"{self.checker}_{self.p_type}_{self.text.replace(space, minus)}"
+
+        # add language to the key if its a spelling or grammar error
+        if language is not None and (self.category == "grammar" or
+                                     self.category == "spelling"):
+            return language + "_" + key
+
+        return key
 
     def __generate_uid(self) -> str:
         """ Creates the UID for the Problem object.
