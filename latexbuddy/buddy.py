@@ -245,3 +245,8 @@ class LatexBuddy:
 
         else:  # using HTML as default
             self.output_html()
+
+    def clear_error_list(self):
+        """Function needed for multiple files.
+           It clears the error list, for the next use"""
+        self.errors.clear()

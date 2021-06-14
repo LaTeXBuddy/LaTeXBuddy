@@ -120,6 +120,8 @@ def main():
     buddy.run_tools()
 
     for path in paths:
+        #  need to clear the error list of the previous file
+        buddy.clear_error_list()
         buddy.change_file(Path(path))
         buddy.run_tools()
 
