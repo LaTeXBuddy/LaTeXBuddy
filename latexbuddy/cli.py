@@ -10,6 +10,8 @@ from time import perf_counter
 
 from colorama import Fore
 
+import latexbuddy.tools as tool
+
 from latexbuddy import __app_name__
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
@@ -18,7 +20,6 @@ from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
 
-
 parser = argparse.ArgumentParser(
     prog=name, description="The one-stop-shop for LaTeX checking."
 )
@@ -26,6 +27,10 @@ parser.add_argument(
     "--version", "-V", action="version", version=f"{__app_name__} v{__version__}"
 )
 parser.add_argument("file", type=Path, help="File that will be processed.")
+parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
+
+# nargs="+" marks the beginning of a list
+parser.add_argument("file", nargs="+", type=Path, help="File that will be processed.")
 parser.add_argument(
     "--config",
     "-c",
@@ -104,13 +109,21 @@ def main():
 
     config_loader = ConfigLoader(args)
 
+    # args.file is a list
+    paths = tool.get_all_paths_in_document(args.file)
+
     buddy = LatexBuddy(
         config_loader=config_loader,
-        file_to_check=args.file,
+        file_to_check=Path(paths.pop(0)),
     )
 
     buddy.run_tools()
+
+    for path in paths:
+        buddy.change_file(Path(path))
+        buddy.run_tools()
+
     buddy.check_whitelist()
     buddy.output_file()
 
-    logger.debug(f"Execution finished in {round(perf_counter()-start, 2)}s")
+    logger.debug(f"Execution finished in {round(perf_counter() - start, 2)}s")

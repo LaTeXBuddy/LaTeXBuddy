@@ -35,7 +35,6 @@ class LatexBuddy:
         """
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = config_loader  # configuration
-        self.preprocessor: Optional[Preprocessor] = None  # in-file preprocessing
         self.file_to_check = file_to_check  # .tex file that is to be error checked
         self.tex_file: TexFile = TexFile(file_to_check)
 
@@ -71,6 +70,19 @@ class LatexBuddy:
         )
 
     def add_error(self, problem: Problem):
+        # current language
+        self.lang = self.cfg.get_config_option_or_default("buddy", "language", "en")
+
+    def change_file(self, file):
+        """Method to change the current file. Used for multi check files included
+            in other files
+
+        :param file: the new file to check next
+        """
+        self.file_to_check = file  # .tex file that is to be error checked
+        self.tex_file: TexFile = TexFile(file)
+
+    def add_error(self, error: Problem):
         """Adds the error to the errors dictionary.
 
         UID is used as key, the error object is used as value.

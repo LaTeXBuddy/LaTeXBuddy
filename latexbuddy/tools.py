@@ -292,3 +292,36 @@ def get_app_dir() -> Path:
     app_dir.mkdir(parents=True, exist_ok=True)
 
     return app_dir
+
+
+def get_all_paths_in_document(file_paths):
+    """Checks files that are included in a file.
+
+    If the file includes more files, these files will also be checked.
+
+    :param file_paths:a list, containing file paths
+    """
+
+    unchecked_files = []  # Holds all unchecked files
+    checked_files = []  # Holds all checked file
+
+    # add all paths to list
+    for file_path in file_paths:
+        unchecked_files.append(file_path)  # add path
+
+    while len(unchecked_files) > 0:
+        checked_files.append(unchecked_files[0])
+        new_files = []
+
+        try:
+            lines = Path(unchecked_files.pop(0)).read_text().splitlines(keepends=False)
+        except Exception as e:  # If the file cannot be found
+            print(e)
+
+        for line in lines:
+            if "\include" in line:
+                path = line[9:]
+                path = path.strip("}")
+                new_files.append(os.path.abspath(path))
+        unchecked_files.extend(new_files)  # add new paths
+    return checked_files
