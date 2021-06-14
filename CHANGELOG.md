@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - adapted all modules using tool-methods find_executable and execute_no_errors to the new features (!94)
 - changed module execution to utilize multiprocessing (!92)
 - changed Problem attribute position to be optional (!96)
-- renamed Problem attribute cid to p_type (!102)
+- renamed Problem attribute cid to p_type and made it optional (!102)
 - whitelist file extension removed (!102)
 - number of suggestions in a problem is now capped at 10 (!102)
 
