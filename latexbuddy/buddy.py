@@ -10,7 +10,7 @@ from typing import AnyStr, List, Optional
 
 import latexbuddy.tools as tools
 
-from latexbuddy import TexFile
+from latexbuddy import TexFile, problem
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
