@@ -13,13 +13,16 @@ from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
 
+language = None  # static variable used for a uniform key generation
+
+
 @total_ordering
 class ProblemSeverity(Enum):
     """Defines possible problem severity grades.
 
     Problem severity is usually preset by the checkers themselves. However, a user
     should be able to redefine the severity of a specific problem, using either
-    category, key, or cid.
+    category, key, or p_type.
 
     * "none" problems are not being highlighted, but are still being output.
     * "info" problems are highlighted with light blue colour. These are suggestions;
@@ -50,6 +53,15 @@ class ProblemSeverity(Enum):
             return self.value < other.value
 
 
+def set_language(lang):
+    """Sets the static variable language used for key generation
+
+    :param lang: global language that the modules currently work with
+    """
+    global language
+    language = lang
+
+
 class Problem:
     """Describes a Problem object.
 
@@ -62,9 +74,9 @@ class Problem:
         position: Optional[Tuple[int, int]],
         text: str,
         checker: str,
-        cid: str,
         file: Path,
         severity: ProblemSeverity = ProblemSeverity.WARNING,
+        p_type: Optional[str] = None,
         length: Optional[int] = None,
         category: Optional[str] = None,
         description: Optional[str] = None,
@@ -79,7 +91,7 @@ class Problem:
         :param length: the length of the problematic text.
         :param text: problematic text.
         :param checker: name of the tool that discovered the problem.
-        :param cid: ID of the problem type, used inside the respective checker.
+        :param p_type: ID of the problem type, used inside the respective checker.
         :param file: **[DEPRECATED]** path to the file where the problem was found
         :param severity: severity of the problem.
         :param category: category of the problem, for example "grammar".
@@ -88,16 +100,20 @@ class Problem:
                         and after the problematic text.
         :param suggestions: list of suggestions, that is, possible replacements for
                             problematic text.
-        :param key: semi-unique string, which can be used to compare two problems.
+        :param key: semi-unique string, which can be used to compare two problems. Will
+                    be used for entries in the whitelist
 
         """
+        # TODO: maybe move the defaults to the params, or was there a specific reason?
         self.position = position
         if length is None:
             length = 0
         self.length = length
         self.text = text
         self.checker = checker
-        self.cid = cid
+        if p_type is None:
+            p_type = ""
+        self.p_type = p_type
         self.file = file  # FIXME: deprecated!
         self.severity = severity
         self.category = category
@@ -108,41 +124,48 @@ class Problem:
         if suggestions is None:
             suggestions = []
         self.suggestions = suggestions
-        self.key = key
-
-        if self.key is None:
-            self.key = self.__generate_key()
+        self.key = self.__generate_key(key)
         self.length = len(text)
         self.uid = self.__generate_uid()
 
-    def __generate_key(self) -> str:
-        """Generates a key for the problem based on checker and problematic text.
+        self.__cut_suggestions(10)
 
-        This method is particularly used in the constructor for the cases when the key
-        wasn't previously supplied.
+    def __cut_suggestions(self, n):
+        """Cuts the suggestions list down to the first n elements if there are more
 
-        :return: generated key
+        :param n: maximum number of suggestions that should be shown
         """
-        return f"{self.checker}/{self.cid}/{self.text}"
+        if len(self.suggestions) > n:
+            self.suggestions = self.suggestions[:n]
+
+    def __generate_key(self, key) -> str:
+        """Generates a key for the problem based on language and the given key.
+
+        Major difference for this method is if the module that created this problem
+        instance has supplied a key or not.
+
+        :param key: key generated and given by the checker module, None if not supplied
+        :return: final generated key
+        """
+        if key is None:
+            # TODO: maybe remove automatic key generation altogether and default to None
+            space = " "
+            minus = "-"
+            key = f"{self.checker}_{self.p_type}_{self.text.replace(space, minus)}"
+
+        # add language to the key if its a spelling or grammar error
+        if language is not None and (
+            self.category == "grammar" or self.category == "spelling"
+        ):
+            return language + "_" + key
+
+        return key
 
     def __generate_uid(self) -> str:
-        """**[DEPRECATED]** Calculates the UID of the Problem object.
+        """Creates the UID for the Problem object.
 
-        The UID is a unique ID containing all important information about the problem.
-
-        :return: the UID of the Problem object
+        :return: a unique UID for the Problem object
         """
-
-        """return "\0".join(
-            [
-                str(self.file),
-                self.checker,
-                str(self.category),
-                self.cid,
-                self.__get_pos_str(),
-                str(self.length),
-            ]
-        )"""
         return str(time.time())
 
     def __get_pos_str(self) -> str:
@@ -191,7 +214,7 @@ class ProblemJSONEncoder(JSONEncoder):
                 "position": obj.position,
                 "text": obj.text,
                 "checker": obj.checker,
-                "cid": obj.cid,
+                "p_type": obj.p_type,
                 "file": str(obj.file),
                 "severity": str(obj.severity),
                 "length": obj.length,
