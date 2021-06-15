@@ -308,6 +308,7 @@ def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
     TODO
     """
     lines = file_to_parse.read_text().splitlines(keepends=False)
+    # TODO check if whitelist file and file to parse is path
     with whitelist_file.open("a+") as file:
         for line in lines:
             if line == "":

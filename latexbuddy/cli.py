@@ -73,14 +73,14 @@ parser.add_argument(
 
 parser.add_argument(
     "--wl_add_word",
-    "-ww",
+    "-aw",
     type=str,
     default=None,
     help="TODO ----------------------------------",
 )
 parser.add_argument(
-    "--wl_from_file",
-    "-wf",
+    "--wl_from_wordlist",
+    "-awl",
     nargs=2,
     default=None,
     help="First argument is word list, second argument is language",
@@ -125,9 +125,9 @@ def main():
             wl_file = Path("whitelist")
         if args.wl_add_word:
             add_whitelist_console(wl_file, args.wl_add_word)
-        if args.wl_from_file:
+        if args.wl_from_wordlist[0] and args.wl_from_wordlist[1]:
             add_whitelist_from_file(
-                wl_file, Path(args.wl_from_file[0]), args.wl_from_file[1]
+                wl_file, Path(args.wl_from_wordlist[0]), args.wl_from_wordlist[1]
             )
         return
 
