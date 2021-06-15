@@ -5,11 +5,13 @@ osInfo[/etc/alpine-release]="apk --update add"
 osInfo[/etc/centos-release]="yum install -y"
 osInfo[/etc/fedora-release]="dnf install -y"
 osInfo[/etc/redhat-release]="yum install -y"
-osInfo[/etc/arch-release]="pacman -U"
+osInfo[/etc/arch-release]="pacman -S"
 osInfo[/etc/gentoo-release]="emerge"
 osInfo[/etc/SuSE-release]="zypper install -y"
+# rename apt-get
 packages=(python3-pip git default-jdk curl make)
 packagesapt=(autoconf automake libtool-bin texinfo)
+packagespacman=(pythonpip)
 
 for f in ${!osInfo[@]}
 do
@@ -24,7 +26,8 @@ do
         update="apt update -y"
         ${update}
     fi
-    ${package_manager} ${i}
+    sudo ${package_manager} ${i}
+    # echo "${i} not installed!"
 done
 
 for i in ${packages[@]}
@@ -33,17 +36,17 @@ do
         update="apt-get update -y"
         ${update}
     fi
-    ${package_manager} ${i}
+    sudo ${package_manager} ${i}
+    # echo "${i} not installed!"
 done
 
 TPATH=$HOME/chktex-1.7.6.tar.gz
-FPATH=$HOME/chktex
+TFPATH=chktex-1.7.6
 url='http://download.savannah.gnu.org/releases/chktex/chktex-1.7.6.tar.gz'
-curl -L $url > TPATH
-cd $HOME
-tar -xvf chktex-1.7.6.tar.gz -C /home/ub
-cd $HOME/chktex-1.7.6/
-sudo ./configure --prefix ~/
+curl -L $url > $TPATH
+tar -xvf $TPATH -C $HOME
+cd $HOME/$TFPATH
+sudo ./configure
 sudo make
 sudo make install
 sudo make check
@@ -51,37 +54,37 @@ make clean
 
 
 TARPATH=$HOME/diction-1.14.tar.gz
-FPATH=$HOME/diction
-url=http://ftp.gnu.org/gnu/diction/diction-1.11.tar.gz
+url=http://www.moria.de/~michael/diction/diction-1.14.tar.gz
 curl $url > $TARPATH
-cd $HOME
-tar -xvf diction-1.14.tar.gz
-cd diction-1.11
+tar -xvf $TARPATH -C $HOME
+cd $HOME/diction-1.14
 sudo ./configure
 sudo make
 sudo make install
-make clean
+# make clean
 
+
+# TBD: install in /usr/local ???
 TARPATH=$HOME/aspell-master.zip
-FPATH=$HOME/aspell
-url=https://github.com/GNUAspell/aspell/aspell-master.zip
+url=https://github.com/GNUAspell/aspell/archive/refs/heads/master.zip
 curl $url > $TARPATH
-cd $HOME
-gunzip aspell-master.zip
-./autogen
-./configure --disable-static
-make
-make install
+unzip $TARPATH -d $HOME
+cd $HOME/aspell
+sudo ./autogen
+sudo ./configure --disable-static
+sudo make
+sudo make install
 make clean
 # or ./config-opt <options> or ./config-debug <options>
 
 
 TARPATH=$HOME/latexbuddy-master.tar.gz
-FPATH=$HOME/latexbuddy
 url=https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/latexbuddy-master.tar.gz
 curl $url > $TARPATH
 cd $HOME
 tar -xvf latexbuddy-master.tar.gz
 
-cd $HOME/LanguageTool
+cd $HOME
+mkdir LanguageTool
+cd LanguageTool
 curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash
