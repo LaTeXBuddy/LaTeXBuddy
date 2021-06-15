@@ -72,9 +72,9 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--wl_add_word",
-    "-aw",
-    type=str,
+    "--wl_add_keys",
+    "-ak",
+    nargs="+",
     default=None,
     help="TODO ----------------------------------",
 )
@@ -118,14 +118,14 @@ def main():
 
     logger.debug(f"Parsed CLI args: {str(args)}")
 
-    if args.wl_add_word or args.wl_from_file:
+    if args.wl_add_keys or args.wl_from_wordlist:
         if args.whitelist:
             wl_file = Path(args.whitelist)
         else:
             wl_file = Path("whitelist")
-        if args.wl_add_word:
-            add_whitelist_console(wl_file, args.wl_add_word)
-        if args.wl_from_wordlist[0] and args.wl_from_wordlist[1]:
+        if args.wl_add_keys:
+            add_whitelist_console(wl_file, args.wl_add_keys)
+        if args.wl_from_wordlist:
             add_whitelist_from_file(
                 wl_file, Path(args.wl_from_wordlist[0]), args.wl_from_wordlist[1]
             )

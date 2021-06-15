@@ -298,9 +298,13 @@ def add_whitelist_console(whitelist_file, to_add):
     """
     TODO
     """
+    whitelist_entries = whitelist_file.read_text().splitlines()
     with whitelist_file.open("a+") as file:
-        file.write(to_add)
-        file.write("\n")
+        for key in to_add:
+            if key not in whitelist_entries:
+                whitelist_entries.append(key)
+                file.write(key)
+                file.write("\n")
 
 
 def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
@@ -309,9 +313,13 @@ def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
     """
     lines = file_to_parse.read_text().splitlines(keepends=False)
     # TODO check if whitelist file and file to parse is path
+    whitelist_entries = whitelist_file.read_text().splitlines()
     with whitelist_file.open("a+") as file:
         for line in lines:
             if line == "":
                 continue
-            file.write(lang + "_spelling_" + line)
-            file.write("\n")
+            key = lang + "_spelling_" + line
+            if key not in whitelist_entries:
+                whitelist_entries.append(key)
+                file.write(key)
+                file.write("\n")
