@@ -76,7 +76,7 @@ parser.add_argument(
     "-ak",
     nargs="+",
     default=None,
-    help="TODO ----------------------------------",
+    help="example: -ak en_spelling_helo en_spelling_hose",
 )
 parser.add_argument(
     "--wl_from_wordlist",
