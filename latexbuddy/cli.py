@@ -71,9 +71,20 @@ parser.add_argument(
     help="Format of the output file (either HTML or JSON).",
 )
 
-parser.add_argument("--wl_add_word", "-ww", type=str, default=None, help="TODO")
-parser.add_argument("--wl_from_file", "-wf", type=Path, default=None, help="TODO")
-parser.add_argument("--wl_lang", "-wfl", type=str, default=None, help="TODO")
+parser.add_argument(
+    "--wl_add_word",
+    "-ww",
+    type=str,
+    default=None,
+    help="TODO ----------------------------------",
+)
+parser.add_argument(
+    "--wl_from_file",
+    "-wf",
+    nargs=2,
+    default=None,
+    help="First argument is word list, second argument is language",
+)
 
 module_selection = parser.add_mutually_exclusive_group()
 module_selection.add_argument(
@@ -115,7 +126,9 @@ def main():
         if args.wl_add_word:
             add_whitelist_console(wl_file, args.wl_add_word)
         if args.wl_from_file:
-            add_whitelist_from_file(wl_file, Path(args.wl_from_file), args.wl_lang)
+            add_whitelist_from_file(
+                wl_file, Path(args.wl_from_file[0]), args.wl_from_file[1]
+            )
         return
 
     config_loader = ConfigLoader(args)
