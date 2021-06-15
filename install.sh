@@ -83,9 +83,5 @@ curl $url > $TARPATH
 cd $HOME
 tar -xvf latexbuddy-master.tar.gz
 
-TARPATH=$HOME/LanguageTool-5.3.zip
-FPATH=$HOME/languageTool
-url=https://languagetool.org/download/LanguageTool-5.3.zip
-curl $url > $TARPATH
-cd$HOME
-unzip LanguageTool-5.3.zip
+cd $HOME/LanguageTool
+curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash
