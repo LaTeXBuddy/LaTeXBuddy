@@ -66,7 +66,7 @@ class LatexBuddy:
         # file that represents the whitelist
         self.whitelist_file = Path(
             self.cfg.get_config_option_or_default(
-                "buddy", "whitelist", Path("whitelist.json"), verify_type=AnyStr
+                "buddy", "whitelist", Path("whitelist"), verify_type=AnyStr
             )
         )
 

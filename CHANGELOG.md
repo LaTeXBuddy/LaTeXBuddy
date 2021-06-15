@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - centralized file for LaTeXBuddy exceptions (!94)
+<<<<<<< CHANGELOG.md
 - checker to warn about low resolution in figures (!101)
 - checker to detect \ref instead of e.g. \cref (!99)
 - language support in whitelist for spelling or grammar errors (!102)
+- added option to manually add keys and word lists to the whitelist via command line (!106)
 
 ### Changed
 - moved module execution time measurements from individual modules to the main buddy instance (!93)
@@ -28,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - import issue with proselint, because proselint.py shared the same name with the imported API (!95)
 - usage of old `compare_...` functions (#45, !97)
 - whitelist working again (!102)
+- invalid default value of cli flag `format` resulting in LaTeXBuddy ignoring the config option for `format` (#56, !104)
 
 ## [0.2.0] - 08 Jun 2021
 
