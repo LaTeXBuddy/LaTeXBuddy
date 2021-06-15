@@ -35,6 +35,25 @@ RUN ./configure && make
 
 
 
+# build languagetool
+FROM debian:buster AS build-languagetool
+
+RUN apt-get update -y
+RUN apt-get install -y \
+    git \
+    maven \
+    openjdk-11-jdk-headless \
+    unzip
+
+RUN git clone --depth 1 https://github.com/languagetool-org/languagetool.git --branch v5.3
+
+WORKDIR /languagetool
+RUN mvn clean
+RUN mvn package -DskipTests
+RUN unzip languagetool-standalone/target/*.zip -d /dist
+
+
+
 # build chktex
 FROM alpine:latest AS build-chktex
 
@@ -73,5 +92,11 @@ COPY --from=build-diction /diction-1.14/diction /usr/local/bin/diction
 # install chktex
 COPY --from=build-chktex /chktex-1.7.6/chktex /usr/local/bin/chktex
 COPY --from=build-chktex /chktex-1.7.6/chktexrc /usr/local/etc/chktexrc
+
+# install LanguageTool
+RUN apk add libstdc++ openjdk11-jre-headless
+COPY --from=build-languagetool /dist /languagetool
+RUN echo "exec java -jar \"$(find /languagetool -maxdepth 2 -name languagetool-commandline.jar)\" \$@" > /usr/local/bin/languagetool \
+    && chmod 755 /usr/local/bin/languagetool
 
 ENTRYPOINT [ "latexbuddy" ]
