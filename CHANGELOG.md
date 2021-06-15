@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- centralized file for LaTeXBuddy exceptions (!94)
+- checker to warn about low resolution in figures
+- checker to detect \ref instead of e.g. \cref
+
+### Changed
+- moved module execution time measurements from individual modules to the main buddy instance (!93)
+- improved logging for tool-methods find_executable and execute_no_errors (!94)
+- adapted all modules using tool-methods find_executable and execute_no_errors to the new features (!94)
+- changed module execution to utilize multiprocessing (!92)
+- changed Problem attribute position to be optional (!96)
+
+### Fixed
+- minor issue in languagetool.py: module didn't stop execution after java-check failed in find_languagetool_command() (!94)
+- import issue with proselint, because proselint.py shared the same name with the imported API (!95)
+- usage of old `compare_...` functions (#45, !97)
+
+## [0.2.0] - 08 Jun 2021
+
+### Added
 
 - button, to add to whitelist (!87)
 - configuration files (!30)
@@ -74,5 +93,7 @@ This is the first (pre-)release of LaTeXBuddy.
 - draft of the abstract module API (!22)
 - logo (!38)
 
-[Unreleased]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.1.0...master
+
+[Unreleased]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.2.0...master
+[0.2.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.1.0...v0.2.0
 [0.1.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/124d0730...v0.1.0

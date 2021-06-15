@@ -1,3 +1,4 @@
+import os
 import re
 
 from typing import List
@@ -12,7 +13,7 @@ from latexbuddy.texfile import TexFile
 
 class UnreferencedFiguresModule(Module):
     def __init__(self):
-        self.tool_name = "refcheck"
+        self.tool_name = "unrefed_figure_check"
         self.cid = "0"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
@@ -302,4 +303,107 @@ class URLModule(Module):
                     length=length,
                 )
             )
+        return problems
+
+
+class CheckFigureResolution(Module):
+
+    file_endings = [
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".bmp",
+        ".jpg",
+        ".jpeg",
+        ".jpe",
+        ".jif",
+        ".jfif",
+        ".jfi",
+        ".gif",
+        ".webp",
+        "tiff",
+        "tif",
+        ".psd",
+        ".dip",
+        ".heif",
+        ".heic",
+        ".jp2",
+    ]
+
+    def __init__(self):
+        self.tool_name = "resolution_check"
+        self.cid = "0"
+        self.severity = ProblemSeverity.INFO
+        self.category = "latex"
+
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+        """Finds potential low resolution figures.
+        :param: config: configurations of the buddy instance
+        :param: file: the file to check
+        :return: a list of found problems
+        """
+        search_root = os.path.dirname(file.tex_file)
+        problems = []
+        figures = []
+
+        for root, dirs, files in os.walk(search_root):
+            root_name = os.path.basename(root)
+            for current_file in files:
+                name, ending = os.path.splitext(current_file)
+                if str.lower(ending) in self.file_endings or (
+                    str.lower(root_name) == "figures" and str.lower(ending) == ".pdf"
+                ):
+                    figures.append(current_file)
+                    problems.append(
+                        Problem(
+                            position=(1, 1),
+                            text=name,
+                            checker=self.tool_name,
+                            category=self.category,
+                            cid="0",
+                            file=file.tex_file,
+                            severity=self.severity,
+                            description=f"Figure might have low resolution due to file format {ending}",
+                            key=self.tool_name + "_" + current_file,
+                            length=1,
+                        )
+                    )
+
+        return problems
+
+
+class NativeUseOfRef(Module):
+    def __init__(self):
+        self.tool_name = "native_ref_use_check"
+        self.severity = ProblemSeverity.INFO
+        self.category = "latex"
+
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+        description = "Instead of \\ref{} use a more precise command e.g. \\cref{}"
+        tex = file.tex
+        problems = []
+        ref_pattern = "\\ref{"
+
+        curr_problem_start = tex.find(ref_pattern)  # init
+        while curr_problem_start != -1:
+            line, col, offset = tools.absolute_to_linecol(tex, curr_problem_start)
+            end_command = tex.find("}", curr_problem_start) + 1
+            problem_text = tex[curr_problem_start:end_command]
+            problems.append(
+                Problem(
+                    position=(line, col),
+                    text=ref_pattern,
+                    checker=self.tool_name,
+                    category=self.category,
+                    cid="0",
+                    file=file.tex_file,
+                    severity=self.severity,
+                    description=description,
+                    context=("", problem_text[5:]),
+                    key=self.tool_name + "_" + "\\" + problem_text,
+                    length=len(ref_pattern),
+                )
+            )
+            curr_problem_start = tex.find(ref_pattern, curr_problem_start + 1)
+
         return problems

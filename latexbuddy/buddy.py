@@ -1,18 +1,22 @@
 """This module describes the main LaTeXBuddy instance class."""
 
 import json
+import multiprocessing as mp
 import os
+import time
 
 from pathlib import Path
-from typing import AnyStr
+from typing import AnyStr, List, Optional
 
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.messages import error_occurred_in_module
+from latexbuddy.modules import Module
 from latexbuddy.preprocessor import Preprocessor
-from latexbuddy.problem import Problem, ProblemJSONEncoder, ProblemSeverity
+from latexbuddy.problem import Problem, ProblemJSONEncoder
 
 
 # TODO: make this a singleton class with static methods
@@ -31,7 +35,7 @@ class LatexBuddy:
         """
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = config_loader  # configuration
-        self.preprocessor: Preprocessor = None  # in-file preprocessing
+        self.preprocessor: Optional[Preprocessor] = None  # in-file preprocessing
         self.file_to_check = file_to_check  # .tex file that is to be error checked
         self.tex_file: TexFile = TexFile(file_to_check)
 
@@ -80,18 +84,15 @@ class LatexBuddy:
             self.errors[problem.uid] = problem
 
     def check_whitelist(self):
-        """Remove errors that are whitelisted."""
-        if not os.path.isfile(self.whitelist_file):
+        """Removes errors that are whitelisted."""
+        if not (self.whitelist_file.exists() and self.whitelist_file.is_file()):
             return  # if no whitelist yet, don't have to check
 
-        with open(self.whitelist_file, "r") as file:
-            whitelist = file.read().split("\n")
+        whitelist_entries = self.whitelist_file.read_text().splitlines()
 
-        for whitelist_element in whitelist:
-            uids = list(self.errors.keys())
-            for uid in uids:
-                if self.errors[uid].compare_with_other_comp_id(whitelist_element):
-                    del self.errors[uid]
+        for uid, problem in self.errors.items():
+            if problem.key in whitelist_entries:
+                del self.errors[uid]
 
     def add_to_whitelist(self, uid):
         """Adds the error identified by the given UID to the whitelist
@@ -102,7 +103,7 @@ class LatexBuddy:
         :param uid: the UID of the error to be deleted
         """
 
-        if uid not in self.errors.keys():
+        if uid not in self.errors:
             self.__logger.error(
                 f"UID not found: {uid}. "
                 "Specified problem will not be added to whitelist."
@@ -110,50 +111,80 @@ class LatexBuddy:
             return
 
         # write error in whitelist
-        with open(self.whitelist_file, "a+") as file:
-            file.write(self.errors[uid].get_comp_id())
+        with self.whitelist_file.open("a+") as file:
+            file.write(self.errors[uid].cid)
             file.write("\n")
 
         # delete error and save comp_id for further check
-        compare_id = self.errors[uid].get_comp_id()
+        compare_id = self.errors[uid].cid
         del self.errors[uid]
 
         # check if there are other errors equal to the one just added to the whitelist
-        uids = list(self.errors.keys())
-        for curr_uid in uids:
-            if self.errors[curr_uid].compare_with_other_comp_id(compare_id):
-                del self.errors[curr_uid]
+        for i_uid, problem in self.errors.items():
+            if problem.key == compare_id:
+                del self.errors[i_uid]
+                break
 
     # TODO: implement
     # def add_to_whitelist_manually(self):
     #     return
 
+    def mapper(self, module: Module) -> List[Problem]:
+        """
+        Executes checks for provided module and returns its Problems.
+        This method is used to parallelize the module execution.
+
+        :param module: module to execute
+        :return: list of resulting problems
+        """
+        result = []
+
+        def lambda_function() -> None:
+            nonlocal result
+
+            start_time = time.perf_counter()
+            self.__logger.debug(f"{module.__class__.__name__} started checks")
+
+            result = module.run_checks(self.cfg, self.tex_file)
+
+            self.__logger.debug(
+                f"{module.__class__.__name__} finished after "
+                f"{round(time.perf_counter() - start_time, 2)} seconds"
+            )
+
+        tools.execute_no_exceptions(
+            lambda_function,
+            error_occurred_in_module(module.__class__.__name__),
+            "DEBUG",
+        )
+
+        return result
+
     def run_tools(self):
-        """Runs all tools in the LaTeXBuddy toolchain"""
+        """Runs all tools in the LaTeXBuddy toolchain in parallel"""
 
         # importing this here to avoid circular import error
         from latexbuddy.tool_loader import ToolLoader
 
-        # check_preprocessor
+        # initialize Preprocessor
         self.preprocessor = Preprocessor()
         self.preprocessor.regex_parse_preprocessor_comments(self.tex_file)
 
+        # initialize ToolLoader
         tool_loader = ToolLoader(Path("latexbuddy/modules/"))
         modules = tool_loader.load_selected_modules(self.cfg)
 
-        for module in modules:
+        self.__logger.debug(
+            f"Using multiprocessing pool with {os.cpu_count()} "
+            f"threads/processes for checks."
+        )
 
-            def lambda_function() -> None:
-                errors = module.run_checks(self.cfg, self.tex_file)
+        with mp.Pool(processes=os.cpu_count()) as pool:
+            result = pool.map(self.mapper, modules)
 
-                for error in errors:
-                    self.add_error(error)
-
-            tools.execute_no_exceptions(
-                lambda_function,
-                f"An error occurred while executing checks for module "
-                f"'{module.__class__.__name__}'",
-            )
+        for problems in result:
+            for problem in problems:
+                self.add_error(problem)
 
         # FOR TESTING ONLY
         # self.check_whitelist()
