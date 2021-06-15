@@ -6,7 +6,7 @@ out-of-the-box. You may move this file and specify its path using the --config f
 modules = {
     "buddy": {
         "language": "en",
-        "whitelist": "whitelist.json",
+        "whitelist": "whitelist",
         "output": "./",
         "format": "HTML",
         "enable-modules-by-default": True,
@@ -45,6 +45,12 @@ modules = {
         "enabled": True,
     },
     "UnreferencedFiguresModule": {
+        "enabled": True,
+    },
+    "NativeUseOfRef": {
+        "enabled": True,
+    },
+    "CheckFigureResolution": {
         "enabled": True,
     },
     "YaLafi": {

@@ -16,7 +16,7 @@ from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
 from latexbuddy.modules import Module
 from latexbuddy.preprocessor import Preprocessor
-from latexbuddy.problem import Problem, ProblemJSONEncoder
+from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
 
 
 # TODO: make this a singleton class with static methods
@@ -66,7 +66,7 @@ class LatexBuddy:
         # file that represents the whitelist
         self.whitelist_file = Path(
             self.cfg.get_config_option_or_default(
-                "buddy", "whitelist", Path("whitelist.json"), verify_type=AnyStr
+                "buddy", "whitelist", Path("whitelist"), verify_type=AnyStr
             )
         )
 
@@ -89,9 +89,11 @@ class LatexBuddy:
             return  # if no whitelist yet, don't have to check
 
         whitelist_entries = self.whitelist_file.read_text().splitlines()
+        # TODO: Ignore emtpy strings in here
 
-        for uid, problem in self.errors.items():
-            if problem.key in whitelist_entries:
+        uids = list(self.errors.keys())  # need to copy here or we get an error deleting
+        for uid in uids:
+            if self.errors[uid].key in whitelist_entries:
                 del self.errors[uid]
 
     def add_to_whitelist(self, uid):
@@ -110,24 +112,20 @@ class LatexBuddy:
             )
             return
 
-        # write error in whitelist
+        # write error to whitelist
         with self.whitelist_file.open("a+") as file:
-            file.write(self.errors[uid].cid)
+            file.write(self.errors[uid].key)
             file.write("\n")
 
-        # delete error and save comp_id for further check
-        compare_id = self.errors[uid].cid
+        # save key for further check and remove error
+        added_key = self.errors[uid].key
         del self.errors[uid]
 
         # check if there are other errors equal to the one just added to the whitelist
-        for i_uid, problem in self.errors.items():
-            if problem.key == compare_id:
-                del self.errors[i_uid]
-                break
-
-    # TODO: implement
-    # def add_to_whitelist_manually(self):
-    #     return
+        uids = list(self.errors.keys())
+        for curr_uid in uids:
+            if self.errors[curr_uid].key == added_key:
+                del self.errors[curr_uid]
 
     def mapper(self, module: Module) -> List[Problem]:
         """
@@ -162,6 +160,14 @@ class LatexBuddy:
 
     def run_tools(self):
         """Runs all tools in the LaTeXBuddy toolchain in parallel"""
+
+        language = self.cfg.get_config_option_or_default(
+            "buddy",
+            "language",
+            None,
+            verify_type=AnyStr,
+        )
+        set_language(language)  # set global variable in problem.py for key generation
 
         # importing this here to avoid circular import error
         from latexbuddy.tool_loader import ToolLoader

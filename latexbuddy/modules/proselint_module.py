@@ -32,7 +32,7 @@ class ProseLintModule(Module):
     def format_errors(self, suggestions: List, file: TexFile):
         problems = []
         for suggestion in suggestions:
-            cid = suggestion[0]
+            p_type = suggestion[0]
             description = suggestion[1]
             # line, col = (suggestion[2] + 1, suggestion[3] + 1)
             start_char = suggestion[4] - 1
@@ -49,13 +49,13 @@ class ProseLintModule(Module):
             if replacements is None:
                 replacements = []
             delimiter = "_"
-            key = self.tool_name + delimiter + cid
+            key = self.tool_name + delimiter + p_type
             problems.append(
                 Problem(
                     position=position,
                     text=text,
                     checker=self.tool_name,
-                    cid=cid,
+                    p_type=p_type,
                     file=file.tex_file,
                     severity=severity,
                     category=self.problem_type,
