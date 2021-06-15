@@ -9,12 +9,22 @@ osInfo[/etc/arch-release]="pacman -U"
 osInfo[/etc/gentoo-release]="emerge"
 osInfo[/etc/SuSE-release]="zypper install -y"
 packages=(python3-pip git default-jdk curl make)
+packagesapt=(autoconf automake libtool-bin texinfo)
 
 for f in ${!osInfo[@]}
 do
     if [[ -f $f ]];then
         package_manager=${osInfo[$f]}
     fi
+done
+
+for i in ${packagesapt[@]}
+do
+    if [[ $package_manager == "apt" ]]; then
+        update="apt update -y"
+        ${update}
+    fi
+    ${package_manager} ${i}
 done
 
 for i in ${packages[@]}
@@ -28,28 +38,54 @@ done
 
 TPATH=$HOME/chktex-1.7.6.tar.gz
 FPATH=$HOME/chktex
-TAR='/usr/bin/tar'
 url='http://download.savannah.gnu.org/releases/chktex/chktex-1.7.6.tar.gz'
 curl -L $url > TPATH
-tar -xvf TPATH -C $FPATH
+cd $HOME
+tar -xvf chktex-1.7.6.tar.gz -C /home/ub
+cd $HOME/chktex-1.7.6/
+sudo ./configure --prefix ~/
+sudo make
+sudo make install
+sudo make check
+make clean
 
 
 TARPATH=$HOME/diction-1.14.tar.gz
 FPATH=$HOME/diction
 url=http://ftp.gnu.org/gnu/diction/diction-1.11.tar.gz
 curl $url > $TARPATH
-
-TARPATH=$HOME/LanguageTool-5.3.zip
-FPATH=$HOME/languageTool
-url=https://languagetool.org/download/LanguageTool-5.3.zip
-curl $url > $TARPATH
+cd $HOME
+tar -xvf diction-1.14.tar.gz
+cd diction-1.11
+sudo ./configure
+sudo make
+sudo make install
+make clean
 
 TARPATH=$HOME/aspell-master.zip
 FPATH=$HOME/aspell
 url=https://github.com/GNUAspell/aspell/aspell-master.zip
 curl $url > $TARPATH
+cd $HOME
+gunzip aspell-master.zip
+./autogen
+./configure --disable-static
+make
+make install
+make clean
+# or ./config-opt <options> or ./config-debug <options>
+
 
 TARPATH=$HOME/latexbuddy-master.tar.gz
 FPATH=$HOME/latexbuddy
 url=https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/latexbuddy-master.tar.gz
 curl $url > $TARPATH
+cd $HOME
+tar -xvf latexbuddy-master.tar.gz
+
+TARPATH=$HOME/LanguageTool-5.3.zip
+FPATH=$HOME/languageTool
+url=https://languagetool.org/download/LanguageTool-5.3.zip
+curl $url > $TARPATH
+cd$HOME
+unzip LanguageTool-5.3.zip
