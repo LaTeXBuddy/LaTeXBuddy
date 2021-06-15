@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - checker to detect \ref instead of e.g. \cref (!99)
 - language support in whitelist for spelling or grammar errors (!102)
 - added option to manually add keys and word lists to the whitelist via command line (!106)
+- added Docker file for Docker-based install (!103)
 
 ### Changed
 - moved module execution time measurements from individual modules to the main buddy instance (!93)
