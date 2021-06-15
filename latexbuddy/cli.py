@@ -76,6 +76,7 @@ parser.add_argument(
     "--wl_add_keys",
     "-ak",
     nargs="+",
+    metavar='KEY',
     default=None,
     help="Arguments are valid keys that should be added to whitelist. Ideally"
          " the keys are copied from LaTeXBuddy HTML Output",
@@ -83,6 +84,7 @@ parser.add_argument(
 parser.add_argument(
     "--wl_from_wordlist",
     "-awl",
+    metavar=('WORD_LIST', 'LANGUAGE'),
     nargs=2,
     default=None,
     help="First argument is a file containing a single word per line, "
