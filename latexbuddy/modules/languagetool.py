@@ -6,16 +6,17 @@ import time
 
 from contextlib import closing
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import AnyStr, Dict, List, Optional
 
 import requests
 
-import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
-from latexbuddy.abs_module import Module
+from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.exceptions import ExecutableNotFoundError
+from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
 
@@ -34,7 +35,77 @@ class Mode(Enum):
 class LanguageTool(Module):
     """Wraps the LanguageTool API calls to check files."""
 
-    _LANGUAGE_MAP = {"de": "de-DE", "en": "en-GB"}
+    __logger = root_logger.getChild("LanguageTool")
+
+    __SUPPORTED_LANGUAGES = [
+        "ar",
+        "ast",
+        "ast-ES",
+        "be",
+        "be-BY",
+        "br",
+        "br-FR",
+        "ca",
+        "ca-ES",
+        "ca-ES-valencia",
+        "zh",
+        "zh-CN",
+        "da",
+        "da-DK",
+        "nl",
+        "nl-BE",
+        "en",
+        "en-AU",
+        "en-CA",
+        "en-GB",
+        "en-NZ",
+        "en-ZA",
+        "en-US",
+        "eo",
+        "fr",
+        "gl",
+        "gl-ES",
+        "de",
+        "de-AT",
+        "de-DE",
+        "de-CH",
+        "de-DE-x-simple-language",
+        "el",
+        "el-GR",
+        "ga",
+        "ga-IE",
+        "it",
+        "ja",
+        "ja-JP",
+        "km",
+        "km-KH",
+        "nb",
+        "no",
+        "fa",
+        "pl",
+        "pl-PL",
+        "pt",
+        "pt-AO",
+        "pt-BR",
+        "pt-MZ",
+        "pt-PT",
+        "ro",
+        "ro-RO",
+        "ru",
+        "ru-RU",
+        "sk",
+        "sk-SK",
+        "sl",
+        "sl-SI",
+        "es",
+        "sv",
+        "tl",
+        "tl-PH",
+        "ta",
+        "ta-IN",
+        "uk",
+        "uk-UA",
+    ]
 
     def __init__(self):
         """Creates a LanguageTool checking module."""
@@ -49,26 +120,34 @@ class LanguageTool(Module):
         self.remote_url = None
         self.lt_console_command = None
 
-    def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the LanguageTool checks on a file and returns the results as a list.
 
         Requires LanguageTool (server) to be set up.
         Local or global servers can be used.
 
-        :param buddy: the LaTeXBuddy instance
+        :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
 
-        try:
-            self.language = LanguageTool._LANGUAGE_MAP[buddy.lang]
-        except KeyError:
-            self.language = None
-
-        self.find_disabled_rules(buddy.cfg)
-
-        cfg_mode = buddy.cfg.get_config_option_or_default(
-            "LanguageTool", "mode", "COMMANDLINE"
+        self.language = config.get_config_option_or_default(
+            "buddy",
+            "language",
+            None,
+            verify_type=AnyStr,
+            verify_choices=LanguageTool.__SUPPORTED_LANGUAGES,
         )
+
+        self.find_disabled_rules(config)
+
+        cfg_mode = config.get_config_option_or_default(
+            "LanguageTool",
+            "mode",
+            "COMMANDLINE",
+            verify_type=AnyStr,
+            verify_choices=[e.value for e in Mode],
+        )
+
         try:
             self.mode = Mode(cfg_mode)
         except ValueError:
@@ -80,51 +159,40 @@ class LanguageTool(Module):
 
         elif self.mode == Mode.REMOTE_SERVER:
             # must include the port and api call (e.g. /v2/check)
-            self.remote_url = buddy.cfg.get_config_option("LanguageTool", "remote_url")
+            self.remote_url = config.get_config_option(
+                "LanguageTool",
+                "remote_url",
+                verify_type=AnyStr,
+                verify_regex="http(s?)://(\\S*)",
+            )
 
         elif self.mode == Mode.COMMANDLINE:
             self.find_languagetool_command()
 
-        return self.check_tex(file)
+        result = self.check_tex(file)
+
+        return result
 
     def find_languagetool_command(self) -> None:
         """Searches for the LanguageTool command line app.
 
         This method also checks if Java is installed.
         """
-        try:
-            tools.find_executable("java")
-        except FileNotFoundError:
-            print("Could not find a Java runtime environment on your system.")
-            print("Please make sure you installed Java correctly.")
 
-            print("For more information check the LaTeXBuddy manual.")
-
-            raise FileNotFoundError("Unable to find Java runtime environment!")
+        tools.find_executable("java", "JRE (Java Runtime Environment)", self.__logger)
 
         try:
-            result = tools.find_executable("languagetool")
+            result = tools.find_executable(
+                "languagetool", "LanguageTool (CLI)", self.__logger, log_errors=False
+            )
             executable_source = "native"
-        except FileNotFoundError:
 
-            try:
-                result = tools.find_executable("languagetool-commandline.jar")
-                executable_source = "java"
-            except FileNotFoundError:
-                print(
-                    "Could not find languagetool-commandline.jar in your system's PATH."
-                )
-                print(
-                    "Please make sure you installed languagetool properly and added the"
-                )
-                print(
-                    "directory to your system's PATH variable. Also make sure to make"
-                )
-                print("the jar-files executable.")
+        except ExecutableNotFoundError:
 
-                print("For more information check the LaTeXBuddy manual.")
-
-                raise FileNotFoundError("Unable to find languagetool installation!")
+            result = tools.find_executable(
+                "languagetool-commandline.jar", "LanguageTool (CLI)", self.__logger
+            )
+            executable_source = "java"
 
         lt_path = result
         self.lt_console_command = []
@@ -153,12 +221,14 @@ class LanguageTool(Module):
     def find_disabled_rules(self, config: ConfigLoader) -> None:
 
         self.disabled_rules = ",".join(
-            config.get_config_option_or_default("LanguageTool", "disabled-rules", [])
+            config.get_config_option_or_default(
+                "LanguageTool", "disabled-rules", [], verify_type=List[str]
+            )
         )
 
         self.disabled_categories = ",".join(
             config.get_config_option_or_default(
-                "LanguageTool", "disabled-categories", []
+                "LanguageTool", "disabled-categories", [], verify_type=List[str]
             )
         )
 
@@ -316,9 +386,11 @@ class LanguageTool(Module):
 class LanguageToolLocalServer:
     """Defines an instance of a local LanguageTool deployment."""
 
-    _DEFAULT_PORT = 8081
-    _SERVER_REQUEST_TIMEOUT = 1  # in seconds
-    _SERVER_MAX_ATTEMPTS = 20
+    __logger = root_logger.getChild("LanguageTool")
+
+    __DEFAULT_PORT = 8081
+    __SERVER_REQUEST_TIMEOUT = 1  # in seconds
+    __SERVER_MAX_ATTEMPTS = 20
 
     def __init__(self):
         self.lt_path = None
@@ -334,38 +406,24 @@ class LanguageToolLocalServer:
 
         This method also checks if Java is installed.
         """
-        try:
-            tools.find_executable("java")
-        except FileNotFoundError:
-            print("Could not find a Java runtime environment on your system.")
-            print("Please make sure you installed Java correctly.")
 
-            print("For more information check the LaTeXBuddy manual.")
-
-            raise FileNotFoundError("Unable to find Java runtime environment!")
+        tools.find_executable("java", "JRE (Java Runtime Environment)", self.__logger)
 
         try:
-            result = tools.find_executable("languagetool-server")
+            result = tools.find_executable(
+                "languagetool-server",
+                "LanguageTool (local server)",
+                self.__logger,
+                log_errors=False,
+            )
             executable_source = "native"
-        except FileNotFoundError:
-            try:
-                result = tools.find_executable("languagetool-server.jar")
-                executable_source = "java"
-            except FileNotFoundError:
-                print(
-                    "Could not find languagetool-commandline.jar in your system's PATH."
-                )
-                print(
-                    "Please make sure you installed languagetool properly and added the"
-                )
-                print(
-                    "directory to your system's PATH variable. Also make sure to make"
-                )
-                print("the jar-files executable.")
 
-                print("For more information check the LaTeXBuddy manual.")
+        except ExecutableNotFoundError:
 
-                raise FileNotFoundError("Unable to find languagetool installation!")
+            result = tools.find_executable(
+                "languagetool-server.jar", "LanguageTool (local server)", self.__logger
+            )
+            executable_source = "java"
 
         self.lt_path = result
 
@@ -385,7 +443,7 @@ class LanguageToolLocalServer:
         self.lt_server_command.append("--port")
         self.lt_server_command.append(str(self.port))
 
-    def start_local_server(self, port: int = _DEFAULT_PORT) -> int:
+    def start_local_server(self, port: int = __DEFAULT_PORT) -> int:
         """Starts the LanguageTool server locally.
 
         :param port: port for the server to listen at
@@ -414,11 +472,11 @@ class LanguageToolLocalServer:
         attempts = 0
         up = False
 
-        while not up and attempts < self._SERVER_MAX_ATTEMPTS:
+        while not up and attempts < self.__SERVER_MAX_ATTEMPTS:
             try:
                 requests.post(
                     f"http://localhost:{self.port}/v2/check",
-                    timeout=self._SERVER_REQUEST_TIMEOUT,
+                    timeout=self.__SERVER_REQUEST_TIMEOUT,
                 )
                 up = True
 

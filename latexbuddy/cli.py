@@ -2,16 +2,29 @@
 LaTeXBuddy."""
 
 import argparse
+import logging
+import os
 
 from pathlib import Path
+from time import perf_counter
 
+from colorama import Fore
+
+from latexbuddy import __app_name__
+from latexbuddy import __logger as root_logger
+from latexbuddy import __name__ as name
+from latexbuddy import __version__
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.tools import add_whitelist_console, add_whitelist_from_file
+from latexbuddy.log import __setup_root_logger
 
 
-parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
-
+parser = argparse.ArgumentParser(
+    prog=name, description="The one-stop-shop for LaTeX checking."
+)
+parser.add_argument(
+    "--version", "-V", action="version", version=f"{__app_name__} v{__version__}"
+)
 parser.add_argument("file", type=Path, help="File that will be processed.")
 parser.add_argument(
     "--config",
@@ -19,6 +32,13 @@ parser.add_argument(
     type=Path,
     default=Path("config.py"),
     help="Location of the config file.",
+)
+parser.add_argument(
+    "--verbose",
+    "-v",
+    action="store_true",
+    default=False,
+    help="Display debug output",
 )
 parser.add_argument(
     "--language",
@@ -30,7 +50,6 @@ parser.add_argument(
 parser.add_argument(
     "--whitelist",
     "-w",
-    # Not JSON so I removed file ending.
     type=Path,
     default=None,
     help="Location of the whitelist file.",
@@ -40,21 +59,15 @@ parser.add_argument(
     "-o",
     type=Path,
     default=None,
-    help="Where to output the errors file.",
+    help="Directory, in which to put the output file.",
 )
 parser.add_argument(
-    "--wl_add_word",
-    "-ww",
+    "--format",
+    "-f",
     type=str,
-    default=None,
-    help="TODO"
-)
-parser.add_argument(
-    "--wl_from_file",
-    "-wf",
-    type=Path,
-    default=None,
-    help="TODO"
+    choices=["HTML", "html", "JSON", "json"],
+    default="HTML",
+    help="Format of the output file (either HTML or JSON).",
 )
 
 module_selection = parser.add_mutually_exclusive_group()
@@ -76,20 +89,18 @@ module_selection.add_argument(
 
 def main():
     """Parses CLI arguments and launches the LaTeXBuddy instance."""
+    start = perf_counter()
+
     args = parser.parse_args()
 
-    # if we want to add word(s) to the whitelist only do that. Don't check.
-    # TODO: no file has to be specified in the call in the next block
-    if args.wl_add_word or args.wl_from_file:
-        if args.whitelist:
-            wl_file = Path(args.whitelist)
-        else:
-            wl_file = Path("whitelist")
-        if args.wl_add_word:
-            add_whitelist_console(wl_file, args.wl_add_word)
-        if args.wl_from_file:
-            add_whitelist_from_file(wl_file, Path(args.wl_from_file))
-        return
+    display_debug = args.verbose or os.environ.get("LATEXBUDDY_DEBUG", False)
+
+    __setup_root_logger(root_logger, logging.DEBUG if display_debug else logging.INFO)
+    logger = root_logger.getChild("cli")
+
+    print(f"{Fore.CYAN}{__app_name__}{Fore.RESET} v{__version__}")
+
+    logger.debug(f"Parsed CLI args: {str(args)}")
 
     config_loader = ConfigLoader(args)
 
@@ -100,5 +111,6 @@ def main():
 
     buddy.run_tools()
     buddy.check_whitelist()
-    buddy.parse_to_json()
-    buddy.output_html()
+    buddy.output_file()
+
+    logger.debug(f"Execution finished in {round(perf_counter()-start, 2)}s")

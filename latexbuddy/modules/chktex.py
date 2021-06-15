@@ -4,38 +4,33 @@ ChkTeX Documentation: https://www.nongnu.org/chktex/ChkTeX.pdf
 """
 from typing import List
 
-import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
-from latexbuddy.abs_module import Module
+from latexbuddy import __logger as root_logger
+from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
 
 class ChktexModule(Module):
+    __logger = root_logger.getChild("ChktexModule")
+
     def __init__(self):
-        self.DELIMITER = ":"
+        self.DELIMITER = ":::"
         self.tool_name = "chktex"
         self.problem_type = "latex"
 
-    def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the chktex checks on a file and converts them to a list of Problems
 
         Requires chktex to be installed separately
 
-        :param buddy: the LaTeXBuddy instance
+        :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
 
-        try:
-            tools.find_executable("chktex")
-        except FileNotFoundError:
-            print("Could not find a valid ChkTeX installation on your system.")
-            print("Please make sure you installed ChkTeX correctly.")
-
-            print("For more information check the LaTeXBuddy manual.")
-
-            raise FileNotFoundError("Unable to find ChkTeX installation!")
+        tools.find_executable("chktex", "ChkTeX", self.__logger)
 
         format_str = (
             self.DELIMITER.join(
@@ -47,7 +42,10 @@ class ChktexModule(Module):
             "chktex", "-f", f"'{format_str}'", "-q", str(file.tex_file)
         )
         out_split = command_output.split("\n")
-        return self.format_problems(out_split, file)
+
+        result = self.format_problems(out_split, file)
+
+        return result
 
     def format_problems(self, out: List[str], file: TexFile) -> List[Problem]:
         """Converts the output of chktex to a list of Problems

@@ -1,7 +1,6 @@
+import importlib
 import importlib.util as importutil
 import inspect
-import sys
-import traceback
 
 from pathlib import Path
 from types import ModuleType
@@ -9,8 +8,8 @@ from typing import List
 
 import latexbuddy.tools as tools
 
-from latexbuddy.abs_module import Module
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.modules import Module
 
 
 class ToolLoader:
@@ -43,6 +42,10 @@ class ToolLoader:
 
             for class_obj in classes:
                 modules.append(class_obj())
+
+        for module in modules:
+
+            module.__module__ = "latexbuddy.modules." + module.__module__
 
         return modules
 
@@ -87,9 +90,9 @@ class ToolLoader:
         for py_file in py_files:
 
             def lambda_function() -> None:
-                spec = importutil.spec_from_file_location(py_file.stem, py_file)
-                module = importutil.module_from_spec(spec)
-                spec.loader.exec_module(module)
+
+                module_path = str(py_file.with_suffix("")).replace("/", ".")
+                module = importlib.import_module(module_path)
 
                 loaded_modules.append(module)
 

@@ -7,11 +7,12 @@ import subprocess
 import sys
 import traceback
 
-from io import StringIO
+from logging import Logger
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple
 
-from yalafi.tex2txt import Options, get_line_starts, tex2txt, translate_numbers
+from latexbuddy.exceptions import ExecutableNotFoundError
+from latexbuddy.messages import not_found
 
 
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
@@ -88,137 +89,62 @@ def get_command_string(cmd: Tuple[str]) -> str:
     return command.strip()
 
 
-def find_executable(name: str) -> str:
-    """Finds path to an executable.
+def find_executable(
+    name: str,
+    to_install: Optional[str] = None,
+    logger: Optional[Logger] = None,
+    log_errors: bool = True,
+) -> str:
+    """Finds path to an executable. If the executable can not be located, an error
+    message is logged to the specified logger, otherwise the executable's path is logged
+    as a debug message.
 
     This uses 'which', i.e. the executable should at least be in user's $PATH
 
     :param name: executable name
+    :param to_install: correct name of the program or project which the requested
+                       executable belongs to (used in log messages)
+    :param logger: custom logger to be used for logging debug/error messages
+    :param log_errors: specifies whether or not this method should log an error message,
+                       if the executable can not be located; if this is False, a debug
+                       message will be logged instead
     :return: path to the executable
     :raises FileNotFoundError: if the executable couldn't be found
     """
+
+    if logger is None:
+        # importing this here to avoid circular import error
+        from latexbuddy import __logger as root_logger
+
+        logger = root_logger.getChild("Tools")
+
     result = execute("which", name)
 
     if not result or "not found" in result:
-        raise FileNotFoundError(f"could not find {name} in system's PATH")
+
+        if log_errors:
+            logger.error(
+                not_found(name, to_install if to_install is not None else name)
+            )
+        else:
+            logger.debug(
+                f"could not find executable '{name}' "
+                f"({to_install if to_install is not None else name}) "
+                f"in the system's PATH"
+            )
+
+        raise ExecutableNotFoundError(
+            f"could not find executable '{name}' in system's PATH"
+        )
+
     else:
-        return result.splitlines()[0]
+
+        path_str = result.splitlines()[0]
+        logger.debug(f"Found executable {name} at '{path_str}'.")
+        return path_str
 
 
 location_re = re.compile(r"line (\d+), column (\d+)")
-
-
-def yalafi_detex(
-    file_to_detex: Path,
-) -> Tuple[Path, List[int], List[Tuple[Optional[Tuple[int, int]], str]]]:
-    """Strips TeX control structures from a file.
-
-    Using YaLaFi's tex2txt, removes TeX code from the file, leaving only the content
-    behind. It also creates a character map to later remap removed characters to their
-    original locations.
-
-    :param file_to_detex: path to the file to be detex'ed
-    :return: path to the detex'ed file, it's character map and list of errors, if any
-    """
-    tex = file_to_detex.read_text()
-    opts = Options()  # use default options
-
-    # parse output of tex2txt to err variable
-    my_stderr = StringIO()
-    sys.stderr = my_stderr
-
-    plain, charmap = tex2txt(tex, opts)
-
-    sys.stderr = sys.__stderr__  # back to default stderr
-    out = my_stderr.getvalue()
-    my_stderr.close()
-
-    out_split = out.split("*** LaTeX error: ")
-    err = []
-
-    # first "error" is a part of yalafi's output
-    for yalafi_error in out_split[1:]:
-        location_str, _, reason = yalafi_error.partition("***")
-
-        location_match = location_re.match(location_str)
-        if location_match:
-            location = (int(location_match.group(1)), int(location_match.group(2)))
-        else:
-            location = None
-
-        err.append((location, reason.strip()))
-
-    # write to detexed file
-    detexed_file = Path(file_to_detex).with_suffix(".detexed")  # TODO: use tempfile
-    detexed_file.write_text(plain)
-
-    return detexed_file, charmap, err
-
-
-def find_char_position(
-    original_file: Path, detexed_file: Path, charmap: List[int], char_pos: int
-) -> Optional[Tuple[int, int]]:
-    """Calculates line and col position of a character in the original file based on its
-    position in detex'ed file.
-
-    Makes use of YaLaFi's character map, which can be obtained from yalafi_detex().
-
-    :param original_file: path to the original tex file
-    :param detexed_file: path to the detex'ed version of that file
-    :param charmap: the charmap to resolve the position
-    :param char_pos: absolute, 0-based position of char in detexed file
-    """
-    tex = original_file.read_text()
-    plain = detexed_file.read_text()
-    line_starts = get_line_starts(plain)  # [0, ...]
-    line = 0
-    while char_pos >= line_starts[line]:
-        line += 1
-
-    # translate_numbers expects 1-based column number
-    # however, line_starts is 0-based
-    char = char_pos - line_starts[line - 1] + 1
-
-    aux = translate_numbers(tex, plain, charmap, line_starts, line, char)
-
-    if aux is None:
-        return None
-        # raise Exception("File parsing error while converting tex to txt.")
-
-    return aux.lin, aux.col
-
-
-def calculate_line_lengths(file: Path) -> List[int]:
-    """Calculates line lengths for each line in a file.
-
-    :param file: path to the inspected file
-    :return: list of line lengths with indices representing 1-based line numbers
-    """
-
-    lines = file.read_text().splitlines(keepends=True)
-    result = [0]
-    for line in lines:
-        result.append(len(line))
-    return result
-
-
-def calculate_line_offsets(file: Path) -> List[int]:
-    """**[DEPRECATED]** Calculates character offsets for each line in a file.
-
-    Indices correspond to the line numbers. For example, if first 4 lines
-    contain 100 characters (including line breaks),result[5] will be 100.
-    result[0] = result[1] = 0
-
-    :param file: path to the inspected file
-    :return: list of line offsets with indices representing 1-based line numbers
-    """
-    lines = Path(file).read_text().splitlines(keepends=True)
-    offset = 0
-    result = [0]
-    for line in lines:
-        result.append(offset)
-        offset += len(line)
-    return result
 
 
 def absolute_to_linecol(text: str, position: int) -> Tuple[int, int, List[int]]:
@@ -281,45 +207,88 @@ def is_binary(file_bytes: bytes) -> bool:
 
 def execute_no_exceptions(
     function_call: Callable[[], None],
-    error_message: str = "An error occurred while executing lambda function at",
+    error_message: str = "An error occurred while executing lambda function",
+    traceback_log_level: Optional[str] = None,
 ) -> None:
-    """Executes a given function call and catches any Exception that is raised during
-        execution. If an Exception is caught, the function is aborted and the error
-        is printed to stderr, but as the Exception is caught, the program won't crash.
+    """Calls a function and catches any Exception that is raised during this.
+
+    If an Exception is caught, the function is aborted and the error is logged, but as
+    the Exception is caught, the program won't crash.
 
     :param function_call: function to be executed
     :param error_message: custom error message displayed in the console
+    :param traceback_log_level: sets the log_level that is used to log the error
+                                traceback. If it is None, no traceback will be logged.
+                                Valid values are: "DEBUG", "INFO", "WARNING", "ERROR"
     """
 
     try:
         function_call()
     except Exception as e:
 
-        print(
-            error_message + ":\n",
-            f"{e.__class__.__name__}: {getattr(e, 'message', e)}",
-            file=sys.stderr,
+        # importing this here to avoid circular import error
+        from latexbuddy import __logger as root_logger
+
+        logger = root_logger.getChild("Tools")
+
+        logger.error(
+            f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}"
         )
-        traceback.print_exc(file=sys.stderr)
+        if traceback_log_level is not None:
+
+            stack_trace = traceback.format_exc()
+
+            if traceback_log_level == "DEBUG":
+                logger.debug(stack_trace)
+            elif traceback_log_level == "INFO":
+                logger.info(stack_trace)
+            elif traceback_log_level == "WARNING":
+                logger.warning(stack_trace)
+            elif traceback_log_level == "ERROR":
+                logger.error(stack_trace)
+            else:
+                # use level DEBUG as default, in case of invalid value
+                logger.debug(stack_trace)
 
 
-def add_whitelist_console(whitelist_file, to_add):
-    """
-    TODO
-    """
-    with whitelist_file.open("a+") as file:
-        file.write(to_add)
-        file.write("\n")
+def get_app_dir() -> Path:
+    """Finds the directory for storing application data (mostly logs).
 
+    This is a lightweight port of Click's mononymous function:
+    https://github.com/pallets/click/blob/af0af571cbbd921d3974a0ff9cf58a4b26bb852b/src/click/utils.py#L412-L458
 
-def add_whitelist_from_file(whitelist_file, file_to_parse):
+    :return: path of the application directory
     """
-    TODO
-    """
-    lines = file_to_parse.read_text().splitlines(keepends=False)
-    with whitelist_file.open("a+") as file:
-        for line in lines:
-            if line == "":
-                continue
-            file.write("spelling_" + line)
-            file.write("\n")
+
+    from latexbuddy import __app_name__ as proper_name
+    from latexbuddy import __name__ as unix_name
+
+    # Windows
+    if sys.platform.startswith("win"):
+        localappdata = os.environ.get("LOCALAPPDATA")
+        if localappdata is not None:
+            config_home = Path(localappdata)
+        else:
+            config_home = Path.home()
+
+        app_dir = config_home / proper_name
+
+    # macOS
+    elif sys.platform.startswith("darwin"):
+        config_home = Path.home() / "Library" / "Application Support"
+
+        app_dir = config_home / proper_name
+
+    # *nix
+    else:
+        xdg_config_home = os.environ.get("XDG_CONFIG_HOME")
+        if xdg_config_home is not None:
+            config_home = Path(xdg_config_home)
+        else:
+            config_home = Path.home() / ".config"
+
+        app_dir = config_home / unix_name
+
+    app_dir.mkdir(parents=True, exist_ok=True)
+
+    return app_dir

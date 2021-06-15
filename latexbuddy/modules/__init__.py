@@ -1,10 +1,12 @@
-"""This module defines the abstract module of LaTeXBuddy."""
+"""This module defines the abstract class for a LaTeXBuddy module, that others can
+inherit from.
+"""
 
 from abc import ABC, abstractmethod
 from typing import List
 
 from latexbuddy import TexFile
-from latexbuddy.buddy import LatexBuddy
+from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.problem import Problem
 
 
@@ -17,11 +19,10 @@ class Module(ABC):
         pass
 
     @abstractmethod
-    def run_checks(self, buddy: LatexBuddy, file: TexFile) -> List[Problem]:
-        """Runs the checks for the respective module and returns a list of problems
-            found by the module.
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+        """Runs the checks and returns a list of discovered problems.
 
-        :param buddy: the calling LaTeXBuddy instance (for config access)
+        :param config: the configuration options of the calling LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex option)
         """
         pass

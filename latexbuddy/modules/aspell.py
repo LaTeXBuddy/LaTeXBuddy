@@ -1,62 +1,72 @@
 """This module defines the connection between LaTeXBuddy and GNU Aspell."""
-
 import shlex
 
 from typing import List
 
-import latexbuddy.buddy as ltb
 import latexbuddy.tools as tools
 
-from latexbuddy.abs_module import Module
+from latexbuddy import __logger as root_logger
+from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.exceptions import LanguageNotSupportedError
+from latexbuddy.messages import not_found
+from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
 class AspellModule(Module):
+    __logger = root_logger.getChild("AspellModule")
+
     def __init__(self):
         self._LANGUAGE_MAP = {"de": "de-DE", "en": "en"}
-        self.language = None
+        self.language = "en"
         self.tool_name = "aspell"
 
-    def run_checks(self, buddy: ltb.LatexBuddy, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the Aspell checks on a file and returns the results as a list.
 
         Requires Aspell to be set up.
 
-        :param buddy: the LaTeXBuddy instance
+        :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
 
-        try:
-            tools.find_executable("aspell")
-        except FileNotFoundError:
-            print("Could not find a valid aspell installation on your system.")
-            print("Please make sure you installed aspell correctly.")
-
-            print("For more information check the LaTeXBuddy manual.")
-
-            raise FileNotFoundError("Unable to find aspell installation!")
+        tools.find_executable("aspell", "GNU Aspell", self.__logger)
 
         try:
-            self.language = self._LANGUAGE_MAP[buddy.lang]
+
+            self.language = self._LANGUAGE_MAP[
+                config.get_config_option_or_default("buddy", "language", None)
+            ]
+
         except KeyError:
             self.language = None
+
         language_quote = shlex.quote(self.language)
         languages = tools.execute("aspell", "dump dicts")
-        AspellModule.check_language(language_quote, languages)
+        self.check_language(language_quote, languages)
+
+        error_list = []
+        counter = 1  # counts the lines
+
         # execute aspell on given file and collect output
-        error_list = tools.execute(
-            f"cat {str(file)} | aspell -a --lang={self.language}"
-        )
+        lines = file.plain.splitlines(keepends=False)
+        for line in lines:  # check every line
+            if len(line) > 0:
+                escaped_line = line.replace("'", "\\'")
+                output = tools.execute(
+                    f"echo '{escaped_line}' | aspell -a -l {language_quote}"
+                )
+                out = output.splitlines()[1:]  # the first line specifies aspell version
+                if len(out) > 0:  # only if the list inst empty
+                    out.pop()  # remove last element
+                error_list.extend(self.format_errors(out, counter, file))
 
-        # format aspell output
-        out = error_list.splitlines()[1:]  # the first line specifies aspell version
+            counter += 1  # if there is an empty line, just increase the counter
 
-        # cleanup error list
-        return self.format_errors(out, file)
+        return error_list
 
-    @staticmethod
-    def check_language(language: str, langs: str):
+    def check_language(self, language: str, langs: str):
         """Checks if a language is in a list of languages.
 
         The list of languages is actually a string; e.g., the output of a terminal
@@ -64,65 +74,61 @@ class AspellModule(Module):
 
         :param language: language to search for
         :param langs: language list to search in
-        :raises Exception: if the language is not on the list
+        :raises LanguageNotSupportedError: if the language is not on the list
         """
         # error if language dict not installed
         if language not in langs:
-            print(f'Dictionary for language "{language}" not found')
-            print("Install dictionary (e.g. via package manager)")
-            print(
-                "check available dictionaries "
-                "at https://ftp.gnu.org/gnu/aspell/dict/0index.html"
+            self.__logger.error(
+                not_found(f"Language for {language}", "the dictionary")
+                + "\nYou can check available dictionaries at "
+                + "https://ftp.gnu.org/gnu/aspell/dict/0index.html"
             )
-            raise Exception("Aspell: Language not found on system.")
 
-    def format_errors(self, out: List[str], file: TexFile) -> List[Problem]:
+            raise LanguageNotSupportedError(
+                f"Aspell: Language '{language}' not found on system."
+            )
+
+    def format_errors(
+        self, out: List[str], line_number: int, file: TexFile
+    ) -> List[Problem]:
         """Parses Aspell errors and returns list of Problems.
 
+        :param line_number: the line_number for the location
         :param out: line-split output of the aspell command
         :param file: the file path
         """
         cid = "0"  # aspell got not error-ids
         severity = ProblemSeverity.ERROR
         key_delimiter = "_"
-        line_number = 1
         problems = []
-        # line_offsets = tools.calculate_line_offsets(file)
 
         for error in out:
-            if error.strip() == "":
-                # this is a line separator
-                line_number += 1
-                continue
-
             if error[0] in ("&", "#"):
                 tmp = error[1:].strip().split(": ", 1)
                 meta_str, suggestions_str = tmp if len(tmp) > 1 else (tmp[0], "")
 
-                # & original count offset
-                # # original
                 meta = meta_str.split(" ")
-
                 text = meta[0]
+
                 suggestions = []
-
-                if error[0] == "&":  # there are suggestions
-                    # location = int(meta[2])  # meta[1] is suggestion count
+                # & if there are suggestions
+                if error[0] == "&":
                     suggestions = suggestions_str.split(", ")
-                # else:  # there are no suggestions
-
+                # just take the first 5 suggestions
                 if len(suggestions) > 5:
                     suggestions = suggestions[0:5]
 
-                # location = int(meta[1])
+                # calculate the char location
+                tmp_split = tmp[0].split(" ")
+                if error[0] in "&":  # if there are suggestions
+                    char_location = int(tmp_split[2]) + 1
+                else:  # if there are no suggestions
+                    char_location = int(tmp_split[1]) + 1
 
-                # location = line_offsets[line_number + 1] + location  # absolute pos in detex
-
-                # location = tools.find_char_position(buddy.file_to_check, Path(file),
-                #                                    buddy.charmap,
-                #                                    location)  # absolute pos in tex
-                location = (0, 0)  # aspell's locations are funky
-                key = self.tool_name + key_delimiter + text
+                location = file.get_position_in_tex_from_linecol(
+                    line_number, char_location
+                )
+                key = "spelling" + key_delimiter + text
 
                 problems.append(
                     Problem(

@@ -4,11 +4,16 @@
 types, however LaTeXBuddy will most probably not display extra metadata.
 """
 
+import time
+
 from enum import Enum
+from functools import total_ordering
+from json import JSONEncoder
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 
+@total_ordering
 class ProblemSeverity(Enum):
     """Defines possible problem severity grades.
 
@@ -29,13 +34,20 @@ class ProblemSeverity(Enum):
       Example: not closed environment, or wrong LaTeX syntax
     """
 
-    NONE = "none"
-    INFO = "info"
-    WARNING = "warning"
-    ERROR = "error"
+    NONE = 0
+    INFO = 1
+    WARNING = 2
+    ERROR = 3
 
     def __str__(self):
-        return self.value
+        return self.name.lower()
+
+    def __eq__(self, other):
+        return self.value == other.value
+
+    def __lt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value < other.value
 
 
 class Problem:
@@ -47,22 +59,24 @@ class Problem:
 
     def __init__(
         self,
-        position: Tuple[int, int],
+        position: Optional[Tuple[int, int]],
         text: str,
         checker: str,
         cid: str,
         file: Path,
         severity: ProblemSeverity = ProblemSeverity.WARNING,
+        length: Optional[int] = None,
         category: Optional[str] = None,
         description: Optional[str] = None,
         context: Optional[Tuple[str, str]] = None,
-        suggestions: List[str] = None,
+        suggestions: Optional[List[str]] = None,
         key: Optional[str] = None,
     ):
         """
 
         :param position: position of the problem in the source file, encoded as
                          `(line, column)`.
+        :param length: the length of the problematic text.
         :param text: problematic text.
         :param checker: name of the tool that discovered the problem.
         :param cid: ID of the problem type, used inside the respective checker.
@@ -78,6 +92,9 @@ class Problem:
 
         """
         self.position = position
+        if length is None:
+            length = 0
+        self.length = length
         self.text = text
         self.checker = checker
         self.cid = cid
@@ -116,7 +133,7 @@ class Problem:
         :return: the UID of the Problem object
         """
 
-        return "\0".join(
+        """return "\0".join(
             [
                 str(self.file),
                 self.checker,
@@ -125,13 +142,17 @@ class Problem:
                 self.__get_pos_str(),
                 str(self.length),
             ]
-        )
+        )"""
+        return str(time.time())
 
     def __get_pos_str(self) -> str:
         """Returns the string value of the problem's position.
 
         :return: string value of the position
         """
+        if self.position is None:
+            return "None"
+
         return f"{self.position[0]}:{self.position[1]}"
 
     def better_eq(self, key: str) -> bool:
@@ -157,3 +178,29 @@ class Problem:
             f"{self.text}: "
             f"{self.description}."
         )
+
+
+class ProblemJSONEncoder(JSONEncoder):
+    """Provides JSON serializability for class Problem"""
+
+    def default(self, obj: Any):
+
+        if type(obj) == Problem:
+
+            return {
+                "position": obj.position,
+                "text": obj.text,
+                "checker": obj.checker,
+                "cid": obj.cid,
+                "file": str(obj.file),
+                "severity": str(obj.severity),
+                "length": obj.length,
+                "category": obj.category,
+                "description": obj.description,
+                "context": obj.context,
+                "suggestions": obj.suggestions,
+                "key": obj.key,
+            }
+
+        else:
+            return JSONEncoder.default(self, obj)
