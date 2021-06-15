@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - centralized file for LaTeXBuddy exceptions (!94)
 - checker to warn about low resolution in figures
 - checker to detect \ref instead of e.g. \cref
+- added option to manually add keys and word lists to the whitelist via command line (!106)
 
 ### Changed
 - moved module execution time measurements from individual modules to the main buddy instance (!93)

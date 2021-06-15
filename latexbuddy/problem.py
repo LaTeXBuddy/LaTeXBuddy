@@ -155,13 +155,16 @@ class Problem:
 
         return f"{self.position[0]}:{self.position[1]}"
 
+    def better_eq(self, key: str) -> bool:
+        """equal method based on the key/CompareID"""
+        return self.key == key
+
     def __eq__(self, o: object) -> bool:
         if not isinstance(o, Problem):
             return False
 
         if not self.key or not o.key:
             return False
-
         return self.key == o.key
 
     def __ne__(self, o: object) -> bool:
