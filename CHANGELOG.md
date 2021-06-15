@@ -9,7 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - centralized file for LaTeXBuddy exceptions (!94)
-<<<<<<< CHANGELOG.md
 - checker to warn about low resolution in figures (!101)
 - checker to detect \ref instead of e.g. \cref (!99)
 - language support in whitelist for spelling or grammar errors (!102)
