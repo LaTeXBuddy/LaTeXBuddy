@@ -17,6 +17,7 @@ from latexbuddy import __version__
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
+from latexbuddy.tools import add_whitelist_console, add_whitelist_from_file
 
 
 parser = argparse.ArgumentParser(
@@ -70,6 +71,10 @@ parser.add_argument(
     help="Format of the output file (either HTML or JSON).",
 )
 
+parser.add_argument("--wl_add_word", "-ww", type=str, default=None, help="TODO")
+parser.add_argument("--wl_from_file", "-wf", type=Path, default=None, help="TODO")
+parser.add_argument("--wl_lang", "-wfl", type=str, default=None, help="TODO")
+
 module_selection = parser.add_mutually_exclusive_group()
 module_selection.add_argument(
     "--enable-modules",
@@ -101,6 +106,17 @@ def main():
     print(f"{Fore.CYAN}{__app_name__}{Fore.RESET} v{__version__}")
 
     logger.debug(f"Parsed CLI args: {str(args)}")
+
+    if args.wl_add_word or args.wl_from_file:
+        if args.whitelist:
+            wl_file = Path(args.whitelist)
+        else:
+            wl_file = Path("whitelist")
+        if args.wl_add_word:
+            add_whitelist_console(wl_file, args.wl_add_word)
+        if args.wl_from_file:
+            add_whitelist_from_file(wl_file, Path(args.wl_from_file), args.wl_lang)
+        return
 
     config_loader = ConfigLoader(args)
 

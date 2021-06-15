@@ -292,3 +292,25 @@ def get_app_dir() -> Path:
     app_dir.mkdir(parents=True, exist_ok=True)
 
     return app_dir
+
+
+def add_whitelist_console(whitelist_file, to_add):
+    """
+    TODO
+    """
+    with whitelist_file.open("a+") as file:
+        file.write(to_add)
+        file.write("\n")
+
+
+def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
+    """
+    TODO
+    """
+    lines = file_to_parse.read_text().splitlines(keepends=False)
+    with whitelist_file.open("a+") as file:
+        for line in lines:
+            if line == "":
+                continue
+            file.write(lang + "_spelling_" + line)
+            file.write("\n")
