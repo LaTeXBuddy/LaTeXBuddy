@@ -71,19 +71,24 @@ parser.add_argument(
     help="Format of the output file (either HTML or JSON).",
 )
 
+# TODO changer parser so no file is required when adding words/ keys to whitelist
 parser.add_argument(
     "--wl_add_keys",
     "-ak",
     nargs="+",
     default=None,
-    help="example: -ak en_spelling_helo en_spelling_hose",
+    help="Arguments are valid keys that should be added to whitelist. Ideally"
+         " the keys are copied from LaTeXBuddy HTML Output",
 )
 parser.add_argument(
     "--wl_from_wordlist",
     "-awl",
     nargs=2,
     default=None,
-    help="First argument is word list, second argument is language",
+    help="First argument is a file containing a single word per line, "
+    "second argument is the language of the words."
+    " The words get parsed to keys and the keys get added to the whitelist as "
+    "spelling errors that will be ignored by LaTeXBuddy",
 )
 
 module_selection = parser.add_mutually_exclusive_group()
