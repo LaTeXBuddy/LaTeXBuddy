@@ -67,7 +67,7 @@ parser.add_argument(
     "-f",
     type=str,
     choices=["HTML", "html", "JSON", "json"],
-    default="HTML",
+    default=None,
     help="Format of the output file (either HTML or JSON).",
 )
 
