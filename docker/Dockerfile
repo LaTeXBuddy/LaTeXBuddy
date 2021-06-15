@@ -1,5 +1,10 @@
-# build the LaTeXBuddy itself
+#
+# LaTeXBuddy
+#
 FROM python:alpine AS build-latexbuddy
+
+# install GCC and other libs for building
+RUN apk update && apk add build-base
 
 # install Poetry
 ENV POETRY_HOME /etc/poetry
@@ -13,16 +18,18 @@ WORKDIR /latexbuddy
 COPY pyproject.toml poetry.lock README.md CHANGELOG.md NOTICE ./
 COPY ./latexbuddy ./latexbuddy
 
-# install GCC and other libs for building
-RUN apk add build-base
-
 # build LaTeXBuddy
 RUN poetry install && poetry build
 
 
 
-# build diction
+#
+# Diction
+#
 FROM alpine:latest AS build-diction
+
+# install GCC and other libs for building
+RUN apk update && apk add build-base
 
 # download diction
 RUN wget 'http://www.moria.de/~michael/diction/diction-1.14.tar.gz' \
@@ -30,32 +37,37 @@ RUN wget 'http://www.moria.de/~michael/diction/diction-1.14.tar.gz' \
 
 # build diction
 WORKDIR /diction-1.14
-RUN apk add build-base
 RUN ./configure && make
 
 
 
-# build languagetool
+#
+# LanguageTool
+#
 FROM debian:buster AS build-languagetool
 
-RUN apt-get update -y
-RUN apt-get install -y \
-    git \
-    maven \
-    openjdk-11-jdk-headless \
-    unzip
-
-RUN git clone --depth 1 https://github.com/languagetool-org/languagetool.git --branch v5.3
+RUN apt-get update -y \
+    && apt-get install -y \
+        git \
+        maven \
+        openjdk-11-jdk-headless \
+        unzip \
+    && git clone --depth 1 https://github.com/languagetool-org/languagetool.git --branch v5.3
 
 WORKDIR /languagetool
-RUN mvn clean
-RUN mvn package -DskipTests
-RUN unzip languagetool-standalone/target/*.zip -d /dist
+RUN mvn clean \
+    && mvn package -DskipTests --quiet \
+    && unzip languagetool-standalone/target/*.zip -d /dist
 
 
 
-# build chktex
+#
+# ChkTeX
+#
 FROM alpine:latest AS build-chktex
+
+# install GCC and other libs for building
+RUN apk update && apk add build-base
 
 # download chktex
 RUN wget 'http://download.savannah.gnu.org/releases/chktex/chktex-1.7.6.tar.gz' \
@@ -63,15 +75,26 @@ RUN wget 'http://download.savannah.gnu.org/releases/chktex/chktex-1.7.6.tar.gz' 
 
 # build chktex
 WORKDIR /chktex-1.7.6
-RUN apk add build-base
-RUN ./configure --prefix /usr/local
-RUN make
-RUN chmod 644 chktexrc
+RUN ./configure --prefix /usr/local \
+    && make \
+    && chmod 644 chktexrc
 
 
 
 # the end image itself
 FROM python:alpine
+
+# install dependencies from package manager
+RUN apk update \
+    && apk add \
+        aspell \
+        aspell-de \
+        aspell-en \
+        aspell-fr \
+        aspell-ru \
+        aspell-uk \
+        libstdc++ \
+        openjdk11-jre-headless
 
 WORKDIR /latexbuddy
 
@@ -82,10 +105,6 @@ COPY --from=build-latexbuddy /latexbuddy/dist/latexbuddy*.whl .
 RUN pip install latexbuddy*.whl \
     && rm -rf latexbuddy*.whl
 
-# install aspell
-# TODO: manually supply other dictionaries
-RUN apk add aspell aspell-de aspell-en aspell-fr aspell-ru aspell-uk
-
 # install diction
 COPY --from=build-diction /diction-1.14/diction /usr/local/bin/diction
 
@@ -94,7 +113,6 @@ COPY --from=build-chktex /chktex-1.7.6/chktex /usr/local/bin/chktex
 COPY --from=build-chktex /chktex-1.7.6/chktexrc /usr/local/etc/chktexrc
 
 # install LanguageTool
-RUN apk add libstdc++ openjdk11-jre-headless
 COPY --from=build-languagetool /dist /languagetool
 RUN echo "exec java -jar \"$(find /languagetool -maxdepth 2 -name languagetool-commandline.jar)\" \$@" > /usr/local/bin/languagetool \
     && chmod 755 /usr/local/bin/languagetool
