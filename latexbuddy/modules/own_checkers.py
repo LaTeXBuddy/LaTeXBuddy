@@ -14,7 +14,7 @@ from latexbuddy.texfile import TexFile
 class UnreferencedFiguresModule(Module):
     def __init__(self):
         self.tool_name = "unrefed_figure_check"
-        self.cid = "0"
+        self.p_type = "0"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 
@@ -54,7 +54,7 @@ class UnreferencedFiguresModule(Module):
                         text=label,
                         checker=self.tool_name,
                         category=self.category,
-                        cid=self.cid,
+                        p_type=self.p_type,
                         file=file.tex_file,
                         severity=self.severity,
                         description=f"Figure {label} not referenced.",
@@ -112,7 +112,7 @@ class SiUnitxModule(Module):
                     text=str(number),
                     checker=self.tool_name,
                     category=self.category,
-                    cid="num",
+                    p_type="num",
                     file=file.tex_file,
                     severity=self.severity,
                     description=f"For number {number} \\num from siunitx may be used.",
@@ -215,7 +215,7 @@ class SiUnitxModule(Module):
                         text=unit,
                         checker=self.tool_name,
                         category=self.category,
-                        cid="unit",
+                        p_type="unit",
                         file=file.tex_file,
                         severity=self.severity,
                         description=f"For unit {unit} siunitx may be used.",
@@ -254,7 +254,7 @@ class EmptySectionsModule(Module):
                     text=text,
                     checker=self.tool_name,
                     category=self.category,
-                    cid="0",
+                    p_type="0",
                     file=file.tex_file,
                     severity=self.severity,
                     description=f"Sections may not be empty.",
@@ -295,7 +295,7 @@ class URLModule(Module):
                     text=url,
                     checker=self.tool_name,
                     category=self.category,
-                    cid="0",
+                    p_type="0",
                     file=file.tex_file,
                     severity=self.severity,
                     description=f"For URLs use \\url.",
@@ -332,7 +332,7 @@ class CheckFigureResolution(Module):
 
     def __init__(self):
         self.tool_name = "resolution_check"
-        self.cid = "0"
+        self.p_type = "0"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 
@@ -360,7 +360,7 @@ class CheckFigureResolution(Module):
                             text=name,
                             checker=self.tool_name,
                             category=self.category,
-                            cid="0",
+                            p_type="0",
                             file=file.tex_file,
                             severity=self.severity,
                             description=f"Figure might have low resolution due to file format {ending}",
@@ -395,15 +395,15 @@ class NativeUseOfRef(Module):
                     text=ref_pattern,
                     checker=self.tool_name,
                     category=self.category,
-                    cid="0",
                     file=file.tex_file,
                     severity=self.severity,
                     description=description,
                     context=("", problem_text[5:]),
-                    key=self.tool_name + "_" + "\\" + problem_text,
+                    key=self.tool_name + "_" + problem_text[5:-1],
                     length=len(ref_pattern),
                 )
             )
+            # find next problem for next iteration
             curr_problem_start = tex.find(ref_pattern, curr_problem_start + 1)
 
         return problems

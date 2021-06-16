@@ -5,12 +5,15 @@ All notable changes to LaTeXBuddy will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] - 15 Jun 2021
 
 ### Added
 - centralized file for LaTeXBuddy exceptions (!94)
-- checker to warn about low resolution in figures
-- checker to detect \ref instead of e.g. \cref
+- checker to warn about low resolution in figures (!101)
+- checker to detect \ref instead of e.g. \cref (!99)
+- language support in whitelist for spelling or grammar errors (!102)
+- added option to manually add keys and word lists to the whitelist via command line (!106)
+- added Docker file for Docker-based install (!103)
 
 ### Changed
 - moved module execution time measurements from individual modules to the main buddy instance (!93)
@@ -18,11 +21,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - adapted all modules using tool-methods find_executable and execute_no_errors to the new features (!94)
 - changed module execution to utilize multiprocessing (!92)
 - changed Problem attribute position to be optional (!96)
+- renamed Problem attribute cid to p_type and made it optional (!102)
+- whitelist file extension removed (!102)
+- number of suggestions in a problem is now capped at 10 (!102)
 
 ### Fixed
 - minor issue in languagetool.py: module didn't stop execution after java-check failed in find_languagetool_command() (!94)
 - import issue with proselint, because proselint.py shared the same name with the imported API (!95)
 - usage of old `compare_...` functions (#45, !97)
+- whitelist working again (!102)
+- invalid default value of cli flag `format` resulting in LaTeXBuddy ignoring the config option for `format` (#56, !104)
 
 ## [0.2.0] - 08 Jun 2021
 
@@ -94,6 +102,7 @@ This is the first (pre-)release of LaTeXBuddy.
 - logo (!38)
 
 
-[Unreleased]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.2.0...master
+[Unreleased]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.3.0...master
+[0.3.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.2.0...v0.3.0
 [0.2.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.1.0...v0.2.0
 [0.1.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/124d0730...v0.1.0

@@ -97,7 +97,7 @@ class AspellModule(Module):
         :param out: line-split output of the aspell command
         :param file: the file path
         """
-        cid = "0"  # aspell got not error-ids
+        p_type = "0"  # aspell got not error-ids
         severity = ProblemSeverity.ERROR
         key_delimiter = "_"
         problems = []
@@ -135,9 +135,9 @@ class AspellModule(Module):
                         position=location,
                         text=text,
                         checker=self.tool_name,
-                        cid=cid,
                         file=file.tex_file,
                         severity=severity,
+                        p_type=p_type,
                         category="spelling",
                         suggestions=suggestions,
                         key=key,
