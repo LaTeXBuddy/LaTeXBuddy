@@ -50,7 +50,9 @@ sudo ./configure
 sudo make
 sudo make install
 sudo make check
-make clean
+sudo echo export PATH="$HOME/$TFPATH/:$PATH" >> ~/.bash_profile
+# sudo echo chktex="$HOME/$TFPATH/chktex" >> ~/.bash_profile
+# make clean
 
 
 TARPATH=$HOME/diction-1.14.tar.gz
@@ -67,9 +69,9 @@ sudo make install
 # TBD: install in /usr/local ???
 TARPATH=$HOME/aspell-master.zip
 url=https://github.com/GNUAspell/aspell/archive/refs/heads/master.zip
-curl $url > $TARPATH
+curl -L $url > $TARPATH
 unzip $TARPATH -d $HOME
-cd $HOME/aspell
+cd $HOME/aspell-master
 sudo ./autogen
 sudo ./configure --disable-static
 sudo make
@@ -80,11 +82,11 @@ make clean
 
 TARPATH=$HOME/latexbuddy-master.tar.gz
 url=https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/latexbuddy-master.tar.gz
-curl $url > $TARPATH
+curl -L $url > $TARPATH
 cd $HOME
 tar -xvf latexbuddy-master.tar.gz
 
 cd $HOME
-mkdir LanguageTool
+mkdir -p LanguageTool
 cd LanguageTool
 curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash
