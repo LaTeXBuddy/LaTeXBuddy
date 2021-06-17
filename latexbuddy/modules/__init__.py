@@ -31,3 +31,15 @@ class Module(ABC):
         """This is the canonical way to determine a module's name."""
 
         return self.__class__.__name__
+
+
+class MainModule(Module):
+    """Interface class adding the ability to provide a display name to the main
+    LaTeXBuddy instance.
+    """
+
+    def __init__(self):
+        return
+
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+        return []
