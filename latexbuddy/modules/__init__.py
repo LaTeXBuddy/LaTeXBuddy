@@ -33,10 +33,11 @@ class Module(ABC):
         """
         pass
 
-    def get_display_name(self) -> str:
+    @classmethod
+    def get_display_name(cls) -> str:
         """This is the canonical way to determine a module's name."""
 
-        return self.__class__.__name__
+        return cls.__name__
 
 
 class MainModule(Module):
