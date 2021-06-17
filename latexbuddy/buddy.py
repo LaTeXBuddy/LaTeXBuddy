@@ -33,6 +33,8 @@ class LatexBuddy(MainModule):
         :param config_loader: ConfigLoader object to manage config options
         :param file_to_check: file that will be checked
         """
+        super().__init__()
+
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = config_loader  # configuration
         self.preprocessor: Optional[Preprocessor] = None  # in-file preprocessing
