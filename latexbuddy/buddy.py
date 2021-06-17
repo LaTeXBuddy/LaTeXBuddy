@@ -14,7 +14,7 @@ from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
-from latexbuddy.modules import Module
+from latexbuddy.modules import MainModule, Module
 from latexbuddy.preprocessor import Preprocessor
 from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
 
@@ -22,7 +22,7 @@ from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
 # TODO: make this a singleton class with static methods
 
 
-class LatexBuddy:
+class LatexBuddy(MainModule):
     """The main instance of the applications that controls all the internal tools."""
 
     __logger = root_logger.getChild("buddy")
