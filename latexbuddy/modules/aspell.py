@@ -1,6 +1,7 @@
 """This module defines the connection between LaTeXBuddy and GNU Aspell."""
 import shlex
 
+from logging import Logger
 from typing import List
 
 import latexbuddy.tools as tools
@@ -15,22 +16,25 @@ from latexbuddy.texfile import TexFile
 
 
 class AspellModule(Module):
-    __logger = root_logger.getChild("AspellModule")
-
     def __init__(self):
         self._LANGUAGE_MAP = {"de": "de-DE", "en": "en"}
         self.language = "en"
         self.tool_name = "aspell"
+        self.__logger = root_logger
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(
+        self, config: ConfigLoader, file: TexFile, logger: Logger
+    ) -> List[Problem]:
         """Runs the Aspell checks on a file and returns the results as a list.
 
         Requires Aspell to be set up.
 
         :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
+        :param logger: root logger child for log output
         """
 
+        self.__logger = logger
         tools.find_executable("aspell", "GNU Aspell", self.__logger)
 
         try:

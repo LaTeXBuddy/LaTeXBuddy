@@ -6,6 +6,7 @@ import time
 
 from contextlib import closing
 from enum import Enum
+from logging import Logger
 from typing import AnyStr, Dict, List, Optional
 
 import requests
@@ -110,6 +111,8 @@ class LanguageTool(Module):
     def __init__(self):
         """Creates a LanguageTool checking module."""
 
+        self.__logger = root_logger
+
         self.mode = None
         self.language = None
 
@@ -120,7 +123,9 @@ class LanguageTool(Module):
         self.remote_url = None
         self.lt_console_command = None
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(
+        self, config: ConfigLoader, file: TexFile, logger: Logger
+    ) -> List[Problem]:
         """Runs the LanguageTool checks on a file and returns the results as a list.
 
         Requires LanguageTool (server) to be set up.
@@ -128,7 +133,10 @@ class LanguageTool(Module):
 
         :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
+        :param logger: root logger child for log output
         """
+
+        self.__logger = logger
 
         self.language = config.get_config_option_or_default(
             "buddy",

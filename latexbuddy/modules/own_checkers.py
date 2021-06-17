@@ -1,6 +1,7 @@
 import os
 import re
 
+from logging import Logger
 from typing import List
 
 import latexbuddy.tools as tools
@@ -18,10 +19,13 @@ class UnreferencedFiguresModule(Module):
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(
+        self, config: ConfigLoader, file: TexFile, logger: Logger
+    ) -> List[Problem]:
         """Finds unreferenced figures.
         :param: config: configurations of the buddy instance
         :param: file: the file to check
+        :param: logger: root logger child for log output
         :return: a list of found problems
         """
         tex = file.tex
@@ -73,10 +77,13 @@ class SiUnitxModule(Module):
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(
+        self, config: ConfigLoader, file: TexFile, logger: Logger
+    ) -> List[Problem]:
         """Finds units and long numbers used without siunitx package.
         :param: config: configurations of the buddy instance
         :param: file: the file to check
+        :param: logger: root logger child for log output
         :return: a list of found problems
         """
         problems = []
@@ -233,7 +240,9 @@ class EmptySectionsModule(Module):
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(
+        self, config: ConfigLoader, file: TexFile, logger: Logger
+    ) -> List[Problem]:
         tex = file.tex
         problems = []
         pattern = r"\\section{.*}\s+\\subsection"
@@ -272,7 +281,9 @@ class URLModule(Module):
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(
+        self, config: ConfigLoader, file: TexFile, logger: Logger
+    ) -> List[Problem]:
         tex = file.tex
         problems = []
         # https://stackoverflow.com/questions/6038061/regular-expression-to-find-urls-within-a-string
@@ -336,10 +347,13 @@ class CheckFigureResolution(Module):
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(
+        self, config: ConfigLoader, file: TexFile, logger: Logger
+    ) -> List[Problem]:
         """Finds potential low resolution figures.
         :param: config: configurations of the buddy instance
         :param: file: the file to check
+        :param: logger: root logger child for log output
         :return: a list of found problems
         """
         search_root = os.path.dirname(file.tex_file)
@@ -378,7 +392,9 @@ class NativeUseOfRef(Module):
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(
+        self, config: ConfigLoader, file: TexFile, logger: Logger
+    ) -> List[Problem]:
         description = "Instead of \\ref{} use a more precise command e.g. \\cref{}"
         tex = file.tex
         problems = []

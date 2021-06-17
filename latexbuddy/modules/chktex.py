@@ -2,6 +2,7 @@
 
 ChkTeX Documentation: https://www.nongnu.org/chktex/ChkTeX.pdf
 """
+from logging import Logger
 from typing import List
 
 import latexbuddy.tools as tools
@@ -14,22 +15,25 @@ from latexbuddy.problem import Problem, ProblemSeverity
 
 
 class ChktexModule(Module):
-    __logger = root_logger.getChild("ChktexModule")
-
     def __init__(self):
         self.DELIMITER = ":::"
         self.tool_name = "chktex"
         self.problem_type = "latex"
+        self.__logger = root_logger
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(
+        self, config: ConfigLoader, file: TexFile, logger: Logger
+    ) -> List[Problem]:
         """Runs the chktex checks on a file and converts them to a list of Problems
 
         Requires chktex to be installed separately
 
         :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
+        :param logger: root logger child for log output
         """
 
+        self.__logger = logger
         tools.find_executable("chktex", "ChkTeX", self.__logger)
 
         format_str = (

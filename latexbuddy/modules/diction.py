@@ -1,6 +1,7 @@
 import hashlib
 import os
 
+from logging import Logger
 from pathlib import Path
 from typing import AnyStr, List
 
@@ -16,15 +17,19 @@ from latexbuddy.texfile import TexFile
 
 
 class DictionModule(Module):
-    __logger = root_logger.getChild("DictionModule")
 
     __SUPPORTED_LANGUAGES = ["en", "de", "nl"]
 
     def __init__(self):
         self.language = None
         self.tool_name = "diction"
+        self.__logger = root_logger
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(
+        self, config: ConfigLoader, file: TexFile, logger: Logger
+    ) -> List[Problem]:
+
+        self.__logger = logger
 
         # check, if diction is installed
         tools.find_executable("diction", "Diction", self.__logger)
@@ -80,7 +85,7 @@ class DictionModule(Module):
         """Parses diction errors and returns list of Problems.
 
         :param original: lines of file to check as list
-        :param out: line splitted output of the diction command with empty lines removed
+        :param out: line split output of the diction command with empty lines removed
         :param file: the file path
         """
         problems = []
@@ -88,14 +93,14 @@ class DictionModule(Module):
 
             o_line = ""
 
-            splitted_error = error.split(" ")
+            split_error = error.split(" ")
             double_world = False
 
-            for i in range(0, len(splitted_error)):
-                if splitted_error[i] == "->":
-                    if i == len(splitted_error) - 2:
+            for i in range(0, len(split_error)):
+                if split_error[i] == "->":
+                    if i == len(split_error) - 2:
                         break
-                    if splitted_error[i + 1] == "Double":
+                    if split_error[i + 1] == "Double":
                         double_world = True
                     else:
                         break
@@ -103,12 +108,12 @@ class DictionModule(Module):
             if double_world:
 
                 src, lines, chars, sugg = error.split(":", maxsplit=3)
-                splitted_lines = lines.split("-")
-                splitted_chars = chars.split("-")
-                splitted_lines_int = [int(a) for a in splitted_lines]
-                splitted_chars_int = [int(a) for a in splitted_chars]
-                start_line, end_line = splitted_lines_int[0], splitted_lines_int[1]
-                start_char, end_char = splitted_chars_int[0] - 1, splitted_chars_int[1]
+                split_lines = lines.split("-")
+                split_chars = chars.split("-")
+                split_lines_int = [int(a) for a in split_lines]
+                split_chars_int = [int(a) for a in split_chars]
+                start_line, end_line = split_lines_int[0], split_lines_int[1]
+                start_char, end_char = split_chars_int[0] - 1, split_chars_int[1]
                 if start_line == end_line:
                     o_line = original[start_line - 1][start_char:end_char]
                 else:
