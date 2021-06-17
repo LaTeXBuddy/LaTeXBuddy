@@ -26,3 +26,8 @@ class Module(ABC):
         :param file: LaTeX file to be checked (with built-in detex option)
         """
         pass
+
+    def get_display_name(self) -> str:
+        """This is the canonical way to determine a module's name."""
+
+        return self.__class__.__name__
