@@ -207,9 +207,11 @@ class ConfigLoader:
 
         return entry
 
+    # TODO: resolve circular import error between config_loader.py and
+    #  modules.__init__.py when importing NamedModule
     def get_config_option(
         self,
-        tool_name: str,
+        module,  # : Union[Type[NamedModule], NamedModule],
         key: str,
         verify_type: Type = Any,
         verify_regex: Optional[str] = None,
@@ -220,7 +222,7 @@ class ConfigLoader:
         doesn't exist or the retrieved entry does not match a specified verification
         criterion.
 
-        :param tool_name: name of the tool owning the config option
+        :param module: type or an instance of the module owning the config option
         :param key: key of the config option
         :param verify_type: typing type that the config entry is required to be an
                             instance of (otherwise ConfigOptionVerificationError is
@@ -240,7 +242,7 @@ class ConfigLoader:
         try:
             return ConfigLoader.__get_option(
                 self.flags,
-                tool_name,
+                module.display_name,
                 key,
                 error_indicator="flag",
                 verify_type=verify_type,
@@ -252,16 +254,18 @@ class ConfigLoader:
 
         return ConfigLoader.__get_option(
             self.configurations,
-            tool_name,
+            module.display_name,
             key,
             verify_type=verify_type,
             verify_regex=verify_regex,
             verify_choices=verify_choices,
         )
 
+    # TODO: resolve circular import error between config_loader.py and
+    #  modules.__init__.py when importing NamedModule
     def get_config_option_or_default(
         self,
-        tool_name: str,
+        module,  # : Union[Type[NamedModule], NamedModule],
         key: str,
         default_value: Any,
         verify_type: Type = Any,
@@ -273,7 +277,7 @@ class ConfigLoader:
         doesn't exist or the retrieved entry does not match a specified verification
         criterion.
 
-        :param tool_name: name of the tool owning the config option
+        :param module: type or an instance of the module owning the config option
         :param key: key of the config option
         :param default_value: default value in case the requested option doesn't exist
         :param verify_type: typing type that the config entry is required to be an
@@ -291,7 +295,7 @@ class ConfigLoader:
 
         try:
             return self.get_config_option(
-                tool_name,
+                module,
                 key,
                 verify_type=verify_type,
                 verify_regex=verify_regex,
@@ -300,8 +304,8 @@ class ConfigLoader:
 
         except ConfigOptionNotFoundError:
             self.__logger.info(
-                f"Config entry '{key}' for module '{tool_name}' not found. Using "
-                f"default value '{str(default_value)}' instead..."
+                f"Config entry '{key}' for module '{module.display_name}' not found. "
+                f"Using default value '{str(default_value)}' instead..."
             )
 
             return default_value
