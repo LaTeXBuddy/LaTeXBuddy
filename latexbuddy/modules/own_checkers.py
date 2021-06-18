@@ -230,11 +230,10 @@ class EmptySectionsModule(Module):
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         tex = file.tex
         problems = []
-        pattern = r"\\section{.*}\s+\\subsection"
-        empty_sections = re.findall(pattern, tex)
-        for section in empty_sections:
-            match = re.search(re.escape(section), tex)
-            start, end = match.span()
+        pattern = r"\\section{(.*)}\s+\\subsection"
+        empty_sections = re.finditer(pattern, tex)
+        for section_match in empty_sections:
+            start, end = section_match.span()
             length = end - start
             line, col, offset = tools.absolute_to_linecol(tex, start)
             text = section_match.group(1)
