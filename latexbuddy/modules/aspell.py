@@ -5,6 +5,7 @@ from typing import List
 
 import latexbuddy.tools as tools
 
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.exceptions import LanguageNotSupportedError
 from latexbuddy.messages import not_found
@@ -17,7 +18,6 @@ class AspellModule(Module):
     def __init__(self):
         self._LANGUAGE_MAP = {"de": "de-DE", "en": "en"}
         self.language = "en"
-        self.tool_name = "aspell"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the Aspell checks on a file and returns the results as a list.
@@ -33,7 +33,7 @@ class AspellModule(Module):
         try:
 
             self.language = self._LANGUAGE_MAP[
-                config.get_config_option_or_default("buddy", "language", None)
+                config.get_config_option_or_default(LatexBuddy, "language", None)
             ]
 
         except KeyError:
@@ -131,7 +131,7 @@ class AspellModule(Module):
                     Problem(
                         position=location,
                         text=text,
-                        checker=self.tool_name,
+                        checker=self,
                         file=file.tex_file,
                         severity=severity,
                         p_type=p_type,
