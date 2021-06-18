@@ -11,6 +11,7 @@ from pydantic import BaseModel, ValidationError
 import latexbuddy.tools as tools
 
 from latexbuddy import __logger as root_logger
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.exceptions import (
     ConfigOptionNotFoundError,
     ConfigOptionVerificationError,
@@ -57,10 +58,11 @@ class ConfigLoader:
 
         :param args: commandline arguments specified at the start of LaTeXBuddy
         :return: a formatted dictionary containing all cli flags as config entries with
-            the label "buddy"
+            the label corresponding to the display name of the main LaTeXBuddy instance
         """
 
-        parsed = {"buddy": {}}
+        module_key = LatexBuddy.display_name
+        parsed = {module_key: {}}
 
         args_dict = vars(args)
 
@@ -72,7 +74,7 @@ class ConfigLoader:
                 # is guaranteed by argparse library
                 if key == "enable_modules":
 
-                    parsed["buddy"]["enable-modules-by-default"] = False
+                    parsed[module_key]["enable-modules-by-default"] = False
 
                     for module_name in self.configurations.keys():
                         if module_name not in parsed:
@@ -88,7 +90,7 @@ class ConfigLoader:
 
                 elif key == "disable_modules":
 
-                    parsed["buddy"]["enable-modules-by-default"] = True
+                    parsed[module_key]["enable-modules-by-default"] = True
 
                     for module_name in self.configurations.keys():
                         if module_name not in parsed:
@@ -103,7 +105,7 @@ class ConfigLoader:
                         parsed[module_name]["enabled"] = False
 
                 else:
-                    parsed["buddy"][key] = args_dict[key]
+                    parsed[module_key][key] = args_dict[key]
 
         return parsed
 
