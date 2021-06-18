@@ -10,7 +10,9 @@ from enum import Enum
 from functools import total_ordering
 from json import JSONEncoder
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Type, Union
+
+from latexbuddy.modules import NamedModule
 
 
 language = None  # static variable used for a uniform key generation
@@ -73,7 +75,7 @@ class Problem:
         self,
         position: Optional[Tuple[int, int]],
         text: str,
-        checker: str,
+        checker: Union[Type[NamedModule], NamedModule],
         file: Path,
         severity: ProblemSeverity = ProblemSeverity.WARNING,
         p_type: Optional[str] = None,
@@ -90,7 +92,7 @@ class Problem:
                          `(line, column)`.
         :param length: the length of the problematic text.
         :param text: problematic text.
-        :param checker: name of the tool that discovered the problem.
+        :param checker: type or instance of the tool that discovered the problem.
         :param p_type: ID of the problem type, used inside the respective checker.
         :param file: **[DEPRECATED]** path to the file where the problem was found
         :param severity: severity of the problem.
@@ -110,7 +112,7 @@ class Problem:
             length = 0
         self.length = length
         self.text = text
-        self.checker = checker
+        self.checker = checker.display_name
         if p_type is None:
             p_type = ""
         self.p_type = p_type
