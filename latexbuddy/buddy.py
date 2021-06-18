@@ -11,10 +11,9 @@ from typing import AnyStr, List, Optional
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
-from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
-from latexbuddy.modules import Module, NamedModule
+from latexbuddy.modules import MainModule, Module
 from latexbuddy.preprocessor import Preprocessor
 from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
 
@@ -22,10 +21,8 @@ from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
 # TODO: make this a singleton class with static methods
 
 
-class LatexBuddy(NamedModule):
+class LatexBuddy(MainModule):
     """The main instance of the applications that controls all the internal tools."""
-
-    __logger = root_logger.getChild("buddy")
 
     def __init__(self, config_loader: ConfigLoader, file_to_check: Path):
         """Initializes the LaTeXBuddy instance.
@@ -49,7 +46,7 @@ class LatexBuddy(NamedModule):
         )
 
         if not self.output_dir.is_dir():
-            self.__logger.warning(
+            self.logger.warning(
                 f"'{str(self.output_dir)}' is not a directory. "
                 f"Current directory will be used instead."
             )
@@ -108,7 +105,7 @@ class LatexBuddy(NamedModule):
         """
 
         if uid not in self.errors:
-            self.__logger.error(
+            self.logger.error(
                 f"UID not found: {uid}. "
                 "Specified problem will not be added to whitelist."
             )
@@ -184,7 +181,7 @@ class LatexBuddy(NamedModule):
         tool_loader = ToolLoader(Path("latexbuddy/modules/"))
         modules = tool_loader.load_selected_modules(self.cfg)
 
-        self.__logger.debug(
+        self.logger.debug(
             f"Using multiprocessing pool with {os.cpu_count()} "
             f"threads/processes for checks."
         )
@@ -216,7 +213,7 @@ class LatexBuddy(NamedModule):
         with json_output_path.open("w") as file:
             json.dump(list_of_problems, file, indent=4, cls=ProblemJSONEncoder)
 
-        self.__logger.info(f"Output saved to {json_output_path.resolve()}")
+        self.logger.info(f"Output saved to {json_output_path.resolve()}")
 
     def output_html(self):
         """Renders all current problem objects as HTML and writes the file."""
@@ -233,7 +230,7 @@ class LatexBuddy(NamedModule):
             )
         )
 
-        self.__logger.info(f"Output saved to {html_output_path.resolve()}")
+        self.logger.info(f"Output saved to {html_output_path.resolve()}")
 
     def output_file(self):
         """Writes all current problems to the specified output file."""

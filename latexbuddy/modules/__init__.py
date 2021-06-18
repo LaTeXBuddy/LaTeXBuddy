@@ -28,6 +28,20 @@ class NamedModule(ABC):
         pass
 
 
+class MainModule(NamedModule):
+
+    __logger = root_logger.getChild("buddy")
+
+    @property
+    def logger(self):
+        return self.__logger.getChild(self.display_name)
+
+    @logger.setter
+    def logger(self, value: Logger) -> None:
+        """Ignores any overwrite operations for property 'logger'."""
+        pass
+
+
 class Module(NamedModule):
     """Abstract class that defines a simple LaTeXBuddy module."""
 
