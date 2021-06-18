@@ -7,7 +7,6 @@ from latexbuddy.problem import Problem, ProblemSeverity
 
 
 class YaLafi(Module):
-
     def __init__(self):
         pass
 
