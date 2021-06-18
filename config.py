@@ -4,7 +4,7 @@ out-of-the-box. You may move this file and specify its path using the --config f
 """
 
 modules = {
-    "buddy": {
+    "LatexBuddy": {
         "language": "en",
         "whitelist": "whitelist",
         "output": "./",
