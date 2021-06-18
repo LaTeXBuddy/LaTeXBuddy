@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - new test cases for multiple occurrences of own_checkers problems (!110)
 
 ### Changed
+- language selection for aspell now works dynamically and using the config (!105)
 
 ### Fixed
 - regex usage in own_checkers (!110)
