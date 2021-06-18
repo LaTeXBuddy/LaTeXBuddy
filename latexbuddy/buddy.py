@@ -41,7 +41,7 @@ class LatexBuddy(MainModule):
         # file where the error should be saved
         self.output_dir = Path(
             self.cfg.get_config_option_or_default(
-                "buddy", "output", Path("./"), verify_type=AnyStr
+                LatexBuddy, "output", Path("./"), verify_type=AnyStr
             )
         )
 
@@ -54,7 +54,7 @@ class LatexBuddy(MainModule):
 
         self.output_format = str(
             self.cfg.get_config_option_or_default(
-                "buddy",
+                LatexBuddy,
                 "format",
                 "HTML",
                 verify_type=AnyStr,
@@ -65,7 +65,7 @@ class LatexBuddy(MainModule):
         # file that represents the whitelist
         self.whitelist_file = Path(
             self.cfg.get_config_option_or_default(
-                "buddy", "whitelist", Path("whitelist"), verify_type=AnyStr
+                LatexBuddy, "whitelist", Path("whitelist"), verify_type=AnyStr
             )
         )
 
@@ -161,7 +161,7 @@ class LatexBuddy(MainModule):
         """Runs all tools in the LaTeXBuddy toolchain in parallel"""
 
         language = self.cfg.get_config_option_or_default(
-            "buddy",
+            LatexBuddy,
             "language",
             None,
             verify_type=AnyStr,
