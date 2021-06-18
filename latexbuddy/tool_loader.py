@@ -1,5 +1,4 @@
 import importlib
-import importlib.util as importutil
 import inspect
 
 from pathlib import Path
@@ -8,6 +7,7 @@ from typing import List
 
 import latexbuddy.tools as tools
 
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 
@@ -43,10 +43,6 @@ class ToolLoader:
             for class_obj in classes:
                 modules.append(class_obj())
 
-        for module in modules:
-
-            module.__module__ = "latexbuddy.modules." + module.__module__
-
         return modules
 
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
@@ -66,10 +62,10 @@ class ToolLoader:
             module
             for module in modules
             if cfg.get_config_option_or_default(
-                module.__class__.__name__,
+                module,
                 "enabled",
                 cfg.get_config_option_or_default(
-                    "buddy", "enable-modules-by-default", True
+                    LatexBuddy, "enable-modules-by-default", True
                 ),
             )
         ]
