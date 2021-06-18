@@ -237,11 +237,7 @@ class EmptySectionsModule(Module):
             start, end = match.span()
             length = end - start
             line, col, offset = tools.absolute_to_linecol(tex, start)
-            sec_len = len("\\section{")
-            rest_pattern = r"}\s+\\subsection"
-            rest_match = re.findall(rest_pattern, section)
-            rest_len = len(rest_match[0])
-            text = section[sec_len : len(section) - rest_len]
+            text = section_match.group(1)
             problems.append(
                 Problem(
                     position=(line, col),
