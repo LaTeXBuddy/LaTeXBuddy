@@ -276,14 +276,12 @@ class URLModule(Module):
         tex = file.tex
         problems = []
         # https://stackoverflow.com/questions/6038061/regular-expression-to-find-urls-within-a-string
-        pattern = "(http|ftp|https)(:\/\/)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
-        urls = re.findall(pattern, tex)
-        for url_list in urls:
-            url = ""
-            for u in url_list:
-                url += u
-            match = re.search(re.escape(url), tex)
-            start, end = match.span()
+        pattern = r"(http|ftp|https)(:\/\/)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
+        urls = re.finditer(pattern, tex)
+
+        for url_match in urls:
+
+            start, end = url_match.span()
             length = end - start
             command_len = len("\\url{")
             if tex[start - command_len : start] == "\\url{":
@@ -292,14 +290,14 @@ class URLModule(Module):
             problems.append(
                 Problem(
                     position=(line, col),
-                    text=url,
+                    text=url_match.group(0),
                     checker=self.tool_name,
                     category=self.category,
                     p_type="0",
                     file=file.tex_file,
                     severity=self.severity,
                     description=f"For URLs use \\url.",
-                    key=self.tool_name + "_" + url,
+                    key=self.tool_name + "_" + url_match.group(0),
                     length=length,
                 )
             )
