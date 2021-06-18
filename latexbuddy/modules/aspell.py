@@ -65,7 +65,10 @@ class AspellModule(Module):
 
     @staticmethod
     def find_languages() -> List[str]:
+        """Returns all languages supported by the current aspell installation.
 
+        :return: list of supported languages in str format
+        """
         return tools.execute("aspell", "dump dicts").splitlines()
 
     def format_errors(
