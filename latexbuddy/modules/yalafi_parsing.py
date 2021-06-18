@@ -7,6 +7,7 @@ from latexbuddy.problem import Problem, ProblemSeverity
 
 
 class YaLafi(Module):
+
     def __init__(self):
         pass
 
@@ -26,6 +27,7 @@ class YaLafi(Module):
                         file=file.tex_file,
                         severity=ProblemSeverity.ERROR,
                         category="latex",
+                        key="YaLafi_tex2txt",
                     )
                 )
 
