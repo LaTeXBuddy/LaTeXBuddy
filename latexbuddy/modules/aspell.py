@@ -1,7 +1,7 @@
 """This module defines the connection between LaTeXBuddy and GNU Aspell."""
 import shlex
 
-from typing import List, AnyStr
+from typing import AnyStr, List
 
 import latexbuddy.tools as tools
 
@@ -33,9 +33,15 @@ class AspellModule(Module):
         tools.find_executable("aspell", "GNU Aspell", self.__logger)
 
         supported_languages = self.find_languages()
-        self.language = shlex.quote(config.get_config_option_or_default(
-            "buddy", "language", "en", verify_type=AnyStr, verify_choices=supported_languages
-        ))
+        self.language = shlex.quote(
+            config.get_config_option_or_default(
+                "buddy",
+                "language",
+                "en",
+                verify_type=AnyStr,
+                verify_choices=supported_languages,
+            )
+        )
 
         error_list = []
         counter = 1  # counts the lines
