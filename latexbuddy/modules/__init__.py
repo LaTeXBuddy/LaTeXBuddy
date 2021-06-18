@@ -7,12 +7,31 @@ from logging import Logger
 from typing import List
 
 from latexbuddy import TexFile
+from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.problem import Problem
 
 
-class Module(ABC):
+class NamedModule(ABC):
+    """Interface class adding the ability to provide a display name to any module
+    instance.
+    """
+
+    @property
+    def display_name(self) -> str:
+        """Returns the canonical display name of the module."""
+        return self.__class__.__name__
+
+    @display_name.setter
+    def display_name(self, value: str) -> None:
+        """Ignores any overwrite operations for property 'display_name'."""
+        pass
+
+
+class Module(NamedModule):
     """Abstract class that defines a simple LaTeXBuddy module."""
+
+    __logger = root_logger.getChild("modules")
 
     @abstractmethod
     def __init__(self):
@@ -33,22 +52,12 @@ class Module(ABC):
         """
         pass
 
-    @classmethod
-    def get_display_name(cls) -> str:
-        """This is the canonical way to determine a module's name."""
+    @property
+    def logger(self) -> Logger:
+        """Returns the logger of the module as a child of LaTeXBuddy's root_logger."""
+        return self.__logger.getChild(self.display_name)
 
-        return cls.__name__
-
-
-class MainModule(Module):
-    """Interface class adding the ability to provide a display name to the main
-    LaTeXBuddy instance.
-    """
-
-    def __init__(self):
-        return
-
-    def run_checks(
-        self, config: ConfigLoader, file: TexFile, logger: Logger
-    ) -> List[Problem]:
-        return []
+    @logger.setter
+    def logger(self, value: Logger) -> None:
+        """Ignores any overwrite operations for property 'logger'."""
+        pass

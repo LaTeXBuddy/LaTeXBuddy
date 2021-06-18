@@ -14,7 +14,7 @@ from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
-from latexbuddy.modules import MainModule, Module
+from latexbuddy.modules import Module, NamedModule
 from latexbuddy.preprocessor import Preprocessor
 from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
 
@@ -22,7 +22,7 @@ from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
 # TODO: make this a singleton class with static methods
 
 
-class LatexBuddy(MainModule):
+class LatexBuddy(NamedModule):
     """The main instance of the applications that controls all the internal tools."""
 
     __logger = root_logger.getChild("buddy")
@@ -142,21 +142,21 @@ class LatexBuddy(MainModule):
         def lambda_function() -> None:
             nonlocal result
 
-            module_logger = self.__logger.getChild(module.get_display_name())
+            module_logger = module.logger
 
             start_time = time.perf_counter()
-            module_logger.debug(f"{module.get_display_name()} started checks")
+            module_logger.debug(f"{module.display_name} started checks")
 
             result = module.run_checks(self.cfg, self.tex_file, module_logger)
 
             module_logger.debug(
-                f"{module.get_display_name()} finished after "
+                f"{module.display_name} finished after "
                 f"{round(time.perf_counter() - start_time, 2)} seconds"
             )
 
         tools.execute_no_exceptions(
             lambda_function,
-            error_occurred_in_module(module.get_display_name()),
+            error_occurred_in_module(module.display_name),
             "DEBUG",
         )
 
