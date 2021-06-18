@@ -139,14 +139,12 @@ class LatexBuddy(MainModule):
         def lambda_function() -> None:
             nonlocal result
 
-            module_logger = module.logger
-
             start_time = time.perf_counter()
-            module_logger.debug(f"{module.display_name} started checks")
+            module.logger.debug(f"{module.display_name} started checks")
 
-            result = module.run_checks(self.cfg, self.tex_file, module_logger)
+            result = module.run_checks(self.cfg, self.tex_file)
 
-            module_logger.debug(
+            module.logger.debug(
                 f"{module.display_name} finished after "
                 f"{round(time.perf_counter() - start_time, 2)} seconds"
             )

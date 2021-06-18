@@ -1,9 +1,7 @@
-from logging import Logger
 from typing import List
 
 import proselint
 
-from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -12,16 +10,11 @@ from latexbuddy.texfile import TexFile
 
 class ProseLintModule(Module):
     def __init__(self):
-        self.__logger = root_logger
 
         self.tool_name = "ProseLintModule"
         self.problem_type = "grammar"
 
-    def run_checks(
-        self, config: ConfigLoader, file: TexFile, logger: Logger
-    ) -> List[Problem]:
-
-        self.__logger = logger
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
 
         lang = config.get_config_option_or_default("buddy", "language", None)
 

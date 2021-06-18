@@ -14,7 +14,6 @@ import requests
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
-from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.exceptions import ExecutableNotFoundError
 from latexbuddy.modules import Module
@@ -35,8 +34,6 @@ class Mode(Enum):
 
 class LanguageTool(Module):
     """Wraps the LanguageTool API calls to check files."""
-
-    __logger = root_logger.getChild("LanguageTool")
 
     __SUPPORTED_LANGUAGES = [
         "ar",
@@ -111,8 +108,6 @@ class LanguageTool(Module):
     def __init__(self):
         """Creates a LanguageTool checking module."""
 
-        self.__logger = root_logger
-
         self.mode = None
         self.language = None
 
@@ -123,20 +118,15 @@ class LanguageTool(Module):
         self.remote_url = None
         self.lt_console_command = None
 
-    def run_checks(
-        self, config: ConfigLoader, file: TexFile, logger: Logger
-    ) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the LanguageTool checks on a file and returns the results as a list.
 
         Requires LanguageTool (server) to be set up.
         Local or global servers can be used.
 
-        :param config: configurations of the LaTeXBuddy instance
-        :param file: the file to run checks on
-        :param logger: root logger child for log output
+        :param config: the configuration options of the calling LaTeXBuddy instance
+        :param file: LaTeX file to be checked (with built-in detex option)
         """
-
-        self.__logger = logger
 
         self.language = config.get_config_option_or_default(
             "buddy",
@@ -162,7 +152,7 @@ class LanguageTool(Module):
             self.mode = Mode.COMMANDLINE
 
         if self.mode == Mode.LOCAL_SERVER:
-            self.local_server = LanguageToolLocalServer()
+            self.local_server = LanguageToolLocalServer(self.logger)
             self.local_server.start_local_server()
 
         elif self.mode == Mode.REMOTE_SERVER:
@@ -187,18 +177,18 @@ class LanguageTool(Module):
         This method also checks if Java is installed.
         """
 
-        tools.find_executable("java", "JRE (Java Runtime Environment)", self.__logger)
+        tools.find_executable("java", "JRE (Java Runtime Environment)", self.logger)
 
         try:
             result = tools.find_executable(
-                "languagetool", "LanguageTool (CLI)", self.__logger, log_errors=False
+                "languagetool", "LanguageTool (CLI)", self.logger, log_errors=False
             )
             executable_source = "native"
 
         except ExecutableNotFoundError:
 
             result = tools.find_executable(
-                "languagetool-commandline.jar", "LanguageTool (CLI)", self.__logger
+                "languagetool-commandline.jar", "LanguageTool (CLI)", self.logger
             )
             executable_source = "java"
 
@@ -394,17 +384,17 @@ class LanguageTool(Module):
 class LanguageToolLocalServer:
     """Defines an instance of a local LanguageTool deployment."""
 
-    __logger = root_logger.getChild("LanguageTool")
-
     __DEFAULT_PORT = 8081
     __SERVER_REQUEST_TIMEOUT = 1  # in seconds
     __SERVER_MAX_ATTEMPTS = 20
 
-    def __init__(self):
+    def __init__(self, logger: Logger):
         self.lt_path = None
         self.lt_server_command = None
         self.server_process = None
         self.port = None
+
+        self.logger = logger
 
     def __del__(self):
         self.stop_local_server()
@@ -415,13 +405,13 @@ class LanguageToolLocalServer:
         This method also checks if Java is installed.
         """
 
-        tools.find_executable("java", "JRE (Java Runtime Environment)", self.__logger)
+        tools.find_executable("java", "JRE (Java Runtime Environment)", self.logger)
 
         try:
             result = tools.find_executable(
                 "languagetool-server",
                 "LanguageTool (local server)",
-                self.__logger,
+                self.logger,
                 log_errors=False,
             )
             executable_source = "native"
@@ -429,7 +419,7 @@ class LanguageToolLocalServer:
         except ExecutableNotFoundError:
 
             result = tools.find_executable(
-                "languagetool-server.jar", "LanguageTool (local server)", self.__logger
+                "languagetool-server.jar", "LanguageTool (local server)", self.logger
             )
             executable_source = "java"
 

@@ -53,16 +53,11 @@ class Module(NamedModule):
         pass
 
     @abstractmethod
-    def run_checks(
-        self, config: ConfigLoader, file: TexFile, logger: Logger
-    ) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the checks and returns a list of discovered problems.
 
         :param config: the configuration options of the calling LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex option)
-        :param logger: logger capable of displaying messages with different severity
-                       levels in the main LaTeXBuddy log (strongly recommended over
-                       print())
         """
         pass
 

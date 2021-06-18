@@ -1,4 +1,3 @@
-from logging import Logger
 from typing import List
 
 from latexbuddy import TexFile
@@ -11,9 +10,7 @@ class YaLafi(Module):
     def __init__(self):
         pass
 
-    def run_checks(
-        self, config: ConfigLoader, file: TexFile, logger: Logger
-    ) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
 
         problems = []
 

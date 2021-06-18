@@ -1,12 +1,10 @@
 """This module defines the connection between LaTeXBuddy and GNU Aspell."""
 import shlex
 
-from logging import Logger
 from typing import List
 
 import latexbuddy.tools as tools
 
-from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.exceptions import LanguageNotSupportedError
 from latexbuddy.messages import not_found
@@ -20,22 +18,17 @@ class AspellModule(Module):
         self._LANGUAGE_MAP = {"de": "de-DE", "en": "en"}
         self.language = "en"
         self.tool_name = "aspell"
-        self.__logger = root_logger
 
-    def run_checks(
-        self, config: ConfigLoader, file: TexFile, logger: Logger
-    ) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the Aspell checks on a file and returns the results as a list.
 
         Requires Aspell to be set up.
 
-        :param config: configurations of the LaTeXBuddy instance
-        :param file: the file to run checks on
-        :param logger: root logger child for log output
+        :param config: the configuration options of the calling LaTeXBuddy instance
+        :param file: LaTeX file to be checked (with built-in detex option)
         """
 
-        self.__logger = logger
-        tools.find_executable("aspell", "GNU Aspell", self.__logger)
+        tools.find_executable("aspell", "GNU Aspell", self.logger)
 
         try:
 
@@ -82,7 +75,7 @@ class AspellModule(Module):
         """
         # error if language dict not installed
         if language not in langs:
-            self.__logger.error(
+            self.logger.error(
                 not_found(f"Language for {language}", "the dictionary")
                 + "\nYou can check available dictionaries at "
                 + "https://ftp.gnu.org/gnu/aspell/dict/0index.html"
