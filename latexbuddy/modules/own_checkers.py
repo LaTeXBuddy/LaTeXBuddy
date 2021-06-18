@@ -89,30 +89,29 @@ class SiUnitxModule(Module):
         """
         problems = []
         text = file.tex
-        all_numbers = re.findall("[0-9]+", text)
+        all_numbers = re.finditer("[0-9]+", text)
         threshold = 3
 
-        def filter_big_numbers(n):
-            return True if len(n) > threshold else False
+        def filter_big_numbers(n: re.Match):
+            return True if len(n.group(0)) > threshold else False
 
         numbers = list(filter(filter_big_numbers, all_numbers))
 
-        for number in numbers:
-            match = re.search(re.escape(str(number)), text)
-            start, end = match.span()
+        for number_match in numbers:
+            start, end = number_match.span()
             length = end - start
             line, col, offset = tools.absolute_to_linecol(text, start)
             problems.append(
                 Problem(
                     position=(line, col),
-                    text=str(number),
+                    text=number_match.group(0),
                     checker=self.tool_name,
                     category=self.category,
                     p_type="num",
                     file=file.tex_file,
                     severity=self.severity,
-                    description=f"For number {number} \\num from siunitx may be used.",
-                    key=self.tool_name + "_" + str(number),
+                    description=f"For number {number_match.group(0)} \\num from siunitx may be used.",
+                    key=self.tool_name + "_" + number_match.group(0),
                     length=length,
                 )
             )
@@ -196,26 +195,25 @@ class SiUnitxModule(Module):
         used_units = []
         for unit in units:
             pattern = rf"[0-9]+\s*{unit}\s"
-            used_unit = re.findall(pattern, text)
+            used_unit = re.finditer(pattern, text)
             used_units.append(used_unit)
 
         for used_unit in used_units:
-            for unit in used_unit:
-                match = re.search(re.escape(unit), text)
-                start, end = match.span()
+            for unit_match in used_unit:
+                start, end = unit_match.span()
                 length = end - start
                 line, col, offset = tools.absolute_to_linecol(text, start)
                 problems.append(
                     Problem(
                         position=(line, col),
-                        text=unit,
+                        text=unit_match.group(0),
                         checker=self.tool_name,
                         category=self.category,
                         p_type="unit",
                         file=file.tex_file,
                         severity=self.severity,
-                        description=f"For unit {unit} siunitx may be used.",
-                        key=self.tool_name + "_" + unit,
+                        description=f"For unit {unit_match.group(0)} siunitx may be used.",
+                        key=self.tool_name + "_" + unit_match.group(0),
                         length=length,
                     )
                 )
