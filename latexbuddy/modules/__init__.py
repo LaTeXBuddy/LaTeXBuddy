@@ -10,6 +10,7 @@ from latexbuddy import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.problem import Problem
+from latexbuddy.tools import classproperty
 
 
 class NamedModule(ABC):
@@ -17,13 +18,13 @@ class NamedModule(ABC):
     instance.
     """
 
-    @property
-    def display_name(self) -> str:
+    @classproperty
+    def display_name(cls) -> str:
         """Returns the canonical display name of the module."""
-        return self.__class__.__name__
+        return cls.__name__
 
     @display_name.setter
-    def display_name(self, value: str) -> None:
+    def display_name(cls, value: str) -> None:
         """Ignores any overwrite operations for property 'display_name'."""
         pass
 
