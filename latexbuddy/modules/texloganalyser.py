@@ -1,7 +1,6 @@
 import re
 
 import latexbuddy.tools as tools
-import os
 
 from typing import List
 from pathlib import Path
@@ -55,8 +54,12 @@ class TexLogAnalyser(Module):
 
     def check_warnings(self, logfile: Path, file: TexFile) -> List[Problem]:
         problems = []
-        raw_output = tools.execute('texloganalyser', '-wpnhv', str(logfile)).splitlines()
+        raw_output = tools.execute('texloganalyser', '-wpnhv',
+                                   str(logfile)).splitlines()
+        i = 0
         for line in raw_output:
+            print(i, line)
+            i += 1
             self.__logger.debug(f"Processing line: {line}")
             warning_match = warning_line_re.match(line)
             if warning_match:
@@ -109,6 +112,8 @@ class TexLogAnalyser(Module):
         tools.execute(f'TEXMFCNF="{self.tex_mf}";',
                       'latex',
                       f'-output-directory={str(path)}',
+                      '-halt-on-error',
                       str(tex_file),
                       )
+
         return path / f'{tex_file.stem}.log'
