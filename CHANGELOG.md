@@ -5,6 +5,18 @@ All notable changes to LaTeXBuddy will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- new test cases for multiple occurrences of own_checkers problems (!110)
+- custom key for YaLafi problems (!109)
+
+### Changed
+- language selection for aspell now works dynamically and using the config (!105)
+
+### Fixed
+- regex usage in own_checkers (!110)
+
 ## [0.3.0] - 15 Jun 2021
 
 ### Added
