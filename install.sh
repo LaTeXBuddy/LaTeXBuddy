@@ -10,7 +10,7 @@ osInfo[/etc/gentoo-release]="emerge"
 osInfo[/etc/SuSE-release]="zypper install -y"
 # rename apt-get
 packages=(python3-pip git default-jdk curl make)
-packagesapt=(autoconf automake libtool-bin texinfo)
+packagesapt=(autoconf automake libtool-bin texinfo autogen autopoint)
 packagespacman=(pythonpip)
 
 for f in ${!osInfo[@]}
@@ -40,6 +40,9 @@ do
     # echo "${i} not installed!"
 done
 
+pip3 install poetry
+python3 -m poetry install
+
 TPATH=$HOME/chktex-1.7.6.tar.gz
 TFPATH=chktex-1.7.6
 url='http://download.savannah.gnu.org/releases/chktex/chktex-1.7.6.tar.gz'
@@ -50,7 +53,7 @@ sudo ./configure
 sudo make
 sudo make install
 sudo make check
-sudo echo export PATH="$HOME/$TFPATH/:$PATH" >> ~/.bash_profile
+sudo echo export PATH="$HOME/$TFPATH/:$PATH" >> ~/.profile
 # sudo echo chktex="$HOME/$TFPATH/chktex" >> ~/.bash_profile
 # make clean
 
@@ -75,18 +78,18 @@ cd $HOME/aspell-master
 sudo ./autogen
 sudo ./configure --disable-static
 sudo make
-sudo make install
-make clean
+# sudo make install
+# make clean
 # or ./config-opt <options> or ./config-debug <options>
 
 
-TARPATH=$HOME/latexbuddy-master.tar.gz
-url=https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/latexbuddy-master.tar.gz
-curl -L $url > $TARPATH
-cd $HOME
-tar -xvf latexbuddy-master.tar.gz
+# TARPATH=$HOME/latexbuddy-master.tar.gz
+# url=https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/latexbuddy-master.tar.gz
+# curl -L $url > $TARPATH
+# cd $HOME
+# tar -xvf latexbuddy-master.tar.gz
 
 cd $HOME
-mkdir -p LanguageTool
-cd LanguageTool
 curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash
+cd LanguageTool-5.3-stable
+sudo echo export PATH="$HOME/LanguageTool-5.3-stable/languagetool-commandline.jar:$PATH" >> ~/.profile
