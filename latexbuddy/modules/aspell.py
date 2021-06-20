@@ -1,7 +1,7 @@
 """This module defines the connection between LaTeXBuddy and GNU Aspell."""
 import shlex
 
-from typing import List
+from typing import AnyStr, List
 
 import latexbuddy.tools as tools
 
@@ -16,8 +16,7 @@ from latexbuddy.texfile import TexFile
 
 class AspellModule(Module):
     def __init__(self):
-        self._LANGUAGE_MAP = {"de": "de-DE", "en": "en"}
-        self.language = "en"
+        self.language = None
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the Aspell checks on a file and returns the results as a list.
@@ -30,18 +29,16 @@ class AspellModule(Module):
 
         tools.find_executable("aspell", "GNU Aspell", self.logger)
 
-        try:
-
-            self.language = self._LANGUAGE_MAP[
-                config.get_config_option_or_default(LatexBuddy, "language", None)
-            ]
-
-        except KeyError:
-            self.language = None
-
-        language_quote = shlex.quote(self.language)
-        languages = tools.execute("aspell", "dump dicts")
-        self.check_language(language_quote, languages)
+        supported_languages = self.find_languages()
+        self.language = shlex.quote(
+            config.get_config_option_or_default(
+                LatexBuddy,
+                "language",
+                "en",
+                verify_type=AnyStr,
+                verify_choices=supported_languages,
+            )
+        )
 
         error_list = []
         counter = 1  # counts the lines
@@ -52,7 +49,7 @@ class AspellModule(Module):
             if len(line) > 0:
                 escaped_line = line.replace("'", "\\'")
                 output = tools.execute(
-                    f"echo '{escaped_line}' | aspell -a -l {language_quote}"
+                    f"echo '{escaped_line}' | aspell -a -l {self.language}"
                 )
                 out = output.splitlines()[1:]  # the first line specifies aspell version
                 if len(out) > 0:  # only if the list inst empty
@@ -63,27 +60,13 @@ class AspellModule(Module):
 
         return error_list
 
-    def check_language(self, language: str, langs: str):
-        """Checks if a language is in a list of languages.
+    @staticmethod
+    def find_languages() -> List[str]:
+        """Returns all languages supported by the current aspell installation.
 
-        The list of languages is actually a string; e.g., the output of a terminal
-        command.
-
-        :param language: language to search for
-        :param langs: language list to search in
-        :raises LanguageNotSupportedError: if the language is not on the list
+        :return: list of supported languages in str format
         """
-        # error if language dict not installed
-        if language not in langs:
-            self.logger.error(
-                not_found(f"Language for {language}", "the dictionary")
-                + "\nYou can check available dictionaries at "
-                + "https://ftp.gnu.org/gnu/aspell/dict/0index.html"
-            )
-
-            raise LanguageNotSupportedError(
-                f"Aspell: Language '{language}' not found on system."
-            )
+        return tools.execute("aspell", "dump dicts").splitlines()
 
     def format_errors(
         self, out: List[str], line_number: int, file: TexFile
