@@ -40,8 +40,8 @@ do
     # echo "${i} not installed!"
 done
 
-pip3 install poetry
-python3 -m poetry install
+# pip3 install poetry
+# python3 -m poetry install
 
 TPATH=$HOME/chktex-1.7.6.tar.gz
 TFPATH=chktex-1.7.6
@@ -53,8 +53,6 @@ sudo ./configure
 sudo make
 sudo make install
 sudo make check
-sudo echo export PATH="$HOME/$TFPATH/:$PATH" >> ~/.profile
-# sudo echo chktex="$HOME/$TFPATH/chktex" >> ~/.bash_profile
 # make clean
 
 
@@ -75,12 +73,26 @@ url=https://github.com/GNUAspell/aspell/archive/refs/heads/master.zip
 curl -L $url > $TARPATH
 unzip $TARPATH -d $HOME
 cd $HOME/aspell-master
-sudo ./autogen
-sudo ./configure --disable-static
-sudo make
-# sudo make install
+./autogen
+./configure --disable-static
+make
+sudo make install
+curl -L https://ftp.gnu.org/gnu/aspell/dict/en/aspell6-en-7.1-0.tar.bz2 > aspell6-en-7.1-0.tar.bz2
+tar -xvf aspell6-en-7.1-0.tar.bz2 -C $HOME/aspell-master/
+cd $HOME/aspell-master/aspell6-en-7.1-0
+./configure
+make
+sudo make install
 # make clean
-# or ./config-opt <options> or ./config-debug <options>
+cd ..
+curl -L https://ftp.gnu.org/gnu/aspell/dict/de/aspell-de-0.50-2.tar.bz2 > aspell-de-0.50-2.tar.bz2
+tar -xvf aspell-de-0.50-2.tar.bz2 -C $HOME/aspell-master/
+cd aspell-de-0.50-2
+./configure
+make
+sudo make install
+# make clean
+cd ..
 
 
 # TARPATH=$HOME/latexbuddy-master.tar.gz
@@ -92,4 +104,6 @@ sudo make
 cd $HOME
 curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash
 cd LanguageTool-5.3-stable
-sudo echo export PATH="$HOME/LanguageTool-5.3-stable/languagetool-commandline.jar:$PATH" >> ~/.profile
+sudo echo export PATH="$HOME/$TFPATH/:$HOME/LanguageTool-5.3-stable/:$PATH" >> ~/.profile
+sudo echo export LTJAR="$HOME/LanguageTool-5.3-stable/languagetool-commandline.jar" >> ~/.profile
+# sudo echo export DICTION="$HOME/diction-1.14/diction" >> ~/.profile
