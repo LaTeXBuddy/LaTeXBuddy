@@ -7,6 +7,7 @@ from typing import List
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
+from pathlib import Path
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
@@ -38,8 +39,10 @@ class ChktexModule(Module):
             )
             + "\n\n"
         )
+
+        path_str = str(Path(file.tex_file).resolve())
         command_output = tools.execute(
-            "chktex", "-f", f"'{format_str}'", "-q", str(file.tex_file)
+            "cd", f"'{path_str}'", ";", "chktex", "-f", f"'{format_str}'", "-q", str(file.tex_file)
         )
         out_split = command_output.split("\n")
 
