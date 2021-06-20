@@ -40,8 +40,12 @@ do
     # echo "${i} not installed!"
 done
 
-# pip3 install poetry
-# python3 -m poetry install
+# change name of pip for different distributions
+pip3 install poetry
+python3 -m poetry install
+python3 -m poetry build
+pip3 install dist/*.whl
+# pip3 install latexbuddy
 
 TPATH=$HOME/chktex-1.7.6.tar.gz
 TFPATH=chktex-1.7.6
@@ -103,7 +107,12 @@ cd ..
 
 cd $HOME
 curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash
-cd LanguageTool-5.3-stable
-sudo echo export PATH="$HOME/$TFPATH/:$HOME/LanguageTool-5.3-stable/:$PATH" >> ~/.profile
+sudo chown -R $USER: $HOME
+cd LanguageTool-5.3-stable/
+chmod +x languagetool-commandline.jar
+sudo echo export PATH="$HOME/aspell-master/:$HOME/$TFPATH/:$HOME/LanguageTool-5.3-stable/:$PATH" >> ~/.profile
+# workaround
 sudo echo export LTJAR="$HOME/LanguageTool-5.3-stable/languagetool-commandline.jar" >> ~/.profile
 # sudo echo export DICTION="$HOME/diction-1.14/diction" >> ~/.profile
+# update path with statement below if diction-1.14 is not installed natively
+# sudo echo export PATH="$HOME/diction-1.14/:$HOME/aspell-master/:$HOME/$TFPATH/:$HOME/LanguageTool-5.3-stable/:$PATH" >> ~/.profile
