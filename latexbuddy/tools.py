@@ -294,35 +294,43 @@ def get_app_dir() -> Path:
     return app_dir
 
 
-def get_all_paths_in_document(file_paths):
+def get_all_paths_in_document(file_path):
     """Checks files that are included in a file.
 
     If the file includes more files, these files will also be checked.
 
-    :param file_paths:a list, containing file paths
+    :param file_path:a string, containing file path
     """
-
     unchecked_files = []  # Holds all unchecked files
     checked_files = []  # Holds all checked file
 
     # add all paths to list
-    for file_path in file_paths:
-        unchecked_files.append(file_path)  # add path
+    # this is used for the command line input
+    unchecked_files.append(file_path)
+    parent = str(Path(file_path).parent)
 
     while len(unchecked_files) > 0:
         checked_files.append(unchecked_files[0])
         new_files = []
 
         try:
-            lines = Path(unchecked_files.pop(0)).read_text().splitlines(keepends=False)
-        except Exception as e:  # If the file cannot be found
+            lines = unchecked_files.pop(0).read_text().splitlines(keepends=False)
+        except Exception as e:  # If the file cannot be found it is already removed
             print(e)
 
         for line in lines:
-            if "\include" in line:
-                path = line[9:]
+            if "\include{" in line:
+                path = line.strip("\include{")
                 path = path.strip("}")
-                new_files.append(Path(os.path.abspath(path)))
+
+                #  if /home/ is missing...
+                if path[0] != "/":
+                    path = "/" + path
+                if "/home/" not in path:
+                    path = parent + path
+                if ".tex" not in path:
+                    path = path + ".tex"
+
+                new_files.append(Path(path))  # get absolute path
         unchecked_files.extend(new_files)  # add new paths
-    print(checked_files)
     return checked_files
