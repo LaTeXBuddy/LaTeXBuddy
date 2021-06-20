@@ -31,7 +31,7 @@ parser.add_argument("file", type=Path, help="File that will be processed.")
 parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
 
 # nargs="+" marks the beginning of a list
-parser.add_argument("file", type=Path, help="File that will be processed.")
+parser.add_argument("file", nargs="+", type=Path, help="File that will be processed.")
 parser.add_argument(
     "--config",
     "-c",
@@ -110,21 +110,24 @@ def main():
 
     config_loader = ConfigLoader(args)
 
-    # args.file is a list
-    paths = tool.get_all_paths_in_document(args.file)
+    """ For each Tex file transferred, all paths
+    are fetched and Latexbuddy is executed """
 
-    buddy = LatexBuddy(
-        config_loader=config_loader,
-        file_to_check=Path(paths[0]),
-        path_list=paths,  # to be used later on in render html
-    )
+    for p in args.file:  # args.file is a list
+        paths = tool.get_all_paths_in_document(p)
 
-    for path in paths:
-        #  need to clear the error list of the previous file
-        buddy.clear_error_list()
-        buddy.change_file(Path(path))
-        buddy.run_tools()
-        buddy.check_whitelist()
-        buddy.output_file()
+        buddy = LatexBuddy(
+            config_loader=config_loader,
+            file_to_check=Path(paths[0]),  # set first file
+            path_list=paths,  # to be used later on in render html
+        )
+
+        for path in paths:
+            #  need to clear the error list of the previous file
+            buddy.clear_error_list()
+            buddy.change_file(Path(path))  # change file everytime
+            buddy.run_tools()
+            buddy.check_whitelist()
+            buddy.output_file()
 
     logger.debug(f"Execution finished in {round(perf_counter() - start, 2)}s")
