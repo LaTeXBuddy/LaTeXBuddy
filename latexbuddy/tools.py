@@ -316,7 +316,14 @@ def get_all_paths_in_document(file_path):
         try:
             lines = unchecked_files.pop(0).read_text().splitlines(keepends=False)
         except Exception as e:  # If the file cannot be found it is already removed
-            print(e)
+            # importing this here to avoid circular import error
+            from latexbuddy import __logger as root_logger
+
+            logger = root_logger.getChild("Tools")
+            error_message = "Error while search for Files"
+            logger.error(
+                f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}"
+            )
 
         for line in lines:
             # check for include and input statements
@@ -334,7 +341,7 @@ def get_all_paths_in_document(file_path):
                     path = path + ".tex"
 
                 new_files.append(Path(path))  # if something was found, add it to a list
-            if "\input{" in line:
+            elif "\input{" in line:
                 path = line.strip("\input{")
                 path = path.strip("}")
                 # if missing / at the beginning, add it.
