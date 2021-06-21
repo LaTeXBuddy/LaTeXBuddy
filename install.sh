@@ -42,8 +42,8 @@ done
 
 # change name of pip for different distributions
 pip3 install poetry
-poetry install
-poetry build
+python3 -m poetry install
+python3 -m poetry build
 pip3 install dist/*.whl
 
 TPATH=$HOME/chktex-1.7.6.tar.gz
@@ -112,6 +112,5 @@ chmod +x languagetool-commandline.jar
 sudo echo export PATH="$HOME/aspell-master/:$HOME/$TFPATH/:$HOME/LanguageTool-5.3-stable/:$PATH" >> ~/.profile
 # workaround
 sudo echo export LTJAR="$HOME/LanguageTool-5.3-stable/languagetool-commandline.jar" >> ~/.profile
+# echo "execute with python3 -m latexbuddy <file>"
 # sudo echo export DICTION="$HOME/diction-1.14/diction" >> ~/.profile
-# update path with statement below if diction-1.14 is not installed natively
-# sudo echo export PATH="$HOME/diction-1.14/:$HOME/aspell-master/:$HOME/$TFPATH/:$HOME/LanguageTool-5.3-stable/:$PATH" >> ~/.profile
