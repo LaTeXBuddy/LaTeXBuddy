@@ -42,10 +42,9 @@ done
 
 # change name of pip for different distributions
 pip3 install poetry
-python3 -m poetry install
-python3 -m poetry build
+poetry install
+poetry build
 pip3 install dist/*.whl
-# pip3 install latexbuddy
 
 TPATH=$HOME/chktex-1.7.6.tar.gz
 TFPATH=chktex-1.7.6
