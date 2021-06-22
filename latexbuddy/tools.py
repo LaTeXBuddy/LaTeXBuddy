@@ -329,29 +329,25 @@ def get_all_paths_in_document(file_path):
             # check for include and input statements
             if "\include{" in line:
                 path = line.strip("\include{")
-                path = path.strip("}")
+                end_of_path: int = path.find("}")
+                path = path[:end_of_path]
                 # if missing / at the beginning, add it.
                 if path[0] != "/":
-                    path = "/" + path
-                # if path not absolute, add parent
-                if "/home/" not in path:
-                    path = parent + path
+                    path = parent + "/" + path
                 # if missing .tex, add it
-                if ".tex" not in path:
+                if not path.endswith(".tex"):
                     path = path + ".tex"
 
                 new_files.append(Path(path))  # if something was found, add it to a list
             elif "\input{" in line:
-                path = line.strip("\input{")
-                path = path.strip("}")
+                path = line.strip("\include{")
+                end_of_path: int = path.find("}")
+                path = path[:end_of_path]
                 # if missing / at the beginning, add it.
                 if path[0] != "/":
-                    path = "/" + path
-                # if path not absolute, add parent
-                if "/home/" not in path:
-                    path = parent + path
+                    path = parent + "/" + path
                 # if missing .tex, add it
-                if ".tex" not in path:
+                if not path.endswith(".tex"):
                     path = path + ".tex"
 
                 new_files.append(Path(path))  # if something was found, add it to a list
