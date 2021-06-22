@@ -5,6 +5,7 @@ ChkTeX Documentation: https://www.nongnu.org/chktex/ChkTeX.pdf
 from typing import List
 
 import latexbuddy.tools as tools
+import os
 
 from latexbuddy import TexFile
 from pathlib import Path
@@ -40,9 +41,9 @@ class ChktexModule(Module):
             + "\n\n"
         )
 
-        path_str = str(Path(file.tex_file).resolve())
+        dir_path, file_path = os.path.split(os.path.abspath(str(file.tex_file)))
         command_output = tools.execute(
-            "cd", f"'{path_str}'", ";", "chktex", "-f", f"'{format_str}'", "-q", str(file.tex_file)
+            "cd", dir_path, ";", "chktex", "-f", f"'{format_str}'", "-q", file_path
         )
         out_split = command_output.split("\n")
 
