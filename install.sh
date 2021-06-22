@@ -100,7 +100,7 @@ cd ..
 
 cd $HOME
 curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash
-sudo chown -R $USER: $HOME
+sudo chown -R $USER: $HOME/LanguageTool-5.3-stable/
 cd LanguageTool-5.3-stable/
 chmod +x languagetool.jar
 chmod +x languagetool-server.jar
