@@ -43,10 +43,6 @@ class ToolLoader:
             for class_obj in classes:
                 modules.append(class_obj())
 
-        for module in modules:
-
-            module.__module__ = "latexbuddy.modules." + module.__module__
-
         return modules
 
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
