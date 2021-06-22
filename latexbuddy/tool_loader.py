@@ -23,28 +23,6 @@ class ToolLoader:
         """
         self.directory = directory
 
-    def load_modules(self) -> List[Module]:
-        """This method loads every module that is found in the ToolLoader's directory.
-
-        :return: a list of instances of classes implementing the Module API
-        """
-
-        imported_py_modules = ToolLoader.import_py_files(self.find_py_files())
-        modules = []
-
-        for module in imported_py_modules:
-
-            classes = [
-                cls_obj
-                for cls_name, cls_obj in inspect.getmembers(module, inspect.isclass)
-                if cls_obj.__module__ == module.__name__ and Module in cls_obj.mro()
-            ]
-
-            for class_obj in classes:
-                modules.append(class_obj())
-
-        return modules
-
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
         """This method loads every module that is found in the ToolLoader's directory
             and only returns instances of modules that are enabled in the specified
@@ -71,6 +49,28 @@ class ToolLoader:
         ]
 
         return selected
+
+    def load_modules(self) -> List[Module]:
+        """This method loads every module that is found in the ToolLoader's directory.
+
+        :return: a list of instances of classes implementing the Module API
+        """
+
+        imported_py_modules = ToolLoader.import_py_files(self.find_py_files())
+        modules = []
+
+        for module in imported_py_modules:
+
+            classes = [
+                cls_obj
+                for cls_name, cls_obj in inspect.getmembers(module, inspect.isclass)
+                if cls_obj.__module__ == module.__name__ and Module in cls_obj.mro()
+            ]
+
+            for class_obj in classes:
+                modules.append(class_obj())
+
+        return modules
 
     @staticmethod
     def import_py_files(py_files: List[Path]) -> List[ModuleType]:
