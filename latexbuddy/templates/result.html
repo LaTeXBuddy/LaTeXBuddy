@@ -103,29 +103,40 @@
         this.uid = uid;
     }
     //gets the popup vars
-    var popup = document.getElementById("popup");
-    var popupcontent = document.getElementsByClassName("popup-content")[0];
+    const popup = document.getElementById("popup");
+    const popup_content = document.getElementsByClassName("popup-content")[0];
+
     //appends the problem key to the popup and show it
     function showMessage(problem_key) {
         let p = document.createElement("p"); //paragraph
+        p.setAttribute("id", "txt"); //attribute used for the copy to clipboard function
         let text = document.createTextNode(problem_key);
         p.appendChild(text);
-        popupcontent.appendChild(p);
+        popup_content.appendChild(p);
         popup.style.display = "block"; //show popup
     }
     //by clicking on the "close" button, remove the problem key and set the button back to "+" state
     document.getElementsByClassName("close")[0].onclick = function() {
-        popupcontent.removeChild(popupcontent.lastChild); //remove last child: aka text node
+        popup_content.removeChild(popup_content.lastChild); //remove last child: aka text node
         popup.style.display = "none"; //hide popup
         let button = document.getElementById(uid);
         button.className = "button"; //normal button state
     }
     //by clicking on the "accept" button, remove the problem key and set the button to "accepted"
     document.getElementsByClassName("accept")[0].onclick = function() {
-        popupcontent.removeChild(popupcontent.lastChild); //remove last child: aka text node
+        copyDivToClipboard()
+        popup_content.removeChild(popup_content.lastChild); //remove last child: aka text node
         popup.style.display = "none"; //hide popup
         let button = document.getElementById(uid);
         button.className = "validate"; //button state "accepted"
+    }
+    function copyDivToClipboard() {
+        const range = document.createRange();
+        range.selectNode(document.getElementById("txt"));
+        window.getSelection().removeAllRanges(); // clear current selection
+        window.getSelection().addRange(range); // to select text
+        document.execCommand("copy");
+        window.getSelection().removeAllRanges();// to deselect
     }
 </script>
 </body>
