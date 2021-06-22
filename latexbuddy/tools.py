@@ -340,7 +340,7 @@ def get_all_paths_in_document(file_path):
 
                 new_files.append(Path(path))  # if something was found, add it to a list
             elif "\input{" in line:
-                path = line.strip("\include{")
+                path = line.strip("\input{")
                 end_of_path: int = path.find("}")
                 path = path[:end_of_path]
                 # if missing / at the beginning, add it.
