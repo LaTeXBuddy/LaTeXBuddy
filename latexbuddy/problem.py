@@ -12,7 +12,7 @@ from json import JSONEncoder
 from pathlib import Path
 from typing import Any, List, Optional, Tuple, Type, Union
 
-from latexbuddy.modules import NamedModule
+# from latexbuddy.modules import NamedModule
 
 
 language = None  # static variable used for a uniform key generation
@@ -75,7 +75,7 @@ class Problem:
         self,
         position: Optional[Tuple[int, int]],
         text: str,
-        checker: Union[Type[NamedModule], NamedModule],
+        checker,  # : Union[Type[NamedModule], NamedModule],
         file: Path,
         severity: ProblemSeverity = ProblemSeverity.WARNING,
         p_type: Optional[str] = None,
