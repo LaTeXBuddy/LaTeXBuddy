@@ -113,17 +113,14 @@ class LanguageTool(Module):
             executable_source = "native"
         except FileNotFoundError:
             try:
-                result = tools.find_executable("$LTJAR")
+                result = tools.find_executable("languagetool-commandline.jar")
                 executable_source = "java"
             except FileNotFoundError:
-                try:
-                    result = tools.find_executable("languagetool-commandline.jar")
-                    executable_source = "java"
-                except FileNotFoundError:
-                    self.__logger.error(
-                        not_found("languagetool-commandline.jar", "LanguageTool CLI")
-                    )
-                    raise FileNotFoundError("Unable to find languagetool installation!")
+                self.__logger.error(
+                    not_found("languagetool-commandline.jar", "LanguageTool CLI")
+                )
+
+                raise FileNotFoundError("Unable to find languagetool installation!")
 
         lt_path = result
         self.lt_console_command = []

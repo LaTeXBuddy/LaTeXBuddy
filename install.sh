@@ -98,19 +98,12 @@ sudo make install
 cd ..
 
 
-# TARPATH=$HOME/latexbuddy-master.tar.gz
-# url=https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/latexbuddy-master.tar.gz
-# curl -L $url > $TARPATH
-# cd $HOME
-# tar -xvf latexbuddy-master.tar.gz
-
 cd $HOME
 curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash
 sudo chown -R $USER: $HOME
 cd LanguageTool-5.3-stable/
+chmod +x languagetool.jar
+chmod +x languagetool-server.jar
 chmod +x languagetool-commandline.jar
-sudo echo export PATH="$HOME/aspell-master/:$HOME/$TFPATH/:$HOME/LanguageTool-5.3-stable/:$PATH" >> ~/.profile
-# workaround
-sudo echo export LTJAR="$HOME/LanguageTool-5.3-stable/languagetool-commandline.jar" >> ~/.profile
-# echo "execute with python3 -m latexbuddy <file>"
-# sudo echo export DICTION="$HOME/diction-1.14/diction" >> ~/.profile
+sudo echo export PATH="$HOME/LanguageTool-5.3-stable/:$HOME/aspell-master/:$HOME/$TFPATH/:$HOME/LanguageTool-5.3-stable/:$PATH" >> ~/.profile
+source ~/.profile
