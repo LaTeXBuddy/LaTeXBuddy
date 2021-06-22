@@ -56,7 +56,8 @@ class ToolLoader:
         :return: a list of instances of classes implementing the Module API
         """
 
-        imported_py_modules = ToolLoader.import_py_files(self.find_py_files())
+        imported_py_modules = self.import_py_files()
+
         modules = []
 
         for module in imported_py_modules:
@@ -72,14 +73,15 @@ class ToolLoader:
 
         return modules
 
-    @staticmethod
-    def import_py_files(py_files: List[Path]) -> List[ModuleType]:
+    def import_py_files(self) -> List[ModuleType]:
         """This method loads a python module from the specified file path for a list
             of file paths.
 
         :param py_files: python module files to be loaded
         :return: a list of python modules ready to be used
         """
+
+        py_files = self.find_py_files()
 
         loaded_modules = []
 
