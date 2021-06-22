@@ -38,7 +38,7 @@ main {
     }
 }
 
-main > section {
+main > div {
     padding: .5rem;
 }
 
@@ -47,7 +47,11 @@ main > section {
 }
 
 #problems-list {
-    flex: 0 1 80ch;
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+    height: 40%;
+    width: 40%;
 }
 
 .problem {

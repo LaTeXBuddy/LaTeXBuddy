@@ -29,12 +29,13 @@
     </div>
 </header>
 <main>
-    <section id="file-contents" style="position:relative;">
+    <div id="file-contents" style="position:relative;">
         <pre style="line-height: 16px"><code>{{ file_text|safe }}</code></pre>
 <!--        {{ problem_str|safe }}-->
-    </section>
-    <section id="problems-list">
+    </div>
+    <div id="problems-list">
         <h3>Problems</h3>
+
         <ol>
             {% for problem in problems %}
                 <li class="problem is-{{ problem.severity }}">
@@ -76,7 +77,7 @@
                 </li>
             {% endfor %}
         </ol>
-    </section>
+    </div>
 </main>
 <!--Popup section-->
 <div id="popup" class="popup">
