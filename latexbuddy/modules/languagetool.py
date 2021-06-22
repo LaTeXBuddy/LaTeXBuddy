@@ -344,7 +344,7 @@ class LanguageTool(Module):
                     position=location,
                     text=text,
                     checker=tool_name,
-                    cid=match["rule"]["id"],
+                    p_type=match["rule"]["id"],
                     file=file.tex_file,
                     severity=ProblemSeverity.ERROR,
                     category=problem_type,

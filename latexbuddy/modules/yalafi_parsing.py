@@ -22,10 +22,11 @@ class YaLafi(Module):
                         position=raw_err[0],
                         text=raw_err[1],
                         checker="YaLafi",
-                        cid="tex2txt",
+                        p_type="tex2txt",
                         file=file.tex_file,
                         severity=ProblemSeverity.ERROR,
                         category="latex",
+                        key="YaLafi_tex2txt",
                     )
                 )
 
