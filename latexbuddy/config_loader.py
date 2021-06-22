@@ -11,7 +11,6 @@ from pydantic import BaseModel, ValidationError
 import latexbuddy.tools as tools
 
 from latexbuddy import __logger as root_logger
-from latexbuddy.buddy import LatexBuddy
 from latexbuddy.exceptions import (
     ConfigOptionNotFoundError,
     ConfigOptionVerificationError,
@@ -60,6 +59,8 @@ class ConfigLoader:
         :return: a formatted dictionary containing all cli flags as config entries with
             the label corresponding to the display name of the main LaTeXBuddy instance
         """
+
+        from latexbuddy.buddy import LatexBuddy
 
         module_key = LatexBuddy.display_name
         parsed = {module_key: {}}
