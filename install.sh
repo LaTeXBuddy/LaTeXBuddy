@@ -105,5 +105,5 @@ cd LanguageTool-5.3-stable/
 chmod +x languagetool.jar
 chmod +x languagetool-server.jar
 chmod +x languagetool-commandline.jar
-sudo echo export PATH="$HOME/LanguageTool-5.3-stable/:$HOME/aspell-master/:$HOME/$TFPATH/:$HOME/LanguageTool-5.3-stable/:$PATH" >> ~/.profile
+sudo echo export PATH="$HOME/aspell-master/:$HOME/$TFPATH/:$HOME/LanguageTool-5.3-stable/:$PATH" >> ~/.profile
 source ~/.profile
