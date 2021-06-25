@@ -54,7 +54,7 @@ class ProseLint(Module):
                 Problem(
                     position=position,
                     text=text,
-                    checker=self.tool_name,
+                    checker=ProseLint,
                     p_type=p_type,
                     file=file.tex_file,
                     severity=severity,

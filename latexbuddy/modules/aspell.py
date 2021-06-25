@@ -128,7 +128,7 @@ class Aspell(Module):
                     Problem(
                         position=location,
                         text=text,
-                        checker=self,
+                        checker=Aspell,
                         file=file.tex_file,
                         severity=severity,
                         p_type=p_type,

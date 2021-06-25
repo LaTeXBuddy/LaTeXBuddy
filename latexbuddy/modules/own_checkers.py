@@ -50,7 +50,7 @@ class UnreferencedFigures(Module):
                     Problem(
                         position=(line, col),
                         text=label,
-                        checker=self.tool_name,
+                        checker=UnreferencedFigures,
                         category=self.category,
                         p_type=self.p_type,
                         file=file.tex_file,
@@ -107,7 +107,7 @@ class SiUnitx(Module):
                 Problem(
                     position=(line, col),
                     text=number_match.group(0),
-                    checker=self.tool_name,
+                    checker=SiUnitx,
                     category=self.category,
                     p_type="num",
                     file=file.tex_file,
@@ -209,7 +209,7 @@ class SiUnitx(Module):
                     Problem(
                         position=(line, col),
                         text=unit_match.group(0),
-                        checker=self.tool_name,
+                        checker=SiUnitx,
                         category=self.category,
                         p_type="unit",
                         file=file.tex_file,
@@ -243,7 +243,7 @@ class EmptySections(Module):
                 Problem(
                     position=(line, col),
                     text=text,
-                    checker=self.tool_name,
+                    checker=EmptySections,
                     category=self.category,
                     p_type="0",
                     file=file.tex_file,
@@ -282,7 +282,7 @@ class URLCheck(Module):
                 Problem(
                     position=(line, col),
                     text=url_match.group(0),
-                    checker=self.tool_name,
+                    checker=URLCheck,
                     category=self.category,
                     p_type="0",
                     file=file.tex_file,
@@ -347,7 +347,7 @@ class CheckFigureResolution(Module):
                         Problem(
                             position=(1, 1),
                             text=name,
-                            checker=self.tool_name,
+                            checker=CheckFigureResolution,
                             category=self.category,
                             p_type="0",
                             file=file.tex_file,
@@ -382,7 +382,7 @@ class NativeUseOfRef(Module):
                 Problem(
                     position=(line, col),
                     text=ref_pattern,
-                    checker=self.tool_name,
+                    checker=NativeUseOfRef,
                     category=self.category,
                     file=file.tex_file,
                     severity=self.severity,

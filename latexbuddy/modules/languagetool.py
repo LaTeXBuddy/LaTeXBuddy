@@ -356,7 +356,7 @@ class LanguageTool(Module):
                 Problem(
                     position=location,
                     text=text,
-                    checker=tool_name,
+                    checker=LanguageTool,
                     p_type=match["rule"]["id"],
                     file=file.tex_file,
                     severity=ProblemSeverity.ERROR,

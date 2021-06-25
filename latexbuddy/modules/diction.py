@@ -144,7 +144,7 @@ class Diction(Module):
                 Problem(
                     position=location,
                     text=o_line,
-                    checker="diction",
+                    checker=Diction,
                     p_type="0",
                     file=file,
                     severity=ProblemSeverity.INFO,

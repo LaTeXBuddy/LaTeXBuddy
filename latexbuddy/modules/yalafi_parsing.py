@@ -21,7 +21,7 @@ class YaLafi(Module):
                     Problem(
                         position=raw_err[0],
                         text=raw_err[1],
-                        checker="YaLafi",
+                        checker=YaLafi,
                         p_type="tex2txt",
                         file=file.tex_file,
                         severity=ProblemSeverity.ERROR,
