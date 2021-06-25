@@ -11,7 +11,7 @@ from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
-class AspellModule(Module):
+class Aspell(Module):
     def __init__(self):
         self.language = None
 

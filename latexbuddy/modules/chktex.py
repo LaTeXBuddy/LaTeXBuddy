@@ -14,7 +14,7 @@ from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
 
-class ChktexModule(Module):
+class Chktex(Module):
     def __init__(self):
         self.DELIMITER = ":::"
         self.tool_name = "chktex"

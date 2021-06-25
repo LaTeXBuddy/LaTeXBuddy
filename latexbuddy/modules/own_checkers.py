@@ -11,7 +11,7 @@ from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
-class UnreferencedFiguresModule(Module):
+class UnreferencedFigures(Module):
     def __init__(self):
         self.tool_name = "unrefed_figure_check"
         self.p_type = "0"
@@ -65,7 +65,7 @@ class UnreferencedFiguresModule(Module):
         return problems
 
 
-class SiUnitxModule(Module):
+class SiUnitx(Module):
     def __init__(self):
         self.tool_name = "siunitx"
         self.category = "latex"
@@ -223,7 +223,7 @@ class SiUnitxModule(Module):
         return problems
 
 
-class EmptySectionsModule(Module):
+class EmptySections(Module):
     def __init__(self):
         self.tool_name = "emptysection"
         self.category = "latex"
@@ -257,7 +257,7 @@ class EmptySectionsModule(Module):
         return problems
 
 
-class URLModule(Module):
+class URLCheck(Module):
     def __init__(self):
         self.tool_name = "urlcheck"
         self.category = "latex"

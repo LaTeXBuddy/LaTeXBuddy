@@ -9,7 +9,7 @@ from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
-class ProseLintModule(Module):
+class ProseLint(Module):
     def __init__(self):
 
         self.tool_name = "ProseLintModule"

@@ -15,7 +15,7 @@ from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
-class DictionModule(Module):
+class Diction(Module):
 
     __SUPPORTED_LANGUAGES = ["en", "de", "nl"]
 
@@ -33,7 +33,7 @@ class DictionModule(Module):
             "language",
             None,
             verify_type=AnyStr,
-            verify_choices=DictionModule.__SUPPORTED_LANGUAGES,
+            verify_choices=Diction.__SUPPORTED_LANGUAGES,
         )
 
         # replace umlauts so error position is correct

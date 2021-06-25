@@ -13,16 +13,16 @@ main = {
 }
 
 modules = {
-    "AspellModule": {
+    "Aspell": {
         "enabled": True,
     },
-    "ChktexModule": {
+    "Chktex": {
         "enabled": True,
     },
-    "DictionModule": {
+    "Diction": {
         "enabled": True,
     },
-    "EmptySectionsModule": {
+    "EmptySections": {
         "enabled": True,
     },
     "LanguageTool": {
@@ -37,16 +37,16 @@ modules = {
             # "TYPOS",
         ],
     },
-    "ProseLintModule": {
+    "ProseLint": {
         "enabled": True
     },
-    "SiUnitxModule": {
+    "SiUnitx": {
         "enabled": True,
     },
-    "URLModule": {
+    "URLCheck": {
         "enabled": True,
     },
-    "UnreferencedFiguresModule": {
+    "UnreferencedFigures": {
         "enabled": True,
     },
     "NativeUseOfRef": {
