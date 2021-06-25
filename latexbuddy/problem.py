@@ -10,7 +10,7 @@ from enum import Enum
 from functools import total_ordering
 from json import JSONEncoder
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Type, Union
+from typing import Any, List, Optional, Tuple
 
 
 # from latexbuddy.modules import NamedModule
