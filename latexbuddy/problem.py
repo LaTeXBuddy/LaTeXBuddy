@@ -12,6 +12,7 @@ from json import JSONEncoder
 from pathlib import Path
 from typing import Any, List, Optional, Tuple, Type, Union
 
+
 # from latexbuddy.modules import NamedModule
 
 
