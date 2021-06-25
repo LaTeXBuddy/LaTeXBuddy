@@ -15,7 +15,6 @@ from typing import Any, List, Optional, Tuple
 
 # from latexbuddy.modules import NamedModule
 
-
 language = None  # static variable used for a uniform key generation
 
 
@@ -72,6 +71,8 @@ class Problem:
     example, it can be wrong LaTeX code or a misspelled word.
     """
 
+    # TODO: resolve circular import error with modules.__init__.py in order to have
+    #       type hints for attribute 'checker'
     def __init__(
         self,
         position: Optional[Tuple[int, int]],
@@ -108,25 +109,46 @@ class Problem:
 
         """
         # TODO: maybe move the defaults to the params, or was there a specific reason?
+
+        # importing these here to avoid circular import error
+        from latexbuddy.buddy import LatexBuddy
+
         self.position = position
+
         if length is None:
             length = 0
         self.length = length
+
         self.text = text
-        self.checker = checker.display_name
+
+        if (
+            checker is None
+            or isinstance(checker, LatexBuddy)
+            or (isinstance(checker, type) and checker == LatexBuddy)
+        ):
+            raise ValueError("Checker module can not be main LatexBuddy instance.")
+
+        else:
+
+            self.checker = checker.display_name
+
         if p_type is None:
             p_type = ""
         self.p_type = p_type
+
         self.file = file  # FIXME: deprecated!
         self.severity = severity
         self.category = category
         self.description = description
+
         if context is None:
             context = ("", "")
         self.context = context
+
         if suggestions is None:
             suggestions = []
         self.suggestions = suggestions
+
         self.key = self.__generate_key(key)
         self.length = len(text)
         self.uid = self.__generate_uid()
