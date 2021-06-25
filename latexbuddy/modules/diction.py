@@ -1,7 +1,6 @@
 import hashlib
 import os
 
-from logging import Logger
 from pathlib import Path
 from typing import AnyStr, List
 
@@ -9,7 +8,7 @@ from unidecode import unidecode
 
 import latexbuddy.tools as tools
 
-from latexbuddy import __logger as root_logger
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -23,19 +22,14 @@ class DictionModule(Module):
     def __init__(self):
         self.language = None
         self.tool_name = "diction"
-        self.__logger = root_logger
 
-    def run_checks(
-        self, config: ConfigLoader, file: TexFile, logger: Logger
-    ) -> List[Problem]:
-
-        self.__logger = logger
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
 
         # check, if diction is installed
-        tools.find_executable("diction", "Diction", self.__logger)
+        tools.find_executable("diction", "Diction", self.logger)
 
         self.language = config.get_config_option_or_default(
-            "buddy",
+            LatexBuddy,
             "language",
             None,
             verify_type=AnyStr,
