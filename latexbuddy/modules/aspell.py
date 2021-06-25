@@ -33,15 +33,27 @@ class AspellModule(Module):
         tools.find_executable("aspell", "GNU Aspell", self.__logger)
 
         supported_languages = self.find_languages()
-        self.language = shlex.quote(
-            config.get_config_option_or_default(
-                "buddy",
-                "language",
-                "en",
-                verify_type=AnyStr,
-                verify_choices=supported_languages,
-            )
+
+        self.language = config.get_config_option_or_default(
+            "buddy",
+            "language",
+            "en",
+            verify_type=AnyStr,
+            verify_choices=supported_languages,
         )
+
+        language_country = config.get_config_option_or_default(
+            "buddy",
+            "language_country",
+            None,
+            verify_type=AnyStr,
+        )
+
+        if (
+            language_country is not None
+            and self.language + "-" + language_country in supported_languages
+        ):
+            self.language = self.language + "-" + language_country
 
         error_list = []
         counter = 1  # counts the lines
@@ -66,10 +78,15 @@ class AspellModule(Module):
     @staticmethod
     def find_languages() -> List[str]:
         """Returns all languages supported by the current aspell installation.
+        Omits specific language variations like 'en-variant_0'.
 
         :return: list of supported languages in str format
         """
-        return tools.execute("aspell", "dump dicts").splitlines()
+        return [
+            lang
+            for lang in tools.execute("aspell", "dump dicts").splitlines()
+            if "-" not in lang
+        ]
 
     def format_errors(
         self, out: List[str], line_number: int, file: TexFile
