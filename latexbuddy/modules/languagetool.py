@@ -35,6 +35,8 @@ class Mode(Enum):
 class LanguageTool(Module):
     """Wraps the LanguageTool API calls to check files."""
 
+    # removed ca-ES-valencia and de-DE-x-simple-language for compliance
+    # with LaTeXBuddy language standards
     __SUPPORTED_LANGUAGES = [
         "ar",
         "ast",
@@ -45,7 +47,6 @@ class LanguageTool(Module):
         "br-FR",
         "ca",
         "ca-ES",
-        "ca-ES-valencia",
         "zh",
         "zh-CN",
         "da",
@@ -67,7 +68,6 @@ class LanguageTool(Module):
         "de-AT",
         "de-DE",
         "de-CH",
-        "de-DE-x-simple-language",
         "el",
         "el-GR",
         "ga",
@@ -135,6 +135,20 @@ class LanguageTool(Module):
             verify_type=AnyStr,
             verify_choices=LanguageTool.__SUPPORTED_LANGUAGES,
         )
+
+        language_country = config.get_config_option_or_default(
+            "buddy",
+            "language_country",
+            None,
+            verify_type=AnyStr,
+        )
+
+        if (
+            self.language is not None
+            and language_country is not None
+            and self.language + "-" + language_country in self.__SUPPORTED_LANGUAGES
+        ):
+            self.language = self.language + "-" + language_country
 
         self.find_disabled_rules(config)
 
