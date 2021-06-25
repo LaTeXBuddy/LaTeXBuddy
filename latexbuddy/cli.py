@@ -140,7 +140,8 @@ def main():
 
     config_loader = ConfigLoader(args)
 
-    buddy = LatexBuddy(
+    buddy = LatexBuddy.instance
+    buddy.init(
         config_loader=config_loader,
         file_to_check=args.file,
     )
