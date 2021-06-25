@@ -2,6 +2,7 @@ from typing import List
 
 import proselint
 
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -16,10 +17,10 @@ class ProseLintModule(Module):
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
 
-        lang = config.get_config_option_or_default("buddy", "language", None)
+        lang = config.get_config_option_or_default(LatexBuddy, "language", None)
 
         if lang != "en":
-            self.__logger.info("Proselint only supports documents written in English.")
+            self.logger.info("Proselint only supports documents written in English.")
             return []
 
         suggestions = proselint.tools.lint(file.plain)
