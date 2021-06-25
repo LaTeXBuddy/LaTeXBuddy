@@ -65,9 +65,7 @@ class ConfigLoader:
         parsed = {"buddy": {}}
 
         args_dict = {
-            key: value
-            for key, value in vars(args).items()
-            if value is not None
+            key: value for key, value in vars(args).items() if value is not None
         }
 
         for key in args_dict:
