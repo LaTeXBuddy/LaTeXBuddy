@@ -30,13 +30,19 @@ class ConfigLoader:
 
     _REGEX_LANGUAGE_FLAG = re.compile(r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?")
 
-    def __init__(self, cli_arguments: Namespace):
+    def __init__(self, cli_arguments: Optional[Namespace] = None):
         """Creates a ConfigLoader module.
 
         :param cli_arguments: The commandline arguments specified in the LaTeXBuddy call
         """
 
         self.configurations = {}
+
+        if cli_arguments is None:
+            self.__logger.debug(
+                "No CLI arguments specified. Default values will be used."
+            )
+            return
 
         if not cli_arguments.config:
             self.__logger.warning(
