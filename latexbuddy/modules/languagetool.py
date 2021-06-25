@@ -14,6 +14,7 @@ import requests
 import latexbuddy.tools as tools
 
 from latexbuddy import TexFile
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.exceptions import ExecutableNotFoundError
 from latexbuddy.modules import Module
@@ -129,7 +130,7 @@ class LanguageTool(Module):
         """
 
         self.language = config.get_config_option_or_default(
-            "buddy",
+            LatexBuddy,
             "language",
             None,
             verify_type=AnyStr,
@@ -137,7 +138,7 @@ class LanguageTool(Module):
         )
 
         language_country = config.get_config_option_or_default(
-            "buddy",
+            LatexBuddy,
             "language_country",
             None,
             verify_type=AnyStr,
@@ -153,7 +154,7 @@ class LanguageTool(Module):
         self.find_disabled_rules(config)
 
         cfg_mode = config.get_config_option_or_default(
-            "LanguageTool",
+            LanguageTool,
             "mode",
             "COMMANDLINE",
             verify_type=AnyStr,
@@ -172,7 +173,7 @@ class LanguageTool(Module):
         elif self.mode == Mode.REMOTE_SERVER:
             # must include the port and api call (e.g. /v2/check)
             self.remote_url = config.get_config_option(
-                "LanguageTool",
+                LanguageTool,
                 "remote_url",
                 verify_type=AnyStr,
                 verify_regex="http(s?)://(\\S*)",
@@ -234,13 +235,13 @@ class LanguageTool(Module):
 
         self.disabled_rules = ",".join(
             config.get_config_option_or_default(
-                "LanguageTool", "disabled-rules", [], verify_type=List[str]
+                LanguageTool, "disabled-rules", [], verify_type=List[str]
             )
         )
 
         self.disabled_categories = ",".join(
             config.get_config_option_or_default(
-                "LanguageTool", "disabled-categories", [], verify_type=List[str]
+                LanguageTool, "disabled-categories", [], verify_type=List[str]
             )
         )
 
