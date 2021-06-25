@@ -39,10 +39,31 @@ def render_html(file_name: str, file_text: str, problems: Dict[str, Problem]) ->
     """
     problem_values = sorted(problems.values(), key=problem_key)
     template = env.get_template("result.html")
+
     highlighted_tex = highlight(file_text, problem_values)
+
+    # add line numbers
+    splitted_text = highlighted_tex.splitlines(keepends=True)
+    new_text = []
+    i = 1
+    line_count = len(splitted_text)
+    for line in splitted_text:
+        # calculate amount of whitespaces needed for correct indentation
+        diff = len(str(line_count)) - len(str(i))
+        new_line = str(i) + "    "
+
+        # add diff whitespaces
+        for x in range(0, diff):
+            new_line += " "
+
+        new_line += line
+        new_text.append(new_line)
+        i += 1
+    new_text = "".join(new_text)
+
     return template.render(
         file_name=file_name,
-        file_text=highlighted_tex,
+        file_text=new_text,
         problems=problem_values,
     )
 
