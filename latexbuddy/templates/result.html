@@ -21,11 +21,67 @@
     </h1>
     <h2><small>Results for</small> {{ file_name|e }}</h2>
     <div class="menu">
-        <ol>
-            {% for path in paths %}
-                <li class="list"><div class="file"><a href="output_{{ path.stem }}.html">{{ path.name }}</a></div></li>
-            {% endfor %}
-        </ol>
+
+        {% set parent_list = [] %} {# the list contains all folder, included in this project #}
+
+        {# get all folder names #}
+        {% for path in paths %}
+            {% set upper_folder = path.parents[0]|string() %}
+            {% set sub_folder = path.parents[1] ~ "/" |string() %}
+            {% set parent = upper_folder|replace(sub_folder, "") %}
+
+            {% if parent not in parent_list %}
+                {% set parent_list = parent_list.append(parent) %}
+            {% endif %}
+        {% endfor %}
+
+        {# set the style for each folder #}
+        {% for folder in parent_list %}
+            <style>
+                .{{ folder }} {
+                    display: flex;
+                    background: white;
+                    margin-left: 25px;
+                    margin-right: 25px;
+                    padding: 20px;
+                }
+                .{{ folder }}-content {
+                  display: none;
+                  position: absolute;
+                  background-color: #f1f1f1;
+                  min-width: 160px;
+                  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                  z-index: 1;
+                }
+                .{{ folder }}-content a {
+                  color: black;
+                  padding: 12px 16px;
+                  text-decoration: none;
+                  display: block;
+                }
+                .{{ folder }}-content a:hover {background-color: #ddd;}
+                .{{ folder }}:hover .{{ folder }}-content {display: block;}
+            </style>
+        {% endfor %}
+
+        {# get all file paths and add to the folder dropdown #}
+
+        {% for folder in parent_list %}
+            <div class="{{ folder }}">{{ folder }}
+                <div class="{{ folder }}-content">
+                        {% for path in paths %}
+                            {% set upper_folder = path.parents[0]|string() %}
+                            {% set sub_folder = path.parents[1] ~ "/" |string() %}
+                            {% set parent = upper_folder|replace(sub_folder, "") %}
+
+                            {% if parent == folder %}
+                                <a href="output_{{ path.stem }}.html">{{ path.name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+
     </div>
 </header>
 <main>
