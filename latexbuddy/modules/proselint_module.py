@@ -21,6 +21,7 @@ class ProseLintModule(Module):
         lang = config.get_config_option_or_default("buddy", "language", None)
 
         if lang != "en":
+            self.__logger.info("Proselint only supports documents written in English.")
             return []
 
         suggestions = proselint.tools.lint(file.plain)

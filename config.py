@@ -6,6 +6,7 @@ out-of-the-box. You may move this file and specify its path using the --config f
 modules = {
     "buddy": {
         "language": "en",
+        "language_country": "GB",
         "whitelist": "whitelist",
         "output": "./",
         "format": "HTML",
