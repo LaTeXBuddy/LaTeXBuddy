@@ -28,6 +28,7 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
 
     # importing this here to avoid circular import error
     from latexbuddy import __logger as root_logger
+
     logger = root_logger.getChild("tools")
 
     command = get_command_string(cmd)
