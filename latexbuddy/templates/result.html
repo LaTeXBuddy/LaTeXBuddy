@@ -9,6 +9,8 @@
     <style>
         {% include "static/modern-normalize.css" %}
         {% include "static/style.css" %}
+        {% include "static/whitelist_button.css" %}
+        {% include "static/popup_for_whitelist.css" %}
     </style>
 </head>
 <body>
@@ -31,7 +33,6 @@
                     <h4 class="problem-context monospaced">
                         {{ problem.context[0]|e }}<span class="problem-text">{{ problem.text|e }}</span>{{ problem.context[1]|e }}
                     </h4>
-
 
                     <p class="problem-description">
                         {{ problem.description if problem.description != None }}
@@ -58,12 +59,66 @@
                             at
                             {{ problem.position[0] }}:{{ problem.position[1] }}
                         {% endif %}
-                        <i>({{ problem.checker }}#{{ problem.cid }})</i>
+                        <i>({{ problem.checker }}#{{ problem.p_type }})</i>
                     </p>
+                    <!--Button section-->
+                    <div class="roboto-font">
+                        <button class="but" id="button{{ problem.uid }}" onclick="clicked('button{{ problem.uid }}','{{ problem.key }}')"></button>
+                    </div>
                 </li>
             {% endfor %}
         </ol>
     </section>
 </main>
+<!--Popup section-->
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <!--Buttons for accepting or rejecting-->
+        <a class="close">&times;</a>
+        <a class="accept">&check;</a>
+        <h2 class="text">Add this to your Whitelist:</h2>
+        <div class="header-box">
+            <h3 class="logo">{% include "static/logomark.svg" %}</h3>
+        </div>
+        <!--Text, inserted by JS-->
+    </div>
+</div>
+<script>
+    var uid;
+    function clicked(uid, problem_key) {
+        let button = document.getElementById(uid);
+        button.className = "onclic"; //activate rotation
+        setUID(uid); //set uid to a global param to have access to it later on
+        showMessage(problem_key); //call Popup
+    }
+    function setUID(uid) {
+        this.uid = uid;
+    }
+    //gets the popup vars
+    var popup = document.getElementById("popup");
+    var popupcontent = document.getElementsByClassName("popup-content")[0];
+    //appends the problem key to the popup and show it
+    function showMessage(problem_key) {
+        let p = document.createElement("p"); //paragraph
+        let text = document.createTextNode(problem_key);
+        p.appendChild(text);
+        popupcontent.appendChild(p);
+        popup.style.display = "block"; //show popup
+    }
+    //by clicking on the "close" button, remove the problem key and set the button back to "+" state
+    document.getElementsByClassName("close")[0].onclick = function() {
+        popupcontent.removeChild(popupcontent.lastChild); //remove last child: aka text node
+        popup.style.display = "none"; //hide popup
+        let button = document.getElementById(uid);
+        button.className = "button"; //normal button state
+    }
+    //by clicking on the "accept" button, remove the problem key and set the button to "accepted"
+    document.getElementsByClassName("accept")[0].onclick = function() {
+        popupcontent.removeChild(popupcontent.lastChild); //remove last child: aka text node
+        popup.style.display = "none"; //hide popup
+        let button = document.getElementById(uid);
+        button.className = "validate"; //button state "accepted"
+    }
+</script>
 </body>
 </html>

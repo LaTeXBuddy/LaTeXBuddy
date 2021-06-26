@@ -2,15 +2,15 @@
 
 ChkTeX Documentation: https://www.nongnu.org/chktex/ChkTeX.pdf
 """
-from time import perf_counter
 from typing import List
 
 import latexbuddy.tools as tools
+import os
 
 from latexbuddy import TexFile
+from pathlib import Path
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 
@@ -31,14 +31,8 @@ class ChktexModule(Module):
         :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
-        start_time = perf_counter()
 
-        try:
-            tools.find_executable("chktex")
-        except FileNotFoundError:
-            self.__logger.error(not_found("chktex", "ChkTeX"))
-
-            raise FileNotFoundError("Unable to find ChkTeX installation!")
+        tools.find_executable("chktex", "ChkTeX", self.__logger)
 
         format_str = (
             self.DELIMITER.join(
@@ -46,16 +40,14 @@ class ChktexModule(Module):
             )
             + "\n\n"
         )
+
+        dir_path, file_path = os.path.split(os.path.abspath(str(file.tex_file)))
         command_output = tools.execute(
-            "chktex", "-f", f"'{format_str}'", "-q", str(file.tex_file)
+            "cd", dir_path, ";", "chktex", "-f", f"'{format_str}'", "-q", file_path
         )
         out_split = command_output.split("\n")
 
         result = self.format_problems(out_split, file)
-
-        self.__logger.debug(
-            f"ChkTeX finished after {round(perf_counter() - start_time, 2)} seconds"
-        )
 
         return result
 
@@ -91,7 +83,7 @@ class ChktexModule(Module):
                     position=position,
                     text=text,
                     checker=self.tool_name,
-                    cid=str(internal_id),
+                    p_type=str(internal_id),
                     file=file.tex_file,
                     severity=severity,
                     category=self.problem_type,

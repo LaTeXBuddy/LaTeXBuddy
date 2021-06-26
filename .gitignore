@@ -186,4 +186,12 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+
+### LaTeXBuddy ###
+
+# Created output files
+/latexbuddy_output.html
+/latexbuddy_output.json
+
+
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm+all,visualstudiocode,windows,macos,linux

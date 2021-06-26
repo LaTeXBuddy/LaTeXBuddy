@@ -7,8 +7,12 @@ import subprocess
 import sys
 import traceback
 
+from logging import Logger
 from pathlib import Path
-from typing import Callable, List, Tuple
+from typing import Callable, List, Optional, Tuple
+
+from latexbuddy.exceptions import ExecutableNotFoundError
+from latexbuddy.messages import not_found
 
 
 __logger = logging.getLogger("latexbuddy").getChild('tools')
@@ -90,21 +94,59 @@ def get_command_string(cmd: Tuple[str]) -> str:
     return command.strip()
 
 
-def find_executable(name: str) -> str:
-    """Finds path to an executable.
+def find_executable(
+    name: str,
+    to_install: Optional[str] = None,
+    logger: Optional[Logger] = None,
+    log_errors: bool = True,
+) -> str:
+    """Finds path to an executable. If the executable can not be located, an error
+    message is logged to the specified logger, otherwise the executable's path is logged
+    as a debug message.
 
     This uses 'which', i.e. the executable should at least be in user's $PATH
 
     :param name: executable name
+    :param to_install: correct name of the program or project which the requested
+                       executable belongs to (used in log messages)
+    :param logger: custom logger to be used for logging debug/error messages
+    :param log_errors: specifies whether or not this method should log an error message,
+                       if the executable can not be located; if this is False, a debug
+                       message will be logged instead
     :return: path to the executable
     :raises FileNotFoundError: if the executable couldn't be found
     """
+
+    if logger is None:
+        # importing this here to avoid circular import error
+        from latexbuddy import __logger as root_logger
+
+        logger = root_logger.getChild("Tools")
+
     result = execute("which", name)
 
     if not result or "not found" in result:
-        raise FileNotFoundError(f"could not find {name} in system's PATH")
+
+        if log_errors:
+            logger.error(
+                not_found(name, to_install if to_install is not None else name)
+            )
+        else:
+            logger.debug(
+                f"could not find executable '{name}' "
+                f"({to_install if to_install is not None else name}) "
+                f"in the system's PATH"
+            )
+
+        raise ExecutableNotFoundError(
+            f"could not find executable '{name}' in system's PATH"
+        )
+
     else:
-        return result.splitlines()[0]
+
+        path_str = result.splitlines()[0]
+        logger.debug(f"Found executable {name} at '{path_str}'.")
+        return path_str
 
 
 location_re = re.compile(r"line (\d+), column (\d+)")
@@ -170,27 +212,48 @@ def is_binary(file_bytes: bytes) -> bool:
 
 def execute_no_exceptions(
     function_call: Callable[[], None],
-    error_message: str = "An error occurred while executing lambda function at",
+    error_message: str = "An error occurred while executing lambda function",
+    traceback_log_level: Optional[str] = None,
 ) -> None:
     """Calls a function and catches any Exception that is raised during this.
 
-    If an Exception is caught, the function is aborted and the error is printed to
-    stderr, but as the Exception is caught, the program won't crash.
+    If an Exception is caught, the function is aborted and the error is logged, but as
+    the Exception is caught, the program won't crash.
 
     :param function_call: function to be executed
     :param error_message: custom error message displayed in the console
+    :param traceback_log_level: sets the log_level that is used to log the error
+                                traceback. If it is None, no traceback will be logged.
+                                Valid values are: "DEBUG", "INFO", "WARNING", "ERROR"
     """
 
     try:
         function_call()
     except Exception as e:
 
-        print(
-            error_message + ":\n",
-            f"{e.__class__.__name__}: {getattr(e, 'message', e)}",
-            file=sys.stderr,
+        # importing this here to avoid circular import error
+        from latexbuddy import __logger as root_logger
+
+        logger = root_logger.getChild("Tools")
+
+        logger.error(
+            f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}"
         )
-        traceback.print_exc(file=sys.stderr)
+        if traceback_log_level is not None:
+
+            stack_trace = traceback.format_exc()
+
+            if traceback_log_level == "DEBUG":
+                logger.debug(stack_trace)
+            elif traceback_log_level == "INFO":
+                logger.info(stack_trace)
+            elif traceback_log_level == "WARNING":
+                logger.warning(stack_trace)
+            elif traceback_log_level == "ERROR":
+                logger.error(stack_trace)
+            else:
+                # use level DEBUG as default, in case of invalid value
+                logger.debug(stack_trace)
 
 
 def get_app_dir() -> Path:
@@ -234,3 +297,45 @@ def get_app_dir() -> Path:
     app_dir.mkdir(parents=True, exist_ok=True)
 
     return app_dir
+
+
+def add_whitelist_console(whitelist_file, to_add):
+    """
+    Adds a list of keys to the Whitelist.
+    Keys should be valid keys, ideally copied from LaTeXBuddy HTML Output.
+
+    :param whitelist_file: Path to whitelist file
+    :param to_add: list of keys
+    """
+    whitelist_entries = whitelist_file.read_text().splitlines()
+    with whitelist_file.open("a+") as file:
+        for key in to_add:
+            if key not in whitelist_entries:
+                whitelist_entries.append(key)
+                file.write(key)
+                file.write("\n")
+
+
+def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
+    """
+    Takes in a list of words and creates their respective keys,
+    then adds them to whitelist.
+    Words in the file_to_parse should all be from the same language.
+    Each line represents a single Word.
+
+    :param whitelist_file: Path to whitelist file
+    :param file_to_parse: Path to wordlist
+    :param lang: language of the words in the wordlist
+    """
+    lines = file_to_parse.read_text().splitlines(keepends=False)
+    # TODO check if whitelist file and file to parse is path
+    whitelist_entries = whitelist_file.read_text().splitlines()
+    with whitelist_file.open("a+") as file:
+        for line in lines:
+            if line == "":
+                continue
+            key = lang + "_spelling_" + line
+            if key not in whitelist_entries:
+                whitelist_entries.append(key)
+                file.write(key)
+                file.write("\n")

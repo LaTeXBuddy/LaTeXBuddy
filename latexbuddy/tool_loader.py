@@ -1,4 +1,4 @@
-import importlib.util as importutil
+import importlib
 import inspect
 
 from pathlib import Path
@@ -21,28 +21,6 @@ class ToolLoader:
         :param directory: the path of the directory to load tools from
         """
         self.directory = directory
-
-    def load_modules(self) -> List[Module]:
-        """This method loads every module that is found in the ToolLoader's directory.
-
-        :return: a list of instances of classes implementing the Module API
-        """
-
-        imported_py_modules = ToolLoader.import_py_files(self.find_py_files())
-        modules = []
-
-        for module in imported_py_modules:
-
-            classes = [
-                cls_obj
-                for cls_name, cls_obj in inspect.getmembers(module, inspect.isclass)
-                if cls_obj.__module__ == module.__name__ and Module in cls_obj.mro()
-            ]
-
-            for class_obj in classes:
-                modules.append(class_obj())
-
-        return modules
 
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
         """This method loads every module that is found in the ToolLoader's directory
@@ -71,8 +49,30 @@ class ToolLoader:
 
         return selected
 
-    @staticmethod
-    def import_py_files(py_files: List[Path]) -> List[ModuleType]:
+    def load_modules(self) -> List[Module]:
+        """This method loads every module that is found in the ToolLoader's directory.
+
+        :return: a list of instances of classes implementing the Module API
+        """
+
+        imported_py_modules = self.import_py_files()
+
+        modules = []
+
+        for module in imported_py_modules:
+
+            classes = [
+                cls_obj
+                for cls_name, cls_obj in inspect.getmembers(module, inspect.isclass)
+                if cls_obj.__module__ == module.__name__ and Module in cls_obj.mro()
+            ]
+
+            for class_obj in classes:
+                modules.append(class_obj())
+
+        return modules
+
+    def import_py_files(self) -> List[ModuleType]:
         """This method loads a python module from the specified file path for a list
             of file paths.
 
@@ -80,14 +80,16 @@ class ToolLoader:
         :return: a list of python modules ready to be used
         """
 
+        py_files = self.find_py_files()
+
         loaded_modules = []
 
         for py_file in py_files:
 
             def lambda_function() -> None:
-                spec = importutil.spec_from_file_location(py_file.stem, py_file)
-                module = importutil.module_from_spec(spec)
-                spec.loader.exec_module(module)
+
+                module_path = str(py_file.with_suffix("")).replace("/", ".")
+                module = importlib.import_module(module_path)
 
                 loaded_modules.append(module)
 

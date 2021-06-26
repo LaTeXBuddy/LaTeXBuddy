@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "latexbuddy"
-version = "0.1.0"
+version = "0.3.0"
 description = ""
 license = "Proprietary"
 authors = [
@@ -28,6 +28,7 @@ proselint = "^0.10.2"
 Unidecode = "^1.2.0"
 colorama = "^0.4.4"
 double-stream-handler = "^1.0.0"
+pydantic = "^1.8.2"
 
 [tool.poetry.dev-dependencies]
 black = "^21.5b1"

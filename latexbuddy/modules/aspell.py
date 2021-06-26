@@ -1,13 +1,13 @@
 """This module defines the connection between LaTeXBuddy and GNU Aspell."""
 import shlex
 
-from time import perf_counter
-from typing import List
+from typing import AnyStr, List
 
 import latexbuddy.tools as tools
 
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.exceptions import LanguageNotSupportedError
 from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -18,8 +18,7 @@ class AspellModule(Module):
     __logger = root_logger.getChild("AspellModule")
 
     def __init__(self):
-        self._LANGUAGE_MAP = {"de": "de-DE", "en": "en"}
-        self.language = "en"  # FIXME: use config's language
+        self.language = None
         self.tool_name = "aspell"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
@@ -30,27 +29,19 @@ class AspellModule(Module):
         :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
         """
-        start_time = perf_counter()
 
-        try:
-            tools.find_executable("aspell")
-        except FileNotFoundError:
-            self.__logger.error(not_found("aspell", "GNU Aspell"))
+        tools.find_executable("aspell", "GNU Aspell", self.__logger)
 
-            raise FileNotFoundError("Unable to find aspell installation!")
-
-        try:
-
-            self.language = self._LANGUAGE_MAP[
-                config.get_config_option_or_default("buddy", "language", None)
-            ]
-
-        except KeyError:
-            self.language = None
-
-        language_quote = shlex.quote(self.language)
-        languages = tools.execute("aspell", "dump dicts")
-        self.check_language(language_quote, languages)
+        supported_languages = self.find_languages()
+        self.language = shlex.quote(
+            config.get_config_option_or_default(
+                "buddy",
+                "language",
+                "en",
+                verify_type=AnyStr,
+                verify_choices=supported_languages,
+            )
+        )
 
         error_list = []
         counter = 1  # counts the lines
@@ -61,7 +52,7 @@ class AspellModule(Module):
             if len(line) > 0:
                 escaped_line = line.replace("'", "\\'")
                 output = tools.execute(
-                    f"echo '{escaped_line}' | aspell -a -l {language_quote}"
+                    f"echo '{escaped_line}' | aspell -a -l {self.language}"
                 )
                 out = output.splitlines()[1:]  # the first line specifies aspell version
                 if len(out) > 0:  # only if the list inst empty
@@ -70,30 +61,15 @@ class AspellModule(Module):
 
             counter += 1  # if there is an empty line, just increase the counter
 
-        self.__logger.debug(
-            f"Aspell finished after {round(perf_counter() - start_time, 2)} seconds"
-        )
         return error_list
 
-    def check_language(self, language: str, langs: str):
-        """Checks if a language is in a list of languages.
+    @staticmethod
+    def find_languages() -> List[str]:
+        """Returns all languages supported by the current aspell installation.
 
-        The list of languages is actually a string; e.g., the output of a terminal
-        command.
-
-        :param language: language to search for
-        :param langs: language list to search in
-        :raises Exception: if the language is not on the list
+        :return: list of supported languages in str format
         """
-        # error if language dict not installed
-        if language not in langs:
-            self.__logger.error(
-                not_found(f"Language for {language}", "the dictionary")
-                + "\nYou can check available dictionaries at "
-                + "https://ftp.gnu.org/gnu/aspell/dict/0index.html"
-            )
-
-            raise Exception("Aspell: Language not found on system.")
+        return tools.execute("aspell", "dump dicts").splitlines()
 
     def format_errors(
         self, out: List[str], line_number: int, file: TexFile
@@ -104,7 +80,7 @@ class AspellModule(Module):
         :param out: line-split output of the aspell command
         :param file: the file path
         """
-        cid = "0"  # aspell got not error-ids
+        p_type = "0"  # aspell got not error-ids
         severity = ProblemSeverity.ERROR
         key_delimiter = "_"
         problems = []
@@ -142,9 +118,9 @@ class AspellModule(Module):
                         position=location,
                         text=text,
                         checker=self.tool_name,
-                        cid=cid,
                         file=file.tex_file,
                         severity=severity,
+                        p_type=p_type,
                         category="spelling",
                         suggestions=suggestions,
                         key=key,

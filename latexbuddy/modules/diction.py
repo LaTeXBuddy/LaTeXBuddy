@@ -2,8 +2,7 @@ import hashlib
 import os
 
 from pathlib import Path
-from time import perf_counter
-from typing import List
+from typing import AnyStr, List
 
 from unidecode import unidecode
 
@@ -19,18 +18,24 @@ from latexbuddy.texfile import TexFile
 class DictionModule(Module):
     __logger = root_logger.getChild("DictionModule")
 
+    __SUPPORTED_LANGUAGES = ["en", "de", "nl"]
+
     def __init__(self):
         self.language = None
         self.tool_name = "diction"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-        start_time = perf_counter()
 
-        # TODO: make this dynamic/configurable using
-        #  config.get_config_option_or_default(
-        #       "buddy", "language", "<default language>"
-        #  )
-        self.language = "en"
+        # check, if diction is installed
+        tools.find_executable("diction", "Diction", self.__logger)
+
+        self.language = config.get_config_option_or_default(
+            "buddy",
+            "language",
+            None,
+            verify_type=AnyStr,
+            verify_choices=DictionModule.__SUPPORTED_LANGUAGES,
+        )
 
         # replace umlauts so error position is correct
         lines = Path(file.plain_file).read_text()
@@ -64,10 +69,6 @@ class DictionModule(Module):
 
         result = self.format_errors(
             cleaned_errors, original_lines, file.plain_file, file
-        )
-
-        self.__logger.debug(
-            f"Diction finished after {round(perf_counter() - start_time, 2)} seconds"
         )
 
         # return list of Problems
@@ -145,10 +146,10 @@ class DictionModule(Module):
                     position=location,
                     text=o_line,
                     checker="diction",
-                    cid="0",
+                    p_type="0",
                     file=file,
                     severity=ProblemSeverity.INFO,
-                    category="wording/ phrasing",
+                    category="grammar",
                     suggestions=[sugg],
                     key="diction_" + str(hashlib.md5(o_line.encode())),
                 )
