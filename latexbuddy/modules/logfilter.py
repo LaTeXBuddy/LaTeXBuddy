@@ -28,7 +28,6 @@ class LogFilter(Module):
         """
         Initializes the LogFilter
         """
-        self.tool_name = "logfilter"
         self.texfilt_path = Path("latexbuddy/modules/texfilt.awk")
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
@@ -91,7 +90,7 @@ class LogFilter(Module):
                     file=file_path,
                     description=description,
                     category="latex",
-                    key=self.tool_name + "_" + severity,
+                    key=self.display_name + "_" + severity,
                 )
             )
         return problems

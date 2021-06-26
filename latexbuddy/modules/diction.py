@@ -21,7 +21,6 @@ class Diction(Module):
 
     def __init__(self):
         self.language = None
-        self.tool_name = "diction"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
 
@@ -150,7 +149,7 @@ class Diction(Module):
                     severity=ProblemSeverity.INFO,
                     category="grammar",
                     suggestions=[sugg],
-                    key="diction_" + str(hashlib.md5(o_line.encode())),
+                    key=self.display_name + "_" + str(hashlib.md5(o_line.encode())),
                 )
             )
 

@@ -26,7 +26,7 @@ class YaLafi(Module):
                         file=file.tex_file,
                         severity=ProblemSeverity.ERROR,
                         category="latex",
-                        key="YaLafi_tex2txt",
+                        key=self.display_name + "_tex2txt",
                     )
                 )
 

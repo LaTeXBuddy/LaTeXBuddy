@@ -11,8 +11,6 @@ from latexbuddy.texfile import TexFile
 
 class ProseLint(Module):
     def __init__(self):
-
-        self.tool_name = "ProseLintModule"
         self.problem_type = "grammar"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
@@ -49,7 +47,7 @@ class ProseLint(Module):
             if replacements is None:
                 replacements = []
             delimiter = "_"
-            key = self.tool_name + delimiter + p_type
+            key = self.display_name + delimiter + p_type
             problems.append(
                 Problem(
                     position=position,

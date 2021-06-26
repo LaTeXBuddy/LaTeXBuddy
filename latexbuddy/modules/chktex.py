@@ -17,7 +17,6 @@ from latexbuddy.problem import Problem, ProblemSeverity
 class Chktex(Module):
     def __init__(self):
         self.DELIMITER = ":::"
-        self.tool_name = "chktex"
         self.problem_type = "latex"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
@@ -73,7 +72,7 @@ class Chktex(Module):
             text = out_split[5]
             description = out_split[6] if len(out_split[6]) > 0 else None
             position = (row, col)
-            key = self.tool_name + key_delimiter + str(internal_id)
+            key = self.display_name + key_delimiter + str(internal_id)
 
             problems.append(
                 Problem(

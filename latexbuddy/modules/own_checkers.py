@@ -13,7 +13,6 @@ from latexbuddy.texfile import TexFile
 
 class UnreferencedFigures(Module):
     def __init__(self):
-        self.tool_name = "unrefed_figure_check"
         self.p_type = "0"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
@@ -56,7 +55,7 @@ class UnreferencedFigures(Module):
                         file=file.tex_file,
                         severity=self.severity,
                         description=f"Figure {label} not referenced.",
-                        key=self.tool_name + "_" + label,
+                        key=self.display_name + "_" + label,
                         length=length,
                         context=("\\label{", "}"),
                     )
@@ -67,7 +66,6 @@ class UnreferencedFigures(Module):
 
 class SiUnitx(Module):
     def __init__(self):
-        self.tool_name = "siunitx"
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
@@ -113,7 +111,7 @@ class SiUnitx(Module):
                     file=file.tex_file,
                     severity=self.severity,
                     description=f"For number {number_match.group(0)} \\num from siunitx may be used.",
-                    key=self.tool_name + "_" + number_match.group(0),
+                    key=self.display_name + "_" + number_match.group(0),
                     length=length,
                 )
             )
@@ -215,7 +213,7 @@ class SiUnitx(Module):
                         file=file.tex_file,
                         severity=self.severity,
                         description=f"For unit {unit_match.group(0)} siunitx may be used.",
-                        key=self.tool_name + "_" + unit_match.group(0),
+                        key=self.display_name + "_" + unit_match.group(0),
                         length=length,
                     )
                 )
@@ -225,7 +223,6 @@ class SiUnitx(Module):
 
 class EmptySections(Module):
     def __init__(self):
-        self.tool_name = "emptysection"
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
@@ -249,7 +246,7 @@ class EmptySections(Module):
                     file=file.tex_file,
                     severity=self.severity,
                     description=f"Sections may not be empty.",
-                    key=self.tool_name + "_" + text,
+                    key=self.display_name + "_" + text,
                     length=length,
                     context=("\\section{", "}"),
                 )
@@ -259,7 +256,6 @@ class EmptySections(Module):
 
 class URLCheck(Module):
     def __init__(self):
-        self.tool_name = "urlcheck"
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
@@ -288,7 +284,7 @@ class URLCheck(Module):
                     file=file.tex_file,
                     severity=self.severity,
                     description=f"For URLs use \\url.",
-                    key=self.tool_name + "_" + url_match.group(0),
+                    key=self.display_name + "_" + url_match.group(0),
                     length=length,
                 )
             )
@@ -320,7 +316,6 @@ class CheckFigureResolution(Module):
     ]
 
     def __init__(self):
-        self.tool_name = "resolution_check"
         self.p_type = "0"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
@@ -353,7 +348,7 @@ class CheckFigureResolution(Module):
                             file=file.tex_file,
                             severity=self.severity,
                             description=f"Figure might have low resolution due to file format {ending}",
-                            key=self.tool_name + "_" + current_file,
+                            key=self.display_name + "_" + current_file,
                             length=1,
                         )
                     )
@@ -363,7 +358,6 @@ class CheckFigureResolution(Module):
 
 class NativeUseOfRef(Module):
     def __init__(self):
-        self.tool_name = "native_ref_use_check"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 
@@ -388,7 +382,7 @@ class NativeUseOfRef(Module):
                     severity=self.severity,
                     description=description,
                     context=("", problem_text[5:]),
-                    key=self.tool_name + "_" + problem_text[5:-1],
+                    key=self.display_name + "_" + problem_text[5:-1],
                     length=len(ref_pattern),
                 )
             )
