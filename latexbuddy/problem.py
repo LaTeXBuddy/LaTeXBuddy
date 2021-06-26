@@ -182,7 +182,7 @@ class Problem:
         if language is not None and (
             self.category == "grammar" or self.category == "spelling"
         ):
-            return language + "_" + key
+            return f"{language}_{key}"
 
         return key
 
