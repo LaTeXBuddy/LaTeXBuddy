@@ -25,23 +25,6 @@ class TexLogAnalyser(Module):
 
     def __init__(self):
         self.tool_name = "texloganalyser"
-        self.tex_mf = self.avoid_linebreak()
-
-    @staticmethod
-    def avoid_linebreak() -> str:
-        """
-        This method makes the log file be written correctly
-        """
-        # https://tex.stackexchange.com/questions/52988/avoid-linebreaks-in-latex-console-log-output-or-increase-columns-in-terminal
-        # https://tex.stackexchange.com/questions/410592/texlive-personal-texmf-cnf
-        text = '\n'.join(
-            ['max_print_line=1000', 'error_line=254', 'half_error_line=238'])
-        cnf_file = 'texmf.cnf'
-        cnf_dir = mkdtemp(prefix='latexbuddy', suffix='texloganalyser')
-        # cnf_path = Path(cnf_dir) / cnf_file
-        # cnf_path.write_text(text)
-        cnf_path = mkstemp(prefix='latexbuddy', suffix='cnf', dir=cnf_dir)
-        return str(cnf_path)
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         try:
@@ -49,18 +32,18 @@ class TexLogAnalyser(Module):
         except FileNotFoundError:
             self.__logger.error(not_found('perl', 'Perl'))
 
-        logfile = self.compile_tex(file.tex_file)
-        warning_problems = self.check_warnings(logfile, file)
+        log_path, pdf_path = tools.compile_tex(self, file.tex_file)
+        warning_problems = self.check_warnings(log_path, file)
         return warning_problems
 
-    def check_warnings(self, logfile: Path, file: TexFile) -> List[Problem]:
+    def check_warnings(self, log_path: Path, file: TexFile) -> List[Problem]:
         problems = []
         raw_output = tools.execute('texloganalyser', '-wpnhv',
-                                   str(logfile)).splitlines()
-        i=0
+                                   str(log_path)).splitlines()
+        i = 0
         for line in raw_output:
             print(i, line)
-            i+=1
+            i += 1
             self.__logger.debug(f"Processing line: {line}")
             warning_match = warning_line_re.match(line)
             if warning_match:
@@ -92,7 +75,7 @@ class TexLogAnalyser(Module):
                 position=position,  # TODO: update type if None
                 text=problem_text,
                 checker=self.tool_name,
-                cid="warning",  # TODO
+                p_type="warning",  # TODO
                 file=file.tex_file,
                 severity=severity,
                 category="latex",
@@ -101,19 +84,3 @@ class TexLogAnalyser(Module):
             problems.append(problem)
 
         return problems
-
-    def compile_tex(self, tex_file: Path) -> Path:
-        try:
-            tools.find_executable('latex')
-        except FileNotFoundError:
-            self.__logger.error(not_found('latex', 'LaTeX (e.g., TeXLive Core)'))
-
-        directory = mkdtemp(prefix='latexbuddy', suffix='texlogs')
-        path = Path(directory).resolve()
-        tools.execute(f'TEXMFCNF="{self.tex_mf}";',
-                      'latex', '-interaction=nonstopmode',
-                      f'-output-directory={str(path)}',
-                      str(tex_file),
-                      )
-
-        return path / f'{tex_file.stem}.log'
