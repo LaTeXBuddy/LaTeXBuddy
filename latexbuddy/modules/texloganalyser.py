@@ -10,7 +10,7 @@ from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 from latexbuddy import __logger as root_logger
 from latexbuddy.messages import not_found
-from tempfile import mkdtemp
+from tempfile import mkdtemp, mkstemp
 
 # ^Page \d+: (Overfull \\hbox .* in paragraph at lines (\d+--\d+))$
 
@@ -38,9 +38,10 @@ class TexLogAnalyser(Module):
             ['max_print_line=1000', 'error_line=254', 'half_error_line=238'])
         cnf_file = 'texmf.cnf'
         cnf_dir = mkdtemp(prefix='latexbuddy', suffix='texloganalyser')
-        cnf_path = Path(cnf_dir) / cnf_file
-        cnf_path.write_text(text)
-        return cnf_dir
+        # cnf_path = Path(cnf_dir) / cnf_file
+        # cnf_path.write_text(text)
+        cnf_path = mkstemp(prefix='latexbuddy', suffix='cnf', dir=cnf_dir)
+        return str(cnf_path)
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         try:
@@ -56,10 +57,10 @@ class TexLogAnalyser(Module):
         problems = []
         raw_output = tools.execute('texloganalyser', '-wpnhv',
                                    str(logfile)).splitlines()
-        i = 0
+        i=0
         for line in raw_output:
             print(i, line)
-            i += 1
+            i+=1
             self.__logger.debug(f"Processing line: {line}")
             warning_match = warning_line_re.match(line)
             if warning_match:
@@ -110,9 +111,8 @@ class TexLogAnalyser(Module):
         directory = mkdtemp(prefix='latexbuddy', suffix='texlogs')
         path = Path(directory).resolve()
         tools.execute(f'TEXMFCNF="{self.tex_mf}";',
-                      'latex',
+                      'latex', '-interaction=nonstopmode',
                       f'-output-directory={str(path)}',
-                      '-halt-on-error',
                       str(tex_file),
                       )
 
