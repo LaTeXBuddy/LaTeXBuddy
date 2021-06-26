@@ -19,13 +19,18 @@
         {% include "static/logo.svg" %}
     </h1>
     <h2><small>Results for</small> {{ file_name|e }}</h2>
+    <input id="pdfbutton" type="button" value="pdfb" />
 </header>
 <main>
-    <section id="file-contents" style="position:relative;">
-        <pre style="line-height: 16px"><code>{{ file_text|safe }}</code></pre>
-<!--        {{ problem_str|safe }}-->
-    </section>
-    <section id="problems-list">
+    <div id="file-container">
+        <div id="file-contents" style="position:relative;">
+            <pre style="line-height: 16px"><code>{{ file_text|safe }}</code></pre>
+        </div>
+        <div id="pdf-disp" style="position:relative;">
+            <iframe id="pdf-ifr" src="tests/testpaper/test_paper_better.pdf" width="100%" height="100%"></iframe>
+        </div>
+    </div>
+    <div id="problems-list">
         <h3>Problems</h3>
         <ol>
             {% for problem in problems %}
@@ -68,7 +73,7 @@
                 </li>
             {% endfor %}
         </ol>
-    </section>
+    </div>
 </main>
 <!--Popup section-->
 <div id="popup" class="popup">
@@ -84,6 +89,15 @@
     </div>
 </div>
 <script>
+    document.getElementById("pdfbutton").onclick = function () {
+        if (document.getElementById("pdf-disp").style.display == "block") {
+            document.getElementById("pdf-disp").style.display = "none";
+            document.getElementById("file-contents").style.display = "block";
+        } else {
+            document.getElementById("file-contents").style.display = "none";
+            document.getElementById("pdf-disp").style.display = "block";
+        }
+    };
     var uid;
     function clicked(uid, problem_key) {
         let button = document.getElementById(uid);

@@ -226,6 +226,7 @@ class LatexBuddy:
                 str(self.tex_file.tex_file),
                 self.tex_file.tex,
                 self.errors,
+                "test_paper_better.pdf"
             )
         )
 

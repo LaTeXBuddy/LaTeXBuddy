@@ -29,12 +29,13 @@ def problem_key(problem: Problem) -> int:
     return problem.position[0]
 
 
-def render_html(file_name: str, file_text: str, problems: Dict[str, Problem]) -> str:
+def render_html(file_name: str, file_text: str, problems: Dict[str, Problem], pdf_path: str) -> str:
     """Renders an HTML page based on file contents and discovered problems.
 
     :param file_name: file name
     :param file_text: contents of the file
     :param problems: dictionary of errors returned from latexbuddy
+    :param pdf_path: path of pdf file
     :return: generated HTML
     """
     problem_values = sorted(problems.values(), key=problem_key)
@@ -62,6 +63,7 @@ def render_html(file_name: str, file_text: str, problems: Dict[str, Problem]) ->
     new_text = "".join(new_text)
 
     return template.render(
+        pdf_path=pdf_path,
         file_name=file_name,
         file_text=new_text,
         problems=problem_values,
