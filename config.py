@@ -37,6 +37,9 @@ modules = {
             # "TYPOS",
         ],
     },
+    "LogFilter": {
+        "enabled": True,
+    },
     "ProseLint": {
         "enabled": True
     },
