@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - language selection for aspell now works dynamically and using the config (!105)
+- language codes are now standardized to fit different formats (!116)
 
 ### Fixed
 - regex usage in own_checkers (!110)
