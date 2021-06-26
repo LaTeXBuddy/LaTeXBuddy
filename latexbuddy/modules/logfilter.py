@@ -6,7 +6,6 @@ from typing import List
 
 import latexbuddy.tools as tools
 
-from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
@@ -24,8 +23,6 @@ class LogFilter(Module):
     A Filter for log files. Using TexFilt:
     https://www.ctan.org/tex-archive/support/texfilt
     """
-
-    __logger = root_logger.getChild("logfilter.pl")
 
     def __init__(self):
         """
@@ -45,7 +42,7 @@ class LogFilter(Module):
         try:
             tools.find_executable("awk")
         except FileNotFoundError:
-            self.__logger.error(not_found("awk", "AWK"))
+            self.logger.error(not_found("awk", "AWK"))
 
         log_path, pdf_path = tools.compile_tex(self, file.tex_file)
         descriptor, raw_problems_path = mkstemp(
@@ -89,7 +86,7 @@ class LogFilter(Module):
                 Problem(
                     position=position,
                     text=problem_text,
-                    checker=self.tool_name,
+                    checker=LogFilter,
                     p_type=severity,
                     file=file_path,
                     description=description,
