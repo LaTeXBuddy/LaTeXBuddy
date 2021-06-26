@@ -356,8 +356,7 @@ def compile_tex(module, tex_file: Path, compile_pdf: bool = False) -> Tuple[Path
         compiler = 'latex'
 
     tex_mf = create_tex_mf()
-    #directory = mkdtemp(prefix='latexbuddy', suffix='texlogs')
-    directory = '.'
+    directory = mkdtemp(prefix='latexbuddy', suffix='texlogs')
     path = Path(directory).resolve()
     file = execute(f'TEXMFCNF="{tex_mf}";',
                    compiler,
