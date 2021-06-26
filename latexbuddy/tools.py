@@ -15,7 +15,8 @@ from typing import Callable, List, Optional, Tuple
 from latexbuddy.exceptions import ExecutableNotFoundError
 from latexbuddy.messages import not_found
 
-__logger = logging.getLogger("latexbuddy").getChild('tools')
+
+__logger = logging.getLogger("latexbuddy").getChild("tools")
 
 
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
@@ -344,31 +345,32 @@ def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
 def compile_tex(module, tex_file: Path, compile_pdf: bool = False) -> Tuple[Path, Path]:
     if compile_pdf:
         try:
-            find_executable('pdflatex')
+            find_executable("pdflatex")
         except FileNotFoundError:
-            module.__logger.error(not_found('pdflatex', 'LaTeX (e.g., TeXLive Core)'))
-        compiler = 'pdflatex'
+            module.__logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
+        compiler = "pdflatex"
     else:
         try:
-            find_executable('latex')
+            find_executable("latex")
         except FileNotFoundError:
-            module.__logger.error(not_found('latex', 'LaTeX (e.g., TeXLive Core)'))
-        compiler = 'latex'
+            module.__logger.error(not_found("latex", "LaTeX (e.g., TeXLive Core)"))
+        compiler = "latex"
 
     tex_mf = create_tex_mf()
-    directory = mkdtemp(prefix='latexbuddy', suffix='texlogs')
+    directory = mkdtemp(prefix="latexbuddy", suffix="texlogs")
     path = Path(directory).resolve()
-    file = execute(f'TEXMFCNF="{tex_mf}";',
-                   compiler,
-                   '-interaction=nonstopmode',
-                   '-8bit',
-                   f'-output-directory={str(path)}',
-                   str(tex_file),
-                   )
+    file = execute(
+        f'TEXMFCNF="{tex_mf}";',
+        compiler,
+        "-interaction=nonstopmode",
+        "-8bit",
+        f"-output-directory={str(path)}",
+        str(tex_file),
+    )
 
     print(file)
-    log = path / f'{tex_file.stem}.log'
-    pdf = path / f'{tex_file.stem}.log'
+    log = path / f"{tex_file.stem}.log"
+    pdf = path / f"{tex_file.stem}.log"
     return log, pdf
 
 
@@ -378,8 +380,7 @@ def create_tex_mf() -> str:
     """
     # https://tex.stackexchange.com/questions/52988/avoid-linebreaks-in-latex-console-log-output-or-increase-columns-in-terminal
     # https://tex.stackexchange.com/questions/410592/texlive-personal-texmf-cnf
-    text = '\n'.join(
-        ['max_print_line=1000', 'error_line=254', 'half_error_line=238'])
-    descriptor, cnf_path = mkstemp(prefix='latexbuddy', suffix='cnf')
+    text = "\n".join(["max_print_line=1000", "error_line=254", "half_error_line=238"])
+    descriptor, cnf_path = mkstemp(prefix="latexbuddy", suffix="cnf")
     Path(cnf_path).resolve().write_text(text)
     return str(cnf_path)
