@@ -226,7 +226,7 @@ class LatexBuddy:
                 str(self.tex_file.tex_file),
                 self.tex_file.tex,
                 self.errors,
-                "tests/testpaper/test_paper_better.pdf"
+                "tests/testpaper/test_paper_better.pdf",
             )
         )
 

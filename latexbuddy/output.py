@@ -29,7 +29,9 @@ def problem_key(problem: Problem) -> int:
     return problem.position[0]
 
 
-def render_html(file_name: str, file_text: str, problems: Dict[str, Problem], pdf_path: str) -> str:
+def render_html(
+    file_name: str, file_text: str, problems: Dict[str, Problem], pdf_path: str
+) -> str:
     """Renders an HTML page based on file contents and discovered problems.
 
     :param file_name: file name
