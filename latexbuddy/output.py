@@ -70,6 +70,9 @@ def render_html(
         i += 1
     new_text = "".join(new_text)
 
+    if not Path(pdf_path).is_file():
+        pdf_path = None
+
     return template.render(
         file_name=file_name,
         file_text=new_text,

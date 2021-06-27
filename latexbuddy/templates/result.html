@@ -83,6 +83,7 @@
         {% endfor %}
 
     </div>
+
     <input id="pdfbutton" type="button" value="pdfb" />
 </header>
 <main>
@@ -91,7 +92,13 @@
             <pre style="line-height: 16px"><code>{{ file_text|safe }}</code></pre>
         </div>
         <div id="pdf-disp" style="position:relative;">
-            <iframe id="pdf-ifr" src="{{ pdf_path }}" width="100%" height="100%"></iframe>
+            {% if pdf_path is not none %}
+                <iframe id="pdf-ifr" src="{{ pdf_path }}" width="100%" height="100%"></iframe>
+            {% else %}
+                <h1>Nothing to show.</h1>
+                <h3>Maybe you disabled the pdf option, or an error during compile time occurred.</h3>
+                If an error occurred: See the box to the right for more.
+            {% endif %}
         </div>
     </div>
     <div id="problems-list">
