@@ -50,6 +50,8 @@
                   position: absolute;
                   background-color: #f1f1f1;
                   min-width: 160px;
+                  margin-top: 20px;
+                  border-radius: 5px 5px 5px 5px;
                   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
                   z-index: 1;
                 }
@@ -83,10 +85,16 @@
         {% endfor %}
 
     </div>
-    <input id="pdfbutton" type="button" value="pdfb" />
+
 </header>
 <main>
     <div id="file-container">
+        <div class="switchWrapper">
+        <label class="switch">
+            <input id="pdfbutton" type="checkbox">
+            <span class="slider round"></span>
+        </label>
+    </div>
         <div id="file-contents" style="position:relative;">
             <pre style="line-height: 16px"><code>{{ file_text|safe }}</code></pre>
         </div>
