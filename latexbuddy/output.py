@@ -8,6 +8,7 @@ from jinja2 import Environment, PackageLoader
 
 from latexbuddy.problem import Problem
 
+
 env = Environment(loader=PackageLoader("latexbuddy"))
 
 
@@ -30,8 +31,12 @@ def problem_key(problem: Problem) -> int:
 
 
 def render_html(
-    file_name: str, file_text: str, problems: Dict[str, Problem], path_list: Path,
-    pdf_path: str) -> str:
+    file_name: str,
+    file_text: str,
+    problems: Dict[str, Problem],
+    path_list: Path,
+    pdf_path: str,
+) -> str:
     """Renders an HTML page based on file contents and discovered problems.
 
     :param file_name: file name
