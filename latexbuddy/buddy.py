@@ -45,7 +45,7 @@ class LatexBuddy:
         # file where the error should be saved
         self.output_dir = Path(
             self.cfg.get_config_option_or_default(
-                "buddy", "output", Path("./"), verify_type=AnyStr
+                "buddy", "output", Path("./latexbuddy_html/"), verify_type=AnyStr
             )
         )
 
@@ -249,7 +249,9 @@ class LatexBuddy:
                 self.tex_file.tex,
                 self.errors,
                 self.path_list,
-                "tests/testpaper/test_paper_better.pdf",
+                str(
+                    self.tex_file.pdf_file
+                ),  # TODO: this should be the path (str) where the pdf file is located
             )
         )
 

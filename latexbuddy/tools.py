@@ -13,7 +13,7 @@ from tempfile import mkdtemp, mkstemp
 from typing import Callable, List, Optional, Tuple
 
 from latexbuddy.exceptions import ExecutableNotFoundError
-from latexbuddy.messages import not_found
+from latexbuddy.messages import not_found, texfile_error
 
 
 __logger = logging.getLogger("latexbuddy").getChild("tools")
@@ -402,47 +402,3 @@ def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
                 whitelist_entries.append(key)
                 file.write(key)
                 file.write("\n")
-
-
-def compile_tex(module, tex_file: Path, compile_pdf: bool = False) -> Tuple[Path, Path]:
-    if compile_pdf:
-        try:
-            find_executable("pdflatex")
-        except FileNotFoundError:
-            module.__logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
-        compiler = "pdflatex"
-    else:
-        try:
-            find_executable("latex")
-        except FileNotFoundError:
-            module.__logger.error(not_found("latex", "LaTeX (e.g., TeXLive Core)"))
-        compiler = "latex"
-
-    tex_mf = create_tex_mf()
-    directory = mkdtemp(prefix="latexbuddy", suffix="texlogs")
-    path = Path(directory).resolve()
-    file = execute(
-        f'TEXMFCNF="{tex_mf}";',
-        compiler,
-        "-interaction=nonstopmode",
-        "-8bit",
-        f"-output-directory={str(path)}",
-        str(tex_file),
-    )
-
-    print(file)
-    log = path / f"{tex_file.stem}.log"
-    pdf = path / f"{tex_file.stem}.log"
-    return log, pdf
-
-
-def create_tex_mf() -> str:
-    """
-    This method makes the log file be written correctly
-    """
-    # https://tex.stackexchange.com/questions/52988/avoid-linebreaks-in-latex-console-log-output-or-increase-columns-in-terminal
-    # https://tex.stackexchange.com/questions/410592/texlive-personal-texmf-cnf
-    text = "\n".join(["max_print_line=1000", "error_line=254", "half_error_line=238"])
-    descriptor, cnf_path = mkstemp(prefix="latexbuddy", suffix="cnf")
-    Path(cnf_path).resolve().write_text(text)
-    return str(cnf_path)
