@@ -300,6 +300,68 @@ def get_app_dir() -> Path:
     return app_dir
 
 
+def get_all_paths_in_document(file_path):
+    """Checks files that are included in a file.
+
+    If the file includes more files, these files will also be checked.
+
+    :param file_path:a string, containing file path
+    """
+    unchecked_files = []  # Holds all unchecked files
+    checked_files = []  # Holds all checked file
+
+    # add all paths to list
+    # this is used for the command line input
+    unchecked_files.append(file_path)
+    parent = str(Path(file_path).parent)
+
+    while len(unchecked_files) > 0:
+        checked_files.append(unchecked_files[0])
+        new_files = []
+
+        try:
+            lines = unchecked_files.pop(0).read_text().splitlines(keepends=False)
+        except Exception as e:  # If the file cannot be found it is already removed
+            # importing this here to avoid circular import error
+            from latexbuddy import __logger as root_logger
+
+            logger = root_logger.getChild("Tools")
+            error_message = "Error while search for Files"
+            logger.error(
+                f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}"
+            )
+
+        for line in lines:
+            # check for include and input statements
+            if "\include{" in line:
+                path = line.strip("\include{")
+                end_of_path: int = path.find("}")
+                path = path[:end_of_path]
+                # if missing / at the beginning, add it.
+                if path[0] != "/":
+                    path = parent + "/" + path
+                # if missing .tex, add it
+                if not path.endswith(".tex"):
+                    path = path + ".tex"
+
+                new_files.append(Path(path))  # if something was found, add it to a list
+            elif "\input{" in line:
+                path = line.strip("\input{")
+                end_of_path: int = path.find("}")
+                path = path[:end_of_path]
+                # if missing / at the beginning, add it.
+                if path[0] != "/":
+                    path = parent + "/" + path
+                # if missing .tex, add it
+                if not path.endswith(".tex"):
+                    path = path + ".tex"
+
+                new_files.append(Path(path))  # if something was found, add it to a list
+
+        unchecked_files.extend(new_files)  # add new paths
+    return checked_files
+
+
 def add_whitelist_console(whitelist_file, to_add):
     """
     Adds a list of keys to the Whitelist.

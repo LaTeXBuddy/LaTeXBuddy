@@ -27,15 +27,18 @@ class LatexBuddy:
 
     __logger = root_logger.getChild("buddy")
 
-    def __init__(self, config_loader: ConfigLoader, file_to_check: Path):
+    def __init__(
+        self, config_loader: ConfigLoader, file_to_check: Path, path_list: Path
+    ):
         """Initializes the LaTeXBuddy instance.
 
         :param config_loader: ConfigLoader object to manage config options
         :param file_to_check: file that will be checked
+        :param path_list: a list of the paths for the html output
         """
+        self.path_list: Path = path_list  # all paths from the files to be used in html
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = config_loader  # configuration
-        self.preprocessor: Optional[Preprocessor] = None  # in-file preprocessing
         self.file_to_check = file_to_check  # .tex file that is to be error checked
         self.tex_file: TexFile = TexFile(file_to_check)
 
@@ -69,6 +72,19 @@ class LatexBuddy:
                 "buddy", "whitelist", Path("whitelist"), verify_type=AnyStr
             )
         )
+
+    def add_error(self, problem: Problem):
+        # current language
+        self.lang = self.cfg.get_config_option_or_default("buddy", "language", "en")
+
+    def change_file(self, file):
+        """Method to change the current file. Used for multi check files included
+            in other files
+
+        :param file: the new file to check next
+        """
+        self.file_to_check = file  # .tex file that is to be error checked
+        self.tex_file: TexFile = TexFile(file)
 
     def add_error(self, problem: Problem):
         """Adds the error to the errors dictionary.
@@ -220,12 +236,19 @@ class LatexBuddy:
         # importing this here to avoid circular import error
         from latexbuddy.output import render_html
 
-        html_output_path = Path(str(self.output_dir) + "/latexbuddy_output.html")
+        html_output_path = Path(
+            str(self.output_dir)
+            + "/"
+            + "output_"
+            + str(self.file_to_check.stem)
+            + ".html"
+        )
         html_output_path.write_text(
             render_html(
                 str(self.tex_file.tex_file),
                 self.tex_file.tex,
                 self.errors,
+                self.path_list,
             )
         )
 
@@ -239,3 +262,8 @@ class LatexBuddy:
 
         else:  # using HTML as default
             self.output_html()
+
+    def clear_error_list(self):
+        """Function needed for multiple files.
+        It clears the error list, for the next use"""
+        self.errors.clear()
