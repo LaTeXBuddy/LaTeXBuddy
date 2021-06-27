@@ -11,7 +11,7 @@
         {% include "static/style.css" %}
         {% include "static/whitelist_button.css" %}
         {% include "static/popup_for_whitelist.css" %}
-        {% include "static/navigation_bar.css" %}
+        {% include "static/navigation_bar_and_pdf_button.css" %}
     </style>
 </head>
 <body>
@@ -85,16 +85,18 @@
         {% endfor %}
 
     </div>
-
+    <label class="switch">
+        <input type="checkbox" id="pdfbutton">
+        <div class="slider round">
+            <!--ADDED HTML -->
+            <span class="on">PDF</span>
+            <span class="off">TEX</span>
+            <!--END-->
+        </div>
+    </label>
 </header>
 <main>
     <div id="file-container">
-        <div class="switchWrapper">
-        <label class="switch">
-            <input id="pdfbutton" type="checkbox">
-            <span class="slider round"></span>
-        </label>
-    </div>
         <div id="file-contents" style="position:relative;">
             <pre style="line-height: 16px"><code>{{ file_text|safe }}</code></pre>
         </div>
