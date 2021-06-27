@@ -45,7 +45,7 @@ class LatexBuddy:
         # file where the error should be saved
         self.output_dir = Path(
             self.cfg.get_config_option_or_default(
-                "buddy", "output", Path("./"), verify_type=AnyStr
+                "buddy", "output", Path("./latexbuddy_html/"), verify_type=AnyStr
             )
         )
 
