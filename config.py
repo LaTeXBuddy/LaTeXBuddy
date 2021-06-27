@@ -11,6 +11,7 @@ modules = {
         "output": "./",
         "format": "HTML",
         "enable-modules-by-default": True,
+        "pdf": True
     },
     "AspellModule": {
         "enabled": True,
