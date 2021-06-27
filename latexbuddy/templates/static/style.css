@@ -67,7 +67,7 @@ main > div {
     text-decoration-thickness: .07em;
 }
 
-.under {clickme
+.under {
     text-decoration-style: wavy;
     text-decoration-line: underline;
     text-decoration-thickness: 1px;

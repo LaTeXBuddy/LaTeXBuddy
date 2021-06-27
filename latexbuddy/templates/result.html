@@ -11,6 +11,7 @@
         {% include "static/style.css" %}
         {% include "static/whitelist_button.css" %}
         {% include "static/popup_for_whitelist.css" %}
+        {% include "static/navigation_bar.css" %}
     </style>
 </head>
 <body>
@@ -19,6 +20,69 @@
         {% include "static/logo.svg" %}
     </h1>
     <h2><small>Results for</small> {{ file_name|e }}</h2>
+    <div class="menu">
+
+        {% set parent_list = [] %} {# the list contains all folder, included in this project #}
+
+        {# get all folder names #}
+        {% for path in paths %}
+            {% set upper_folder = path.parents[0]|string() %}
+            {% set sub_folder = path.parents[1] ~ "/" |string() %}
+            {% set parent = upper_folder|replace(sub_folder, "") %}
+
+            {% if parent not in parent_list %}
+                {% set parent_list = parent_list.append(parent) %}
+            {% endif %}
+        {% endfor %}
+
+        {# set the style for each folder #}
+        {% for folder in parent_list %}
+            <style>
+                .{{ folder }} {
+                    display: flex;
+                    background: white;
+                    margin-left: 25px;
+                    margin-right: 25px;
+                    padding: 20px;
+                }
+                .{{ folder }}-content {
+                  display: none;
+                  position: absolute;
+                  background-color: #f1f1f1;
+                  min-width: 160px;
+                  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                  z-index: 1;
+                }
+                .{{ folder }}-content a {
+                  color: black;
+                  padding: 12px 16px;
+                  text-decoration: none;
+                  display: block;
+                }
+                .{{ folder }}-content a:hover {background-color: #ddd;}
+                .{{ folder }}:hover .{{ folder }}-content {display: block;}
+            </style>
+        {% endfor %}
+
+        {# get all file paths and add to the folder dropdown #}
+
+        {% for folder in parent_list %}
+            <div class="{{ folder }}">{{ folder }}
+                <div class="{{ folder }}-content">
+                        {% for path in paths %}
+                            {% set upper_folder = path.parents[0]|string() %}
+                            {% set sub_folder = path.parents[1] ~ "/" |string() %}
+                            {% set parent = upper_folder|replace(sub_folder, "") %}
+
+                            {% if parent == folder %}
+                                <a href="output_{{ path.stem }}.html">{{ path.name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
     <input id="pdfbutton" type="button" value="pdfb" />
 </header>
 <main>
@@ -32,6 +96,7 @@
     </div>
     <div id="problems-list">
         <h3>Problems</h3>
+
         <ol>
             {% for problem in problems %}
                 <li class="problem is-{{ problem.severity }}">
@@ -109,29 +174,40 @@
         this.uid = uid;
     }
     //gets the popup vars
-    var popup = document.getElementById("popup");
-    var popupcontent = document.getElementsByClassName("popup-content")[0];
+    const popup = document.getElementById("popup");
+    const popup_content = document.getElementsByClassName("popup-content")[0];
+
     //appends the problem key to the popup and show it
     function showMessage(problem_key) {
         let p = document.createElement("p"); //paragraph
+        p.setAttribute("id", "txt"); //attribute used for the copy to clipboard function
         let text = document.createTextNode(problem_key);
         p.appendChild(text);
-        popupcontent.appendChild(p);
+        popup_content.appendChild(p);
         popup.style.display = "block"; //show popup
     }
     //by clicking on the "close" button, remove the problem key and set the button back to "+" state
     document.getElementsByClassName("close")[0].onclick = function() {
-        popupcontent.removeChild(popupcontent.lastChild); //remove last child: aka text node
+        popup_content.removeChild(popup_content.lastChild); //remove last child: aka text node
         popup.style.display = "none"; //hide popup
         let button = document.getElementById(uid);
         button.className = "button"; //normal button state
     }
     //by clicking on the "accept" button, remove the problem key and set the button to "accepted"
     document.getElementsByClassName("accept")[0].onclick = function() {
-        popupcontent.removeChild(popupcontent.lastChild); //remove last child: aka text node
+        copyDivToClipboard()
+        popup_content.removeChild(popup_content.lastChild); //remove last child: aka text node
         popup.style.display = "none"; //hide popup
         let button = document.getElementById(uid);
         button.className = "validate"; //button state "accepted"
+    }
+    function copyDivToClipboard() {
+        const range = document.createRange();
+        range.selectNode(document.getElementById("txt"));
+        window.getSelection().removeAllRanges(); // clear current selection
+        window.getSelection().addRange(range); // to select text
+        document.execCommand("copy");
+        window.getSelection().removeAllRanges();// to deselect
     }
 </script>
 </body>

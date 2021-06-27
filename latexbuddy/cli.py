@@ -10,6 +10,8 @@ from time import perf_counter
 
 from colorama import Fore
 
+import latexbuddy.tools as tool
+
 from latexbuddy import __app_name__
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
@@ -27,6 +29,10 @@ parser.add_argument(
     "--version", "-V", action="version", version=f"{__app_name__} v{__version__}"
 )
 parser.add_argument("file", type=Path, help="File that will be processed.")
+parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
+
+# nargs="+" marks the beginning of a list
+parser.add_argument("file", nargs="+", type=Path, help="File that will be processed.")
 parser.add_argument(
     "--config",
     "-c",
@@ -140,13 +146,24 @@ def main():
 
     config_loader = ConfigLoader(args)
 
-    buddy = LatexBuddy(
-        config_loader=config_loader,
-        file_to_check=args.file,
-    )
+    """ For each Tex file transferred, all paths
+    are fetched and Latexbuddy is executed """
 
-    buddy.run_tools()
-    buddy.check_whitelist()
-    buddy.output_file()
+    for p in args.file:  # args.file is a list
+        paths = tool.get_all_paths_in_document(p)
 
-    logger.debug(f"Execution finished in {round(perf_counter()-start, 2)}s")
+        buddy = LatexBuddy(
+            config_loader=config_loader,
+            file_to_check=Path(paths[0]),  # set first file
+            path_list=paths,  # to be used later on in render html
+        )
+
+        for path in paths:
+            #  need to clear the error list of the previous file
+            buddy.clear_error_list()
+            buddy.change_file(Path(path))  # change file everytime
+            buddy.run_tools()
+            buddy.check_whitelist()
+            buddy.output_file()
+
+    logger.debug(f"Execution finished in {round(perf_counter() - start, 2)}s")

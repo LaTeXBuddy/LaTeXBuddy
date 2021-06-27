@@ -25,7 +25,7 @@ modules = {
         "enabled": True,
     },
     "LanguageTool": {
-        "enabled": True,
+        "enabled": False,
         "mode": "COMMANDLINE",
         # "remote_url": "https://api.languagetoolplus.com/v2/check",
         "disabled-rules": [
@@ -36,9 +36,7 @@ modules = {
             # "TYPOS",
         ],
     },
-    "ProseLintModule": {
-        "enabled": True
-    },
+    "ProseLintModule": {"enabled": True},
     "SiUnitxModule": {
         "enabled": True,
     },
@@ -54,7 +52,5 @@ modules = {
     "CheckFigureResolution": {
         "enabled": True,
     },
-    "YaLafi": {
-        "enabled": True
-    },
+    "YaLafi": {"enabled": True},
 }
