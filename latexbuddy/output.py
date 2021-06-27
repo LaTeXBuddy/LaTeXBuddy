@@ -31,13 +31,18 @@ def problem_key(problem: Problem) -> int:
 
 
 def render_html(
-    file_name: str, file_text: str, problems: Dict[str, Problem], path_list: Path
+    file_name: str,
+    file_text: str,
+    problems: Dict[str, Problem],
+    path_list: Path,
+    pdf_path: str,
 ) -> str:
     """Renders an HTML page based on file contents and discovered problems.
 
     :param file_name: file name
     :param file_text: contents of the file
     :param problems: dictionary of errors returned from latexbuddy
+    :param pdf_path: path of pdf file
     :param path_list: a list, containing all file paths to the checked files
     :return: generated HTML
     """
@@ -70,6 +75,7 @@ def render_html(
         file_text=new_text,
         problems=problem_values,
         paths=path_list,
+        pdf_path=pdf_path,
     )
 
 

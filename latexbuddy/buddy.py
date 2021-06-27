@@ -249,6 +249,7 @@ class LatexBuddy:
                 self.tex_file.tex,
                 self.errors,
                 self.path_list,
+                "tests/testpaper/test_paper_better.pdf",
             )
         )
 
