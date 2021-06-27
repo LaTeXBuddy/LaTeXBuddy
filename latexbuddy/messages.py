@@ -22,7 +22,4 @@ def error_occurred_in_module(module_name: str) -> str:
 
 
 def texfile_error(msg: str) -> str:
-    return (
-        f"An error occurred while compiling the tex file:"
-        f"{msg}"
-    )
+    return f"An error occurred while compiling the tex file:" f"{msg}"

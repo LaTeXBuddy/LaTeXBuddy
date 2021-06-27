@@ -15,6 +15,7 @@ from typing import Callable, List, Optional, Tuple
 from latexbuddy.exceptions import ExecutableNotFoundError
 from latexbuddy.messages import not_found, texfile_error
 
+
 __logger = logging.getLogger("latexbuddy").getChild("tools")
 
 

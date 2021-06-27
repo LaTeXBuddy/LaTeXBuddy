@@ -6,14 +6,23 @@ import sys
 
 from io import StringIO
 from pathlib import Path
-from tempfile import mkstemp, mkdtemp
+from tempfile import mkdtemp, mkstemp
 from typing import Optional, Tuple
+
 from chardet import detect
+
 # from latexbuddy.config_loader import ConfigLoader
 from yalafi.tex2txt import Options, tex2txt, translate_numbers
+
 from latexbuddy.messages import not_found, texfile_error
-from latexbuddy.tools import absolute_to_linecol, get_line_offsets, is_binary, \
-    find_executable, execute
+from latexbuddy.tools import (
+    absolute_to_linecol,
+    execute,
+    find_executable,
+    get_line_offsets,
+    is_binary,
+)
+
 
 # regex to parse out error location from tex2txt output
 location_re = re.compile(r"line (\d+), column (\d+)")
@@ -126,19 +135,19 @@ class TexFile:
     def __compile_tex(self, compile_pdf: bool) -> Tuple[Optional[Path], Optional[Path]]:
         # from latexbuddy import __logger as root_logger
         # self.__logger = root_logger.getChild("texfile")
-        compiler = 'latex'
+        compiler = "latex"
         if compile_pdf:
             try:
                 find_executable("pdflatex")
-                compiler = 'pdflatex'
+                compiler = "pdflatex"
             except FileNotFoundError:
                 # self.__logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
                 return None, None
         else:
             try:
-                find_executable('latex')
+                find_executable("latex")
             except FileNotFoundError:
-                #self.__logger.error(not_found('latex', 'LaTeX (e.g., TeXLive Core)'))
+                # self.__logger.error(not_found('latex', 'LaTeX (e.g., TeXLive Core)'))
                 return None, None
 
         tex_mf = self.__create_tex_mf()
@@ -146,26 +155,26 @@ class TexFile:
         try:
             os.mkdir(html_directory)
         except FileExistsError:
-            #self.__logger.error(texfile_error(f'Directory {html_directory} exists.'))
-            pass    # TODO
+            # self.__logger.error(texfile_error(f'Directory {html_directory} exists.'))
+            pass  # TODO
         except Exception as exc:
             # self.__logger.error(
             #     texfile_error(f'{exc} ocurred while creating {html_directory}.'))
-            pass    # TODO
+            pass  # TODO
         compile_directory = html_directory + "/compiled"
         try:
             os.mkdir(compile_directory)
         except FileExistsError:
             # self.__logger.error(texfile_error(f'Directory {compile_directory} exists.'))
-            pass    # TODO
+            pass  # TODO
         except Exception as exc:
             # self.__logger.error(
             #     texfile_error(f'{exc} ocurred while creating {compile_directory}.'))
-            pass    # TODO
+            pass  # TODO
 
         # for unique file names
         path = Path(
-            mkdtemp(suffix='_compiled_tex', prefix='latexbuddy_', dir=compile_directory)
+            mkdtemp(suffix="_compiled_tex", prefix="latexbuddy_", dir=compile_directory)
         )
 
         # TODO: Might have fatal errors, why a pdf e.g. is not created.
@@ -191,7 +200,8 @@ class TexFile:
         # https://tex.stackexchange.com/questions/52988/avoid-linebreaks-in-latex-console-log-output-or-increase-columns-in-terminal
         # https://tex.stackexchange.com/questions/410592/texlive-personal-texmf-cnf
         text = "\n".join(
-            ["max_print_line=1000", "error_line=254", "half_error_line=238"])
+            ["max_print_line=1000", "error_line=254", "half_error_line=238"]
+        )
         descriptor, cnf_path = mkstemp(prefix="latexbuddy", suffix="cnf")
         Path(cnf_path).resolve().write_text(text)
         return str(cnf_path)
