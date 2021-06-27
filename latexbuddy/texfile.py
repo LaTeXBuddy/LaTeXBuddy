@@ -9,6 +9,7 @@ from pathlib import Path
 from tempfile import mkstemp, mkdtemp
 from typing import Optional, Tuple
 from chardet import detect
+# from latexbuddy.config_loader import ConfigLoader
 from yalafi.tex2txt import Options, tex2txt, translate_numbers
 from latexbuddy.messages import not_found, texfile_error
 from latexbuddy.tools import absolute_to_linecol, get_line_offsets, is_binary, \
@@ -30,7 +31,7 @@ class TexFile:
 
         :param file: Path object of the file to be loaded
         """
-
+        self.__logger = None  # TODO: Resolve circular import
         self.tex_file = file
 
         tex_bytes = self.tex_file.read_bytes()
@@ -46,8 +47,12 @@ class TexFile:
         self.plain_file.write_text(self.plain)
 
         self.is_faulty = is_binary(tex_bytes) or len(self._parse_problems) > 0
+        # compile_pdf = cfg.get_config_option_or_default(
+        #     "buddy", "pdf", True, verify_type=bool
+        # )
         compile_pdf = True
         self.log_file, self.pdf_file = self.__compile_tex(compile_pdf)
+        print(str(self.log_file), str(self.pdf_file))
 
     def __detex(self):
         opts = Options()  # use default options
@@ -118,41 +123,53 @@ class TexFile:
     def __str__(self) -> str:
         return str(self.tex_file)
 
-    def __compile_tex(self, compile_pdf: bool) -> Tuple[Path, Path]:
+    def __compile_tex(self, compile_pdf: bool) -> Tuple[Optional[Path], Optional[Path]]:
+        # from latexbuddy import __logger as root_logger
+        # self.__logger = root_logger.getChild("texfile")
         compiler = 'latex'
         if compile_pdf:
             try:
                 find_executable("pdflatex")
+                compiler = 'pdflatex'
             except FileNotFoundError:
-                self.__logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
-            compiler = "pdflatex"
+                # self.__logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
+                return None, None
         else:
             try:
                 find_executable('latex')
             except FileNotFoundError:
-                self.__logger.error(not_found('latex', 'LaTeX (e.g., TeXLive Core)'))
+                #self.__logger.error(not_found('latex', 'LaTeX (e.g., TeXLive Core)'))
+                return None, None
 
         tex_mf = self.__create_tex_mf()
         html_directory = os.getcwd() + "/latexbuddy_html"
         try:
             os.mkdir(html_directory)
         except FileExistsError:
-            pass # TODO
+            #self.__logger.error(texfile_error(f'Directory {html_directory} exists.'))
+            pass    # TODO
         except Exception as exc:
-            pass # TODO
+            # self.__logger.error(
+            #     texfile_error(f'{exc} ocurred while creating {html_directory}.'))
+            pass    # TODO
         compile_directory = html_directory + "/compiled"
         try:
             os.mkdir(compile_directory)
         except FileExistsError:
-            pass # TODO
+            # self.__logger.error(texfile_error(f'Directory {compile_directory} exists.'))
+            pass    # TODO
         except Exception as exc:
-            pass # TODO
+            # self.__logger.error(
+            #     texfile_error(f'{exc} ocurred while creating {compile_directory}.'))
+            pass    # TODO
 
         # for unique file names
         path = Path(
-            mkdtemp(suffix='comiled_tex', prefix='latexbuddy', dir=compile_directory)
+            mkdtemp(suffix='_compiled_tex', prefix='latexbuddy_', dir=compile_directory)
         )
-        # path = Path(compile_directory)
+
+        # TODO: Might have fatal errors, why a pdf e.g. is not created.
+        # TODO: If so, set pdf = None
         execute(
             f'TEXMFCNF="{tex_mf}";',
             compiler,
@@ -162,7 +179,6 @@ class TexFile:
             str(self.tex_file),
         )
 
-        path = Path(compile_directory).resolve()
         log = path / f"{self.tex_file.stem}.log"
         pdf = path / f"{self.tex_file.stem}.pdf" if compile_pdf else None
         return log, pdf

@@ -47,7 +47,7 @@ class LogFilter(Module):
         except FileNotFoundError:
             self.__logger.error(not_found("awk", "AWK"))
 
-        log_path, pdf_path = tools.compile_tex(self, file.tex_file)
+        log_path = file.log_file
         descriptor, raw_problems_path = mkstemp(
             prefix="latexbuddy", suffix="raw_log_errors"
         )
