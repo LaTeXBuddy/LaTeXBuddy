@@ -28,6 +28,8 @@ class ConfigLoader:
 
     __logger = root_logger.getChild("config_loader")
 
+    _REGEX_LANGUAGE_FLAG = re.compile(r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?")
+
     def __init__(self, cli_arguments: Namespace):
         """Creates a ConfigLoader module.
 
@@ -62,48 +64,68 @@ class ConfigLoader:
 
         parsed = {"buddy": {}}
 
-        args_dict = vars(args)
+        args_dict = {
+            key: value for key, value in vars(args).items() if value is not None
+        }
 
         for key in args_dict:
-            # filter out none-parameters
-            if args_dict[key]:
+            # mutual exclusion of enable_modules and disable_modules
+            # is guaranteed by argparse library
+            if key == "enable_modules":
 
-                # mutual exclusion of enable_modules and disable_modules
-                # is guaranteed by argparse library
-                if key == "enable_modules":
+                parsed["buddy"]["enable-modules-by-default"] = False
 
-                    parsed["buddy"]["enable-modules-by-default"] = False
+                for module_name in self.configurations.keys():
+                    if module_name not in parsed:
+                        parsed[module_name] = {}
 
-                    for module_name in self.configurations.keys():
-                        if module_name not in parsed:
-                            parsed[module_name] = {}
+                    parsed[module_name]["enabled"] = False
 
-                        parsed[module_name]["enabled"] = False
+                for module_name in args_dict[key].split(","):
+                    if module_name not in parsed:
+                        parsed[module_name] = {}
 
-                    for module_name in args_dict[key].split(","):
-                        if module_name not in parsed:
-                            parsed[module_name] = {}
+                    parsed[module_name]["enabled"] = True
 
-                        parsed[module_name]["enabled"] = True
+            elif key == "disable_modules":
 
-                elif key == "disable_modules":
+                parsed["buddy"]["enable-modules-by-default"] = True
 
-                    parsed["buddy"]["enable-modules-by-default"] = True
+                for module_name in self.configurations.keys():
+                    if module_name not in parsed:
+                        parsed[module_name] = {}
 
-                    for module_name in self.configurations.keys():
-                        if module_name not in parsed:
-                            parsed[module_name] = {}
+                    parsed[module_name]["enabled"] = True
 
-                        parsed[module_name]["enabled"] = True
+                for module_name in args_dict[key].split(","):
+                    if module_name not in parsed:
+                        parsed[module_name] = {}
 
-                    for module_name in args_dict[key].split(","):
-                        if module_name not in parsed:
-                            parsed[module_name] = {}
+                    parsed[module_name]["enabled"] = False
 
-                        parsed[module_name]["enabled"] = False
+            elif key == "language":
+
+                language_match = self._REGEX_LANGUAGE_FLAG.fullmatch(args_dict[key])
+
+                if language_match is not None:
+
+                    parsed["buddy"]["language"] = language_match.group(1)
+
+                    if language_match.group(2) is not None:
+                        parsed["buddy"]["language_country"] = language_match.group(2)
 
                 else:
-                    parsed["buddy"][key] = args_dict[key]
+
+                    self.__logger.warning(
+                        f"Specified language '{args_dict[key]}' is not a valid "
+                        f"language key. Please use a key in the following syntax: "
+                        f"<language>[-<country>] (e.g.: en-GB, en_US, de-DE)"
+                    )
+
+            else:
+                parsed["buddy"][key] = args_dict[key]
+
+        self.__logger.debug(f"Parsed CLI config options:\n{str(parsed)}")
 
         return parsed
 
