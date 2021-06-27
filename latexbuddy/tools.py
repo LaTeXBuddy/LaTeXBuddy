@@ -13,8 +13,7 @@ from tempfile import mkdtemp, mkstemp
 from typing import Callable, List, Optional, Tuple
 
 from latexbuddy.exceptions import ExecutableNotFoundError
-from latexbuddy.messages import not_found
-
+from latexbuddy.messages import not_found, texfile_error
 
 __logger = logging.getLogger("latexbuddy").getChild("tools")
 
@@ -404,21 +403,30 @@ def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
                 file.write("\n")
 
 
-def compile_tex(module, tex_file: Path, compile_pdf: bool = False) -> Tuple[Path, Path]:
+def compile_tex(module, tex_file: Path, compile_pdf: bool = True) -> Tuple[Path, Path]:
     if compile_pdf:
         try:
             find_executable("pdflatex")
         except FileNotFoundError:
             module.__logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
         compiler = "pdflatex"
-    else:
-        try:
-            find_executable("latex")
-        except FileNotFoundError:
-            module.__logger.error(not_found("latex", "LaTeX (e.g., TeXLive Core)"))
-        compiler = "latex"
 
     tex_mf = create_tex_mf()
+    html_directory = os.getcwd() + "/latexbuddy_html"
+    try:
+        os.mkdir(html_directory)
+    except FileExistsError as e:
+        module.__logger.error(texfile_error(f"{html_directory} already exists, do you expect this?"))
+    except Exception as e2:
+        module.__logger.error(texfile_error(f"{e2} occurred during creation of directory."))
+    pdf_directory = html_directory + "/pdf"
+    try:
+        os.mkdir(pdf_directory)
+    except FileExistsError as e:
+        module.__logger.error(texfile_error(f"{html_directory} already exists, do you expect this?"))
+    except Exception as e2:
+        module.__logger.error(texfile_error(f"{e2} occurred during creation of directory."))
+
     directory = mkdtemp(prefix="latexbuddy", suffix="texlogs")
     path = Path(directory).resolve()
     file = execute(

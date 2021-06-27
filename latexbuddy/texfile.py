@@ -11,7 +11,7 @@ from typing import Optional, Tuple
 from chardet import detect
 from yalafi.tex2txt import Options, tex2txt, translate_numbers
 
-from latexbuddy.tools import absolute_to_linecol, get_line_offsets, is_binary
+from latexbuddy.tools import absolute_to_linecol, get_line_offsets, is_binary, compile_tex
 
 
 # regex to parse out error location from tex2txt output
@@ -45,6 +45,7 @@ class TexFile:
         self.plain_file.write_text(self.plain)
 
         self.is_faulty = is_binary(tex_bytes) or len(self._parse_problems) > 0
+        self.log_file, self.pdf_file = compile_tex(self, file.tex_file)
 
     def __detex(self):
         opts = Options()  # use default options

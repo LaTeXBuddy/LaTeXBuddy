@@ -249,7 +249,7 @@ class LatexBuddy:
                 self.tex_file.tex,
                 self.errors,
                 self.path_list,
-                "tests/testpaper/test_paper_better.pdf",
+                str(self.tex_file.pdf_file),    #TODO: this should be the path (str) where the pdf file is located
             )
         )
 

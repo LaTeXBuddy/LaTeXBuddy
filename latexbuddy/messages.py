@@ -21,3 +21,10 @@ def error_occurred_in_module(module_name: str) -> str:
         f"An error occurred while executing checks for module '{module_name}' "
         f"resulting in the module stopping execution and not providing any results"
     )
+
+def texfile_error(msg: str) -> str:
+
+    return (
+        f"An error occurred while executing the texfile"
+        f"{msg}"
+    )
