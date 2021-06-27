@@ -2,13 +2,14 @@
 
 ChkTeX Documentation: https://www.nongnu.org/chktex/ChkTeX.pdf
 """
+import os
+
+from pathlib import Path
 from typing import List
 
 import latexbuddy.tools as tools
-import os
 
 from latexbuddy import TexFile
-from pathlib import Path
 from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
