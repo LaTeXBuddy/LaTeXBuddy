@@ -70,7 +70,9 @@
                     background-color: silver;
                     border-radius: 5px 5px 5px 5px;
                 }
-                .{{ folder }}:hover .{{ folder }}-content {display: block;}
+                .{{ folder }}:hover .{{ folder }}-content {
+                    display: block;
+                }
             </style>
         {% endfor %}
 
@@ -95,8 +97,8 @@
                 </div>
             </div>
         {% endfor %}
-
     </div>
+
     <label class="switch">
         <input type="checkbox" id="pdfbutton">
         <div class="slider round">
