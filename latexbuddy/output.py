@@ -73,6 +73,9 @@ def render_html(
     if not Path(pdf_path).is_file():
         pdf_path = None
 
+    # TODO: temporary fix, might cause issues if another "compiled" directory is in pdf_path
+    pdf_path = pdf_path[pdf_path.find('compiled'):]
+
     return template.render(
         file_name=file_name,
         file_text=new_text,
