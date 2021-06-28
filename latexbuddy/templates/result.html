@@ -112,9 +112,58 @@
     </div>
     <div id="problems-list">
         <h3>Problems</h3>
-
-        <ol>
+        <label class="switch">
+            <input type="checkbox" id="change_problems">
+            <div class="slider round">
+                <!--ADDED HTML -->
+                <span class="on">in-line</span>
+                <span class="off">general</span>
+                <!--END-->
+            </div>
+        </label>
+        <ol id="problem-disp">
             {% for problem in problems %}
+                <li class="problem is-{{ problem.severity }}">
+                    <h4 class="problem-context monospaced">
+                        {{ problem.context[0]|e }}<span class="problem-text">{{ problem.text|e }}</span>{{ problem.context[1]|e }}
+                    </h4>
+
+                    <p class="problem-description">
+                        {{ problem.description if problem.description != None }}
+                    </p>
+
+                    {% if problem.suggestions|length > 0 %}
+
+
+                        <p class="problem-suggestions">
+                            <strong>Suggestions:</strong>
+                            <br>
+                            {% if problem.suggestions|length <= 1 %}
+                                {{ "".join(problem.suggestions) }}
+                            {% else %}
+                                {{ ", ".join(problem['suggestions']) }}
+                            {% endif %}
+                        </p>
+                    {% endif %}
+
+                    <p class="problem-meta">
+                        {{ problem.category.capitalize() if problem.category != None }}
+                        {{ problem.severity | lower }}
+                        {% if problem.position %}
+                            at
+                            {{ problem.position[0] }}:{{ problem.position[1] }}
+                        {% endif %}
+                        <i>({{ problem.checker }}#{{ problem.p_type }})</i>
+                    </p>
+                    <!--Button section-->
+                    <div class="roboto-font">
+                        <button class="but" id="button{{ problem.uid }}" onclick="clicked('button{{ problem.uid }}','{{ problem.key }}')"></button>
+                    </div>
+                </li>
+            {% endfor %}
+        </ol>
+        <ol id="general-problem-disp">
+            {% for problem in general_problems %}
                 <li class="problem is-{{ problem.severity }}">
                     <h4 class="problem-context monospaced">
                         {{ problem.context[0]|e }}<span class="problem-text">{{ problem.text|e }}</span>{{ problem.context[1]|e }}
@@ -177,6 +226,16 @@
         } else {
             document.getElementById("file-contents").style.display = "none";
             document.getElementById("pdf-disp").style.display = "block";
+        }
+    };
+
+    document.getElementById("change_problems").onclick = function () {
+        if (document.getElementById("general-problem-disp").style.display == "block") {
+            document.getElementById("general-problem-disp").style.display = "none";
+            document.getElementById("problem-disp").style.display = "block";
+        } else {
+            document.getElementById("problem-disp").style.display = "none";
+            document.getElementById("general-problem-disp").style.display = "block";
         }
     };
     var uid;

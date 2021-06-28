@@ -82,7 +82,7 @@ def render_html(
         file_name=file_name,
         file_text=new_text,
         problems=problem_values,
-        none_problems=general_problems,
+        general_problems=general_problems,
         paths=path_list,
         pdf_path=pdf_path,
     )
