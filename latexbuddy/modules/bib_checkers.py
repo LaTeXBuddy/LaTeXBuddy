@@ -6,6 +6,10 @@ import re
 
 from bibtexparser.bibdatabase import UndefinedString
 from pathlib import Path
+from typing import List
+from difflib import SequenceMatcher
+
+from multiprocessing.dummy import Pool as ThreadPool
 
 import latexbuddy.tools as tools
 
@@ -15,6 +19,7 @@ from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
+# TODO: logger
 class NewerPublications(Module):
     def __init__(self):
         self.tool_name = "newer_publication"
@@ -24,7 +29,7 @@ class NewerPublications(Module):
     def __get_bibfile(self, file: TexFile):
         tex = file.tex
         path = file.tex_file
-        pattern = r"\\bibliography\{([A-Za-z0-9_/-]+)\}"
+        pattern = r"\\bibliography\{([A-Za-z0-9_/-]+)\}"  # TODO: improve the pattern
         m = re.search(pattern, tex)
 
         if m is None:
@@ -50,7 +55,12 @@ class NewerPublications(Module):
                     or entries[_]["ENTRYTYPE"] == "article"
                 ):
                     # TODO: what entry types?
-                    results.append((entries[_]["title"], entries[_]["year"]))
+                    a = entries[_]["title"]
+                    while a[0] == "{":
+                        a = a[1:]
+                    while a[-1] == "}":
+                        a = a[:-1]
+                    results.append((a, entries[_]["year"]))
                     # TODO: Error if one is empty
                     # print(entries[_]["title"])
                     # print(entries[_]["year"])
@@ -62,18 +72,30 @@ class NewerPublications(Module):
         # send requests
         # ex: https://dblp.org/search/publ/api?format=json&q=In%20Search%20of%20an%20Understandable%20Consensus%20Algorithm
         # print(publication)
-        x = requests.get(f'https://dblp.org/search/publ/api?format=json&q={publication[0]}')
+        c_returns = 3  # number of max returns from the request
+        x = requests.get(f'https://dblp.org/search/publ/api?format=json&h={c_returns}&q={publication[0]}')
         ret = json.loads(x.text)
         try:
             l = ret["result"]["hits"]["@total"]
             if int(l) < 2:
                 return
-            print()
-            print(f"Found {l} entries:")
+
+            #print(f"Found {l} entries:")
             for hit in ret["result"]["hits"]["hit"]:
-                print(hit["info"]["year"])
-                print(hit["info"]["title"])
-                print(publication[0])
+                if int(hit["info"]["year"]) <= int(publication[1]):
+                    continue
+                a = hit["info"]["year"]
+                b = hit["info"]["title"]
+                if b[-1] == ".":
+                    b = b[:-1]
+                sim = SequenceMatcher(None, b.upper(), publication[0].upper()).ratio()
+                if sim < 0.85:  # Tuning parameter
+                    continue
+                print()
+                print(a)
+                print(b)
+                print(f"Similarity: {sim}")
+                print(publication)
         except KeyError:
             # if no hit found
             pass
@@ -97,11 +119,13 @@ class NewerPublications(Module):
             return []
 
         a = time.time()
+        #with ThreadPool(4) as p:
+        #    p.map(self.check_for_new, used_pubs)
         for pub in used_pubs:
             self.check_for_new(pub)
             # print(f"Old entry: {pub}")
 
-        print(f"dblp requests took {time.time() - a} seconds")
-        print(f"{len(used_pubs)} entries found")
+        print(f"dblp requests took {round(time.time() - a, 3)} seconds")
+        print(f"{len(used_pubs)} entries found in \"{bib_file}\"")
 
         return []
