@@ -70,6 +70,9 @@ def render_html(
         i += 1
     new_text = "".join(new_text)
 
+    # TODO: temporary fix, might cause issues if another "compiled" directory is in pdf_path
+    pdf_path = pdf_path[pdf_path.find('compiled'):]
+    
     if not Path(pdf_path).is_file():
         pdf_path = None
 
