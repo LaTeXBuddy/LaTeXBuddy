@@ -380,7 +380,7 @@ class NativeUseOfRef(Module):
             problem_text = tex[curr_problem_start:end_command]
             problems.append(
                 Problem(
-                    position=(line, col),
+                    position=None,
                     text=ref_pattern,
                     checker=self.tool_name,
                     category=self.category,
