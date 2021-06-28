@@ -119,10 +119,10 @@ class NewerPublications(Module):
             return []
 
         a = time.time()
-        #with ThreadPool(4) as p:
-        #    p.map(self.check_for_new, used_pubs)
-        for pub in used_pubs:
-            self.check_for_new(pub)
+        with ThreadPool(4) as p:
+            p.map(self.check_for_new, used_pubs)
+        #for pub in used_pubs:
+        #    self.check_for_new(pub)
             # print(f"Old entry: {pub}")
 
         print(f"dblp requests took {round(time.time() - a, 3)} seconds")
