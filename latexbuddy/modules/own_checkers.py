@@ -2,7 +2,6 @@ import os
 import re
 
 from typing import List
-from pathlib import Path
 
 import latexbuddy.tools as tools
 
@@ -397,54 +396,3 @@ class NativeUseOfRef(Module):
             curr_problem_start = tex.find(ref_pattern, curr_problem_start + 1)
 
         return problems
-
-
-import bibtexparser
-from bibtexparser.bibdatabase import UndefinedString
-class NewerPublications(Module):
-
-    def __init__(self):
-        self.tool_name = "newer_publication"
-        self.severity = ProblemSeverity.INFO
-        self.category = "latex"
-
-    def __get_bibfile(self, file: TexFile):
-        tex = file.tex
-        pattern = r"\\bibliography\{([A-Za-z0-9_]+)\}"
-        m = re.search(pattern, tex)
-
-        if m is None:
-            return None  # No bibtex file found
-        path = file.tex_file
-        path = str(path)[:-len(path.parts[-1])]  # remove filename
-        return Path(path + m.group(1) + ".bib")  # assuming theres only one bibtex file
-
-    def __get_publications(self, bibfile: Path):
-        with bibfile.open() as bibtex_file:
-            bib_database = bibtexparser.load(bibtex_file)
-            entries = bib_database.entries
-        # print(entries)
-        for _ in range(len(entries)):
-            try:
-                if entries[_]["ENTRYTYPE"] == "inproceedings":
-
-                    print(entries[_]["title"])
-                    print(entries[_]["year"])
-            except KeyError:
-                pass
-
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-        bib_file = self.__get_bibfile(file)
-        print(bib_file)
-
-        # check if the referenced bibtex file exists
-        if bib_file is None:
-            return []
-
-        # catch error that is raised if the bibtex file is not correctly formatted
-        try:
-            self.__get_publications(bib_file)
-        except UndefinedString as e:
-            print("Error in .bib, something wrong with: " + str(e))
-
-        return []
