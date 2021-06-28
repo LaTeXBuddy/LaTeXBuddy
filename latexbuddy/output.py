@@ -70,11 +70,11 @@ def render_html(
         i += 1
     new_text = "".join(new_text)
 
-    if not Path(pdf_path).is_file():
-        pdf_path = None
-
     # TODO: temporary fix, might cause issues if another "compiled" directory is in pdf_path
     pdf_path = pdf_path[pdf_path.find('compiled'):]
+    
+    if not Path(pdf_path).is_file():
+        pdf_path = None
 
     return template.render(
         file_name=file_name,
