@@ -49,10 +49,10 @@ def render_html(
     problem_values = sorted(problems.values(), key=problem_key)
     template = env.get_template("result.html")
 
-    highlighted_tex = highlight(file_text, problem_values)
+    # highlighted_tex = highlight(file_text, problem_values)
 
     # add line numbers
-    splitted_text = highlighted_tex.splitlines(keepends=True)
+    splitted_text = file_text.splitlines(keepends=True)
     new_text = []
     i = 1
     line_count = len(splitted_text)

@@ -40,17 +40,22 @@
             <style>
                 .{{ folder }} {
                     display: flex;
-                    background: white;
+                    flex-direction: column;
+                    align-items: center;
                     margin-left: 25px;
                     margin-right: 25px;
                     padding: 20px;
+                }
+                .{{ folder }} svg {
+                    width: 45px;
+                    height: 45px;
                 }
                 .{{ folder }}-content {
                   display: none;
                   position: absolute;
                   background-color: #f1f1f1;
                   min-width: 160px;
-                  margin-top: 20px;
+                  margin-top: 70px;
                   border-radius: 5px 5px 5px 5px;
                   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
                   z-index: 1;
@@ -61,7 +66,10 @@
                   text-decoration: none;
                   display: block;
                 }
-                .{{ folder }}-content a:hover {background-color: #ddd;}
+                .{{ folder }}-content a:hover {
+                    background-color: silver;
+                    border-radius: 5px 5px 5px 5px;
+                }
                 .{{ folder }}:hover .{{ folder }}-content {display: block;}
             </style>
         {% endfor %}
@@ -70,6 +78,10 @@
 
         {% for folder in parent_list %}
             <div class="{{ folder }}">{{ folder }}
+                <svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" enable-background="new 0 0 48 48">
+                    <path fill="#00b6b6" d="M40,12H22l-4-4H8c-2.2,0-4,1.8-4,4v8h40v-4C44,13.8,42.2,12,40,12z" />
+                    <path fill="#008281" d="M40,12H8c-2.2,0-4,1.8-4,4v20c0,2.2,1.8,4,4,4h32c2.2,0,4-1.8,4-4V16C44,13.8,42.2,12,40,12z" />
+                </svg>
                 <div class="{{ folder }}-content">
                         {% for path in paths %}
                             {% set upper_folder = path.parents[0]|string() %}
