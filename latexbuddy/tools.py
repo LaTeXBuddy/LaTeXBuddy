@@ -320,7 +320,7 @@ def get_all_paths_in_document(file_path: str):
     old_lines = ""  # need access to it in creating errors
 
     while len(unchecked_files) > 0:
-        last_checked = checked_files[-1] if len(checked_files) > 0 else ''
+        last_checked = checked_files[-1] if len(checked_files) > 0 else ""
         unchecked_file = unchecked_files.pop(0)
         new_files = []
         path_line = {}

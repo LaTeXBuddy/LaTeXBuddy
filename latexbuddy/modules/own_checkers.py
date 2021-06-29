@@ -345,7 +345,7 @@ class CheckFigureResolution(Module):
                     figures.append(current_file)
                     problems.append(
                         Problem(
-                            position=(1, 1),
+                            position=None,
                             text=name,
                             checker=self.tool_name,
                             category=self.category,
@@ -380,7 +380,7 @@ class NativeUseOfRef(Module):
             problem_text = tex[curr_problem_start:end_command]
             problems.append(
                 Problem(
-                    position=None,
+                    position=(line, col),
                     text=ref_pattern,
                     checker=self.tool_name,
                     category=self.category,

@@ -117,6 +117,14 @@ main > div {
     background-color:lightyellow;
 }
 
+#problem-disp {
+    display: none;
+}
+
+#general-problem-disp {
+    display: block;
+}
+
 #pdf-disp {
     margin-top: 15px;
     margin-right: 10px;

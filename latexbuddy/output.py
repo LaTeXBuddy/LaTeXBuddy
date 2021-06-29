@@ -47,6 +47,14 @@ def render_html(
     :return: generated HTML
     """
     problem_values = sorted(problems.values(), key=problem_key)
+    general_problems = [
+        problem for problem in problem_values if problem_key(problem) < 0
+    ]
+    problem_values = [
+        problem_value
+        for problem_value in problem_values
+        if problem_value not in general_problems
+    ]
     template = env.get_template("result.html")
 
     highlighted_tex = highlight(file_text, problem_values)
@@ -70,7 +78,7 @@ def render_html(
         i += 1
     new_text = "".join(new_text)
 
-    if not Path(pdf_path).is_file():
+    if not Path(pdf_path).exists():
         pdf_path = None
     else:
         # TODO: temporary fix, might cause issues if another "compiled" directory is in pdf_path
@@ -80,6 +88,7 @@ def render_html(
         file_name=file_name,
         file_text=new_text,
         problems=problem_values,
+        general_problems=general_problems,
         paths=path_list,
         pdf_path=pdf_path,
     )
