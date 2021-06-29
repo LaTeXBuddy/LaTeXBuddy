@@ -150,13 +150,16 @@ def main():
     are fetched and Latexbuddy is executed """
 
     for p in args.file:  # args.file is a list
-        paths = tool.get_all_paths_in_document(p)
+        paths, problems = tool.get_all_paths_in_document(p)
 
         buddy = LatexBuddy(
             config_loader=config_loader,
             file_to_check=Path(paths[0]),  # set first file
             path_list=paths,  # to be used later on in render html
         )
+
+        for problem in problems:
+            buddy.add_error(problem)
 
         for path in paths:
             #  need to clear the error list of the previous file

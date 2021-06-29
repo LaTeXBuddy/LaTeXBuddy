@@ -12,7 +12,6 @@ from pathlib import Path
 from tempfile import mkdtemp, mkstemp
 from typing import Callable, List, Optional, Tuple
 
-from latexbuddy.buddy import LatexBuddy
 from latexbuddy.exceptions import ExecutableNotFoundError
 from latexbuddy.messages import not_found, path_not_found, texfile_error
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -302,7 +301,7 @@ def get_app_dir() -> Path:
     return app_dir
 
 
-def get_all_paths_in_document(file_path: str, buddy: LatexBuddy):
+def get_all_paths_in_document(file_path: str):
     """Checks files that are included in a file.
 
     If the file includes more files, these files will also be checked.
@@ -312,6 +311,7 @@ def get_all_paths_in_document(file_path: str, buddy: LatexBuddy):
     """
     unchecked_files = []  # Holds all unchecked files
     checked_files = []  # Holds all checked file
+    problems = []
 
     # add all paths to list
     # this is used for the command line input
@@ -320,7 +320,7 @@ def get_all_paths_in_document(file_path: str, buddy: LatexBuddy):
     old_lines = ""  # need access to it in creating errors
 
     while len(unchecked_files) > 0:
-        last_checked = checked_files[-1]
+        last_checked = checked_files[-1] if len(checked_files) > 0 else ''
         unchecked_file = unchecked_files.pop(0)
         new_files = []
         path_line = {}
@@ -345,7 +345,7 @@ def get_all_paths_in_document(file_path: str, buddy: LatexBuddy):
                 checker = "includes"
 
             position = re.search(line, old_lines)
-            buddy.add_error(
+            problems.append(
                 Problem(
                     position=(1, 1),
                     text=path_line[unchecked_file],
@@ -388,7 +388,7 @@ def get_all_paths_in_document(file_path: str, buddy: LatexBuddy):
 
         unchecked_files.extend(new_files)  # add new
         checked_files.append(unchecked_file)
-    return checked_files
+    return checked_files, problems
 
 
 def add_whitelist_console(whitelist_file, to_add):
