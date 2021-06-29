@@ -60,7 +60,7 @@ def render_html(
     # calculate amount of whitespaces needed for line numbers to be indented correctly
     splitted_lines = file_text.split("\n")
     line_numbers = []
-    i = 0
+    i = 1
     line_count = len(splitted_lines)
     for line in splitted_lines:
         diff = len(str(line_count)) - len(str(i))
