@@ -11,6 +11,7 @@ from difflib import SequenceMatcher
 from multiprocessing import cpu_count
 from concurrent.futures import as_completed
 from requests_futures.sessions import FuturesSession
+# TODO: add requests-futures to poetry if used again
 
 from multiprocessing.dummy import Pool as ThreadPool
 
