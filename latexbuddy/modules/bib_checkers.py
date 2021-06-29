@@ -8,6 +8,9 @@ from bibtexparser.bibdatabase import UndefinedString
 from pathlib import Path
 from typing import List
 from difflib import SequenceMatcher
+from multiprocessing import cpu_count
+from concurrent.futures import as_completed
+from requests_futures.sessions import FuturesSession
 
 from multiprocessing.dummy import Pool as ThreadPool
 
@@ -25,6 +28,7 @@ class NewerPublications(Module):
         self.tool_name = "newer_publication"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
+        self.time = 0
 
     def __get_bibfile(self, file: TexFile):
         tex = file.tex
@@ -66,34 +70,43 @@ class NewerPublications(Module):
                     # print(entries[_]["year"])
             except KeyError:
                 pass
+        # check similar entries example
+        # for pub in results:
+            # print(SequenceMatcher(None, str(pub), str(results[0])).ratio())  # why slower with str???
         return results
 
     def check_for_new(self, publication: (str, str)):
         # send requests
         # ex: https://dblp.org/search/publ/api?format=json&q=In%20Search%20of%20an%20Understandable%20Consensus%20Algorithm
         # print(publication)
-        c_returns = 3  # number of max returns from the request
+        c_returns = 4  # number of max returns from the request
+        # TODO: handle "ConnectionError"
+        # session = requests.session()  # gut wenn man so viele sessions aufmacht? gibt aber etwas speedup
         x = requests.get(f'https://dblp.org/search/publ/api?format=json&h={c_returns}&q={publication[0]}')
         ret = json.loads(x.text)
+        self.time += float(ret["result"]["time"]["text"])
+        print(ret["result"]["time"]["text"])
         try:
-            l = ret["result"]["hits"]["@total"]
-            if int(l) < 2:
+            n_hits = ret["result"]["hits"]["@total"]
+            if int(n_hits) < 2:
+                # only one result means that it's most probably the same article
                 return
 
-            #print(f"Found {l} entries:")
+            # print(f"Found {l} entries:")
             for hit in ret["result"]["hits"]["hit"]:
                 if int(hit["info"]["year"]) <= int(publication[1]):
                     continue
-                a = hit["info"]["year"]
-                b = hit["info"]["title"]
-                if b[-1] == ".":
-                    b = b[:-1]
-                sim = SequenceMatcher(None, b.upper(), publication[0].upper()).ratio()
-                if sim < 0.85:  # Tuning parameter
+                title = hit["info"]["title"]
+                if title[-1] == ".":  # remove . at the end, dblp adds it sometimes
+                    title = title[:-1]
+                sim = SequenceMatcher(None, title.upper(), publication[0].upper()).ratio()
+                if sim < 0.85:  # Heuristic tuning parameter
                     continue
+                year = hit["info"]["year"]
+
                 print()
-                print(a)
-                print(b)
+                print(year)
+                print(title)
                 print(f"Similarity: {sim}")
                 print(publication)
         except KeyError:
@@ -119,13 +132,38 @@ class NewerPublications(Module):
             return []
 
         a = time.time()
-        with ThreadPool(4) as p:
-            p.map(self.check_for_new, used_pubs)
-        #for pub in used_pubs:
-        #    self.check_for_new(pub)
-            # print(f"Old entry: {pub}")
 
-        print(f"dblp requests took {round(time.time() - a, 3)} seconds")
-        print(f"{len(used_pubs)} entries found in \"{bib_file}\"")
+        with ThreadPool(8) as p:
+            p.map(self.check_for_new, used_pubs)
+
+        #session = requests.session()
+        #for pub in used_pubs:
+        #    x = session.get(f'https://dblp.org/search/publ/api?format=json&h={4}&q={pub[0]}')
+        #    self.check_for_new(pub, x)
+        # session.close()
+
+        """with FuturesSession() as session:
+            futures = [session.get(f'https://dblp.org/search/publ/api?format=json&h={4}&q={pub[0]}') for pub in used_pubs]
+            i = 0
+            for future in as_completed(futures):
+                self.check_for_new(used_pubs[i], future.result())
+                i += 1"""
+
+        """session = FuturesSession()
+                def response_hook(resp, *args, **kwargs):
+                    # parse the json storing the result on the response object
+                    self.check_for_new(jsn=(resp.json()))
+                futures = []
+                for pub in used_pubs:
+                    future = session.get(f'https://dblp.org/search/publ/api?format=json&h={4}&q={pub[0]}', hooks={
+                        'response': response_hook,
+                    })
+                    futures.append(future)
+                for fut in as_completed(futures):
+                    fut.result()"""
+
+        print(f"\n\ndblp requests took {round(time.time() - a, 3)} seconds")
+        print(self.time)
+        print(f"{len(used_pubs)} entries found in \"{bib_file}\"\n")
 
         return []
