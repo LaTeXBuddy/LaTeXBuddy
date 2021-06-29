@@ -9,22 +9,22 @@ modules = {
         "whitelist": "whitelist",
         "output": "./",
         "format": "HTML",
-        "enable-modules-by-default": True,
+        "enable-modules-by-default": False,
     },
     "AspellModule": {
-        "enabled": True,
+        "enabled": False,
     },
     "ChktexModule": {
-        "enabled": True,
+        "enabled": False,
     },
     "DictionModule": {
-        "enabled": True,
+        "enabled": False,
     },
     "EmptySectionsModule": {
-        "enabled": True,
+        "enabled": False,
     },
     "LanguageTool": {
-        "enabled": True,
+        "enabled": False,
         "mode": "COMMANDLINE",
         # "remote_url": "https://api.languagetoolplus.com/v2/check",
         "disabled-rules": [
@@ -36,24 +36,27 @@ modules = {
         ],
     },
     "ProseLintModule": {
-        "enabled": True
+        "enabled": False
     },
     "SiUnitxModule": {
-        "enabled": True,
+        "enabled": False,
     },
     "URLModule": {
-        "enabled": True,
+        "enabled": False,
     },
     "UnreferencedFiguresModule": {
-        "enabled": True,
+        "enabled": False,
     },
     "NativeUseOfRef": {
-        "enabled": True,
+        "enabled": False,
     },
     "CheckFigureResolution": {
-        "enabled": True,
+        "enabled": False,
     },
     "YaLafi": {
+        "enabled": False
+    },
+    "NewerPublications": {
         "enabled": True
     },
 }
