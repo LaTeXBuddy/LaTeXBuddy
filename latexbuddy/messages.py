@@ -1,6 +1,7 @@
 """This module defines standard messages that are to be printed to the command line
 as well as builders for those.
 """
+from pathlib import Path
 
 
 def not_found(executable: str, to_install: str) -> str:
@@ -23,3 +24,10 @@ def error_occurred_in_module(module_name: str) -> str:
 
 def texfile_error(msg: str) -> str:
     return f"An error occurred while compiling the tex file:" f"{msg}"
+
+
+def path_not_found(error_occasion: str, path: Path) -> str:
+    return (
+        f"An error occurred during {error_occasion}: "
+        f"No such file or directory: {str(path)}."
+    )
