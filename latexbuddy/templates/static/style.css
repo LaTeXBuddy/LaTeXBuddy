@@ -118,11 +118,11 @@ main > div {
 }
 
 #problem-disp {
-    display: block;
+    display: none;
 }
 
 #general-problem-disp {
-    display: none;
+    display: block;
 }
 
 #pdf-disp {
