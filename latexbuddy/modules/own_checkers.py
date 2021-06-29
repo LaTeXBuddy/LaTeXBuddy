@@ -45,7 +45,7 @@ class UnreferencedFiguresModule(Module):
 
         for (position, length), label in labels.items():
             line, col, offset = tools.absolute_to_linecol(file.tex, position)
-            if re.search(re.escape("\\ref{") + label + re.escape("}"), tex) is None:
+            if re.search(r"\\c?ref{" + label + re.escape("}"), tex) is None:
                 problems.append(
                     Problem(
                         position=(line, col),
@@ -371,7 +371,7 @@ class NativeUseOfRef(Module):
         description = "Instead of \\ref{} use a more precise command e.g. \\cref{}"
         tex = file.tex
         problems = []
-        ref_pattern = "\\c?ref{"
+        ref_pattern = "\\ref{"
 
         curr_problem_start = tex.find(ref_pattern)  # init
         while curr_problem_start != -1:
