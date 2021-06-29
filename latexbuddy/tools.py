@@ -14,8 +14,9 @@ from typing import Callable, List, Optional, Tuple
 
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.exceptions import ExecutableNotFoundError
-from latexbuddy.messages import not_found, texfile_error, path_not_found
+from latexbuddy.messages import not_found, path_not_found, texfile_error
 from latexbuddy.problem import Problem, ProblemSeverity
+
 
 __logger = logging.getLogger("latexbuddy").getChild("tools")
 
@@ -316,7 +317,7 @@ def get_all_paths_in_document(file_path: str, buddy: LatexBuddy):
     # this is used for the command line input
     unchecked_files.append(file_path)
     parent = str(Path(file_path).parent)
-    old_lines = ''  # need access to it in creating errors
+    old_lines = ""  # need access to it in creating errors
 
     while len(unchecked_files) > 0:
         last_checked = checked_files[-1]
@@ -331,16 +332,17 @@ def get_all_paths_in_document(file_path: str, buddy: LatexBuddy):
         except FileNotFoundError:  # the file might not be included in path
             # importing this here to avoid circular import error
             from latexbuddy import __logger as root_logger
+
             logger = root_logger.getChild("Tools")
             logger.error(
-                path_not_found('the checking of imports', Path(unchecked_file))
+                path_not_found("the checking of imports", Path(unchecked_file))
             )
 
             line = path_line[unchecked_file]
-            if line.startswith('\\input'):
-                checker = 'inputs'
+            if line.startswith("\\input"):
+                checker = "inputs"
             else:
-                checker = 'includes'
+                checker = "includes"
 
             position = re.search(line, old_lines)
             buddy.add_error(
@@ -348,8 +350,8 @@ def get_all_paths_in_document(file_path: str, buddy: LatexBuddy):
                     position=(1, 1),
                     text=path_line[unchecked_file],
                     checker=checker,
-                    category='latex',
-                    p_type='0',
+                    category="latex",
+                    p_type="0",
                     file=Path(last_checked),
                     severity=ProblemSeverity.WARNING,
                     description=f"File not found {unchecked_file}.",
@@ -369,7 +371,7 @@ def get_all_paths_in_document(file_path: str, buddy: LatexBuddy):
 
         for line in lines:
             # check for include and input statements
-            if line.startswith('\\include{') or line.startswith('\\input{'):
+            if line.startswith("\\include{") or line.startswith("\\input{"):
                 path = line
                 begin_of_path: int = path.find("{") + 1
                 end_of_path: int = path.find("}")
