@@ -98,21 +98,28 @@
             </div>
         {% endfor %}
     </div>
-
+    {# slider to switch to the pdf view #}
     <label class="switch">
         <input type="checkbox" id="pdfbutton">
         <div class="slider round">
-            <!--ADDED HTML -->
             <span class="on">PDF</span>
             <span class="off">TEX</span>
-            <!--END-->
         </div>
     </label>
 </header>
 <main>
     <div id="file-container">
         <div id="file-contents" style="position:relative;">
-            <pre style="line-height: 16px"><code>{{ file_text|safe }}</code></pre>
+        {# the tex-container is used to hold the file text line and the correspondign line number #}
+            <div class="text-container">
+                {% for line_num, text in file_text %}
+                    {# container that holds the line number and the coresponding text line #}
+                    <div class="line-container">
+                        <div class="line-number">{{ line_num }}</div>
+                        <code>{{ text|safe }}</code>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
         <div id="pdf-disp" style="position:relative;">
             {% if pdf_path is not none %}
@@ -127,13 +134,12 @@
     <div id="problems-list">
         <div class="problem-list-header">
             <h2>Problems</h2>
+            {# the slider, used to switch the problems #}
             <label class="switch">
                 <input type="checkbox" id="change_problems">
                 <div class="slider round">
-                    <!--ADDED HTML -->
                     <span class="on">Specific</span>
                     <span class="off">General</span>
-                    <!--END-->
                 </div>
             </label>
         </div>

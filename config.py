@@ -10,13 +10,13 @@ modules = {
         "whitelist": "whitelist",
         "format": "HTML",
         "enable-modules-by-default": True,
-        "pdf": True
+        "pdf": True,
     },
     "AspellModule": {
         "enabled": True,
     },
     "ChktexModule": {
-        "enabled": True,
+        "enabled": False,
     },
     "DictionModule": {
         "enabled": True,
