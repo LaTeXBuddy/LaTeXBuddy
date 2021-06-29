@@ -25,6 +25,7 @@
         {% set parent_list = [] %} {# the list contains all folder, included in this project #}
 
         {# get all folder names #}
+        {# TODO: Refactor Algo to work with multiple same named folders #}
         {% for path in paths %}
             {% set upper_folder = path.parents[0]|string() %}
             {% set sub_folder = path.parents[1] ~ "/" |string() %}
@@ -38,6 +39,7 @@
         {# set the style for each folder #}
         {% for folder in parent_list %}
             <style>
+                {# TODO: Add uid #}
                 .{{ "_" ~ folder }} {
                     display: flex;
                     flex-direction: column;
