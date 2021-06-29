@@ -38,7 +38,7 @@
         {# set the style for each folder #}
         {% for folder in parent_list %}
             <style>
-                .{{ folder }} {
+                .{{ folder|string() }} {
                     display: flex;
                     flex-direction: column;
                     align-items: center;
@@ -46,11 +46,11 @@
                     margin-right: 25px;
                     padding: 20px;
                 }
-                .{{ folder }} svg {
+                .{{ folder|string() }} svg {
                     width: 45px;
                     height: 45px;
                 }
-                .{{ folder }}-content {
+                .{{ folder|string() }}-content {
                   display: none;
                   position: absolute;
                   background-color: #f1f1f1;
@@ -60,17 +60,17 @@
                   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
                   z-index: 1;
                 }
-                .{{ folder }}-content a {
+                .{{ folder|string() }}-content a {
                   color: black;
                   padding: 12px 16px;
                   text-decoration: none;
                   display: block;
                 }
-                .{{ folder }}-content a:hover {
+                .{{ folder|string() }}-content a:hover {
                     background-color: silver;
                     border-radius: 5px 5px 5px 5px;
                 }
-                .{{ folder }}:hover .{{ folder }}-content {
+                .{{ folder|string() }}:hover .{{ folder|string() }}-content {
                     display: block;
                 }
             </style>
@@ -79,12 +79,12 @@
         {# get all file paths and add to the folder dropdown #}
 
         {% for folder in parent_list %}
-            <div class="{{ folder }}">{{ folder }}
+            <div class="{{ folder|string() }}">{{ folder|string() }}
                 <svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" enable-background="new 0 0 48 48">
                     <path fill="#00b6b6" d="M40,12H22l-4-4H8c-2.2,0-4,1.8-4,4v8h40v-4C44,13.8,42.2,12,40,12z" />
                     <path fill="#008281" d="M40,12H8c-2.2,0-4,1.8-4,4v20c0,2.2,1.8,4,4,4h32c2.2,0,4-1.8,4-4V16C44,13.8,42.2,12,40,12z" />
                 </svg>
-                <div class="{{ folder }}-content">
+                <div class="{{ folder|string() }}-content">
                         {% for path in paths %}
                             {% set upper_folder = path.parents[0]|string() %}
                             {% set sub_folder = path.parents[1] ~ "/" |string() %}
