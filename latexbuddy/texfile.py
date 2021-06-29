@@ -23,7 +23,6 @@ from latexbuddy.tools import (
     is_binary,
 )
 
-
 # regex to parse out error location from tex2txt output
 location_re = re.compile(r"line (\d+), column (\d+)")
 
@@ -61,7 +60,6 @@ class TexFile:
         # )
         compile_pdf = True
         self.log_file, self.pdf_file = self.__compile_tex(compile_pdf)
-        print(str(self.log_file), str(self.pdf_file))
 
     def __detex(self):
         opts = Options()  # use default options
@@ -135,23 +133,18 @@ class TexFile:
     def __compile_tex(self, compile_pdf: bool) -> Tuple[Optional[Path], Optional[Path]]:
         # from latexbuddy import __logger as root_logger
         # self.__logger = root_logger.getChild("texfile")
-        compiler = "latex"
-        if compile_pdf:
-            try:
-                find_executable("pdflatex")
-                compiler = "pdflatex"
-            except FileNotFoundError:
-                # self.__logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
-                return None, None
-        else:
-            try:
-                find_executable("latex")
-            except FileNotFoundError:
-                # self.__logger.error(not_found('latex', 'LaTeX (e.g., TeXLive Core)'))
-                return None, None
+        pdf_flag = ''
+        try:
+            find_executable('latex')
+        except FileNotFoundError:
+            # self.__logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
+            return None, None
 
-        tex_mf = self.__create_tex_mf()
-        html_directory = os.getcwd() + "/latexbuddy_html"
+        if compile_pdf:
+            pdf_flag = "-output-format='pdf'"
+
+        html_directory = "./latexbuddy_html"
+
         try:
             os.mkdir(html_directory)
         except FileExistsError:
@@ -161,7 +154,9 @@ class TexFile:
             # self.__logger.error(
             #     texfile_error(f'{exc} ocurred while creating {html_directory}.'))
             pass  # TODO
+
         compile_directory = html_directory + "/compiled"
+
         try:
             os.mkdir(compile_directory)
         except FileExistsError:
@@ -173,27 +168,34 @@ class TexFile:
             pass  # TODO
 
         # for unique file names
+        # TODO make it easier for the user
         path = Path(
-            mkdtemp(suffix="_compiled_tex", prefix="latexbuddy_", dir=compile_directory)
+            mkdtemp(prefix="latexbuddy_", suffix="_compiled_tex", dir=compile_directory)
         )
 
-        # TODO: Might have fatal errors, why a pdf e.g. is not created.
-        # TODO: If so, set pdf = None
+        tex_mf = self.__create_tex_mf(path)
+
+        print('TEXFILE:', str(self.tex_file), self.tex_file.exists())
+        print('PATH:', str(path), path.exists())
+
         execute(
             f'TEXMFCNF="{tex_mf}";',
-            compiler,
+            'latex',
             "-interaction=nonstopmode",
             "-8bit",
-            f"-output-directory={str(path)}",
+            f"-output-directory='{str(path)}'",
+            pdf_flag,
             str(self.tex_file),
         )
 
         log = path / f"{self.tex_file.stem}.log"
         pdf = path / f"{self.tex_file.stem}.pdf" if compile_pdf else None
+        print('LOG:', log, log.is_file())
+        print('PDF:', pdf, pdf.is_file())
         return log, pdf
 
     @staticmethod
-    def __create_tex_mf() -> str:
+    def __create_tex_mf(path: Path) -> str:
         """
         This method makes the log file be written correctly
         """
@@ -202,6 +204,6 @@ class TexFile:
         text = "\n".join(
             ["max_print_line=1000", "error_line=254", "half_error_line=238"]
         )
-        descriptor, cnf_path = mkstemp(prefix="latexbuddy", suffix="cnf")
+        cnf_path = path / 'texmf.cnf'
         Path(cnf_path).resolve().write_text(text)
-        return str(cnf_path)
+        return str(cnf_path.parent) + ':'
