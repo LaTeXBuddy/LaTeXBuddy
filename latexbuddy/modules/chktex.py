@@ -44,7 +44,7 @@ class ChktexModule(Module):
 
         dir_path, file_path = os.path.split(os.path.abspath(str(file.tex_file)))
         command_output = tools.execute(
-            "cd", dir_path, ";", "chktex", "-f", f"'{format_str}'", "-q", file_path
+            "chktex", "-f", f"'{format_str}'", "-q", file_path
         )
         out_split = command_output.split("\n")
 
