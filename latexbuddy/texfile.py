@@ -23,6 +23,7 @@ from latexbuddy.tools import (
     is_binary,
 )
 
+
 # regex to parse out error location from tex2txt output
 location_re = re.compile(r"line (\d+), column (\d+)")
 
@@ -133,9 +134,9 @@ class TexFile:
     def __compile_tex(self, compile_pdf: bool) -> Tuple[Optional[Path], Optional[Path]]:
         # from latexbuddy import __logger as root_logger
         # self.__logger = root_logger.getChild("texfile")
-        pdf_flag = ''
+        pdf_flag = ""
         try:
-            find_executable('latex')
+            find_executable("latex")
         except FileNotFoundError:
             # self.__logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
             return None, None
@@ -175,12 +176,12 @@ class TexFile:
 
         tex_mf = self.__create_tex_mf(path)
 
-        print('TEXFILE:', str(self.tex_file), self.tex_file.exists())
-        print('PATH:', str(path), path.exists())
+        print("TEXFILE:", str(self.tex_file), self.tex_file.exists())
+        print("PATH:", str(path), path.exists())
 
         execute(
             f'TEXMFCNF="{tex_mf}";',
-            'latex',
+            "latex",
             "-interaction=nonstopmode",
             "-8bit",
             f"-output-directory='{str(path)}'",
@@ -190,8 +191,8 @@ class TexFile:
 
         log = path / f"{self.tex_file.stem}.log"
         pdf = path / f"{self.tex_file.stem}.pdf" if compile_pdf else None
-        print('LOG:', log, log.is_file())
-        print('PDF:', pdf, pdf.is_file())
+        print("LOG:", log, log.is_file())
+        print("PDF:", pdf, pdf.is_file())
         return log, pdf
 
     @staticmethod
@@ -204,6 +205,6 @@ class TexFile:
         text = "\n".join(
             ["max_print_line=1000", "error_line=254", "half_error_line=238"]
         )
-        cnf_path = path / 'texmf.cnf'
+        cnf_path = path / "texmf.cnf"
         Path(cnf_path).resolve().write_text(text)
-        return str(cnf_path.parent) + ':'
+        return str(cnf_path.parent) + ":"
