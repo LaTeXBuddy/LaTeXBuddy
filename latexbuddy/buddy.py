@@ -39,8 +39,8 @@ class LatexBuddy:
         self.path_list: Path = path_list  # all paths from the files to be used in html
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = config_loader  # configuration
-        self.file_to_check = file_to_check  # .tex file that is to be error checked
-        self.tex_file: TexFile = TexFile(file_to_check)
+        self.file_to_check = None
+        self.tex_file = None
 
         # file where the error should be saved
         self.output_dir = Path(
@@ -72,10 +72,6 @@ class LatexBuddy:
                 "buddy", "whitelist", Path("whitelist"), verify_type=AnyStr
             )
         )
-
-    def add_error(self, problem: Problem):
-        # current language
-        self.lang = self.cfg.get_config_option_or_default("buddy", "language", "en")
 
     def change_file(self, file):
         """Method to change the current file. Used for multi check files included
