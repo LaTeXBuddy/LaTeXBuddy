@@ -8,7 +8,7 @@
     <title>{{ file_name|e }} | LaTeXBuddy</title>
     <style>
         {% include "static/modern-normalize.css" %}
-        {% include "static/style.css" %}
+        {% include "static/main_style.css" %}
         {% include "static/whitelist_button.css" %}
         {% include "static/popup_for_whitelist.css" %}
         {% include "static/navigation_bar_and_pdf_button.css" %}
@@ -125,14 +125,14 @@
         </div>
     </div>
     <div id="problems-list">
-        <div>
-            <h3>Problems</h3>
+        <div class="problem-list-header">
+            <h2>Problems</h2>
             <label class="switch">
                 <input type="checkbox" id="change_problems">
                 <div class="slider round">
                     <!--ADDED HTML -->
-                    <span class="on">in-line</span>
-                    <span class="off">general</span>
+                    <span class="on">Specific</span>
+                    <span class="off">General</span>
                     <!--END-->
                 </div>
             </label>
