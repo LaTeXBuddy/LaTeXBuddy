@@ -13,7 +13,8 @@ from tempfile import mkdtemp, mkstemp
 from typing import Callable, List, Optional, Tuple
 
 from latexbuddy.exceptions import ExecutableNotFoundError
-from latexbuddy.messages import not_found, texfile_error
+from latexbuddy.messages import not_found, path_not_found, texfile_error
+from latexbuddy.problem import Problem, ProblemSeverity
 
 
 __logger = logging.getLogger("latexbuddy").getChild("tools")
@@ -300,43 +301,81 @@ def get_app_dir() -> Path:
     return app_dir
 
 
-def get_all_paths_in_document(file_path):
+def get_all_paths_in_document(file_path: str):
     """Checks files that are included in a file.
 
     If the file includes more files, these files will also be checked.
 
     :param file_path:a string, containing file path
+    :param buddy: the latexbuddy instance
     """
     unchecked_files = []  # Holds all unchecked files
     checked_files = []  # Holds all checked file
+    problems = []
 
     # add all paths to list
     # this is used for the command line input
     unchecked_files.append(file_path)
     parent = str(Path(file_path).parent)
+    old_lines = ""  # need access to it in creating errors
 
     while len(unchecked_files) > 0:
-        checked_files.append(unchecked_files[0])
+        last_checked = checked_files[-1] if len(checked_files) > 0 else ''
+        unchecked_file = unchecked_files.pop(0)
         new_files = []
+        path_line = {}
+        lines = ""  # might not be reset for new file otherwise
 
         try:
-            lines = unchecked_files.pop(0).read_text().splitlines(keepends=False)
+            lines = unchecked_file.read_text().splitlines(keepends=False)
+            old_lines = lines
+        except FileNotFoundError:  # the file might not be included in path
+            # importing this here to avoid circular import error
+            from latexbuddy import __logger as root_logger
+
+            logger = root_logger.getChild("Tools")
+            logger.error(
+                path_not_found("the checking of imports", Path(unchecked_file))
+            )
+
+            line = path_line[unchecked_file]
+            if line.startswith("\\input"):
+                checker = "inputs"
+            else:
+                checker = "includes"
+
+            position = re.search(line, old_lines)
+            problems.append(
+                Problem(
+                    position=(1, 1),
+                    text=path_line[unchecked_file],
+                    checker=checker,
+                    category="latex",
+                    p_type="0",
+                    file=Path(last_checked),
+                    severity=ProblemSeverity.WARNING,
+                    description=f"File not found {unchecked_file}.",
+                    key=checker + "_" + unchecked_file,
+                    length=len(line),
+                )
+            )
         except Exception as e:  # If the file cannot be found it is already removed
             # importing this here to avoid circular import error
             from latexbuddy import __logger as root_logger
 
             logger = root_logger.getChild("Tools")
-            error_message = "Error while search for Files"
+            error_message = "Error while searching for files"
             logger.error(
                 f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}"
             )
 
         for line in lines:
             # check for include and input statements
-            if "\include{" in line:
-                path = line.strip("\include{")
+            if line.startswith("\\include{") or line.startswith("\\input{"):
+                path = line
+                begin_of_path: int = path.find("{") + 1
                 end_of_path: int = path.find("}")
-                path = path[:end_of_path]
+                path = path[begin_of_path:end_of_path]
                 # if missing / at the beginning, add it.
                 if path[0] != "/":
                     path = parent + "/" + path
@@ -344,22 +383,12 @@ def get_all_paths_in_document(file_path):
                 if not path.endswith(".tex"):
                     path = path + ".tex"
 
-                new_files.append(Path(path))  # if something was found, add it to a list
-            elif "\input{" in line:
-                path = line.strip("\input{")
-                end_of_path: int = path.find("}")
-                path = path[:end_of_path]
-                # if missing / at the beginning, add it.
-                if path[0] != "/":
-                    path = parent + "/" + path
-                # if missing .tex, add it
-                if not path.endswith(".tex"):
-                    path = path + ".tex"
-
+                path_line[path] = line
                 new_files.append(Path(path))  # if something was found, add it to a list
 
-        unchecked_files.extend(new_files)  # add new paths
-    return checked_files
+        unchecked_files.extend(new_files)  # add new
+        checked_files.append(unchecked_file)
+    return checked_files, problems
 
 
 def add_whitelist_console(whitelist_file, to_add):
