@@ -8,14 +8,8 @@ from bibtexparser.bibdatabase import UndefinedString
 from pathlib import Path
 from typing import List
 from difflib import SequenceMatcher
-from multiprocessing import cpu_count
-from concurrent.futures import as_completed
-from requests_futures.sessions import FuturesSession
-# TODO: add requests-futures to poetry if used again
 
 from multiprocessing.dummy import Pool as ThreadPool
-
-import latexbuddy.tools as tools
 
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
@@ -35,6 +29,7 @@ class NewerPublications(Module):
         tex = file.tex
         path = file.tex_file
         pattern = r"\\bibliography\{([A-Za-z0-9_/-]+)\}"  # TODO: improve the pattern
+        # in particular space
         m = re.search(pattern, tex)
 
         if m is None:
@@ -44,19 +39,18 @@ class NewerPublications(Module):
         path = str(path)[: -len(path.parts[-1])]  # remove filename
         return Path(path + m.group(1) + ".bib")  # assuming theres only one bibtex file
 
-    def __get_publications(self, bibfile: Path):
+    def __parse_bibfile(self, bibfile: Path):
         with bibfile.open() as bibtex_file:
             bib_database = bibtexparser.load(bibtex_file)
             entries = bib_database.entries
-        # print(entries)
-        # print(len(entries))
+
         # duplicates https://stackoverflow.com/questions/9427163/remove-duplicate-dict-in-list-in-python
         results = []
 
         for _ in range(len(entries)):
             try:
                 if (
-                    entries[_]["ENTRYTYPE"] == "inproceedings"
+                    True or entries[_]["ENTRYTYPE"] == "inproceedings"
                     or entries[_]["ENTRYTYPE"] == "article"
                 ):
                     # TODO: what entry types?
@@ -79,14 +73,14 @@ class NewerPublications(Module):
     def check_for_new(self, publication: (str, str)):
         # send requests
         # ex: https://dblp.org/search/publ/api?format=json&q=In%20Search%20of%20an%20Understandable%20Consensus%20Algorithm
-        # print(publication)
         c_returns = 4  # number of max returns from the request
-        # TODO: handle "ConnectionError"
-        # session = requests.session()  # gut wenn man so viele sessions aufmacht? gibt aber etwas speedup
+
+        # session = requests.session()  # TODO: maybe add sessions for better performance
         x = requests.get(f'https://dblp.org/search/publ/api?format=json&h={c_returns}&q={publication[0]}')
         ret = json.loads(x.text)
         self.time += float(ret["result"]["time"]["text"])
-        print(ret["result"]["time"]["text"])
+
+        #print(ret["result"]["time"]["text"])
         try:
             n_hits = ret["result"]["hits"]["@total"]
             if int(n_hits) < 2:
@@ -105,63 +99,34 @@ class NewerPublications(Module):
                     continue
                 year = hit["info"]["year"]
 
-                print()
-                print(year)
-                print(title)
-                print(f"Similarity: {sim}")
-                print(publication)
+                #print()
+                #print(year)
+                #print(title)
+                #print(f"Similarity: {sim}")
+                #print(publication)
         except KeyError:
-            # if no hit found
-            pass
+            pass  # if no hit found
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         bib_file = self.__get_bibfile(file)
 
-        # check if the referenced bibtex file exists
         if bib_file is None:
-            return []
+            raise ValueError("No valid path in the \\bibliography{} command")
 
         if not bib_file.exists():
-            print(f"Error: No bibliography found at {bib_file}")
-            return []
+            raise FileNotFoundError(f"No bibliography found at {bib_file}")
 
         # catch error that is raised if the bibtex file is not correctly formatted
         try:
-            used_pubs = self.__get_publications(bib_file)
+            used_pubs = self.__parse_bibfile(bib_file)
         except UndefinedString as e:
             print(f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}')
             return []
 
         a = time.time()
 
-        with ThreadPool(8) as p:
+        with ThreadPool(4) as p:
             p.map(self.check_for_new, used_pubs)
-
-        #session = requests.session()
-        #for pub in used_pubs:
-        #    x = session.get(f'https://dblp.org/search/publ/api?format=json&h={4}&q={pub[0]}')
-        #    self.check_for_new(pub, x)
-        # session.close()
-
-        """with FuturesSession() as session:
-            futures = [session.get(f'https://dblp.org/search/publ/api?format=json&h={4}&q={pub[0]}') for pub in used_pubs]
-            i = 0
-            for future in as_completed(futures):
-                self.check_for_new(used_pubs[i], future.result())
-                i += 1"""
-
-        """session = FuturesSession()
-                def response_hook(resp, *args, **kwargs):
-                    # parse the json storing the result on the response object
-                    self.check_for_new(jsn=(resp.json()))
-                futures = []
-                for pub in used_pubs:
-                    future = session.get(f'https://dblp.org/search/publ/api?format=json&h={4}&q={pub[0]}', hooks={
-                        'response': response_hook,
-                    })
-                    futures.append(future)
-                for fut in as_completed(futures):
-                    fut.result()"""
 
         print(f"\n\ndblp requests took {round(time.time() - a, 3)} seconds")
         print(self.time)
