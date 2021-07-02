@@ -32,12 +32,16 @@ def get_bibfile(file: TexFile) -> Path:
     # in particular space
     m = re.search(pattern, tex)
 
-    if m is None:
-        print(f"Error: No bibliography found in the .tex at {path}")
-        return None  # No bibtex file found
+    if m is None:  # TODO: maybe make this to logger
+        raise ValueError("No valid bibliography found in the .tex at {path}")
 
     path = str(path)[: -len(path.parts[-1])]  # remove filename
-    return Path(path + m.group(1) + ".bib")  # assuming theres only one bibtex file
+    bib_path = Path(path + m.group(1) + ".bib")
+
+    if not bib_path.exists():
+        raise FileNotFoundError(f"No bibliography found at {bib_path}")
+
+    return bib_path  # assuming theres only one bibtex file
 
 
 def parse_bibfile(bibfile: Path) -> (str, str, str):
@@ -48,7 +52,11 @@ def parse_bibfile(bibfile: Path) -> (str, str, str):
     """
     with bibfile.open() as bibtex_file:
         bib_database = bibtexparser.load(bibtex_file)
-        entries = bib_database.entries
+        try:
+            entries = bib_database.entries
+        # catch error that is raised if the bibtex file is not correctly formatted
+        except UndefinedString as e:
+            raise ValueError(f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}')
 
     results = []
     for entry in entries:
@@ -119,19 +127,12 @@ class NewerPublications(Module):
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         bib_file = get_bibfile(file)
-
+        """ Reactivate if no error raised anymore in get_bibfile
         if bib_file is None:
-            raise ValueError("No valid path in the \\bibliography{} command")
-
-        if not bib_file.exists():
-            raise FileNotFoundError(f"No bibliography found at {bib_file}")
-
-        # catch error that is raised if the bibtex file is not correctly formatted
-        try:
-            used_pubs = parse_bibfile(bib_file)
-        except UndefinedString as e:
-            print(f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}')
             return []
+        """
+
+        used_pubs = parse_bibfile(bib_file)
 
         a = time.time()
 
@@ -153,7 +154,7 @@ class NewerPublications(Module):
             bibtex_id = pub[3][2]
             problem_text = f"BibTeX: "
             # TODO: maybe only do this if output format is html
-            suggestion = f"Potential newer version \"<i>{pub[0]}</i>\" from {pub[1]} at <a href=\"{pub[2]}\"target=\"_blank\">{pub[2]}</a>"
+            suggestion = f"Potential newer version \"<i>{pub[0]}</i>\" from <b>{pub[1]}</b> at <a href=\"{pub[2]}\"target=\"_blank\">{pub[2]}</a>"
             problems.append(
                 Problem(
                     position=(0, 0),
@@ -172,7 +173,9 @@ class NewerPublications(Module):
 
 class BibtexDuplicates(Module):
     def __init__(self):
-        pass
+        self.tool_name = "bibtex_duplicate"
+        self.severity = ProblemSeverity.INFO
+        self.category = "latex"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         # check similar entries example
