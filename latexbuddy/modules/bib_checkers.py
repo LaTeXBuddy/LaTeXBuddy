@@ -51,8 +51,8 @@ def parse_bibfile(bibfile: Path) -> (str, str, str):
     :return: the title, year, and BibTeX Id of each publication as 3-Tuple
     """
     with bibfile.open() as bibtex_file:
-        bib_database = bibtexparser.load(bibtex_file)
         try:
+            bib_database = bibtexparser.load(bibtex_file)
             entries = bib_database.entries
         # catch error that is raised if the bibtex file is not correctly formatted
         except UndefinedString as e:
@@ -152,7 +152,7 @@ class NewerPublications(Module):
         problems = []
         for pub in self.found_pubs:
             bibtex_id = pub[3][2]
-            problem_text = f"BibTeX: "
+            problem_text = f"BibTeX outdated: "
             # TODO: maybe only do this if output format is html
             suggestion = f"Potential newer version \"<i>{pub[0]}</i>\" from <b>{pub[1]}</b> at <a href=\"{pub[2]}\"target=\"_blank\">{pub[2]}</a>"
             problems.append(
@@ -176,11 +176,65 @@ class BibtexDuplicates(Module):
         self.tool_name = "bibtex_duplicate"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
+        self.found_duplicates = []
+
+    def clean_str(self, to_clean: str) -> str:
+        while to_clean[0] == "{":
+            to_clean = to_clean[1:]
+        while to_clean[-1] == "}":
+            to_clean = to_clean[:-1]
+        return to_clean.upper()
+
+    def compare(self, entry_1, entry_2) -> None:
+        ids = (entry_1["ID"], entry_2["ID"])
+        same_keys = (set(entry_1.keys()).intersection(set(entry_2.keys())))
+        same_keys.remove("ID")
+        ratio = 0
+        for key in same_keys:
+            ratio += SequenceMatcher(None, self.clean_str(entry_1[key]), self.clean_str(entry_2[key])).ratio()
+        r = ratio / len(same_keys)
+        if r > 0.85:
+            print(f"------------------\n{r}\n{entry_1}\n{entry_2}\n------------------")
+            self.found_duplicates.append(ids)
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-        # check similar entries example
-        # for pub in results:
-        # print(SequenceMatcher(None, str(pub), str(results[0])).ratio())  # why slower with str???
 
-        # duplicates https://stackoverflow.com/questions/9427163/remove-duplicate-dict-in-list-in-python
-        pass
+        bib_file = get_bibfile(file)
+        """ Reactivate if no error raised anymore in get_bibfile
+        if bib_file is None:
+            return []
+        """
+
+        with bib_file.open() as bibtex_file:
+            try:
+                bib_database = bibtexparser.load(bibtex_file)
+                entries = bib_database.entries
+            # catch error that is raised if the bibtex file is not correctly formatted
+            except UndefinedString as e:
+                raise ValueError(
+                    f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}')
+
+        for i in range(len(entries)):
+            for j in range(i+1, len(entries)):
+                self.compare(entries[i], entries[j])
+
+        problems = []
+        for dup_ids in self.found_duplicates:
+            problem_text = f"{dup_ids[0]} <=> {dup_ids[1]}"
+            context = "BibTeX duplicate: "
+            description = "Possible duplicate entries in the BibTeX file. These entries might be redundant. It's recommended to compare them manually."
+            problems.append(
+                Problem(
+                    position=(0, 0),
+                    text=problem_text,
+                    checker=self.tool_name,
+                    category=self.category,
+                    file=file.tex_file,
+                    severity=self.severity,
+                    description=description,
+                    context=(context, ""),
+                    key=f"{self.tool_name}_{dup_ids[0]}_{dup_ids[1]}",
+                )
+            )
+
+        return problems
