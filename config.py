@@ -59,4 +59,7 @@ modules = {
     "NewerPublications": {
         "enabled": True
     },
+    "BibtexDuplicates": {
+        "enabled": True
+    }
 }
