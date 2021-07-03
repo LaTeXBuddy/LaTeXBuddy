@@ -193,6 +193,7 @@ class BibtexDuplicates(Module):
             while to_clean[-1] == "}":
                 to_clean = to_clean[:-1]
         except IndexError:
+            # empty word or only parentheses
             return ""
         return to_clean.upper()
 
