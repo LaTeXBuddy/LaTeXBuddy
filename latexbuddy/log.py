@@ -5,9 +5,10 @@ from logging.handlers import RotatingFileHandler
 from colorama import Back, Fore, Style
 from double_stream_handler import DoubleStreamHandler
 
+import latexbuddy
+
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
-from latexbuddy.tools import get_app_dir
 
 
 class ConsoleFormatter(Formatter):
@@ -60,7 +61,7 @@ def __setup_root_logger(logger: Logger, console_level: int = INFO) -> None:
         logger.removeHandler(handler)
 
     fh = RotatingFileHandler(
-        get_app_dir() / "debug.log", maxBytes=4000000, backupCount=8
+        latexbuddy.tools.get_app_dir() / "debug.log", maxBytes=4000000, backupCount=8
     )
     fh.setLevel(DEBUG)  # output everything to file
     fh.setFormatter(
