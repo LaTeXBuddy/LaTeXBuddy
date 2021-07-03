@@ -29,7 +29,8 @@ modules = {
     "LanguageTool": {
         "enabled": True,
         "mode": "COMMANDLINE",
-        # "remote_url": "https://api.languagetoolplus.com/v2/check",
+        "remote_url_check": "https://api.languagetoolplus.com/v2/check",
+        "remote_url_languages": "https://api.languagetoolplus.com/v2/languages",
         "disabled-rules": [
             "WHITESPACE_RULE",
             # "TYPOGRAFISCHE_ANFUEHRUNGSZEICHEN",
