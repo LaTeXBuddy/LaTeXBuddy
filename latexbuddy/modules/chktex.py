@@ -8,10 +8,10 @@ from typing import List
 
 import latexbuddy.tools as tools
 
-from latexbuddy import TexFile
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.texfile import TexFile
 
 
 class Chktex(Module):

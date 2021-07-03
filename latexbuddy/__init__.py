@@ -3,8 +3,6 @@ from pkgutil import extend_path
 
 import colorama
 
-from latexbuddy.texfile import TexFile
-
 
 # package metadata
 __app_name__ = "LaTeXBuddy"  # proper name

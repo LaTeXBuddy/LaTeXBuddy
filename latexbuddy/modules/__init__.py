@@ -5,10 +5,10 @@ inherit from.
 from abc import abstractmethod
 from typing import List
 
-from latexbuddy import TexFile
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import Loggable
 from latexbuddy.problem import Problem
+from latexbuddy.texfile import TexFile
 from latexbuddy.tools import classproperty
 
 

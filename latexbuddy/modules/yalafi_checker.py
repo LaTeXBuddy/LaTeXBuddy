@@ -1,9 +1,9 @@
 from typing import List
 
-from latexbuddy import TexFile
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.texfile import TexFile
 
 
 class YaLafi(Module):

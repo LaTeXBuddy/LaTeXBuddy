@@ -3,9 +3,9 @@ import re
 from abc import ABC, abstractmethod
 from typing import Callable, List, Optional
 
-from latexbuddy import TexFile
 from latexbuddy.log import Loggable
 from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.texfile import TexFile
 
 
 # forward-declare

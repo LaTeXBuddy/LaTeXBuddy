@@ -13,12 +13,12 @@ import requests
 
 import latexbuddy.tools as tools
 
-from latexbuddy import TexFile
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.exceptions import ExecutableNotFoundError
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.texfile import TexFile
 
 
 class Mode(Enum):

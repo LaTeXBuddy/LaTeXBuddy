@@ -10,12 +10,12 @@ from typing import AnyStr, List, Optional
 
 import latexbuddy.tools as tools
 
-from latexbuddy import TexFile
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
 from latexbuddy.modules import MainModule, Module
 from latexbuddy.preprocessor import Preprocessor
 from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
+from latexbuddy.texfile import TexFile
 from latexbuddy.tools import classproperty
 
 

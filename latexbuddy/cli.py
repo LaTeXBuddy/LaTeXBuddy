@@ -17,7 +17,7 @@ from latexbuddy import __version__
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
-from latexbuddy.tools import perform_whitelist_operations, get_all_paths_in_document
+from latexbuddy.tools import get_all_paths_in_document, perform_whitelist_operations
 
 
 parser = argparse.ArgumentParser(
@@ -27,7 +27,9 @@ parser.add_argument(
     "--version", "-V", action="version", version=f"{__app_name__} v{__version__}"
 )
 # nargs="+" marks the beginning of a list
-parser.add_argument("file", nargs="+", type=Path, help="File(s) that will be processed.")
+parser.add_argument(
+    "file", nargs="+", type=Path, help="File(s) that will be processed."
+)
 parser.add_argument(
     "--config",
     "-c",
