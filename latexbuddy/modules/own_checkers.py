@@ -44,7 +44,7 @@ class UnreferencedFigures(Module):
 
         for (position, length), label in labels.items():
             line, col, offset = tools.absolute_to_linecol(file.tex, position)
-            if re.search(re.escape("\\ref{") + label + re.escape("}"), tex) is None:
+            if re.search(r"\\c?ref{" + label + re.escape("}"), tex) is None:
                 problems.append(
                     Problem(
                         position=(line, col),
@@ -306,8 +306,8 @@ class CheckFigureResolution(Module):
         ".jfi",
         ".gif",
         ".webp",
-        "tiff",
-        "tif",
+        ".tiff",
+        ".tif",
         ".psd",
         ".dip",
         ".heif",
@@ -340,7 +340,7 @@ class CheckFigureResolution(Module):
                     figures.append(current_file)
                     problems.append(
                         Problem(
-                            position=(1, 1),
+                            position=None,
                             text=name,
                             checker=CheckFigureResolution,
                             category=self.category,

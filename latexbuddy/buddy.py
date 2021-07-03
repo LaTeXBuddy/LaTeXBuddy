@@ -38,6 +38,7 @@ class LatexBuddy(MainModule):
         self.output_dir: Optional[Path] = None
         self.output_format: Optional[str] = None
         self.whitelist_file: Optional[Path] = None
+        self.path_list: List[Path] = []  # all paths of the files to be used in html
 
     @classproperty
     def instance(cls):
@@ -46,23 +47,25 @@ class LatexBuddy(MainModule):
         return cls.__current_instance
 
     @staticmethod
-    def init(config_loader: ConfigLoader, file_to_check: Path):
+    def init(config_loader: ConfigLoader, file_to_check: Path, path_list: List[Path]):
         """Initializes the LaTeXBuddy instance.
 
         :param config_loader: ConfigLoader object to manage config options
         :param file_to_check: file that will be checked
+        :param path_list: a list of the paths for the html output
         """
 
         LatexBuddy.instance.errors = {}
         LatexBuddy.instance.cfg = config_loader
         LatexBuddy.instance.preprocessor = None
-        LatexBuddy.instance.file_to_check = file_to_check
-        LatexBuddy.instance.tex_file = TexFile(file_to_check)
+        LatexBuddy.instance.file_to_check = None
+        LatexBuddy.instance.tex_file = None
+        LatexBuddy.instance.path_list = path_list
 
         # file where the error should be saved
         LatexBuddy.instance.output_dir = Path(
             LatexBuddy.instance.cfg.get_config_option_or_default(
-                LatexBuddy, "output", Path("./"), verify_type=AnyStr
+                LatexBuddy, "output", "./latexbuddy_html/", verify_type=AnyStr
             )
         )
 
@@ -89,6 +92,16 @@ class LatexBuddy(MainModule):
                 LatexBuddy, "whitelist", Path("whitelist"), verify_type=AnyStr
             )
         )
+
+    @staticmethod
+    def change_file(file: Path):
+        """Method to change the current file. Used for multi check files included
+            in other files
+
+        :param file: the new file to check next
+        """
+        LatexBuddy.instance.file_to_check = file
+        LatexBuddy.instance.tex_file = TexFile(file)
 
     @staticmethod
     def add_error(problem: Problem):
@@ -259,13 +272,21 @@ class LatexBuddy(MainModule):
         from latexbuddy.output import render_html
 
         html_output_path = Path(
-            str(LatexBuddy.instance.output_dir) + "/latexbuddy_output.html"
+            str(LatexBuddy.instance.output_dir)
+            + "/"
+            + "output_"
+            + str(LatexBuddy.instance.file_to_check.stem)
+            + ".html"
         )
         html_output_path.write_text(
             render_html(
                 str(LatexBuddy.instance.tex_file.tex_file),
                 LatexBuddy.instance.tex_file.tex,
                 LatexBuddy.instance.errors,
+                LatexBuddy.instance.path_list,
+                str(
+                    LatexBuddy.instance.tex_file.pdf_file
+                ),  # TODO: this should be the path (str) where the pdf file is located
             )
         )
 
@@ -280,3 +301,9 @@ class LatexBuddy(MainModule):
 
         else:  # using HTML as default
             LatexBuddy.instance.output_html()
+
+    @staticmethod
+    def clear_error_list():
+        """Function needed for multiple files.
+        It clears the error list, for the next use"""
+        LatexBuddy.instance.errors.clear()

@@ -7,9 +7,9 @@ main = {
     "language": "en",
     "language_country": "GB",
     "whitelist": "whitelist",
-    "output": "./",
     "format": "HTML",
     "enable-modules-by-default": True,
+    "pdf": True,
 }
 
 modules = {
