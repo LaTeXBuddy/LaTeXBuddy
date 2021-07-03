@@ -17,7 +17,7 @@ from latexbuddy import __version__
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
-from latexbuddy.tools import add_whitelist_console, add_whitelist_from_file
+from latexbuddy.tools import perform_whitelist_operations
 
 
 parser = argparse.ArgumentParser(
@@ -126,16 +126,8 @@ def main():
     logger.debug(f"Parsed CLI args: {str(args)}")
 
     if args.wl_add_keys or args.wl_from_wordlist:
-        if args.whitelist:
-            wl_file = Path(args.whitelist)
-        else:
-            wl_file = Path("whitelist")
-        if args.wl_add_keys:
-            add_whitelist_console(wl_file, args.wl_add_keys)
-        if args.wl_from_wordlist:
-            add_whitelist_from_file(
-                wl_file, Path(args.wl_from_wordlist[0]), args.wl_from_wordlist[1]
-            )
+
+        perform_whitelist_operations(args)
         return
 
     config_loader = ConfigLoader(args)
