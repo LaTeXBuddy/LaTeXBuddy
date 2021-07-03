@@ -7,6 +7,7 @@ main = {
     "language": "en",
     "language_country": "GB",
     "whitelist": "whitelist",
+    "output": "./latexbuddy_html/",
     "format": "HTML",
     "enable-modules-by-default": True,
     "pdf": True,
