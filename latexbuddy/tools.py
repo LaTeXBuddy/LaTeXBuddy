@@ -338,6 +338,7 @@ def get_all_paths_in_document(file_path: str):
                 path_not_found("the checking of imports", Path(unchecked_file))
             )
 
+            # TODO: This wont work -->
             line = path_line[unchecked_file]
             if line.startswith("\\input"):
                 checker = "inputs"
@@ -359,6 +360,7 @@ def get_all_paths_in_document(file_path: str):
                     length=len(line),
                 )
             )
+            # TODO: This wont work <--
         except Exception as e:  # If the file cannot be found it is already removed
             # importing this here to avoid circular import error
             from latexbuddy import __logger as root_logger
@@ -379,9 +381,11 @@ def get_all_paths_in_document(file_path: str):
                 # if missing / at the beginning, add it.
                 if path[0] != "/":
                     path = parent + "/" + path
-                # if missing .tex, add it
+                # if missing .tex, add a problem
                 if not path.endswith(".tex"):
-                    path = path + ".tex"
+                    # TODO: Error message.
+                    print("'.tex' is missing. Check all includes/inputs!")
+                    continue  # if file ending is not given, ignore file
 
                 path_line[path] = line
                 new_files.append(Path(path))  # if something was found, add it to a list

@@ -36,9 +36,11 @@ class LatexBuddy:
         :param file_to_check: file that will be checked
         :param path_list: a list of the paths for the html output
         """
+        self.preprocessor = Preprocessor()  # initialize at the beginning!!
         self.path_list: Path = path_list  # all paths from the files to be used in html
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = config_loader  # configuration
+
         self.file_to_check = None
         self.tex_file = None
 
@@ -185,7 +187,6 @@ class LatexBuddy:
         from latexbuddy.tool_loader import ToolLoader
 
         # initialize Preprocessor
-        self.preprocessor = Preprocessor()
         self.preprocessor.regex_parse_preprocessor_comments(self.tex_file)
 
         # initialize ToolLoader

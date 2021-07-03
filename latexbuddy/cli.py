@@ -158,8 +158,9 @@ def main():
             path_list=paths,  # to be used later on in render html
         )
 
-        for problem in problems:
-            buddy.add_error(problem)
+        #  TODO: this wont work
+        #  for problem in problems:
+        #      buddy.add_error(problem)
 
         for path in paths:
             #  need to clear the error list of the previous file
