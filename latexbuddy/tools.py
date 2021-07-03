@@ -14,7 +14,15 @@ from tempfile import mkdtemp, mkstemp
 from typing import Callable, List, Optional, Tuple
 
 from latexbuddy.exceptions import ExecutableNotFoundError
+from latexbuddy.log import Loggable
 from latexbuddy.messages import not_found
+
+
+class ToolLogger(Loggable):
+    pass
+
+
+logger = ToolLogger().logger
 
 
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
@@ -26,11 +34,6 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     :param encoding: output encoding
     :return: command output
     """
-
-    # importing this here to avoid circular import error
-    from latexbuddy import __logger as root_logger
-
-    logger = root_logger.getChild("tools")
 
     command = get_command_string(cmd)
 
@@ -102,7 +105,7 @@ def get_command_string(cmd: Tuple[str]) -> str:
 def find_executable(
     name: str,
     to_install: Optional[str] = None,
-    logger: Optional[Logger] = None,
+    err_logger: Logger = logger,
     log_errors: bool = True,
 ) -> str:
     """Finds path to an executable. If the executable can not be located, an error
@@ -114,7 +117,7 @@ def find_executable(
     :param name: executable name
     :param to_install: correct name of the program or project which the requested
                        executable belongs to (used in log messages)
-    :param logger: custom logger to be used for logging debug/error messages
+    :param err_logger: custom logger to be used for logging debug/error messages
     :param log_errors: specifies whether or not this method should log an error message,
                        if the executable can not be located; if this is False, a debug
                        message will be logged instead
@@ -122,22 +125,16 @@ def find_executable(
     :raises FileNotFoundError: if the executable couldn't be found
     """
 
-    if logger is None:
-        # importing this here to avoid circular import error
-        from latexbuddy import __logger as root_logger
-
-        logger = root_logger.getChild("Tools")
-
     result = execute("which", name)
 
     if not result or "not found" in result:
 
         if log_errors:
-            logger.error(
+            err_logger.error(
                 not_found(name, to_install if to_install is not None else name)
             )
         else:
-            logger.debug(
+            err_logger.debug(
                 f"could not find executable '{name}' "
                 f"({to_install if to_install is not None else name}) "
                 f"in the system's PATH"
@@ -150,7 +147,7 @@ def find_executable(
     else:
 
         path_str = result.splitlines()[0]
-        logger.debug(f"Found executable {name} at '{path_str}'.")
+        err_logger.debug(f"Found executable {name} at '{path_str}'.")
         return path_str
 
 
@@ -235,11 +232,6 @@ def execute_no_exceptions(
     try:
         function_call()
     except Exception as e:
-
-        # importing this here to avoid circular import error
-        from latexbuddy import __logger as root_logger
-
-        logger = root_logger.getChild("Tools")
 
         logger.error(
             f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}"
@@ -364,13 +356,13 @@ def compile_tex(module, tex_file: Path, compile_pdf: bool = False) -> Tuple[Path
         try:
             find_executable("pdflatex")
         except FileNotFoundError:
-            module.__logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
+            module.logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
         compiler = "pdflatex"
     else:
         try:
             find_executable("latex")
         except FileNotFoundError:
-            module.__logger.error(not_found("latex", "LaTeX (e.g., TeXLive Core)"))
+            module.logger.error(not_found("latex", "LaTeX (e.g., TeXLive Core)"))
         compiler = "latex"
 
     tex_mf = create_tex_mf()
