@@ -10,14 +10,14 @@ from pydantic import BaseModel, ValidationError
 
 import latexbuddy.tools as tools
 
-from latexbuddy import __logger as root_logger
 from latexbuddy.exceptions import (
     ConfigOptionNotFoundError,
     ConfigOptionVerificationError,
 )
+from latexbuddy.log import Loggable
 
 
-class ConfigLoader:
+class ConfigLoader(Loggable):
     """Describes a ConfigLoader object.
 
     The ConfigLoader processes LaTeXBuddy's cli arguments and loads the specified
@@ -25,8 +25,6 @@ class ConfigLoader:
     ConfigLoader also offers methods for accessing config entries with the option
     to specify a default value on Failure.
     """
-
-    __logger = root_logger.getChild("config_loader")
 
     _REGEX_LANGUAGE_FLAG = re.compile(r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?")
 
@@ -43,13 +41,13 @@ class ConfigLoader:
         self.module_flags: Dict[str, Dict[str, Any]] = {}
 
         if cli_arguments is None:
-            self.__logger.debug(
+            self.logger.debug(
                 "No CLI arguments specified. Default values will be used."
             )
             return
 
         if not cli_arguments.config:
-            self.__logger.warning(
+            self.logger.warning(
                 "No configuration file specified. Default values will be used."
             )
             return
@@ -57,7 +55,7 @@ class ConfigLoader:
         if cli_arguments.config.exists():
             self.load_configurations(cli_arguments.config)
         else:
-            self.__logger.warning(
+            self.logger.warning(
                 f"File not found: {cli_arguments.config}. "
                 f"Default configuration values will be used."
             )
@@ -132,7 +130,7 @@ class ConfigLoader:
 
                 else:
 
-                    self.__logger.warning(
+                    self.logger.warning(
                         f"Specified language '{args_dict[key]}' is not a valid "
                         f"language key. Please use a key in the following syntax: "
                         f"<language>[-<country>] (e.g.: en-GB, en_US, de-DE)"
@@ -141,7 +139,7 @@ class ConfigLoader:
             else:
                 parsed_main[key] = args_dict[key]
 
-        self.__logger.debug(
+        self.logger.debug(
             f"Parsed CLI config options (main):\n{str(parsed_main)}\n\n"
             f"Parsed CLI config options (modules):\n{str(parsed_modules)}"
         )
@@ -434,7 +432,7 @@ class ConfigLoader:
             )
 
         except ConfigOptionNotFoundError:
-            self.__logger.info(
+            self.logger.info(
                 f"Config entry '{key}' for module '{module.display_name}' not found. "
                 f"Using default value '{str(default_value)}' instead..."
             )
@@ -442,7 +440,7 @@ class ConfigLoader:
             return default_value
 
         except ConfigOptionVerificationError as e:
-            self.__logger.warning(
+            self.logger.warning(
                 f"Config entry invalid. Using default value '{str(default_value)}' "
                 f"instead. Details: {str(e)}"
             )
