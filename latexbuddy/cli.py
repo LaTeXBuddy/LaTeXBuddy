@@ -7,6 +7,7 @@ import os
 
 from pathlib import Path
 from time import perf_counter
+from typing import AnyStr
 
 from colorama import Fore
 
@@ -140,7 +141,13 @@ def main():
     are fetched and Latexbuddy is executed """
 
     buddy = LatexBuddy.instance
-    module_loader = ModuleLoader(Path("latexbuddy/modules/"))
+    module_loader = ModuleLoader(
+        Path(
+            config_loader.get_config_option_or_default(
+                LatexBuddy, "module_dir", "latexbuddy/modules/", verify_type=AnyStr
+            )
+        )
+    )
 
     for p in args.file:  # args.file is a list
         paths, problems = get_all_paths_in_document(p)

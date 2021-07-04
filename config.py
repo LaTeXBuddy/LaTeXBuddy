@@ -6,6 +6,7 @@ out-of-the-box. You may move this file and specify its path using the --config f
 main = {
     "language": "en",
     "language_country": "GB",
+    "module_dir": "latexbuddy/modules/",
     "whitelist": "whitelist",
     "output": "./latexbuddy_html/",
     "format": "HTML",
