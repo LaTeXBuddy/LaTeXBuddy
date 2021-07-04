@@ -34,7 +34,7 @@ class LatexBuddy(MainModule):
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = ConfigLoader()  # configuration
         self.preprocessor: Optional[Preprocessor] = None  # in-file preprocessing
-        self.module_provider = Optional[ModuleProvider] = None
+        self.module_provider: Optional[ModuleProvider] = None
         self.file_to_check: Optional[Path] = None  # .tex file to be error checked
         self.tex_file: Optional[TexFile] = None
         self.output_dir: Optional[Path] = None
@@ -49,7 +49,12 @@ class LatexBuddy(MainModule):
         return cls.__current_instance
 
     @staticmethod
-    def init(config_loader: ConfigLoader, module_provider: ModuleProvider, file_to_check: Path, path_list: List[Path]):
+    def init(
+        config_loader: ConfigLoader,
+        module_provider: ModuleProvider,
+        file_to_check: Path,
+        path_list: List[Path],
+    ):
         """Initializes the LaTeXBuddy instance.
 
         :param config_loader: ConfigLoader object to manage config options
@@ -225,7 +230,9 @@ class LatexBuddy(MainModule):
         )
 
         # acquire Module instances
-        modules = LatexBuddy.instance.module_provider.load_selected_modules(LatexBuddy.instance.cfg)
+        modules = LatexBuddy.instance.module_provider.load_selected_modules(
+            LatexBuddy.instance.cfg
+        )
 
         LatexBuddy.instance.logger.debug(
             f"Using multiprocessing pool with {os.cpu_count()} "
