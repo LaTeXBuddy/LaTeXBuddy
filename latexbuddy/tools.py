@@ -37,7 +37,7 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
 
     command = get_command_string(cmd)
 
-    logger.debug(f"Executing {command}")
+    logger.debug(f"Executing '{command}'")
 
     error_list = subprocess.Popen(
         [command], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
@@ -53,6 +53,8 @@ def execute_background(*cmd: str) -> subprocess.Popen:
     :return: subprocess instance of the executed command
     """
     command = get_command_string(cmd)
+
+    logger.debug(f"Executing '{command}' in the background")
 
     process = subprocess.Popen(
         [command],
@@ -82,6 +84,8 @@ def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
     :return: command output
     """
     command = get_command_string(cmd)
+
+    logger.debug(f"Executing '{command}' (ignoring errors)")
 
     error_list = subprocess.Popen(
         [command], shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL
