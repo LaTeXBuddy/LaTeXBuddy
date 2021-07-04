@@ -58,8 +58,8 @@ class LatexBuddy(MainModule):
         LatexBuddy.instance.errors = {}
         LatexBuddy.instance.cfg = config_loader
         LatexBuddy.instance.preprocessor = None
-        LatexBuddy.instance.file_to_check = None
-        LatexBuddy.instance.tex_file = None
+        LatexBuddy.instance.file_to_check = file_to_check
+        LatexBuddy.instance.tex_file = TexFile(file_to_check)
         LatexBuddy.instance.path_list = path_list
 
         # file where the error should be saved
@@ -92,16 +92,6 @@ class LatexBuddy(MainModule):
                 LatexBuddy, "whitelist", Path("whitelist"), verify_type=AnyStr
             )
         )
-
-    @staticmethod
-    def change_file(file: Path):
-        """Method to change the current file. Used for multi check files included
-            in other files
-
-        :param file: the new file to check next
-        """
-        LatexBuddy.instance.file_to_check = file
-        LatexBuddy.instance.tex_file = TexFile(file)
 
     @staticmethod
     def add_error(problem: Problem):
@@ -301,9 +291,3 @@ class LatexBuddy(MainModule):
 
         else:  # using HTML as default
             LatexBuddy.instance.output_html()
-
-    @staticmethod
-    def clear_error_list():
-        """Function needed for multiple files.
-        It clears the error list, for the next use"""
-        LatexBuddy.instance.errors.clear()
