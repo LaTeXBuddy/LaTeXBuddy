@@ -56,14 +56,14 @@ parser.add_argument(
 parser.add_argument(
     "--whitelist",
     "-w",
-    type=Path,
+    type=str,
     default=None,
     help="Location of the whitelist file.",
 )
 parser.add_argument(
     "--output",
     "-o",
-    type=Path,
+    type=str,
     default=None,
     help="Directory, in which to put the output file.",
 )
