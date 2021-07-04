@@ -148,7 +148,7 @@ def main():
             # re-initialize the buddy instance with a new path
             buddy.init(
                 config_loader=config_loader,
-                file_to_check=path,  # set first file
+                file_to_check=path,
                 path_list=paths,  # to be used later on in render html
             )
 
