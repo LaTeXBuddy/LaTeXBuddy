@@ -17,6 +17,7 @@ from latexbuddy import __version__
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
+from latexbuddy.module_loader import ModuleLoader
 from latexbuddy.tools import get_all_paths_in_document, perform_whitelist_operations
 
 
@@ -139,6 +140,7 @@ def main():
     are fetched and Latexbuddy is executed """
 
     buddy = LatexBuddy.instance
+    module_loader = ModuleLoader(Path("latexbuddy/modules/"))
 
     for p in args.file:  # args.file is a list
         paths, problems = get_all_paths_in_document(p)
@@ -148,6 +150,7 @@ def main():
             # re-initialize the buddy instance with a new path
             buddy.init(
                 config_loader=config_loader,
+                module_provider=module_loader,
                 file_to_check=path,
                 path_list=paths,  # to be used later on in render html
             )
