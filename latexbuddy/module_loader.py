@@ -1,6 +1,7 @@
 import importlib
 import inspect
 
+from abc import ABC
 from pathlib import Path
 from types import ModuleType
 from typing import List
@@ -12,7 +13,11 @@ from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 
 
-class ToolLoader:
+class ModuleProvider(ABC):
+    pass
+
+
+class ModuleLoader:
     """This class encapsulates all features necessary to load LaTeXBuddy modules from
     a specified directory."""
 

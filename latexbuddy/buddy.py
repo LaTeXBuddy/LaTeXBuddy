@@ -214,7 +214,7 @@ class LatexBuddy(MainModule):
         set_language(language)  # set global variable in problem.py for key generation
 
         # importing this here to avoid circular import error
-        from latexbuddy.module_loader import ToolLoader
+        from latexbuddy.module_loader import ModuleLoader
 
         # initialize Preprocessor
         LatexBuddy.instance.preprocessor = Preprocessor()
@@ -223,7 +223,7 @@ class LatexBuddy(MainModule):
         )
 
         # initialize ToolLoader
-        tool_loader = ToolLoader(Path("latexbuddy/modules/"))
+        tool_loader = ModuleLoader(Path("latexbuddy/modules/"))
         modules = tool_loader.load_selected_modules(LatexBuddy.instance.cfg)
 
         LatexBuddy.instance.logger.debug(
