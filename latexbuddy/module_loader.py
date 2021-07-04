@@ -14,6 +14,11 @@ from latexbuddy.modules import Module
 
 
 class ModuleProvider(ABC):
+    """
+    This interface class defines all methods necessary to provide a list of instances
+    of modules that implement the Module API, which is required in order for the
+    instances to be executed by the main LatexBuddy instance.
+    """
 
     @abstractmethod
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
@@ -40,8 +45,10 @@ class ModuleProvider(ABC):
 
 
 class ModuleLoader(ModuleProvider):
-    """This class encapsulates all features necessary to load LaTeXBuddy modules from
-    a specified directory."""
+    """
+    This class encapsulates all features necessary to load LaTeXBuddy modules from
+    a specified directory.
+    """
 
     def __init__(self, directory: Path):
         """Initializes the ModuleLoader for a specific directory.
