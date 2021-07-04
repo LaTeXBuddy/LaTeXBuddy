@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - custom key for YaLafi problems (!109)
 - filter for log files (!121)
 - new base class for all modules and LatexBuddy (NamedModule`) (!108)
-- new `Loggable` base class which provides a properly named logger to any class inheriting from it (!108)
+- new `Loggable` base class which provides a properly named logger to any class inheriting from it (!108) 
 
 ### Changed
 - language selection for aspell now works dynamically and using the config (!105)
@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - all modules now use the new standards for ConfigLoader, Problem API and logging (!1ß8)
 - `LatexBuddy` is now a singleton and inherits from `MainModule`, making it an instance of `NamedModule` as well (!108)
 - modified format of `config.py`: options with key `"buddy"` are now located in a seperate dictionary (!108)
+- languagetool now dynamically retrieves a list of supported languages from the commandline or (local/remote) server instead of comparing with a hardcoded list (!139)
 
 ### Fixed
 - regex usage in own_checkers (!110)
