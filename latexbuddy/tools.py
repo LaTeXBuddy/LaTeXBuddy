@@ -10,12 +10,11 @@ import traceback
 from argparse import Namespace
 from logging import Logger
 from pathlib import Path
-from tempfile import mkdtemp, mkstemp
 from typing import Callable, List, Optional, Tuple
 
 from latexbuddy.exceptions import ExecutableNotFoundError
 from latexbuddy.log import Loggable
-from latexbuddy.messages import not_found, path_not_found, texfile_error
+from latexbuddy.messages import not_found, path_not_found
 from latexbuddy.problem import Problem, ProblemSeverity
 
 
