@@ -12,6 +12,7 @@ import latexbuddy.tools as tools
 
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
+from latexbuddy.module_loader import ModuleProvider
 from latexbuddy.modules import MainModule, Module
 from latexbuddy.preprocessor import Preprocessor
 from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
@@ -33,6 +34,7 @@ class LatexBuddy(MainModule):
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = ConfigLoader()  # configuration
         self.preprocessor: Optional[Preprocessor] = None  # in-file preprocessing
+        self.module_provider = Optional[ModuleProvider] = None
         self.file_to_check: Optional[Path] = None  # .tex file to be error checked
         self.tex_file: Optional[TexFile] = None
         self.output_dir: Optional[Path] = None
@@ -47,10 +49,12 @@ class LatexBuddy(MainModule):
         return cls.__current_instance
 
     @staticmethod
-    def init(config_loader: ConfigLoader, file_to_check: Path, path_list: List[Path]):
+    def init(config_loader: ConfigLoader, module_provider: ModuleProvider, file_to_check: Path, path_list: List[Path]):
         """Initializes the LaTeXBuddy instance.
 
         :param config_loader: ConfigLoader object to manage config options
+        :param module_provider: ModuleProvider instance as a source of Module instances
+                                for running checks on the specified file
         :param file_to_check: file that will be checked
         :param path_list: a list of the paths for the html output
         """
@@ -58,6 +62,7 @@ class LatexBuddy(MainModule):
         LatexBuddy.instance.errors = {}
         LatexBuddy.instance.cfg = config_loader
         LatexBuddy.instance.preprocessor = None
+        LatexBuddy.instance.module_provider = module_provider
         LatexBuddy.instance.file_to_check = file_to_check
         LatexBuddy.instance.tex_file = TexFile(file_to_check)
         LatexBuddy.instance.path_list = path_list
@@ -168,7 +173,7 @@ class LatexBuddy(MainModule):
                 del LatexBuddy.instance.errors[curr_uid]
 
     @staticmethod
-    def mapper(module: Module) -> List[Problem]:
+    def execute_module(module: Module) -> List[Problem]:
         """
         Executes checks for provided module and returns its Problems.
         This method is used to parallelize the module execution.
@@ -203,7 +208,7 @@ class LatexBuddy(MainModule):
 
     @staticmethod
     def run_tools():
-        """Runs all tools in the LaTeXBuddy toolchain in parallel"""
+        """Runs all modules in the LaTeXBuddy toolchain in parallel"""
 
         language = LatexBuddy.instance.cfg.get_config_option_or_default(
             LatexBuddy,
@@ -213,18 +218,14 @@ class LatexBuddy(MainModule):
         )
         set_language(language)  # set global variable in problem.py for key generation
 
-        # importing this here to avoid circular import error
-        from latexbuddy.module_loader import ModuleLoader
-
         # initialize Preprocessor
         LatexBuddy.instance.preprocessor = Preprocessor()
         LatexBuddy.instance.preprocessor.regex_parse_preprocessor_comments(
             LatexBuddy.instance.tex_file
         )
 
-        # initialize ToolLoader
-        tool_loader = ModuleLoader(Path("latexbuddy/modules/"))
-        modules = tool_loader.load_selected_modules(LatexBuddy.instance.cfg)
+        # acquire Module instances
+        modules = LatexBuddy.instance.module_provider.load_selected_modules(LatexBuddy.instance.cfg)
 
         LatexBuddy.instance.logger.debug(
             f"Using multiprocessing pool with {os.cpu_count()} "
@@ -232,7 +233,7 @@ class LatexBuddy(MainModule):
         )
 
         with mp.Pool(processes=os.cpu_count()) as pool:
-            result = pool.map(LatexBuddy.instance.mapper, modules)
+            result = pool.map(LatexBuddy.instance.execute_module, modules)
 
         for problems in result:
             for problem in problems:
