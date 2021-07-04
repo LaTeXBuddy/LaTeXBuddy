@@ -8,7 +8,6 @@ from typing import List
 
 import latexbuddy.tools as tools
 
-from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 
@@ -58,6 +57,9 @@ class ModuleLoader(ModuleProvider):
         self.directory = directory
 
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
+
+        # importing this here to avoid circular import error
+        from latexbuddy.buddy import LatexBuddy
 
         modules = self.load_modules()
 
