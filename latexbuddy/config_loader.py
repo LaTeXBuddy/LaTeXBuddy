@@ -4,7 +4,7 @@ import re
 
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, AnyStr, Dict, List, Optional, Set, Tuple, Type, Union
+from typing import Any, AnyStr, Callable, Dict, List, Optional, Set, Tuple, Type, Union
 
 from pydantic import BaseModel, ValidationError
 
@@ -97,7 +97,13 @@ class ConfigLoader(Loggable):
 
         # mutual exclusion of enable_modules and disable_modules
         # is guaranteed by argparse library
-        flag_function_map = {
+        flag_function_map: Dict[
+            str,
+            Callable[
+                [Any, Dict[str, Any], Dict[str, Dict[str, Any]]],
+                Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]],
+            ],
+        ] = {
             "enable_modules": self.__parse_flag_enable_modules,
             "disable_modules": self.__parse_flag_disable_modules,
             "language": self.__parse_flag_language,
