@@ -111,6 +111,10 @@ class LatexBuddy(MainModule):
     @staticmethod
     def check_whitelist():
         """Removes errors that are whitelisted."""
+
+        LatexBuddy.instance.logger.debug("Beginning whitelist-check...")
+        start_time = time.perf_counter()
+
         if not (
             LatexBuddy.instance.whitelist_file.exists()
             and LatexBuddy.instance.whitelist_file.is_file()
@@ -125,6 +129,11 @@ class LatexBuddy(MainModule):
         for uid in uids:
             if LatexBuddy.instance.errors[uid].key in whitelist_entries:
                 del LatexBuddy.instance.errors[uid]
+
+        LatexBuddy.instance.logger.debug(
+            f"Finished whitelist-check in {round(time.perf_counter() - start_time, 2)} "
+            f"seconds"
+        )
 
     @staticmethod
     def add_to_whitelist(uid):
