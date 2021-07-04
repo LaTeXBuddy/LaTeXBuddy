@@ -75,74 +75,97 @@ class ConfigLoader(Loggable):
                  contains all remaining options for other modules
         """
 
-        parsed_main = {}
-        parsed_modules = {}
-
         args_dict = {
             key: value for key, value in vars(args).items() if value is not None
         }
 
-        for key in args_dict:
-            # mutual exclusion of enable_modules and disable_modules
-            # is guaranteed by argparse library
-            if key == "enable_modules":
-
-                parsed_main["enable-modules-by-default"] = False
-
-                for module_name in self.module_configurations.keys():
-                    if module_name not in parsed_modules:
-                        parsed_modules[module_name] = {}
-
-                    parsed_modules[module_name]["enabled"] = False
-
-                for module_name in args_dict[key].split(","):
-                    if module_name not in parsed_modules:
-                        parsed_modules[module_name] = {}
-
-                    parsed_modules[module_name]["enabled"] = True
-
-            elif key == "disable_modules":
-
-                parsed_main["enable-modules-by-default"] = True
-
-                for module_name in self.module_configurations.keys():
-                    if module_name not in parsed_modules:
-                        parsed_modules[module_name] = {}
-
-                    parsed_modules[module_name]["enabled"] = True
-
-                for module_name in args_dict[key].split(","):
-                    if module_name not in parsed_modules:
-                        parsed_modules[module_name] = {}
-
-                    parsed_modules[module_name]["enabled"] = False
-
-            elif key == "language":
-
-                language_match = self._REGEX_LANGUAGE_FLAG.fullmatch(args_dict[key])
-
-                if language_match is not None:
-
-                    parsed_main["language"] = language_match.group(1)
-
-                    if language_match.group(2) is not None:
-                        parsed_main["language_country"] = language_match.group(2)
-
-                else:
-
-                    self.logger.warning(
-                        f"Specified language '{args_dict[key]}' is not a valid "
-                        f"language key. Please use a key in the following syntax: "
-                        f"<language>[-<country>] (e.g.: en-GB, en_US, de-DE)"
-                    )
-
-            else:
-                parsed_main[key] = args_dict[key]
+        parsed_main, parsed_modules = self.__parse_args_dict(args_dict)
 
         self.logger.debug(
             f"Parsed CLI config options (main):\n{str(parsed_main)}\n\n"
             f"Parsed CLI config options (modules):\n{str(parsed_modules)}"
         )
+
+        return parsed_main, parsed_modules
+
+    def __parse_args_dict(self, args_dict: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
+
+        parsed_main = {}
+        parsed_modules = {}
+
+        # mutual exclusion of enable_modules and disable_modules
+        # is guaranteed by argparse library
+        flag_function_map = {
+            "enable_modules": self.__parse_flag_enable_modules,
+            "disable_modules": self.__parse_flag_disable_modules,
+            "language": self.__parse_flag_language,
+        }
+
+        for key in args_dict:
+
+            if key in flag_function_map:
+
+                parsed_main, parsed_modules = flag_function_map[key](args_dict[key], parsed_main, parsed_modules)
+
+            else:
+                parsed_main[key] = args_dict[key]
+
+        return parsed_main, parsed_modules
+
+    def __parse_flag_enable_modules(self, flag_value: Any, parsed_main: Dict[str, Any], parsed_modules: Dict[str, Dict[str, Any]]) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
+
+        parsed_main["enable-modules-by-default"] = False
+
+        for module_name in self.module_configurations.keys():
+            if module_name not in parsed_modules:
+                parsed_modules[module_name] = {}
+
+            parsed_modules[module_name]["enabled"] = False
+
+        for module_name in flag_value.split(","):
+            if module_name not in parsed_modules:
+                parsed_modules[module_name] = {}
+
+            parsed_modules[module_name]["enabled"] = True
+
+        return parsed_main, parsed_modules
+
+    def __parse_flag_disable_modules(self, flag_value: Any, parsed_main: Dict[str, Any], parsed_modules: Dict[str, Dict[str, Any]]) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
+
+        parsed_main["enable-modules-by-default"] = True
+
+        for module_name in self.module_configurations.keys():
+            if module_name not in parsed_modules:
+                parsed_modules[module_name] = {}
+
+            parsed_modules[module_name]["enabled"] = True
+
+        for module_name in flag_value.split(","):
+            if module_name not in parsed_modules:
+                parsed_modules[module_name] = {}
+
+            parsed_modules[module_name]["enabled"] = False
+
+        return parsed_main, parsed_modules
+
+    def __parse_flag_language(self, flag_value: Any, parsed_main: Dict[str, Any], parsed_modules: Dict[str, Dict[str, Any]]) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
+
+        language_match = self._REGEX_LANGUAGE_FLAG.fullmatch(flag_value)
+
+        if language_match is not None:
+
+            parsed_main["language"] = language_match.group(1)
+
+            if language_match.group(2) is not None:
+                parsed_main["language_country"] = language_match.group(2)
+
+        else:
+
+            self.logger.warning(
+                f"Specified language '{flag_value}' is not a valid "
+                f"language key. Please use a key in the following syntax: "
+                f"<language>[-<country>] (e.g.: en-GB, en_US, de-DE)"
+            )
 
         return parsed_main, parsed_modules
 
