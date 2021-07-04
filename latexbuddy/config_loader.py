@@ -91,7 +91,12 @@ class ConfigLoader(Loggable):
     def __parse_args_dict(
         self, args_dict: Dict[str, Any]
     ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
+        """
+        This private helper function parses the preprocessed args_dict (without
+        None-elements).
 
+        :param args_dict: preprocessed dictionary to be parsed
+        """
         parsed_main = {}
         parsed_modules = {}
 
@@ -128,6 +133,9 @@ class ConfigLoader(Loggable):
         parsed_main: Dict[str, Any],
         parsed_modules: Dict[str, Dict[str, Any]],
     ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
+        """
+        This private helper-function parses the CLI flag '--enable_modules'
+        """
 
         parsed_main["enable-modules-by-default"] = False
 
@@ -151,7 +159,9 @@ class ConfigLoader(Loggable):
         parsed_main: Dict[str, Any],
         parsed_modules: Dict[str, Dict[str, Any]],
     ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
-
+        """
+        This private helper-function parses the CLI flag '--disable_modules'
+        """
         parsed_main["enable-modules-by-default"] = True
 
         for module_name in self.module_configurations.keys():
@@ -174,7 +184,9 @@ class ConfigLoader(Loggable):
         parsed_main: Dict[str, Any],
         parsed_modules: Dict[str, Dict[str, Any]],
     ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
-
+        """
+        This private helper-function parses the CLI flag '--language'
+        """
         language_match = self._REGEX_LANGUAGE_FLAG.fullmatch(flag_value)
 
         if language_match is not None:
