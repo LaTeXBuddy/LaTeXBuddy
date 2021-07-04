@@ -88,7 +88,9 @@ class ConfigLoader(Loggable):
 
         return parsed_main, parsed_modules
 
-    def __parse_args_dict(self, args_dict: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
+    def __parse_args_dict(
+        self, args_dict: Dict[str, Any]
+    ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
 
         parsed_main = {}
         parsed_modules = {}
@@ -105,14 +107,21 @@ class ConfigLoader(Loggable):
 
             if key in flag_function_map:
 
-                parsed_main, parsed_modules = flag_function_map[key](args_dict[key], parsed_main, parsed_modules)
+                parsed_main, parsed_modules = flag_function_map[key](
+                    args_dict[key], parsed_main, parsed_modules
+                )
 
             else:
                 parsed_main[key] = args_dict[key]
 
         return parsed_main, parsed_modules
 
-    def __parse_flag_enable_modules(self, flag_value: Any, parsed_main: Dict[str, Any], parsed_modules: Dict[str, Dict[str, Any]]) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
+    def __parse_flag_enable_modules(
+        self,
+        flag_value: Any,
+        parsed_main: Dict[str, Any],
+        parsed_modules: Dict[str, Dict[str, Any]],
+    ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
 
         parsed_main["enable-modules-by-default"] = False
 
@@ -130,7 +139,12 @@ class ConfigLoader(Loggable):
 
         return parsed_main, parsed_modules
 
-    def __parse_flag_disable_modules(self, flag_value: Any, parsed_main: Dict[str, Any], parsed_modules: Dict[str, Dict[str, Any]]) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
+    def __parse_flag_disable_modules(
+        self,
+        flag_value: Any,
+        parsed_main: Dict[str, Any],
+        parsed_modules: Dict[str, Dict[str, Any]],
+    ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
 
         parsed_main["enable-modules-by-default"] = True
 
@@ -148,7 +162,12 @@ class ConfigLoader(Loggable):
 
         return parsed_main, parsed_modules
 
-    def __parse_flag_language(self, flag_value: Any, parsed_main: Dict[str, Any], parsed_modules: Dict[str, Dict[str, Any]]) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
+    def __parse_flag_language(
+        self,
+        flag_value: Any,
+        parsed_main: Dict[str, Any],
+        parsed_modules: Dict[str, Dict[str, Any]],
+    ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
 
         language_match = self._REGEX_LANGUAGE_FLAG.fullmatch(flag_value)
 
