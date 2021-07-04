@@ -306,7 +306,6 @@ def get_all_paths_in_document(file_path: str):
     If the file includes more files, these files will also be checked.
 
     :param file_path:a string, containing file path
-    :param buddy: the latexbuddy instance
     """
     unchecked_files = []  # Holds all unchecked files
     checked_files = []  # Holds all checked file
