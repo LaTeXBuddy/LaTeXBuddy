@@ -12,6 +12,7 @@ import requests
 
 from bibtexparser.bibdatabase import UndefinedString
 
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -34,7 +35,7 @@ def get_bibfile(file: TexFile) -> Optional[Path]:
     # in particular space
     m = re.search(pattern, tex)
 
-    if m is None:  # TODO: maybe make this to logger
+    if m is None:  # TODO: maybe log this
         # raise ValueError("No valid bibliography found in the .tex at {path}")
         return None
 
@@ -160,7 +161,7 @@ class NewerPublications(Module):
             print(self.time)
             print(f'{len(used_pubs)} entries found in "{bib_file}"\n')
 
-        output_format = config.get_config_option("buddy", "format")
+        output_format = config.get_config_option(LatexBuddy, "format")
         html_formats = {"html", "HTML"}
         problem_text = "BibTeX outdated: "
         problems = []
@@ -179,7 +180,7 @@ class NewerPublications(Module):
                 )
             problems.append(
                 Problem(
-                    position=(0, 0),
+                    position=None,
                     text=bibtex_id,
                     checker=NewerPublications,
                     category=self.category,
@@ -262,7 +263,7 @@ class BibtexDuplicates(Module):
             problem_text = f"{dup_ids[0]} <=> {dup_ids[1]}"
             problems.append(
                 Problem(
-                    position=(0, 0),
+                    position=None,
                     text=problem_text,
                     checker=BibtexDuplicates,
                     category=self.category,
