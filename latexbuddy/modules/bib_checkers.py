@@ -160,7 +160,9 @@ class NewerPublications(Module):
         for pub in self.found_pubs:
             bibtex_id = pub[3][2]
             if output_format in html_formats:  # HTML tags if output to HTML page
-                suggestion = f"Potential newer version \"<i>{pub[0]}</i>\" from <b>{pub[1]}</b> at <a href=\"{pub[2]}\"target=\"_blank\">{pub[2]}</a>"
+                suggestion = f"Potential newer version \"<i>{pub[0]}</i>\" from " \
+                             f"<b>{pub[1]}</b> at <a href=\"{pub[2]}\"" \
+                             f"target=\"_blank\">{pub[2]}</a>"
             else:
                 suggestion = f"Potential newer version \"{pub[0]}\" from {pub[1]} at {pub[2]}"
             problems.append(
