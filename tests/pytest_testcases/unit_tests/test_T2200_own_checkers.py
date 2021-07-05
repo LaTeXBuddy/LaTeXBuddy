@@ -19,7 +19,7 @@ def script_dir():
 def test_run_checks_unreferenced_figures(script_dir):
 
     ERROR_COUNT = 1
-    document_path = script_dir + "/resources/T2100.tex"
+    document_path = script_dir + "/resources/T2200.tex"
     checker_instance = UnreferencedFigures()
 
     test_file = TexFile(Path(document_path))
@@ -33,7 +33,7 @@ def test_run_checks_unreferenced_figures(script_dir):
 def test_run_checks_si_unit(script_dir):
 
     ERROR_COUNT = 3
-    document_path = script_dir + "/resources/T2100.tex"
+    document_path = script_dir + "/resources/T2200.tex"
     checker_instance = SiUnitx()
 
     test_file = TexFile(Path(document_path))
@@ -48,7 +48,7 @@ def test_run_checks_si_unit(script_dir):
 def test_run_checks_empty_sections(script_dir):
 
     ERROR_COUNT = 1
-    document_path = script_dir + "/resources/T2100.tex"
+    document_path = script_dir + "/resources/T2200.tex"
     checker_instance = EmptySections()
 
     test_file = TexFile(Path(document_path))
@@ -62,7 +62,7 @@ def test_run_checks_empty_sections(script_dir):
 def test_run_checks_url_check(script_dir):
 
     ERROR_COUNT = 1
-    document_path = script_dir + "/resources/T2100.tex"
+    document_path = script_dir + "/resources/T2200.tex"
     checker_instance = URLCheck()
 
     test_file = TexFile(Path(document_path))
@@ -76,7 +76,7 @@ def test_run_checks_url_check(script_dir):
 def test_run_checks_native_use_of_ref(script_dir):
 
     ERROR_COUNT = 1
-    document_path = script_dir + "/resources/T2100.tex"
+    document_path = script_dir + "/resources/T2200.tex"
     checker_instance = NativeUseOfRef()
 
     test_file = TexFile(Path(document_path))
