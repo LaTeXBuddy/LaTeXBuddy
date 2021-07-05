@@ -4,8 +4,9 @@ import pytest as pytest
 
 
 """
-IMPORTANT NOTE: every test case method and .py-file must either begin or end in 'test'
-                eg. 'test_my_cool_feature()' or 'divisibility_test()'
+IMPORTANT NOTE: every test case method must begin with 'test'
+                eg. 'test_my_cool_feature()'
+                the test case .py files may start or end with 'test_'
 """
 
 
