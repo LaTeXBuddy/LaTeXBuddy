@@ -6,7 +6,6 @@ out-of-the-box. You may move this file and specify its path using the --config f
 main = {
     "language": "en",
     "language_country": "GB",
-    "module_dir": "tests/pytest_testcases/integration_tests/resources/T700_driver_modules/",
     "output": "./latexbuddy_html/",
     "format": "HTML",
     "enable-modules-by-default": False,
