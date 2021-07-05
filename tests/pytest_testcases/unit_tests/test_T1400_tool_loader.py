@@ -6,8 +6,8 @@ import pytest
 
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.module_loader import ModuleLoader
-from tests.pytest_testcases.unit_tests.resources.T1400_dummy_modules.dummy_module_0 import \
-    DummyModule0
+from tests.pytest_testcases.unit_tests.resources.T1400_dummy_modules.dummy_module_0 \
+    import DummyModule0
 
 
 @pytest.fixture
@@ -25,7 +25,7 @@ def config_loader(script_dir):
     ))
 
 
-def test_unit_tool_loader(script_dir, config_loader):
+def test_unit_tool_loader(config_loader):
 
     module_loader = ModuleLoader(
         Path("tests/pytest_testcases/unit_tests/resources/T1400_dummy_modules/")
