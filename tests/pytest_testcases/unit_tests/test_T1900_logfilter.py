@@ -10,7 +10,7 @@ def script_dir():
     return str(Path(os.path.realpath(__file__)).parents[0])
 
 
-def test_run_checks(script_dir):
+def test_unit_logfilter_run_checks(script_dir):
     config_path = script_dir + "/resources/T1900_config.py"
     document_path = script_dir + "/resources/T1900.tex"
 
