@@ -25,5 +25,4 @@ def test_run_checks_aspell(script_dir):
     assert output_problems[0].text == "speeek"
     assert output_problems[1].text == "tike"
     assert output_problems[2].text == "mesage"
-    assert len(output_problems) > 0
     assert len(output_problems) == ERROR_COUNT
