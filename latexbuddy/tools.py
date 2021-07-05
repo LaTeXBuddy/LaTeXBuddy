@@ -7,12 +7,23 @@ import subprocess
 import sys
 import traceback
 
+from argparse import Namespace
 from logging import Logger
 from pathlib import Path
+from tempfile import mkdtemp, mkstemp
 from typing import Callable, List, Optional, Tuple
 
 from latexbuddy.exceptions import ExecutableNotFoundError
-from latexbuddy.messages import not_found
+from latexbuddy.log import Loggable
+from latexbuddy.messages import not_found, path_not_found, texfile_error
+from latexbuddy.problem import Problem, ProblemSeverity
+
+
+class ToolLogger(Loggable):
+    pass
+
+
+logger = ToolLogger().logger
 
 
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
@@ -24,7 +35,10 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     :param encoding: output encoding
     :return: command output
     """
+
     command = get_command_string(cmd)
+
+    logger.debug(f"Executing {command}")
 
     error_list = subprocess.Popen(
         [command], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
@@ -92,7 +106,7 @@ def get_command_string(cmd: Tuple[str]) -> str:
 def find_executable(
     name: str,
     to_install: Optional[str] = None,
-    logger: Optional[Logger] = None,
+    err_logger: Logger = logger,
     log_errors: bool = True,
 ) -> str:
     """Finds path to an executable. If the executable can not be located, an error
@@ -104,7 +118,7 @@ def find_executable(
     :param name: executable name
     :param to_install: correct name of the program or project which the requested
                        executable belongs to (used in log messages)
-    :param logger: custom logger to be used for logging debug/error messages
+    :param err_logger: custom logger to be used for logging debug/error messages
     :param log_errors: specifies whether or not this method should log an error message,
                        if the executable can not be located; if this is False, a debug
                        message will be logged instead
@@ -112,22 +126,16 @@ def find_executable(
     :raises FileNotFoundError: if the executable couldn't be found
     """
 
-    if logger is None:
-        # importing this here to avoid circular import error
-        from latexbuddy import __logger as root_logger
-
-        logger = root_logger.getChild("Tools")
-
     result = execute("which", name)
 
     if not result or "not found" in result:
 
         if log_errors:
-            logger.error(
+            err_logger.error(
                 not_found(name, to_install if to_install is not None else name)
             )
         else:
-            logger.debug(
+            err_logger.debug(
                 f"could not find executable '{name}' "
                 f"({to_install if to_install is not None else name}) "
                 f"in the system's PATH"
@@ -140,7 +148,7 @@ def find_executable(
     else:
 
         path_str = result.splitlines()[0]
-        logger.debug(f"Found executable {name} at '{path_str}'.")
+        err_logger.debug(f"Found executable {name} at '{path_str}'.")
         return path_str
 
 
@@ -226,11 +234,6 @@ def execute_no_exceptions(
         function_call()
     except Exception as e:
 
-        # importing this here to avoid circular import error
-        from latexbuddy import __logger as root_logger
-
-        logger = root_logger.getChild("Tools")
-
         logger.error(
             f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}"
         )
@@ -294,6 +297,102 @@ def get_app_dir() -> Path:
     return app_dir
 
 
+def get_all_paths_in_document(file_path: str):
+    """Checks files that are included in a file.
+
+    If the file includes more files, these files will also be checked.
+
+    :param file_path:a string, containing file path
+    :param buddy: the latexbuddy instance
+    """
+    unchecked_files = []  # Holds all unchecked files
+    checked_files = []  # Holds all checked file
+    problems = []
+
+    # add all paths to list
+    # this is used for the command line input
+    unchecked_files.append(file_path)
+    parent = str(Path(file_path).parent)
+    old_lines = ""  # need access to it in creating errors
+
+    while len(unchecked_files) > 0:
+        last_checked = checked_files[-1] if len(checked_files) > 0 else ""
+        unchecked_file = unchecked_files.pop(0)
+        new_files = []
+        path_line = {}
+        lines = ""  # might not be reset for new file otherwise
+
+        try:
+            lines = unchecked_file.read_text().splitlines(keepends=False)
+            old_lines = lines
+        except FileNotFoundError:  # the file might not be included in path
+            logger.error(
+                path_not_found("the checking of imports", Path(unchecked_file))
+            )
+
+            line = path_line[unchecked_file]
+            if line.startswith("\\input"):
+                checker = "inputs"
+            else:
+                checker = "includes"
+
+            position = re.search(line, old_lines)
+            problems.append(
+                Problem(
+                    position=(1, 1),
+                    text=path_line[unchecked_file],
+                    checker=checker,
+                    category="latex",
+                    p_type="0",
+                    file=Path(last_checked),
+                    severity=ProblemSeverity.WARNING,
+                    description=f"File not found {unchecked_file}.",
+                    key=checker + "_" + unchecked_file,
+                    length=len(line),
+                )
+            )
+        except Exception as e:  # If the file cannot be found it is already removed
+
+            error_message = "Error while searching for files"
+            logger.error(
+                f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}"
+            )
+
+        for line in lines:
+            # check for include and input statements
+            if line.startswith("\\include{") or line.startswith("\\input{"):
+                path = line
+                begin_of_path: int = path.find("{") + 1
+                end_of_path: int = path.find("}")
+                path = path[begin_of_path:end_of_path]
+                # if missing / at the beginning, add it.
+                if path[0] != "/":
+                    path = parent + "/" + path
+                # if missing .tex, add it
+                if not path.endswith(".tex"):
+                    path = path + ".tex"
+
+                path_line[path] = line
+                new_files.append(Path(path))  # if something was found, add it to a list
+
+        unchecked_files.extend(new_files)  # add new
+        checked_files.append(unchecked_file)
+    return checked_files, problems
+
+
+def perform_whitelist_operations(args: Namespace):
+
+    wl_file = args.whitelist if args.whitelist else Path("whitelist")
+
+    if args.wl_add_keys:
+        add_whitelist_console(wl_file, args.wl_add_keys)
+
+    if args.wl_from_wordlist:
+        add_whitelist_from_file(
+            wl_file, Path(args.wl_from_wordlist[0]), args.wl_from_wordlist[1]
+        )
+
+
 def add_whitelist_console(whitelist_file, to_add):
     """
     Adds a list of keys to the Whitelist.
@@ -334,3 +433,10 @@ def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
                 whitelist_entries.append(key)
                 file.write(key)
                 file.write("\n")
+
+
+class classproperty(property):
+    """Provides a way to implement a python property with class-level accessibility"""
+
+    def __get__(self, cls, owner):
+        return classmethod(self.fget).__get__(None, owner)()

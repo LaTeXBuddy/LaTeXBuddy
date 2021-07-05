@@ -17,7 +17,7 @@ from latexbuddy import __version__
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
-from latexbuddy.tools import add_whitelist_console, add_whitelist_from_file
+from latexbuddy.tools import get_all_paths_in_document, perform_whitelist_operations
 
 
 parser = argparse.ArgumentParser(
@@ -26,7 +26,10 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     "--version", "-V", action="version", version=f"{__app_name__} v{__version__}"
 )
-parser.add_argument("file", type=Path, help="File that will be processed.")
+# nargs="+" marks the beginning of a list
+parser.add_argument(
+    "file", nargs="+", type=Path, help="File(s) that will be processed."
+)
 parser.add_argument(
     "--config",
     "-c",
@@ -126,27 +129,35 @@ def main():
     logger.debug(f"Parsed CLI args: {str(args)}")
 
     if args.wl_add_keys or args.wl_from_wordlist:
-        if args.whitelist:
-            wl_file = Path(args.whitelist)
-        else:
-            wl_file = Path("whitelist")
-        if args.wl_add_keys:
-            add_whitelist_console(wl_file, args.wl_add_keys)
-        if args.wl_from_wordlist:
-            add_whitelist_from_file(
-                wl_file, Path(args.wl_from_wordlist[0]), args.wl_from_wordlist[1]
-            )
+
+        perform_whitelist_operations(args)
         return
 
     config_loader = ConfigLoader(args)
 
-    buddy = LatexBuddy(
-        config_loader=config_loader,
-        file_to_check=args.file,
-    )
+    """ For each Tex file transferred, all paths
+    are fetched and Latexbuddy is executed """
 
-    buddy.run_tools()
-    buddy.check_whitelist()
-    buddy.output_file()
+    buddy = LatexBuddy.instance
 
-    logger.debug(f"Execution finished in {round(perf_counter()-start, 2)}s")
+    for p in args.file:  # args.file is a list
+        paths, problems = get_all_paths_in_document(p)
+
+        buddy.init(
+            config_loader=config_loader,
+            file_to_check=Path(paths[0]),  # set first file
+            path_list=paths,  # to be used later on in render html
+        )
+
+        for problem in problems:
+            buddy.add_error(problem)
+
+        for path in paths:
+            #  need to clear the error list of the previous file
+            buddy.clear_error_list()
+            buddy.change_file(Path(path))  # change file everytime
+            buddy.run_tools()
+            buddy.check_whitelist()
+            buddy.output_file()
+
+    logger.debug(f"Execution finished in {round(perf_counter() - start, 2)}s")

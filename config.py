@@ -3,28 +3,31 @@ This is an example configuration for LaTeXBuddy and the tools that are supported
 out-of-the-box. You may move this file and specify its path using the --config flag.
 """
 
+main = {
+    "language": "en",
+    "language_country": "GB",
+    "whitelist": "whitelist",
+    "output": "./latexbuddy_html/",
+    "format": "HTML",
+    "enable-modules-by-default": True,
+    "pdf": True,
+}
+
 modules = {
-    "buddy": {
-        "language": "en",
-        "whitelist": "whitelist",
-        "output": "./",
-        "format": "HTML",
-        "enable-modules-by-default": False,
+    "Aspell": {
+        "enabled": True,
     },
-    "AspellModule": {
-        "enabled": False,
+    "Chktex": {
+        "enabled": True,
     },
-    "ChktexModule": {
-        "enabled": False,
+    "Diction": {
+        "enabled": True,
     },
-    "DictionModule": {
-        "enabled": False,
-    },
-    "EmptySectionsModule": {
-        "enabled": False,
+    "EmptySections": {
+        "enabled": True,
     },
     "LanguageTool": {
-        "enabled": False,
+        "enabled": True,
         "mode": "COMMANDLINE",
         # "remote_url": "https://api.languagetoolplus.com/v2/check",
         "disabled-rules": [
@@ -35,23 +38,26 @@ modules = {
             # "TYPOS",
         ],
     },
-    "ProseLintModule": {
-        "enabled": False
+    "LogFilter": {
+        "enabled": True,
     },
-    "SiUnitxModule": {
-        "enabled": False,
+    "ProseLint": {
+        "enabled": True
     },
-    "URLModule": {
-        "enabled": False,
+    "SiUnitx": {
+        "enabled": True,
     },
-    "UnreferencedFiguresModule": {
-        "enabled": False,
+    "URLCheck": {
+        "enabled": True,
+    },
+    "UnreferencedFigures": {
+        "enabled": True,
     },
     "NativeUseOfRef": {
-        "enabled": False,
+        "enabled": True,
     },
     "CheckFigureResolution": {
-        "enabled": False,
+        "enabled": True,
     },
     "YaLafi": {
         "enabled": False
@@ -61,5 +67,5 @@ modules = {
     },
     "BibtexDuplicates": {
         "enabled": True
-    }
+    },
 }

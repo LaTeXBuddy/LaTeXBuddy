@@ -11,17 +11,16 @@ from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
-class UnreferencedFiguresModule(Module):
+class UnreferencedFigures(Module):
     def __init__(self):
-        self.tool_name = "unrefed_figure_check"
         self.p_type = "0"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Finds unreferenced figures.
-        :param: config: configurations of the buddy instance
-        :param: file: the file to check
+        :param config: the configuration options of the calling LaTeXBuddy instance
+        :param file: LaTeX file to be checked (with built-in detex option)
         :return: a list of found problems
         """
         tex = file.tex
@@ -45,18 +44,18 @@ class UnreferencedFiguresModule(Module):
 
         for (position, length), label in labels.items():
             line, col, offset = tools.absolute_to_linecol(file.tex, position)
-            if re.search(re.escape("\\ref{") + label + re.escape("}"), tex) is None:
+            if re.search(r"\\c?ref{" + label + re.escape("}"), tex) is None:
                 problems.append(
                     Problem(
                         position=(line, col),
                         text=label,
-                        checker=self.tool_name,
+                        checker=UnreferencedFigures,
                         category=self.category,
                         p_type=self.p_type,
                         file=file.tex_file,
                         severity=self.severity,
                         description=f"Figure {label} not referenced.",
-                        key=self.tool_name + "_" + label,
+                        key=self.display_name + "_" + label,
                         length=length,
                         context=("\\label{", "}"),
                     )
@@ -65,9 +64,8 @@ class UnreferencedFiguresModule(Module):
         return problems
 
 
-class SiUnitxModule(Module):
+class SiUnitx(Module):
     def __init__(self):
-        self.tool_name = "siunitx"
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
@@ -107,13 +105,13 @@ class SiUnitxModule(Module):
                 Problem(
                     position=(line, col),
                     text=number_match.group(0),
-                    checker=self.tool_name,
+                    checker=SiUnitx,
                     category=self.category,
                     p_type="num",
                     file=file.tex_file,
                     severity=self.severity,
                     description=f"For number {number_match.group(0)} \\num from siunitx may be used.",
-                    key=self.tool_name + "_" + number_match.group(0),
+                    key=self.display_name + "_" + number_match.group(0),
                     length=length,
                 )
             )
@@ -209,13 +207,13 @@ class SiUnitxModule(Module):
                     Problem(
                         position=(line, col),
                         text=unit_match.group(0),
-                        checker=self.tool_name,
+                        checker=SiUnitx,
                         category=self.category,
                         p_type="unit",
                         file=file.tex_file,
                         severity=self.severity,
                         description=f"For unit {unit_match.group(0)} siunitx may be used.",
-                        key=self.tool_name + "_" + unit_match.group(0),
+                        key=self.display_name + "_" + unit_match.group(0),
                         length=length,
                     )
                 )
@@ -223,9 +221,8 @@ class SiUnitxModule(Module):
         return problems
 
 
-class EmptySectionsModule(Module):
+class EmptySections(Module):
     def __init__(self):
-        self.tool_name = "emptysection"
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
@@ -243,13 +240,13 @@ class EmptySectionsModule(Module):
                 Problem(
                     position=(line, col),
                     text=text,
-                    checker=self.tool_name,
+                    checker=EmptySections,
                     category=self.category,
                     p_type="0",
                     file=file.tex_file,
                     severity=self.severity,
                     description=f"Sections may not be empty.",
-                    key=self.tool_name + "_" + text,
+                    key=self.display_name + "_" + text,
                     length=length,
                     context=("\\section{", "}"),
                 )
@@ -257,9 +254,8 @@ class EmptySectionsModule(Module):
         return problems
 
 
-class URLModule(Module):
+class URLCheck(Module):
     def __init__(self):
-        self.tool_name = "urlcheck"
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
@@ -282,13 +278,13 @@ class URLModule(Module):
                 Problem(
                     position=(line, col),
                     text=url_match.group(0),
-                    checker=self.tool_name,
+                    checker=URLCheck,
                     category=self.category,
                     p_type="0",
                     file=file.tex_file,
                     severity=self.severity,
                     description=f"For URLs use \\url.",
-                    key=self.tool_name + "_" + url_match.group(0),
+                    key=self.display_name + "_" + url_match.group(0),
                     length=length,
                 )
             )
@@ -310,8 +306,8 @@ class CheckFigureResolution(Module):
         ".jfi",
         ".gif",
         ".webp",
-        "tiff",
-        "tif",
+        ".tiff",
+        ".tif",
         ".psd",
         ".dip",
         ".heif",
@@ -320,7 +316,6 @@ class CheckFigureResolution(Module):
     ]
 
     def __init__(self):
-        self.tool_name = "resolution_check"
         self.p_type = "0"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
@@ -345,15 +340,15 @@ class CheckFigureResolution(Module):
                     figures.append(current_file)
                     problems.append(
                         Problem(
-                            position=(1, 1),
+                            position=None,
                             text=name,
-                            checker=self.tool_name,
+                            checker=CheckFigureResolution,
                             category=self.category,
                             p_type="0",
                             file=file.tex_file,
                             severity=self.severity,
                             description=f"Figure might have low resolution due to file format {ending}",
-                            key=self.tool_name + "_" + current_file,
+                            key=self.display_name + "_" + current_file,
                             length=1,
                         )
                     )
@@ -363,7 +358,6 @@ class CheckFigureResolution(Module):
 
 class NativeUseOfRef(Module):
     def __init__(self):
-        self.tool_name = "native_ref_use_check"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 
@@ -382,13 +376,13 @@ class NativeUseOfRef(Module):
                 Problem(
                     position=(line, col),
                     text=ref_pattern,
-                    checker=self.tool_name,
+                    checker=NativeUseOfRef,
                     category=self.category,
                     file=file.tex_file,
                     severity=self.severity,
                     description=description,
                     context=("", problem_text[5:]),
-                    key=self.tool_name + "_" + problem_text[5:-1],
+                    key=self.display_name + "_" + problem_text[5:-1],
                     length=len(ref_pattern),
                 )
             )

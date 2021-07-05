@@ -3,9 +3,9 @@ import re
 from abc import ABC, abstractmethod
 from typing import Callable, List, Optional
 
-from latexbuddy import TexFile
-from latexbuddy import __logger as root_logger
+from latexbuddy.log import Loggable
 from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.texfile import TexFile
 
 
 # forward-declare
@@ -232,15 +232,13 @@ class WhitelistKeyProblemFilter(ProblemFilter):
         return type(other) == WhitelistKeyProblemFilter and other.wl_key == self.wl_key
 
 
-class Preprocessor:
+class Preprocessor(Loggable):
     """
     This class represents the LaTeXBuddy in-file preprocessor.
     the Preprocessor is capable of parsing buddy commands disguised as LaTeX comments
     from a TexFile object using regexes and is able to filter any given Problem or list
     of Problems accordingly.
     """
-
-    __logger = root_logger.getChild("Preprocessor")
 
     __COMMAND_PATTERN = re.compile(
         r"%\s?buddy (ignore-next|begin-ignore|end-ignore)( (\S+))*"
@@ -337,7 +335,7 @@ class Preprocessor:
             if match is not None:
                 return match
 
-        Preprocessor.__logger.warning(
+        self.logger.warning(
             f"Invalid Syntax: Could not parse preprocessing command "
             f"in line {line_num}: \n{line}"
         )
@@ -357,7 +355,7 @@ class Preprocessor:
 
         match = Preprocessor.__COMMAND_PATTERN_IGNORE_NEXT_ONE_LINE.fullmatch(line)
         if match is not None:
-            Preprocessor.__logger.debug(
+            self.logger.debug(
                 f"Created LineProblemFilter from line {line_num + 1} to {line_num + 1}"
             )
             return [LineProblemFilter(line_num + 1, line_num + 1)]
@@ -381,7 +379,7 @@ class Preprocessor:
         match = Preprocessor.__COMMAND_PATTERN_IGNORE_NEXT_N_LINES.fullmatch(line)
         if match is not None:
             n = int(match.group(1))
-            Preprocessor.__logger.debug(
+            self.logger.debug(
                 f"Created LineProblemFilter from line {line_num + 1} to {line_num + n}"
             )
             return [LineProblemFilter(line_num + 1, line_num + n)]
@@ -406,12 +404,12 @@ class Preprocessor:
             open_ended_filter = self.__get_open_ended_filter(LineProblemFilter(0))
 
             if open_ended_filter is not None:
-                Preprocessor.__logger.info(
+                self.logger.info(
                     f"Ignored duplicate command 'begin-ignore' in line {line_num}"
                 )
                 return []
             else:
-                Preprocessor.__logger.debug(
+                self.logger.debug(
                     f"Created open-ended LineProblemFilter "
                     f"beginning in line {line_num + 1}"
                 )
@@ -445,12 +443,12 @@ class Preprocessor:
                 )
 
                 if open_ended_filter is not None:
-                    Preprocessor.__logger.info(
+                    self.logger.info(
                         f"Ignored duplicate command 'begin-ignore' "
                         f"for module '{module}' in line {line_num}"
                     )
                 else:
-                    Preprocessor.__logger.debug(
+                    self.logger.debug(
                         f"Created open-ended ModuleProblemFilter "
                         f"for module '{module}' beginning in line {line_num + 1}"
                     )
@@ -489,12 +487,12 @@ class Preprocessor:
                     )
 
                     if open_ended_filter is not None:
-                        Preprocessor.__logger.info(
+                        self.logger.info(
                             f"Ignored duplicate command 'begin-ignore' "
                             f"for severity '{severity}' in line {line_num}"
                         )
                     else:
-                        Preprocessor.__logger.debug(
+                        self.logger.debug(
                             f"Created open-ended ModuleProblemFilter for severity "
                             f"'{str(enum_severity)}' beginning in line {line_num + 1}"
                         )
@@ -502,7 +500,7 @@ class Preprocessor:
                             SeverityProblemFilter(enum_severity, line_num + 1)
                         )
                 except KeyError:
-                    Preprocessor.__logger.warning(
+                    self.logger.warning(
                         f"Invalid syntax: Unknown ProblemSeverity '{severity}' "
                         f"in line {line_num}"
                     )
@@ -537,12 +535,12 @@ class Preprocessor:
                 )
 
                 if open_ended_filter is not None:
-                    Preprocessor.__logger.info(
+                    self.logger.info(
                         f"Ignored duplicate command 'begin-ignore' "
                         f"for whitelist-key '{key}' in line {line_num}"
                     )
                 else:
-                    Preprocessor.__logger.debug(
+                    self.logger.debug(
                         f"Created open-ended WhitelistKeyProblemFilter "
                         f"for whitelist-key '{key}' beginning in line {line_num + 1}"
                     )
@@ -570,11 +568,11 @@ class Preprocessor:
             open_ended_filter = self.__get_open_ended_filter(LineProblemFilter(0))
 
             if open_ended_filter is None:
-                Preprocessor.__logger.info(
+                self.logger.info(
                     f"Ignored duplicate command 'end-ignore' in line {line_num}"
                 )
             else:
-                Preprocessor.__logger.debug(
+                self.logger.debug(
                     f"Ended existing open-ended LineProblemFilter in line {line_num}"
                 )
                 open_ended_filter.end(line_num)
@@ -606,12 +604,12 @@ class Preprocessor:
                 )
 
                 if open_ended_filter is None:
-                    Preprocessor.__logger.info(
+                    self.logger.info(
                         f"Ignored duplicate command 'end-ignore' for module '{module}' "
                         f"in line {line_num}"
                     )
                 else:
-                    Preprocessor.__logger.debug(
+                    self.logger.debug(
                         f"Ended existing open-ended ModuleProblemFilter "
                         f"for module '{module}' in line {line_num + 1}"
                     )
@@ -647,18 +645,18 @@ class Preprocessor:
                     )
 
                     if open_ended_filter is None:
-                        Preprocessor.__logger.info(
+                        self.logger.info(
                             f"Ignored duplicate command 'end-ignore' "
                             f"for severity '{severity}' in line {line_num}"
                         )
                     else:
-                        Preprocessor.__logger.debug(
+                        self.logger.debug(
                             f"Ended existing open-ended SeverityProblemFilter for "
                             f"severity '{str(enum_severity)}' in line {line_num + 1}"
                         )
                         open_ended_filter.end(line_num)
                 except KeyError:
-                    Preprocessor.__logger.warning(
+                    self.logger.warning(
                         f"Invalid syntax: Unknown ProblemSeverity '{severity}' "
                         f"in line {line_num}"
                     )
@@ -690,12 +688,12 @@ class Preprocessor:
                 )
 
                 if open_ended_filter is None:
-                    Preprocessor.__logger.info(
+                    self.logger.info(
                         f"Ignored duplicate command 'end-ignore' "
                         f"for whitelist-key '{key}' in line {line_num}"
                     )
                 else:
-                    Preprocessor.__logger.debug(
+                    self.logger.debug(
                         f"Ended existing open-ended WhitelistKeyProblemFilter "
                         f"for whitelist-key '{key}' in line {line_num + 1}"
                     )

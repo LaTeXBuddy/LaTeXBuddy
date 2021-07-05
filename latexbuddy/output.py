@@ -1,6 +1,7 @@
 from copy import deepcopy
 from html import escape
 from operator import attrgetter
+from pathlib import Path
 from typing import Dict, List
 
 from jinja2 import Environment, PackageLoader
@@ -29,15 +30,31 @@ def problem_key(problem: Problem) -> int:
     return problem.position[0]
 
 
-def render_html(file_name: str, file_text: str, problems: Dict[str, Problem]) -> str:
+def render_html(
+    file_name: str,
+    file_text: str,
+    problems: Dict[str, Problem],
+    path_list: Path,
+    pdf_path: str,
+) -> str:
     """Renders an HTML page based on file contents and discovered problems.
 
     :param file_name: file name
     :param file_text: contents of the file
     :param problems: dictionary of errors returned from latexbuddy
+    :param pdf_path: path of pdf file
+    :param path_list: a list, containing all file paths to the checked files
     :return: generated HTML
     """
     problem_values = sorted(problems.values(), key=problem_key)
+    general_problems = [
+        problem for problem in problem_values if problem_key(problem) < 0
+    ]
+    problem_values = [
+        problem_value
+        for problem_value in problem_values
+        if problem_value not in general_problems
+    ]
     template = env.get_template("result.html")
 
     highlighted_tex = highlight(file_text, problem_values)
@@ -61,10 +78,19 @@ def render_html(file_name: str, file_text: str, problems: Dict[str, Problem]) ->
         i += 1
     new_text = "".join(new_text)
 
+    if not Path(pdf_path).exists():
+        pdf_path = None
+    else:
+        # TODO: temporary fix, might cause issues if another "compiled" directory is in pdf_path
+        pdf_path = pdf_path[pdf_path.find("compiled") :]
+
     return template.render(
         file_name=file_name,
         file_text=new_text,
         problems=problem_values,
+        general_problems=general_problems,
+        paths=path_list,
+        pdf_path=pdf_path,
     )
 
 

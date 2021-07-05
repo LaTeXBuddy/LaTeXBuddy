@@ -2,25 +2,23 @@ from typing import List
 
 import proselint
 
-from latexbuddy import __logger as root_logger
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
-class ProseLintModule(Module):
-    __logger = root_logger.getChild("ProseLintModule")
-
+class ProseLint(Module):
     def __init__(self):
-        self.tool_name = "ProseLintModule"
         self.problem_type = "grammar"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
 
-        lang = config.get_config_option_or_default("buddy", "language", None)
+        lang = config.get_config_option_or_default(LatexBuddy, "language", None)
 
         if lang != "en":
+            self.logger.info("Proselint only supports documents written in English.")
             return []
 
         suggestions = proselint.tools.lint(file.plain)
@@ -49,12 +47,12 @@ class ProseLintModule(Module):
             if replacements is None:
                 replacements = []
             delimiter = "_"
-            key = self.tool_name + delimiter + p_type
+            key = self.display_name + delimiter + p_type
             problems.append(
                 Problem(
                     position=position,
                     text=text,
-                    checker=self.tool_name,
+                    checker=ProseLint,
                     p_type=p_type,
                     file=file.tex_file,
                     severity=severity,
