@@ -1,6 +1,6 @@
 BEGIN{
 printf("\nTeXFILT version 1.0 Copyright (c) 1994 EBTS\n\n");
-if (DEBUG != 0) 
+if (DEBUG != 0)
  {
   printf("\n\n\n\a\aDEBUG FLAG IS ON\a\a\n\n\n")
  }
@@ -111,7 +111,7 @@ END{
 printf("\nWarning and Error -------\
  TeXFILT Process Completed \
  ------- 999999999:");
-if (DEBUG != 0) 
+if (DEBUG != 0)
  {
  print " "; print "stack1 should be empty for a successful run"
   for (i in stack1)
