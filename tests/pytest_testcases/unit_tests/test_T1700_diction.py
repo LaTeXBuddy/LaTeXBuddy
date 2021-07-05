@@ -12,7 +12,7 @@ def script_dir():
     return str(Path(os.path.realpath(__file__)).parents[0])
 
 
-def test_run_checks(script_dir):
+def test_run_checks_diction(script_dir):
 
     ERROR_COUNT = 2
     document_path = script_dir + "/resources/T1700.txt"

@@ -12,7 +12,7 @@ def script_dir():
     return str(Path(os.path.realpath(__file__)).parents[0])
 
 
-def test_run_checks(script_dir):
+def test_run_checks_chktex(script_dir):
 
     ERROR_COUNT = 3
     document_path = script_dir + "/resources/T1600.tex"
