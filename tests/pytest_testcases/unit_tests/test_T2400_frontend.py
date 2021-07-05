@@ -4,7 +4,7 @@ import pytest
 
 from latexbuddy.modules.aspell import Aspell
 from latexbuddy.output import render_html
-from latexbuddy.problem import Problem
+from latexbuddy.problem import Problem, ProblemSeverity
 from pathlib import Path
 
 
@@ -13,9 +13,10 @@ def script_dir():
     return str(Path(os.path.realpath(__file__)).parents[0])
 
 
-def test_render_html(script_dir):
+def test_unit_frontend_render_html(script_dir):
 
-    file_name = "/home/lenni/Desktop/test.tex"  # this is static!
+    file_name = "/home/lenni/Desktop/test.tex"  # FIXME: this is static!
+    file_path = Path(file_name)
     file_text = "\\begin{document} \nHello, how are you? \n I am fine, and you? \n " \
                 "\\end{document} "
 
@@ -25,15 +26,15 @@ def test_render_html(script_dir):
             position=None,
             text="test_error",
             checker=aspell,
-            file=None,
-            severity="INFO",
+            file=file_path,
+            severity=ProblemSeverity.INFO,
             p_type="123",
             category="spelling",
             suggestions=["lel", "lol", "lul"],
             key="aspell_check",
         )
     }
-    path_list = [Path("/home/lenni/Desktop/test.tex")]  # this is static!
+    path_list = [file_path]  # this is static!
     pdf_path = script_dir + "/resources/test_T2400_pdf.pdf"
 
     path = Path("test_T2400_output.html")
