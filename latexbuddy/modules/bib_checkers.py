@@ -180,7 +180,7 @@ class NewerPublications(Module):
                 Problem(
                     position=(0, 0),
                     text=bibtex_id,
-                    checker=self.tool_name,
+                    checker=NewerPublications,
                     category=self.category,
                     file=file.tex_file,
                     severity=self.severity,
@@ -263,7 +263,7 @@ class BibtexDuplicates(Module):
                 Problem(
                     position=(0, 0),
                     text=problem_text,
-                    checker=self.tool_name,
+                    checker=BibtexDuplicates,
                     category=self.category,
                     file=file.tex_file,
                     severity=self.severity,
