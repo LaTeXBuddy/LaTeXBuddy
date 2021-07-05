@@ -10,24 +10,24 @@ main = {
     "output": "./latexbuddy_html/",
     "format": "HTML",
     "enable-modules-by-default": True,
-    "pdf": True,
+    "pdf": False,
 }
 
 modules = {
     "Aspell": {
-        "enabled": True,
+        "enabled": False,
     },
     "Chktex": {
-        "enabled": True,
+        "enabled": False,
     },
     "Diction": {
-        "enabled": True,
+        "enabled": False,
     },
     "EmptySections": {
-        "enabled": True,
+        "enabled": False,
     },
     "LanguageTool": {
-        "enabled": True,
+        "enabled": False,
         "mode": "COMMANDLINE",
         # "remote_url": "https://api.languagetoolplus.com/v2/check",
         "disabled-rules": [
@@ -39,25 +39,25 @@ modules = {
         ],
     },
     "LogFilter": {
-        "enabled": True,
+        "enabled": False,
     },
     "ProseLint": {
-        "enabled": True
+        "enabled": False
     },
     "SiUnitx": {
-        "enabled": True,
+        "enabled": False,
     },
     "URLCheck": {
-        "enabled": True,
+        "enabled": False,
     },
     "UnreferencedFigures": {
-        "enabled": True,
+        "enabled": False,
     },
     "NativeUseOfRef": {
-        "enabled": True,
+        "enabled": False,
     },
     "CheckFigureResolution": {
-        "enabled": True,
+        "enabled": False,
     },
     "YaLafi": {
         "enabled": False
