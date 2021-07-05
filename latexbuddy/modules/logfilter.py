@@ -14,7 +14,7 @@ from latexbuddy.texfile import TexFile
 
 
 line_re = re.compile(
-    r"(?P<severity>Warning|Error)\s(?P<file_path>.*\.tex)?\s?(?P<line_no>\d+):"
+    r"(?P<severity>Warning|Error)\s(?P<file_path>.*)?\s?(?P<line_no>\d+):"
 )
 
 
@@ -64,19 +64,14 @@ class LogFilter(Module):
         """
         problems = []
         raw_problems = raw_problems_path.read_text().split("\n\n")
+
         for problem_line in raw_problems:
+            problem_line = problem_line.replace('\n', ' ')
             match = line_re.match(problem_line)
             if not match:
-                print(problem_line)
                 continue
-            print(match.group())
             severity = match.group("severity").upper()
-            file_path = (
-                Path(match.group("file_path"))
-                if match.group("file_path")
-                else file.tex_file
-            )
-            print(str(file))
+            file_path = file.tex_file
             position = (int(match.group("line_no")), 1)
             split_match = problem_line.split(f"{match.group()}")
             split = split_match[1].split("\n")
@@ -93,4 +88,5 @@ class LogFilter(Module):
                     key=self.display_name + "_" + severity,
                 )
             )
+
         return problems
