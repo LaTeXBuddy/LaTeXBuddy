@@ -12,7 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - custom key for YaLafi problems (!109)
 - filter for log files (!121)
 - new base class for all modules and LatexBuddy (NamedModule`) (!108)
-- new `Loggable` base class which provides a properly named logger to any class inheriting from it (!108) 
+- new `Loggable` base class which provides a properly named logger to any class inheriting from it (!108)
+- new module "NewerPublications" that checks for each entry in the BibTeX file if a newer publication exists (!120)
+- new module "BibtexDuplicates" that checks the BibTeX file for similar entries (!120)
 - debug message for beginning and end of whitelist check in `LatexBuddy` (!141)
 
 ### Changed
