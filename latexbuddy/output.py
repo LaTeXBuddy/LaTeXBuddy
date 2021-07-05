@@ -57,7 +57,7 @@ def render_html(
     ]
     template = env.get_template("result.html")
 
-    highlighted_tex = file_text#highlight(file_text, problem_values)
+    highlighted_tex = highlight(file_text, problem_values)
 
     # add line numbers
     splitted_text = highlighted_tex.splitlines(keepends=True)

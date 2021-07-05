@@ -66,7 +66,7 @@ class LogFilter(Module):
         raw_problems = raw_problems_path.read_text().split("\n\n")
 
         for problem_line in raw_problems:
-            problem_line = problem_line.replace('\n', ' ')
+            problem_line = problem_line.replace("\n", " ")
             match = line_re.match(problem_line)
             if not match:
                 continue

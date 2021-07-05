@@ -15,19 +15,19 @@ main = {
 
 modules = {
     "Aspell": {
-        "enabled": False,
+        "enabled": True,
     },
     "Chktex": {
-        "enabled": False,
+        "enabled": True,
     },
     "Diction": {
-        "enabled": False,
+        "enabled": True,
     },
     "EmptySections": {
-        "enabled": False,
+        "enabled": True,
     },
     "LanguageTool": {
-        "enabled": False,
+        "enabled": True,
         "mode": "COMMANDLINE",
         # "remote_url": "https://api.languagetoolplus.com/v2/check",
         "disabled-rules": [
@@ -39,28 +39,28 @@ modules = {
         ],
     },
     "LogFilter": {
-        "enabled": False,
+        "enabled": True,
     },
     "ProseLint": {
-        "enabled": False
+        "enabled": True
     },
     "SiUnitx": {
-        "enabled": False,
+        "enabled": True,
     },
     "URLCheck": {
-        "enabled": False,
+        "enabled": True,
     },
     "UnreferencedFigures": {
-        "enabled": False,
+        "enabled": True,
     },
     "NativeUseOfRef": {
-        "enabled": False,
+        "enabled": True,
     },
     "CheckFigureResolution": {
-        "enabled": False,
+        "enabled": True,
     },
     "YaLafi": {
-        "enabled": False
+        "enabled": True
     },
     "NewerPublications": {
         "enabled": True
