@@ -238,6 +238,10 @@ class LatexBuddy(MainModule):
             f"Using multiprocessing pool with {os.cpu_count()} "
             f"threads/processes for checks."
         )
+        LatexBuddy.instance.logger.debug(
+            f"Executing the following modules in parallel: "
+            f"{[module.display_name for module in modules]}"
+        )
 
         with mp.Pool(processes=os.cpu_count()) as pool:
             result = pool.map(LatexBuddy.instance.execute_module, modules)
