@@ -1,20 +1,22 @@
-import bibtexparser
-import requests
 import json
-import time
 import re
+import time
 
-from bibtexparser.bibdatabase import UndefinedString
+from difflib import SequenceMatcher
+from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
 from typing import List
-from difflib import SequenceMatcher
 
-from multiprocessing.dummy import Pool as ThreadPool
+import bibtexparser
+import requests
+
+from bibtexparser.bibdatabase import UndefinedString
 
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
+
 
 # TODO: logger
 
@@ -56,7 +58,9 @@ def parse_bibfile(bibfile: Path) -> (str, str, str):
             entries = bib_database.entries
         # catch error that is raised if the bibtex file is not correctly formatted
         except UndefinedString as e:
-            raise ValueError(f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}')
+            raise ValueError(
+                f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}'
+            )
 
     results = []
     for entry in entries:
@@ -89,7 +93,9 @@ class NewerPublications(Module):
         # ex: https://dblp.org/search/publ/api?format=json&q=In%20Search%20of%20an%20Understandable%20Consensus%20Algorithm
 
         c_returns = 4  # number of max returns from the request
-        x = s.get(f'https://dblp.org/search/publ/api?format=json&h={c_returns}&q={publication[0]}')
+        x = s.get(
+            f"https://dblp.org/search/publ/api?format=json&h={c_returns}&q={publication[0]}"
+        )
         ret = json.loads(x.text)["result"]
 
         # time keeping
@@ -109,8 +115,9 @@ class NewerPublications(Module):
                     title = title[:-1]
 
                 # Check if the title is somewhat similar to the one from BibTeX
-                sim = SequenceMatcher(None, title.upper(),
-                                      publication[0].upper()).ratio()
+                sim = SequenceMatcher(
+                    None, title.upper(), publication[0].upper()
+                ).ratio()
                 if sim < 0.85:
                     continue
 
@@ -150,12 +157,9 @@ class NewerPublications(Module):
         if self.debug:
             print(f"\n\ndblp requests took {round(time.time() - a, 3)} seconds")
             print(self.time)
-            print(f"{len(used_pubs)} entries found in \"{bib_file}\"\n")
+            print(f'{len(used_pubs)} entries found in "{bib_file}"\n')
 
-        output_format = config.get_config_option(
-            "buddy",
-            "format"
-        )
+        output_format = config.get_config_option("buddy", "format")
         html_formats = {"html", "HTML"}
         problem_text = "BibTeX outdated: "
         problems = []
@@ -163,11 +167,15 @@ class NewerPublications(Module):
         for pub in self.found_pubs:
             bibtex_id = pub[3][2]
             if output_format in html_formats:  # HTML tags if output to HTML page
-                suggestion = f"Potential newer version \"<i>{pub[0]}</i>\" from " \
-                             f"<b>{pub[1]}</b> at <a href=\"{pub[2]}\"" \
-                             f"target=\"_blank\">{pub[2]}</a>"
+                suggestion = (
+                    f'Potential newer version "<i>{pub[0]}</i>" from '
+                    f'<b>{pub[1]}</b> at <a href="{pub[2]}"'
+                    f'target="_blank">{pub[2]}</a>'
+                )
             else:
-                suggestion = f"Potential newer version \"{pub[0]}\" from {pub[1]} at {pub[2]}"
+                suggestion = (
+                    f'Potential newer version "{pub[0]}" from {pub[1]} at {pub[2]}'
+                )
             problems.append(
                 Problem(
                     position=(0, 0),
@@ -205,15 +213,19 @@ class BibtexDuplicates(Module):
 
     def compare_entries(self, entry_1, entry_2) -> None:
         ids = (entry_1["ID"], entry_2["ID"])
-        same_keys = (set(entry_1.keys()).intersection(set(entry_2.keys())))
+        same_keys = set(entry_1.keys()).intersection(set(entry_2.keys()))
         same_keys.remove("ID")
         total_ratio = 0
         for key in same_keys:
-            total_ratio += SequenceMatcher(None, self.clean_str(entry_1[key]), self.clean_str(entry_2[key])).ratio()
+            total_ratio += SequenceMatcher(
+                None, self.clean_str(entry_1[key]), self.clean_str(entry_2[key])
+            ).ratio()
         ratio = total_ratio / len(same_keys)
         if ratio > 0.85:
             if self.debug:
-                print(f"------------------\n{ratio}\n{entry_1}\n{entry_2}\n------------------")
+                print(
+                    f"------------------\n{ratio}\n{entry_1}\n{entry_2}\n------------------"
+                )
             self.found_duplicates.append(ids)
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
@@ -231,16 +243,19 @@ class BibtexDuplicates(Module):
             # catch error that is raised if the bibtex file is not correctly formatted
             except UndefinedString as e:
                 raise ValueError(
-                    f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}')
+                    f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}'
+                )
 
         for i in range(len(entries)):
-            for j in range(i+1, len(entries)):
+            for j in range(i + 1, len(entries)):
                 self.compare_entries(entries[i], entries[j])
 
         context = "BibTeX duplicate: "
-        description = "Possible duplicate entries in the BibTeX file. These entries " \
-                      "are really similar and might be redundant. It's recommended " \
-                      "to compare them manually."
+        description = (
+            "Possible duplicate entries in the BibTeX file. These entries "
+            "are really similar and might be redundant. It's recommended "
+            "to compare them manually."
+        )
         problems = []
         for dup_ids in self.found_duplicates:
             problem_text = f"{dup_ids[0]} <=> {dup_ids[1]}"
