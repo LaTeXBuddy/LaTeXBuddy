@@ -18,7 +18,7 @@ def script_dir():
 
 def test_unit_all_problems_in_texfilt(script_dir):
     # config_path = script_dir + "/resources/T1900_config.py"
-    document_path = script_dir + "/resources/T1900.tex"
+    document_path = Path(script_dir + "/resources/T1900.tex")
     texfilt_path = script_dir + "/latexbuddy/modules/texfilt.awk"
     log_filter = LogFilter()
     config_loader = ConfigLoader()
@@ -39,14 +39,14 @@ def test_unit_all_problems_in_texfilt(script_dir):
 
     test = True
     for problem in problems:
-        test = test and problem.description in raw_problems
-        test = test and problem.text in raw_problems
+        if not problem.description is None:
+            test = test and problem.description in raw_problems
     assert test
 
 
 def test_unit_all_texfilt_in_problems(script_dir):
     # config_path = script_dir + "/resources/T1900_config.py"
-    document_path = script_dir + "/resources/T1900.tex"
+    document_path = Path(script_dir + "/resources/T1900.tex")
     texfilt_path = script_dir + "/latexbuddy/modules/texfilt.awk"
     log_filter = LogFilter()
     config_loader = ConfigLoader()
