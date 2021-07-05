@@ -10,7 +10,7 @@ main = {
     "output": "./latexbuddy_html/",
     "format": "HTML",
     "enable-modules-by-default": False,
-    "pdf": True,
+    "pdf": False,
 }
 
 modules = {
