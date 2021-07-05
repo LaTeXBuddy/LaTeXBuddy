@@ -1,3 +1,5 @@
+import re
+
 import pytest
 import os
 
@@ -33,6 +35,13 @@ def test_unit_all_problems_in_texfilt(script_dir):
         f"{str(tex_file.log_file)} > {raw_problems_path}",
     ]
     result = execute_and_collect(*cmd)  # not used
+    raw_problems = Path(raw_problems_path).read_text()
+
+    test = True
+    for problem in problems:
+        test = test and problem.description in raw_problems
+        test = test and problem.text in raw_problems
+    assert test
 
 
 def test_unit_all_texfilt_in_problems(script_dir):
@@ -47,6 +56,9 @@ def test_unit_all_texfilt_in_problems(script_dir):
     )
 
     problems = log_filter.run_checks(config_loader, tex_file)
+    problem_line_nos = []
+    for problem in problems:
+        problem_line_nos.append(problem.position[0])
 
     cmd = [
         "awk", "-f",
@@ -54,4 +66,18 @@ def test_unit_all_texfilt_in_problems(script_dir):
         f"{str(tex_file.log_file)} > {raw_problems_path}",
     ]
     result = execute_and_collect(*cmd)  # not used
+    raw_problems = Path(raw_problems_path).read_text()
+    texfilt_problems_split = raw_problems.split(' ')
+    problem_re = re.compile(
+        r"(?P<line_no>\d+):"
+    )
+
+    test = True
+    for problem in texfilt_problems_split:
+        match = problem_re.match(problem)
+        if not match:
+            continue
+        line_no = match.group('line_no')
+        test = test and line_no in problem_line_nos
+    assert test
 
