@@ -4,24 +4,19 @@ ChkTeX Documentation: https://www.nongnu.org/chktex/ChkTeX.pdf
 """
 import os
 
-from pathlib import Path
 from typing import List
 
 import latexbuddy.tools as tools
 
-from latexbuddy import TexFile
-from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.texfile import TexFile
 
 
-class ChktexModule(Module):
-    __logger = root_logger.getChild("ChktexModule")
-
+class Chktex(Module):
     def __init__(self):
         self.DELIMITER = ":::"
-        self.tool_name = "chktex"
         self.problem_type = "latex"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
@@ -29,11 +24,11 @@ class ChktexModule(Module):
 
         Requires chktex to be installed separately
 
-        :param config: configurations of the LaTeXBuddy instance
-        :param file: the file to run checks on
+        :param config: the configuration options of the calling LaTeXBuddy instance
+        :param file: LaTeX file to be checked (with built-in detex option)
         """
 
-        tools.find_executable("chktex", "ChkTeX", self.__logger)
+        tools.find_executable("chktex", "ChkTeX", self.logger)
 
         format_str = (
             self.DELIMITER.join(
@@ -77,13 +72,13 @@ class ChktexModule(Module):
             text = out_split[5]
             description = out_split[6] if len(out_split[6]) > 0 else None
             position = (row, col)
-            key = self.tool_name + key_delimiter + str(internal_id)
+            key = self.display_name + key_delimiter + str(internal_id)
 
             problems.append(
                 Problem(
                     position=position,
                     text=text,
-                    checker=self.tool_name,
+                    checker=Chktex,
                     p_type=str(internal_id),
                     file=file.tex_file,
                     severity=severity,

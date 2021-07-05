@@ -3,29 +3,31 @@ This is an example configuration for LaTeXBuddy and the tools that are supported
 out-of-the-box. You may move this file and specify its path using the --config flag.
 """
 
+main = {
+    "language": "en",
+    "language_country": "GB",
+    "whitelist": "whitelist",
+    "output": "./latexbuddy_html/",
+    "format": "HTML",
+    "enable-modules-by-default": True,
+    "pdf": True,
+}
+
 modules = {
-    "buddy": {
-        "language": "en",
-        "language_country": "GB",
-        "whitelist": "whitelist",
-        "format": "HTML",
-        "enable-modules-by-default": True,
-        "pdf": True
-    },
-    "AspellModule": {
+    "Aspell": {
         "enabled": True,
     },
-    "ChktexModule": {
+    "Chktex": {
         "enabled": True,
     },
-    "DictionModule": {
+    "Diction": {
         "enabled": True,
     },
-    "EmptySectionsModule": {
+    "EmptySections": {
         "enabled": True,
     },
     "LanguageTool": {
-        "enabled": False,
+        "enabled": True,
         "mode": "COMMANDLINE",
         # "remote_url": "https://api.languagetoolplus.com/v2/check",
         "disabled-rules": [
@@ -36,14 +38,19 @@ modules = {
             # "TYPOS",
         ],
     },
-    "ProseLintModule": {"enabled": True},
-    "SiUnitxModule": {
+    "LogFilter": {
         "enabled": True,
     },
-    "URLModule": {
+    "ProseLint": {
+        "enabled": True
+    },
+    "SiUnitx": {
         "enabled": True,
     },
-    "UnreferencedFiguresModule": {
+    "URLCheck": {
+        "enabled": True,
+    },
+    "UnreferencedFigures": {
         "enabled": True,
     },
     "NativeUseOfRef": {
@@ -52,5 +59,7 @@ modules = {
     "CheckFigureResolution": {
         "enabled": True,
     },
-    "YaLafi": {"enabled": True},
+    "YaLafi": {
+        "enabled": True
+    },
 }

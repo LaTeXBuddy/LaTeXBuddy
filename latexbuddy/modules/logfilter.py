@@ -6,7 +6,6 @@ from typing import List
 
 import latexbuddy.tools as tools
 
-from latexbuddy import __logger as root_logger
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
@@ -25,13 +24,10 @@ class LogFilter(Module):
     https://www.ctan.org/tex-archive/support/texfilt
     """
 
-    __logger = root_logger.getChild("logfilter.pl")
-
     def __init__(self):
         """
         Initializes the LogFilter
         """
-        self.tool_name = "logfilter"
         self.texfilt_path = Path("latexbuddy/modules/texfilt.awk")
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
@@ -45,7 +41,7 @@ class LogFilter(Module):
         try:
             tools.find_executable("awk")
         except FileNotFoundError:
-            self.__logger.error(not_found("awk", "AWK"))
+            self.logger.error(not_found("awk", "AWK"))
 
         log_path = file.log_file
         descriptor, raw_problems_path = mkstemp(
@@ -89,12 +85,12 @@ class LogFilter(Module):
                 Problem(
                     position=position,
                     text=problem_text,
-                    checker=self.tool_name,
+                    checker=LogFilter,
                     p_type=severity,
                     file=file_path,
                     description=description,
                     category="latex",
-                    key=self.tool_name + "_" + severity,
+                    key=self.display_name + "_" + severity,
                 )
             )
         return problems

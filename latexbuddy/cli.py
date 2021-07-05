@@ -10,8 +10,6 @@ from time import perf_counter
 
 from colorama import Fore
 
-import latexbuddy.tools as tool
-
 from latexbuddy import __app_name__
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
@@ -19,7 +17,7 @@ from latexbuddy import __version__
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
-from latexbuddy.tools import add_whitelist_console, add_whitelist_from_file
+from latexbuddy.tools import get_all_paths_in_document, perform_whitelist_operations
 
 
 parser = argparse.ArgumentParser(
@@ -28,11 +26,10 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     "--version", "-V", action="version", version=f"{__app_name__} v{__version__}"
 )
-parser.add_argument("file", type=Path, help="File that will be processed.")
-parser = argparse.ArgumentParser(description="The one-stop-shop for LaTeX checking.")
-
 # nargs="+" marks the beginning of a list
-parser.add_argument("file", nargs="+", type=Path, help="File that will be processed.")
+parser.add_argument(
+    "file", nargs="+", type=Path, help="File(s) that will be processed."
+)
 parser.add_argument(
     "--config",
     "-c",
@@ -132,16 +129,8 @@ def main():
     logger.debug(f"Parsed CLI args: {str(args)}")
 
     if args.wl_add_keys or args.wl_from_wordlist:
-        if args.whitelist:
-            wl_file = Path(args.whitelist)
-        else:
-            wl_file = Path("whitelist")
-        if args.wl_add_keys:
-            add_whitelist_console(wl_file, args.wl_add_keys)
-        if args.wl_from_wordlist:
-            add_whitelist_from_file(
-                wl_file, Path(args.wl_from_wordlist[0]), args.wl_from_wordlist[1]
-            )
+
+        perform_whitelist_operations(args)
         return
 
     config_loader = ConfigLoader(args)
@@ -149,10 +138,12 @@ def main():
     """ For each Tex file transferred, all paths
     are fetched and Latexbuddy is executed """
 
-    for p in args.file:  # args.file is a list
-        paths, problems = tool.get_all_paths_in_document(p)
+    buddy = LatexBuddy.instance
 
-        buddy = LatexBuddy(
+    for p in args.file:  # args.file is a list
+        paths, problems = get_all_paths_in_document(p)
+
+        buddy.init(
             config_loader=config_loader,
             file_to_check=Path(paths[0]),  # set first file
             path_list=paths,  # to be used later on in render html
