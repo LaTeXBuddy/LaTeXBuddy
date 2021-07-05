@@ -34,15 +34,6 @@ class ModuleProvider(ABC):
         """
         pass
 
-    @abstractmethod
-    def load_modules(self) -> List[Module]:
-        """
-        This method loads every module that is found in the ModuleLoader's directory.
-
-        :return: a list of instances of classes implementing the Module API
-        """
-        pass
-
 
 class ModuleLoader(ModuleProvider, Loggable):
     """
@@ -79,6 +70,11 @@ class ModuleLoader(ModuleProvider, Loggable):
         return selected
 
     def load_modules(self) -> List[Module]:
+        """
+        This method loads every module that is found in the ModuleLoader's directory.
+
+        :return: a list of instances of classes implementing the Module API
+        """
 
         imported_py_modules = self.import_py_files()
 
