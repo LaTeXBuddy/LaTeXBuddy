@@ -23,4 +23,5 @@ class ConfigLoader:
             return ""
         if key == "disabled-categories":
             return ""
-
+        if key == "format":
+            return "not html"

@@ -2,7 +2,7 @@ import pytest
 import os
 
 from pathlib import Path
-from latexbuddy.modules.aspell import Aspell
+# from latexbuddy.modules.bib_checkers import NewerPublications, BibtexDuplicates
 from latexbuddy.texfile import TexFile
 from tests.pytest_testcases.unit_tests.resources.driver_config_loader import ConfigLoader as DriverCL
 
@@ -11,18 +11,27 @@ from tests.pytest_testcases.unit_tests.resources.driver_config_loader import Con
 def script_dir():
     return str(Path(os.path.realpath(__file__)).parents[0])
 
+"""
+def test_run_checks_bib_checkers(script_dir):
 
-def test_run_checks_aspell(script_dir):
+    ERROR_COUNT_DUP = 2
+    ERROR_COUNT_NEW = 2
 
-    ERROR_COUNT = 3  # From aspell commandline output
+    bib_dup_instance = BibtexDuplicates()
+    bib_new_instance = NewerPublications
+
     document_path = script_dir + "/resources/T2300.tex"
-    aspell_instance = Aspell()
-
     test_file = TexFile(Path(document_path))
 
-    output_problems = aspell_instance.run_checks(DriverCL(), test_file)
+    output_problems_dup = bib_dup_instance.run_checks(DriverCL(), test_file)
+    output_problems_new = bib_new_instance.run_checks(DriverCL(), test_file)
 
-    assert output_problems[0].text == "speeek"
-    assert output_problems[1].text == "tike"
-    assert output_problems[2].text == "mesage"
-    assert len(output_problems) == ERROR_COUNT
+    assert len(output_problems_dup) == ERROR_COUNT_DUP
+    assert len(output_problems_dup) == ERROR_COUNT_NEW
+
+    assert output_problems_dup[0].text == "FirecrackerGithub <=> FirecrackerBlog"
+    assert output_problems_dup[1].text == "StatefulDataflow:2014 <=> SFDF"
+
+    assert output_problems_new[0].text == "werner2018serverless"
+    assert output_problems_new[1].text == "Anna:2019"
+"""
