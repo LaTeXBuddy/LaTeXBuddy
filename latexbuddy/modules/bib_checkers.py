@@ -82,6 +82,7 @@ class NewerPublications(Module):
         self.category = "latex"
         self.time = 0
         self.found_pubs = []
+        self.debug = False
 
     def check_for_new(self, publication: (str, str), s) -> (str, str, str, (str, str)):
         # send requests
@@ -93,7 +94,8 @@ class NewerPublications(Module):
 
         # time keeping
         self.time += float(ret["time"]["text"])
-        print(ret["time"]["text"])
+        if self.debug:
+            print(ret["time"]["text"])
 
         try:
             # TODO: handle multiple newer publications found
@@ -145,9 +147,10 @@ class NewerPublications(Module):
             p.map(self.check_for_new, used_pubs)
         """
 
-        print(f"\n\ndblp requests took {round(time.time() - a, 3)} seconds")
-        print(self.time)
-        print(f"{len(used_pubs)} entries found in \"{bib_file}\"\n")
+        if self.debug:
+            print(f"\n\ndblp requests took {round(time.time() - a, 3)} seconds")
+            print(self.time)
+            print(f"{len(used_pubs)} entries found in \"{bib_file}\"\n")
 
         output_format = config.get_config_option(
             "buddy",
@@ -187,6 +190,7 @@ class BibtexDuplicates(Module):
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
         self.found_duplicates = []
+        self.debug = False
 
     def clean_str(self, to_clean: str) -> str:
         try:
@@ -208,7 +212,8 @@ class BibtexDuplicates(Module):
             total_ratio += SequenceMatcher(None, self.clean_str(entry_1[key]), self.clean_str(entry_2[key])).ratio()
         ratio = total_ratio / len(same_keys)
         if ratio > 0.85:
-            print(f"------------------\n{ratio}\n{entry_1}\n{entry_2}\n------------------")
+            if self.debug:
+                print(f"------------------\n{ratio}\n{entry_1}\n{entry_2}\n------------------")
             self.found_duplicates.append(ids)
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
