@@ -17,4 +17,10 @@ class ConfigLoader:
             return "en"
         if key == "language_country":
             return None
+        if key == "mode":
+            return "COMMANDLINE"
+        if key == "disabled-rules":
+            return ""
+        if key == "disabled-categories":
+            return ""
 
