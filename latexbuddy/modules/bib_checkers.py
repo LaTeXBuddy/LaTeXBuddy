@@ -5,7 +5,7 @@ import time
 from difflib import SequenceMatcher
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import bibtexparser
 import requests
@@ -21,7 +21,7 @@ from latexbuddy.texfile import TexFile
 # TODO: logger
 
 
-def get_bibfile(file: TexFile) -> Path:
+def get_bibfile(file: TexFile) -> Optional[Path]:
     """Checks the given file text for a \bibliography{} command and returns the full
     path of the input BibTeX file. For now only works with a single BibTeX file.
 
@@ -35,7 +35,8 @@ def get_bibfile(file: TexFile) -> Path:
     m = re.search(pattern, tex)
 
     if m is None:  # TODO: maybe make this to logger
-        raise ValueError("No valid bibliography found in the .tex at {path}")
+        # raise ValueError("No valid bibliography found in the .tex at {path}")
+        return None
 
     path = str(path)[: -len(path.parts[-1])]  # remove filename
     bib_path = Path(path + m.group(1) + ".bib")
@@ -136,10 +137,10 @@ class NewerPublications(Module):
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         bib_file = get_bibfile(file)
-        """ Reactivate if no error raised anymore in get_bibfile
+
         if bib_file is None:
+            # No bib_file found
             return []
-        """
 
         used_pubs = parse_bibfile(bib_file)
 
@@ -231,10 +232,10 @@ class BibtexDuplicates(Module):
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
 
         bib_file = get_bibfile(file)
-        """ Reactivate if no error raised anymore in get_bibfile
+
         if bib_file is None:
+            # No bib_file found
             return []
-        """
 
         with bib_file.open() as bibtex_file:
             try:
