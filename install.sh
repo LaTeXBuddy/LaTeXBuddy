@@ -9,8 +9,7 @@ osInfo[/etc/arch-release]="pacman -S"
 osInfo[/etc/gentoo-release]="emerge"
 osInfo[/etc/SuSE-release]="zypper install -y"
 # rename apt-get
-packages=(python3-pip git default-jdk curl make)
-packagesapt=(autoconf automake libtool-bin texinfo autogen autopoint)
+packages=(python3-pip git default-jdk curl make autoconf automake libtool-bin texinfo autogen autopoint)
 packagespacman=(pythonpip)
 
 for f in ${!osInfo[@]}
@@ -20,16 +19,6 @@ do
     fi
 done
 
-for i in ${packagesapt[@]}
-do
-    if [[ $package_manager == "apt" ]]; then
-        update="apt update -y"
-        ${update}
-    fi
-    sudo ${package_manager} ${i}
-    # echo "${i} not installed!"
-done
-
 for i in ${packages[@]}
 do
     if [[ $package_manager == "apt-get" ]]; then
@@ -37,7 +26,6 @@ do
         ${update}
     fi
     sudo ${package_manager} ${i}
-    # echo "${i} not installed!"
 done
 
 # change name of pip for different distributions
