@@ -14,7 +14,7 @@ def script_dir():
     return str(Path(os.path.realpath(__file__)).parents[0])
 
 
-def test_all_problems_in_texfilt(script_dir):
+def test_unit_all_problems_in_texfilt(script_dir):
     # config_path = script_dir + "/resources/T1900_config.py"
     document_path = script_dir + "/resources/T1900.tex"
     texfilt_path = script_dir + "/latexbuddy/modules/texfilt.awk"
@@ -35,7 +35,7 @@ def test_all_problems_in_texfilt(script_dir):
     result = execute_and_collect(*cmd)  # not used
 
 
-def test_all_texfilt_in_problems(script_dir):
+def test_unit_all_texfilt_in_problems(script_dir):
     # config_path = script_dir + "/resources/T1900_config.py"
     document_path = script_dir + "/resources/T1900.tex"
     texfilt_path = script_dir + "/latexbuddy/modules/texfilt.awk"
