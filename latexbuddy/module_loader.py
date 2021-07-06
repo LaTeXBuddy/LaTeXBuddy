@@ -1,38 +1,65 @@
 import importlib
 import inspect
 
+from abc import ABC, abstractmethod
 from pathlib import Path
 from types import ModuleType
 from typing import List
 
 import latexbuddy.tools as tools
 
-from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 
 
-class ToolLoader:
-    """This class encapsulates all features necessary to load LaTeXBuddy modules from
-    a specified directory."""
+class ModuleProvider(ABC):
+    """
+    This interface class defines all methods necessary to provide a list of instances
+    of modules that implement the Module API, which is required in order for the
+    instances to be executed by the main LatexBuddy instance.
+    """
 
-    def __init__(self, directory: Path):
-        """Initializes the ToolLoader for a specific directory.
-
-        :param directory: the path of the directory to load tools from
-        """
-        self.directory = directory
-
+    @abstractmethod
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
-        """This method loads every module that is found in the ToolLoader's directory
-            and only returns instances of modules that are enabled in the specified
-            configuration context.
+        """
+        This method loads every module that is found in the ModuleLoader's directory
+        and only returns instances of modules that are enabled in the specified
+        configuration context.
 
         :param cfg: ConfigLoader instance containing config options for
                     enabled/disabled tools
         :return: a list of instances of classes implementing the Module API which have
                  been enabled in the specified configuration context
         """
+        pass
+
+    @abstractmethod
+    def load_modules(self) -> List[Module]:
+        """
+        This method loads every module that is found in the ModuleLoader's directory.
+
+        :return: a list of instances of classes implementing the Module API
+        """
+        pass
+
+
+class ModuleLoader(ModuleProvider):
+    """
+    This class encapsulates all features necessary to load LaTeXBuddy modules from
+    a specified directory.
+    """
+
+    def __init__(self, directory: Path):
+        """Initializes the ModuleLoader for a specific directory.
+
+        :param directory: the path of the directory to load modules from
+        """
+        self.directory = directory
+
+    def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
+
+        # importing this here to avoid circular import error
+        from latexbuddy.buddy import LatexBuddy
 
         modules = self.load_modules()
 
@@ -51,10 +78,6 @@ class ToolLoader:
         return selected
 
     def load_modules(self) -> List[Module]:
-        """This method loads every module that is found in the ToolLoader's directory.
-
-        :return: a list of instances of classes implementing the Module API
-        """
 
         imported_py_modules = self.import_py_files()
 
@@ -101,10 +124,10 @@ class ToolLoader:
         return loaded_modules
 
     def find_py_files(self) -> List[Path]:
-        """This method finds all .py files within the ToolLoader's directory or any
+        """This method finds all .py files within the ModuleLoader's directory or any
             subdirectories and returns a list of their paths.
 
-        :return: a list of all .py files in the ToolLoader's directory (or subfolders)
+        :return: a list of all .py files in the ModuleLoader's directory (or subfolders)
         """
 
         if not self.directory.is_dir():

@@ -192,6 +192,7 @@ $RECYCLE.BIN/
 # Created output files
 /latexbuddy_output.html
 /latexbuddy_output.json
+/latexbuddy_html
 
 
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm+all,visualstudiocode,windows,macos,linux

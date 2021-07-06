@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - filter for log files (!121)
 - new base class for all modules and LatexBuddy (NamedModule`) (!108)
 - new `Loggable` base class which provides a properly named logger to any class inheriting from it (!108)
+- new module "NewerPublications" that checks for each entry in the BibTeX file if a newer publication exists (!120)
+- new module "BibtexDuplicates" that checks the BibTeX file for similar entries (!120)
+- debug message for beginning and end of whitelist check in `LatexBuddy` (!141)
 
 ### Changed
 - language selection for aspell now works dynamically and using the config (!105)
@@ -23,10 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - all modules now use the new standards for ConfigLoader, Problem API and logging (!1ß8)
 - `LatexBuddy` is now a singleton and inherits from `MainModule`, making it an instance of `NamedModule` as well (!108)
 - modified format of `config.py`: options with key `"buddy"` are now located in a seperate dictionary (!108)
+- languagetool now dynamically retrieves a list of supported languages from the commandline or (local/remote) server instead of comparing with a hardcoded list (!139)
+- renamed tool_loader.py to module_loader.py and ToolLoader to ModuleLoader (!141)
+- extracted an interface `ModuleProvider` from `ModuleLoader` and adjusted `LatexBuddy` and cli.py accordingly (!141)
+- removed `LatexBuddy` methods `change_file` and `clear_error_list` and replaced their occurrences with `init` (!141)
 
 ### Fixed
 - regex usage in own_checkers (!110)
 - inconsistent naming of some checkers in config, Problem API and classnames (!108)
+- shortened slightly lengthy methods in config_loader.py (!140)
 
 ## [0.3.0] - 15 Jun 2021
 
