@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- line numbers(!135)
+- line numbers (!135)
 - new test cases for multiple occurrences of own_checkers problems (!110)
 - custom key for YaLafi problems (!109)
 - filter for log files (!121)
