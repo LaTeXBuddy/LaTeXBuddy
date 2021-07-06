@@ -61,13 +61,7 @@ class LatexBuddy(MainModule):
         LatexBuddy.instance.file_to_check = None
         LatexBuddy.instance.tex_file = None
         LatexBuddy.instance.path_list = path_list
-        self.preprocessor = Preprocessor()  # initialize at the beginning!!
-        self.path_list: Path = path_list  # all paths from the files to be used in html
-        self.errors = {}  # all current errors
-        self.cfg: ConfigLoader = config_loader  # configuration
 
-        self.file_to_check = None
-        self.tex_file = None
 
         # file where the error should be saved
         LatexBuddy.instance.output_dir = Path(
