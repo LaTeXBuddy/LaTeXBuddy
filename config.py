@@ -11,7 +11,7 @@ main = {
     "output": "./latexbuddy_html/",
     "format": "HTML",
     "enable-modules-by-default": True,
-    "pdf": True,
+    "pdf": False,
 }
 
 modules = {
@@ -62,6 +62,12 @@ modules = {
         "enabled": True,
     },
     "YaLafi": {
+        "enabled": True
+    },
+    "NewerPublications": {
+        "enabled": True
+    },
+    "BibtexDuplicates": {
         "enabled": True
     },
 }
