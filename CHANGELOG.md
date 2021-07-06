@@ -11,13 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - new test cases for multiple occurrences of own_checkers problems (!110)
 - custom key for YaLafi problems (!109)
 - filter for log files (!121)
+- new base class for all modules and LatexBuddy (NamedModule`) (!108)
+- new `Loggable` base class which provides a properly named logger to any class inheriting from it (!108)
+- new module "NewerPublications" that checks for each entry in the BibTeX file if a newer publication exists (!120)
+- new module "BibtexDuplicates" that checks the BibTeX file for similar entries (!120)
 
 ### Changed
 - language selection for aspell now works dynamically and using the config (!105)
 - language codes are now standardized to fit different formats (!116)
+- methods in ConfigLoader now take an instance or a type-descriptor of type NamedModule instead of taking the name as a string (!108)
+- Problem API now takes an instance or a type-descriptor of type NamedModule instead of a string (!108)
+- `NamedModule` is now the base class of `Module` and `MainModule` (therefore `LatexBuddy`) and provides a logger to all these classes by inheriting from `Loggable` (!108)
+- all modules now use the new standards for ConfigLoader, Problem API and logging (!1ß8)
+- `LatexBuddy` is now a singleton and inherits from `MainModule`, making it an instance of `NamedModule` as well (!108)
+- modified format of `config.py`: options with key `"buddy"` are now located in a seperate dictionary (!108)
 
 ### Fixed
 - regex usage in own_checkers (!110)
+- inconsistent naming of some checkers in config, Problem API and classnames (!108)
 
 ## [0.3.0] - 15 Jun 2021
 

@@ -1,41 +1,35 @@
 """This module defines the connection between LaTeXBuddy and GNU Aspell."""
-import shlex
 
 from typing import AnyStr, List
 
 import latexbuddy.tools as tools
 
-from latexbuddy import __logger as root_logger
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.exceptions import LanguageNotSupportedError
-from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
-class AspellModule(Module):
-    __logger = root_logger.getChild("AspellModule")
-
+class Aspell(Module):
     def __init__(self):
         self.language = None
-        self.tool_name = "aspell"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
         """Runs the Aspell checks on a file and returns the results as a list.
 
         Requires Aspell to be set up.
 
-        :param config: configurations of the LaTeXBuddy instance
-        :param file: the file to run checks on
+        :param config: the configuration options of the calling LaTeXBuddy instance
+        :param file: LaTeX file to be checked (with built-in detex option)
         """
 
-        tools.find_executable("aspell", "GNU Aspell", self.__logger)
+        tools.find_executable("aspell", "GNU Aspell", self.logger)
 
         supported_languages = self.find_languages()
 
         self.language = config.get_config_option_or_default(
-            "buddy",
+            LatexBuddy,
             "language",
             "en",
             verify_type=AnyStr,
@@ -43,7 +37,7 @@ class AspellModule(Module):
         )
 
         language_country = config.get_config_option_or_default(
-            "buddy",
+            LatexBuddy,
             "language_country",
             None,
             verify_type=AnyStr,
@@ -134,7 +128,7 @@ class AspellModule(Module):
                     Problem(
                         position=location,
                         text=text,
-                        checker=self.tool_name,
+                        checker=Aspell,
                         file=file.tex_file,
                         severity=severity,
                         p_type=p_type,

@@ -6,18 +6,19 @@ import time
 
 from contextlib import closing
 from enum import Enum
+from logging import Logger
 from typing import AnyStr, Dict, List, Optional
 
 import requests
 
 import latexbuddy.tools as tools
 
-from latexbuddy import TexFile
-from latexbuddy import __logger as root_logger
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.exceptions import ExecutableNotFoundError
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.texfile import TexFile
 
 
 class Mode(Enum):
@@ -34,8 +35,6 @@ class Mode(Enum):
 
 class LanguageTool(Module):
     """Wraps the LanguageTool API calls to check files."""
-
-    __logger = root_logger.getChild("LanguageTool")
 
     # removed ca-ES-valencia and de-DE-x-simple-language for compliance
     # with LaTeXBuddy language standards
@@ -126,12 +125,12 @@ class LanguageTool(Module):
         Requires LanguageTool (server) to be set up.
         Local or global servers can be used.
 
-        :param config: configurations of the LaTeXBuddy instance
-        :param file: the file to run checks on
+        :param config: the configuration options of the calling LaTeXBuddy instance
+        :param file: LaTeX file to be checked (with built-in detex option)
         """
 
         self.language = config.get_config_option_or_default(
-            "buddy",
+            LatexBuddy,
             "language",
             None,
             verify_type=AnyStr,
@@ -139,7 +138,7 @@ class LanguageTool(Module):
         )
 
         language_country = config.get_config_option_or_default(
-            "buddy",
+            LatexBuddy,
             "language_country",
             None,
             verify_type=AnyStr,
@@ -155,7 +154,7 @@ class LanguageTool(Module):
         self.find_disabled_rules(config)
 
         cfg_mode = config.get_config_option_or_default(
-            "LanguageTool",
+            LanguageTool,
             "mode",
             "COMMANDLINE",
             verify_type=AnyStr,
@@ -168,13 +167,13 @@ class LanguageTool(Module):
             self.mode = Mode.COMMANDLINE
 
         if self.mode == Mode.LOCAL_SERVER:
-            self.local_server = LanguageToolLocalServer()
+            self.local_server = LanguageToolLocalServer(self.logger)
             self.local_server.start_local_server()
 
         elif self.mode == Mode.REMOTE_SERVER:
             # must include the port and api call (e.g. /v2/check)
             self.remote_url = config.get_config_option(
-                "LanguageTool",
+                LanguageTool,
                 "remote_url",
                 verify_type=AnyStr,
                 verify_regex="http(s?)://(\\S*)",
@@ -193,18 +192,18 @@ class LanguageTool(Module):
         This method also checks if Java is installed.
         """
 
-        tools.find_executable("java", "JRE (Java Runtime Environment)", self.__logger)
+        tools.find_executable("java", "JRE (Java Runtime Environment)", self.logger)
 
         try:
             result = tools.find_executable(
-                "languagetool", "LanguageTool (CLI)", self.__logger, log_errors=False
+                "languagetool", "LanguageTool (CLI)", self.logger, log_errors=False
             )
             executable_source = "native"
 
         except ExecutableNotFoundError:
 
             result = tools.find_executable(
-                "languagetool-commandline.jar", "LanguageTool (CLI)", self.__logger
+                "languagetool-commandline.jar", "LanguageTool (CLI)", self.logger
             )
             executable_source = "java"
 
@@ -236,13 +235,13 @@ class LanguageTool(Module):
 
         self.disabled_rules = ",".join(
             config.get_config_option_or_default(
-                "LanguageTool", "disabled-rules", [], verify_type=List[str]
+                LanguageTool, "disabled-rules", [], verify_type=List[str]
             )
         )
 
         self.disabled_categories = ",".join(
             config.get_config_option_or_default(
-                "LanguageTool", "disabled-categories", [], verify_type=List[str]
+                LanguageTool, "disabled-categories", [], verify_type=List[str]
             )
         )
 
@@ -357,7 +356,7 @@ class LanguageTool(Module):
                 Problem(
                     position=location,
                     text=text,
-                    checker=tool_name,
+                    checker=LanguageTool,
                     p_type=match["rule"]["id"],
                     file=file.tex_file,
                     severity=ProblemSeverity.ERROR,
@@ -400,17 +399,17 @@ class LanguageTool(Module):
 class LanguageToolLocalServer:
     """Defines an instance of a local LanguageTool deployment."""
 
-    __logger = root_logger.getChild("LanguageTool")
-
     __DEFAULT_PORT = 8081
     __SERVER_REQUEST_TIMEOUT = 1  # in seconds
     __SERVER_MAX_ATTEMPTS = 20
 
-    def __init__(self):
+    def __init__(self, logger: Logger):
         self.lt_path = None
         self.lt_server_command = None
         self.server_process = None
         self.port = None
+
+        self.logger = logger
 
     def __del__(self):
         self.stop_local_server()
@@ -421,13 +420,13 @@ class LanguageToolLocalServer:
         This method also checks if Java is installed.
         """
 
-        tools.find_executable("java", "JRE (Java Runtime Environment)", self.__logger)
+        tools.find_executable("java", "JRE (Java Runtime Environment)", self.logger)
 
         try:
             result = tools.find_executable(
                 "languagetool-server",
                 "LanguageTool (local server)",
-                self.__logger,
+                self.logger,
                 log_errors=False,
             )
             executable_source = "native"
@@ -435,7 +434,7 @@ class LanguageToolLocalServer:
         except ExecutableNotFoundError:
 
             result = tools.find_executable(
-                "languagetool-server.jar", "LanguageTool (local server)", self.__logger
+                "languagetool-server.jar", "LanguageTool (local server)", self.logger
             )
             executable_source = "java"
 

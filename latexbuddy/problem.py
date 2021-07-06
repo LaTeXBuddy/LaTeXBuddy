@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
 
+# from latexbuddy.modules import NamedModule
+
 language = None  # static variable used for a uniform key generation
 
 
@@ -69,11 +71,13 @@ class Problem:
     example, it can be wrong LaTeX code or a misspelled word.
     """
 
+    # TODO: resolve circular import error with modules.__init__.py in order to have
+    #       type hints for attribute 'checker'
     def __init__(
         self,
         position: Optional[Tuple[int, int]],
         text: str,
-        checker: str,
+        checker,  # : Union[Type[NamedModule], NamedModule],
         file: Path,
         severity: ProblemSeverity = ProblemSeverity.WARNING,
         p_type: Optional[str] = None,
@@ -90,7 +94,7 @@ class Problem:
                          `(line, column)`.
         :param length: the length of the problematic text.
         :param text: problematic text.
-        :param checker: name of the tool that discovered the problem.
+        :param checker: type or instance of the tool that discovered the problem.
         :param p_type: ID of the problem type, used inside the respective checker.
         :param file: **[DEPRECATED]** path to the file where the problem was found
         :param severity: severity of the problem.
@@ -105,25 +109,46 @@ class Problem:
 
         """
         # TODO: maybe move the defaults to the params, or was there a specific reason?
+
+        # importing these here to avoid circular import error
+        from latexbuddy.buddy import LatexBuddy
+
         self.position = position
+
         if length is None:
             length = 0
         self.length = length
+
         self.text = text
-        self.checker = checker
+
+        if (
+            checker is None
+            or isinstance(checker, LatexBuddy)
+            or (isinstance(checker, type) and checker == LatexBuddy)
+        ):
+            raise ValueError("Checker module can not be main LatexBuddy instance.")
+
+        else:
+
+            self.checker = checker.display_name
+
         if p_type is None:
             p_type = ""
         self.p_type = p_type
+
         self.file = file  # FIXME: deprecated!
         self.severity = severity
         self.category = category
         self.description = description
+
         if context is None:
             context = ("", "")
         self.context = context
+
         if suggestions is None:
             suggestions = []
         self.suggestions = suggestions
+
         self.key = self.__generate_key(key)
         self.length = len(text)
         self.uid = self.__generate_uid()
@@ -157,7 +182,7 @@ class Problem:
         if language is not None and (
             self.category == "grammar" or self.category == "spelling"
         ):
-            return language + "_" + key
+            return f"{language}_{key}"
 
         return key
 

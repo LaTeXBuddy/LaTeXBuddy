@@ -7,6 +7,7 @@ from typing import List
 
 import latexbuddy.tools as tools
 
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 
@@ -39,10 +40,10 @@ class ToolLoader:
             module
             for module in modules
             if cfg.get_config_option_or_default(
-                module.__class__.__name__,
+                module,
                 "enabled",
                 cfg.get_config_option_or_default(
-                    "buddy", "enable-modules-by-default", True
+                    LatexBuddy, "enable-modules-by-default", True
                 ),
             )
         ]
@@ -76,7 +77,6 @@ class ToolLoader:
         """This method loads a python module from the specified file path for a list
             of file paths.
 
-        :param py_files: python module files to be loaded
         :return: a list of python modules ready to be used
         """
 

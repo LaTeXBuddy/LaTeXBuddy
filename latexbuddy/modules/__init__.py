@@ -2,15 +2,34 @@
 inherit from.
 """
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import List
 
-from latexbuddy import TexFile
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.log import Loggable
 from latexbuddy.problem import Problem
+from latexbuddy.texfile import TexFile
+from latexbuddy.tools import classproperty
 
 
-class Module(ABC):
+class NamedModule(Loggable):
+    """Interface class adding the ability to provide a display name to any module
+    instance.
+    """
+
+    @classproperty
+    def display_name(cls) -> str:
+        """Returns the canonical display name of the module."""
+        return cls.__name__
+
+
+class MainModule(NamedModule):
+    """Superclass intended for the main LatexBuddy instance."""
+
+    pass
+
+
+class Module(NamedModule):
     """Abstract class that defines a simple LaTeXBuddy module."""
 
     @abstractmethod
