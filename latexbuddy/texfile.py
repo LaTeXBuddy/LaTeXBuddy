@@ -148,11 +148,11 @@ class TexFile(Loggable):
         try:
             os.mkdir(html_directory)
         except FileExistsError:
-            self.logger.debug(f'Directory {html_directory} already exists.')
+            self.logger.debug(f"Directory {html_directory} already exists.")
             pass
         except Exception as exc:
             self.logger.error(
-                texfile_error(f'{exc} occurred while creating {html_directory}.')
+                texfile_error(f"{exc} occurred while creating {html_directory}.")
             )
             pass
 
@@ -161,11 +161,11 @@ class TexFile(Loggable):
         try:
             os.mkdir(compile_directory)
         except FileExistsError:
-            self.logger.debug(f'Directory {compile_directory} already exists.')
+            self.logger.debug(f"Directory {compile_directory} already exists.")
             pass
         except Exception as exc:
             self.logger.error(
-                texfile_error(f'{exc} occurred while creating {compile_directory}.')
+                texfile_error(f"{exc} occurred while creating {compile_directory}.")
             )
             pass
 
@@ -177,7 +177,9 @@ class TexFile(Loggable):
 
         tex_mf = self.__create_tex_mf(path)
 
-        self.logger.debug(f"TEXFILE: {str(self.tex_file)}, exists: {self.tex_file.exists()}")
+        self.logger.debug(
+            f"TEXFILE: {str(self.tex_file)}, exists: {self.tex_file.exists()}"
+        )
         self.logger.debug(f"PATH: {str(path)}, exists: {path.exists()}")
 
         execute(
