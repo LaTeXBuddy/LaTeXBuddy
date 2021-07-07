@@ -83,7 +83,6 @@ def parse_bibfile(bibfile: Path) -> (str, str, str):
 
 class NewerPublications(Module):
     def __init__(self):
-        self.tool_name = "newer_publication"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
         self.time = 0
@@ -102,8 +101,7 @@ class NewerPublications(Module):
 
         # time keeping
         self.time += float(ret["time"]["text"])
-        if self.debug:
-            print(ret["time"]["text"])
+        self.logger.debug(ret["time"]["text"])
 
         try:
             # TODO: handle multiple newer publications found
@@ -156,10 +154,9 @@ class NewerPublications(Module):
             p.map(self.check_for_new, used_pubs)
         """
 
-        if self.debug:
-            print(f"\n\ndblp requests took {round(time.time() - a, 3)} seconds")
-            print(self.time)
-            print(f'{len(used_pubs)} entries found in "{bib_file}"\n')
+        self.logger.debug(f"\n\ndblp requests took {round(time.time() - a, 3)} seconds")
+        self.logger.debug(self.time)
+        self.logger.debug(f'{len(used_pubs)} entries found in "{bib_file}"\n')
 
         output_format = config.get_config_option(LatexBuddy, "format")
         html_formats = {"html", "HTML"}
@@ -188,7 +185,7 @@ class NewerPublications(Module):
                     severity=self.severity,
                     description=suggestion,
                     context=(problem_text, ""),
-                    key=self.tool_name + "_" + bibtex_id,
+                    key=self.display_name + "_" + bibtex_id,
                 )
             )
         return problems
@@ -196,7 +193,6 @@ class NewerPublications(Module):
 
 class BibtexDuplicates(Module):
     def __init__(self):
-        self.tool_name = "bibtex_duplicate"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
         self.found_duplicates = []
@@ -224,10 +220,9 @@ class BibtexDuplicates(Module):
             ).ratio()
         ratio = total_ratio / len(same_keys)
         if ratio > 0.85:
-            if self.debug:
-                print(
-                    f"------------------\n{ratio}\n{entry_1}\n{entry_2}\n------------------"
-                )
+            self.logger.debug(
+                f"------------------\n{ratio}\n{entry_1}\n{entry_2}\n------------------"
+            )
             self.found_duplicates.append(ids)
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
@@ -271,7 +266,7 @@ class BibtexDuplicates(Module):
                     severity=self.severity,
                     description=description,
                     context=(context, ""),
-                    key=f"{self.tool_name}_{dup_ids[0]}_{dup_ids[1]}",
+                    key=f"{self.display_name}_{dup_ids[0]}_{dup_ids[1]}",
                 )
             )
 
