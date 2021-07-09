@@ -16,12 +16,14 @@ header h1 > svg {
     height: 2.5em;
 }
 
+/*
 pre {
     background-color: #eeeeee;
     padding: 1rem;
     border-radius: .5rem;
     white-space: pre-wrap;
 }
+*/
 
 main {
     display: flex;
@@ -51,7 +53,8 @@ main > div {
     flex-direction: column;
     width: 40%;
     min-width: 40%;
-    height: 100%;
+    height: 1000px;
+    overflow: auto;
 }
 
 .problem {
@@ -149,23 +152,53 @@ main > div {
 #pdf-disp {
     margin-top: 15px;
     margin-right: 10px;
+    margin-bottom: 15px;
     display: none;
     width: 100%;
-    height: 100%;
-
+    height: 29.8cm;
 }
 
 #pdf-ifr {
     display: flex;
     width: 100%;
     height: 100%;
-    max-height: 29.7cm;
+    max-height: 29.8cm;
+    margin-bottom: 15px;
 }
 
 #file-container {
     display: flex;
+    margin: 0 auto;
     width: 60%;
-    height: 29.8cm;
+    height: 1000px;
+}
+
+.text-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background-color: #eeeeee;
+    border-radius: .5rem;
+    overflow: auto;
+}
+
+.line-container {
+    display: flex;
+    flex-direction: row;
+
+}
+
+.line-container code {
+    margin-left: 10px;
+    padding-top: 2px;
+    line-height: 20px;
+}
+
+.line-number {
+    font-size: 1em;
+    padding: 4px;
+    background: silver;
 }
 
 .latex {
