@@ -10,7 +10,7 @@ main = {
     "output": "./latexbuddy_html/",
     "format": "HTML",
     "enable-modules-by-default": True,
-    "pdf": False,
+    "pdf": True,
 }
 
 modules = {
@@ -27,7 +27,7 @@ modules = {
         "enabled": True,
     },
     "LanguageTool": {
-        "enabled": True,
+        "enabled": False,
         "mode": "COMMANDLINE",
         "remote_url_check": "https://api.languagetoolplus.com/v2/check",
         "remote_url_languages": "https://api.languagetoolplus.com/v2/languages",

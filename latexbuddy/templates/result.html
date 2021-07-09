@@ -99,22 +99,28 @@
             </div>
         {% endfor %}
     </div>
-    {# slider to switch to the pdf view #}
-    <label class="switch">
-        <input type="checkbox" id="pdfbutton">
-        <div class="slider round">
-            <span class="on">PDF</span>
-            <span class="off">TEX</span>
+    <div class="sliderholder">
+        <div class="pdfsliderdiv">
+        {# slider to switch to the pdf view #}
+        <label class="switch">
+            <input type="checkbox" id="pdfbutton">
+            <div class="slider round">
+                <span class="on">PDF</span>
+                <span class="off">TEX</span>
+            </div>
+        </label>
         </div>
-    </label>
-    {# the slider, used to switch the problems #}
-    <label class="switch">
-        <input type="checkbox" id="change_problems">
-        <div class="slider round">
-            <span class="on">Specific</span>
-            <span class="off">General</span>
+        <div class="problemsliderdiv">
+            {# the slider, used to switch the problems #}
+            <label style="margin-left: 25px;" class="switch">
+                <input type="checkbox" id="change_problems">
+                <div class="slider round">
+                    <span style="" class="on">Specific</span>
+                    <span class="off">General</span>
+                </div>
+            </label>
         </div>
-    </label>
+    </div>
 </header>
 <main>
     <div id="file-container">
