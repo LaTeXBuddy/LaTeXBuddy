@@ -25,3 +25,11 @@ class ConfigLoader:
             return ""
         if key == "format":
             return "not html"
+
+    def get_config_option(
+        self,
+        module,
+        key: str,
+    ):
+        if key == "format":
+            return "json"
