@@ -1,12 +1,11 @@
-from copy import deepcopy
 from html import escape
 from operator import attrgetter
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple, Union
 
 from jinja2 import Environment, PackageLoader
 
-from latexbuddy.problem import Problem
+from latexbuddy.problem import Problem, ProblemSeverity
 
 
 env = Environment(loader=PackageLoader("latexbuddy"))
@@ -58,11 +57,11 @@ def render_html(
     template = env.get_template("result.html")
 
     # calculate amount of whitespaces needed for line numbers to be indented correctly
-    splitted_lines = file_text.split("\n")
+    split_lines = file_text.split("\n")
     line_numbers = []
     i = 1
-    line_count = len(splitted_lines)
-    for line in splitted_lines:
+    line_count = len(split_lines)
+    for line in split_lines:
         diff = len(str(line_count)) - len(str(i))
         new_line = ""
 
@@ -79,7 +78,8 @@ def render_html(
     if not Path(pdf_path).exists():
         pdf_path = None
     else:
-        # TODO: temporary fix, might cause issues if another "compiled" directory is in pdf_path
+        # TODO: temporary fix, might cause issues if another "compiled" directory
+        #  is in pdf_path
         cut_path = pdf_path.find("compiled")
         if -1 < cut_path:
             pdf_path = pdf_path[pdf_path.find("compiled") :]
@@ -103,84 +103,125 @@ def render_html(
 
 
 class Interval:
-    def __init__(self, problem: Problem) -> None:
-        self.problem = problem
+    """forward declaration to enable type-hinting within class"""
 
     @property
     def start(self) -> int:
-        return self.problem.position[1]
+        return -1
 
     @property
     def end(self) -> int:
-        return self.start + self.problem.length
+        return -1
 
     @property
     def severity(self) -> int:
-        return self.problem.severity.value
+        return -1
+
+    @property
+    def problems(self):
+        return []
+
+    def intersects(self, other):
+        return False
+
+    def perform_intersection(self, other):
+        return None
+
+
+class Interval:
+    def __init__(
+        self,
+        problems: Union[Problem, List[Problem]],
+        start: Optional[int] = None,
+        end: Optional[int] = None,
+    ) -> None:
+
+        if isinstance(problems, Problem):
+            problems = [problems]
+
+        if not problems or len(problems) == 0:
+            raise ValueError("An interval must have at least one problem!")
+
+        self._problems = problems
+
+        self._start = start if start else problems[0].position[1]
+        self._end = end if end else self.start + problems[0].length
+
+    @property
+    def problems(self):
+        return self._problems
+
+    @property
+    def start(self) -> int:
+        return self._start
+
+    @property
+    def end(self) -> int:
+        return self._end
+
+    @property
+    def severity(self) -> int:
+        return max([problem.severity.value for problem in self.problems])
+
+    @property
+    def html_tag_title(self) -> str:
+        return ", ".join(
+            [problem.description for problem in self.problems if problem.description]
+        )
+
+    def intersects(self, other: Interval) -> bool:
+        """
+        Determines whether or not the other interval intersects with 'self'
+
+        :param other: other interval to consider
+        """
+
+        if other.start < self.start:
+            return other.end > self.start
+        else:
+            return other.start < self.end
+
+    def perform_intersection(self, other: Interval) -> Optional[List[Interval]]:
+        """
+        Performs an intersection of two intervals and returns a list of new
+        non-intersecting intervals to replace the two specified intervals 'self' and
+        'other', if the intervals actually intersect. Should the intervals not
+        intersect, None is returned, indicating that there is no need to replace the
+        two intervals.
+        The intervals in the returned list are sorted by their start index in ascending
+        order.
+
+        :param other: other interval to intersect with 'self'
+        """
+
+        if not self.intersects(other):
+            return None
+
+        # narrow down mirrored positions without restricting the input space
+        if other.start < self.start:
+            return other.perform_intersection(self)
+
+        new_intervals: List[Interval] = []
+
+        if other.start > self.start:
+            new_intervals.append(Interval(self.problems, self.start, other.start))
+
+        new_intervals.append(
+            Interval(
+                self.problems + other.problems, other.start, min(self.end, other.end)
+            )
+        )
+
+        if other.end < self.end:
+            new_intervals.append(Interval(self.problems, other.end, self.end))
+
+        elif other.end > self.end:
+            new_intervals.append(Interval(other.problems, self.end, other.end))
+
+        return new_intervals
 
     def __str__(self) -> str:
         return f"({self.start}, {self.end}, {self.severity})"
-
-
-def find_best_intervals(intervals: List[Interval]) -> List[Interval]:
-    """Returns a list of non-overlapping intervals with the maximal sum of severities.
-
-    In other words, it filters out less important intervals to find the most optimal set
-    of non-overlapping intervals that are to be highlighted.
-
-    Dynamic programming algorithm composed by David Meyer <da.meyer@tu-braunsschweig.de>
-
-    :param intervals: original list of (possibly overlapping) intervals
-    :return: list of non-overlapping intervals
-    """
-    if len(intervals) == 0:
-        return []
-
-    if len(intervals) == 1:
-        return intervals
-
-    sorted_intervals = sorted(intervals, key=attrgetter("end"))
-    n = len(sorted_intervals)
-
-    def find_predecessor(idx: int) -> int:
-        """Calculates the index of the closest predecessor to the interval with index i.
-
-        :param idx: index of the inspected interval
-        :return: index of the closest predecessor
-        """
-        i_start = sorted_intervals[idx].start
-        j = idx - 1
-        while j >= 0:
-            if sorted_intervals[j].end <= i_start:
-                return j  # j'th interval is the closest predecessor
-            j -= 1
-
-        return -1  # no predecessor exists
-
-    # dictionary for storing intermediate results
-    calculated = {-1: ([], 0)}
-
-    for i in range(n):
-        if i == 0:
-            # always add first interval
-            calculated[i] = (
-                [sorted_intervals[i]],
-                sorted_intervals[i].severity,
-            )
-            continue
-
-        pred_i = find_predecessor(i)
-        if calculated[i - 1][1] > calculated[pred_i][1] + sorted_intervals[i].severity:
-            calculated[i] = calculated[i - 1]
-        else:
-            copy_tuples = deepcopy(calculated[pred_i][0])
-            copy_tuples.append(sorted_intervals[i])
-            calculated[i] = (
-                copy_tuples,
-                calculated[pred_i][1] + sorted_intervals[i].severity,
-            )
-
-    return calculated[n - 1][0]
 
 
 def highlight(tex: str, problems: List[Problem]) -> str:
@@ -192,49 +233,23 @@ def highlight(tex: str, problems: List[Problem]) -> str:
     """
 
     tex_lines: List[str] = tex.splitlines(keepends=True)
-    line_intervals: List[List[Interval]] = __create_empty_line_interval_list(tex_lines)
+    line_intervals: List[List[Interval]] = create_empty_line_interval_list(tex_lines)
 
-    __add_basic_problem_intervals(line_intervals, problems)
+    add_basic_problem_intervals(line_intervals, problems)
 
-    for i in range(len(line_intervals) - 1):
+    # old_highlighting(line_intervals, tex_lines)
+    for intervals in line_intervals:
+        resolve_interval_intersections(intervals)
 
-        intervals = line_intervals[i]
-        if len(intervals) == 0:
-            continue
-
-        best_intervals = find_best_intervals(intervals)
-
-        offset = 0
-        for interval in best_intervals:
-            old_len = len(tex_lines[i])
-            start = offset + interval.start - 1
-            end = offset + interval.end - 1
-            opening_tag = (
-                f"<span "
-                f'class="under is-{str(interval.problem.severity)}" '
-                f'title="{escape(interval.problem.description or "")}"'
-                f">"
-            )
-            closing_tag = f"</span>"
-
-            # TODO: figure out HTML escaping
-            string = (
-                f"{tex_lines[i][:start]}"
-                f"{opening_tag}"
-                f"{tex_lines[i][start:end]}"
-                f"{closing_tag}"
-                f"{tex_lines[i][end:]}"
-            )
-            tex_lines[i] = string
-            offset += len(string) - old_len
+    mark_intervals_in_tex(tex_lines, line_intervals)
 
     return "".join(tex_lines)
 
 
-def __create_empty_line_interval_list(tex_lines: List[str]) -> List[List[Interval]]:
+def create_empty_line_interval_list(tex_lines: List[str]) -> List[List[Interval]]:
     """
-    Creates and returns a list of (empty) lists of Intervals. The outer list will contain
-    exactly len(tex_lines) + 1 empty lists.
+    Creates and returns a list of (empty) lists of Intervals. The outer list will
+    contain exactly len(tex_lines) + 1 empty lists.
 
     :param tex_lines: individual lines of a .tex-file as a list of strings
     :returns: a list of empty lists that meet the specified dimensions
@@ -250,7 +265,7 @@ def __create_empty_line_interval_list(tex_lines: List[str]) -> List[List[Interva
     return line_intervals
 
 
-def __add_basic_problem_intervals(
+def add_basic_problem_intervals(
     line_intervals: List[List[Interval]], problems: List[Problem]
 ) -> None:
     """
@@ -271,5 +286,85 @@ def __add_basic_problem_intervals(
             continue
 
         # TODO: add more intervals for Problems that encompass multiple lines
-        lin = problem.position[0] - 1
-        line_intervals[lin].append(Interval(problem))
+        # FIXME: split intervals, if they encompass a latex command which has been
+        #  removed in the detex process (issue #58)
+        line = problem.position[0] - 1
+        line_intervals[line].append(Interval(problem))
+
+
+def resolve_interval_intersections(intervals: List[Interval]) -> None:
+    """
+    Finds any intersecting intervals and replaces them with non-intersecting intervals
+    that may contain more than one problem.
+
+    :param intervals: list of intervals in one line to be checked for intersections
+    """
+
+    if len(intervals) < 2:
+        return
+
+    next_index: int = 1
+
+    while next_index < len(intervals):
+
+        intervals.sort(key=attrgetter("start"))
+
+        intersect_result = intervals[next_index - 1].perform_intersection(
+            intervals[next_index]
+        )
+
+        if intersect_result is not None:
+
+            # remove both intersected intervals
+            intervals.pop(next_index - 1)
+            intervals.pop(next_index - 1)
+
+            insert_index: int = next_index - 1
+
+            for new_interval in intersect_result:
+                intervals.insert(insert_index, new_interval)
+                insert_index += 1
+
+        else:
+            next_index += 1
+
+
+def mark_intervals_in_tex(
+    tex_lines: List[str], line_intervals: List[List[Interval]]
+) -> None:
+
+    for i in range(len(tex_lines)):
+        tex_lines[i] = mark_intervals_in_tex_line(tex_lines[i], line_intervals[i])
+
+
+def mark_intervals_in_tex_line(tex_line: str, intervals: List[Interval]) -> str:
+
+    offset: int = 0
+    for interval in intervals:
+        open_tag, close_tag = generate_wrapper_html_tags(interval)
+
+        start: int = interval.start + offset - 1
+        end: int = interval.end + offset - 1
+
+        # TODO: figure out HTML escaping
+        tex_line = (
+            f"{tex_line[:start]}"
+            f"{open_tag}{tex_line[start:end]}{close_tag}"
+            f"{tex_line[end:]}"
+        )
+
+        offset += len(open_tag) + len(close_tag)
+
+    return tex_line
+
+
+def generate_wrapper_html_tags(interval: Interval) -> Tuple[str, str]:
+    opening_tag = (
+        f"<span "
+        f'class="under is-{str(ProblemSeverity(interval.severity))}" '
+        f'title="{escape(interval.html_tag_title)}"'
+        f">"
+    )
+    closing_tag = f"</span>"
+
+    return opening_tag, closing_tag
