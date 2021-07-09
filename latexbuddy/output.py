@@ -190,27 +190,14 @@ def highlight(tex: str, problems: List[Problem]) -> str:
     :param problems: list of problems
     :return: HTML string with highlighted errors, ready to be put inside <pre>
     """
-    line_intervals: List[List[Interval]] = []
-    tex_lines = tex.splitlines(keepends=True)
-    for _ in tex_lines:
-        line_intervals.append([])
 
-    # when parsing, yalafi often marks the n+1'th line as erroneous
-    line_intervals.append([])
+    tex_lines: List[str] = tex.splitlines(keepends=True)
+    line_intervals: List[List[Interval]] = __create_empty_line_interval_list(tex_lines)
 
-    for problem in problems:
-        # we don't care about problems with no position
-        if problem.position is None:
-            continue
+    __add_basic_problem_intervals(line_intervals, problems)
 
-        # we don't care about problems without length (for now)
-        if problem.length == 0:
-            continue
+    for i in range(len(line_intervals) - 1):
 
-        lin = problem.position[0] - 1
-        line_intervals[lin].append(Interval(problem))
-
-    for i in range(len(line_intervals)):
         intervals = line_intervals[i]
         if len(intervals) == 0:
             continue
@@ -242,3 +229,47 @@ def highlight(tex: str, problems: List[Problem]) -> str:
             offset += len(string) - old_len
 
     return "".join(tex_lines)
+
+
+def __create_empty_line_interval_list(tex_lines: List[str]) -> List[List[Interval]]:
+    """
+    Creates and returns a list of (empty) lists of Intervals. The outer list will contain
+    exactly len(tex_lines) + 1 empty lists.
+
+    :param tex_lines: individual lines of a .tex-file as a list of strings
+    :returns: a list of empty lists that meet the specified dimensions
+    """
+
+    line_intervals: List[List[Interval]] = []
+    for _ in tex_lines:
+        line_intervals.append([])
+
+    # when parsing, yalafi often marks the n+1'th line as erroneous
+    line_intervals.append([])
+
+    return line_intervals
+
+
+def __add_basic_problem_intervals(
+    line_intervals: List[List[Interval]], problems: List[Problem]
+) -> None:
+    """
+    Filters out problems without a position attribute or with length zero and inserts
+    the remaining ones into the line_intervals list.
+
+    :param line_intervals: List of lists of Intervals for any given line
+    :param problems: list of problems to be inserted as Intervals
+    """
+
+    for problem in problems:
+        # we don't care about problems with no position
+        if problem.position is None:
+            continue
+
+        # we don't care about problems without length (for now)
+        if problem.length == 0:
+            continue
+
+        # TODO: add more intervals for Problems that encompass multiple lines
+        lin = problem.position[0] - 1
+        line_intervals[lin].append(Interval(problem))
