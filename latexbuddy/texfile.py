@@ -176,8 +176,8 @@ class TexFile:
 
         tex_mf = self.__create_tex_mf(path)
 
-        print("TEXFILE:", str(self.tex_file), self.tex_file.exists())
-        print("PATH:", str(path), path.exists())
+        # print("TEXFILE:", str(self.tex_file), self.tex_file.exists())
+        # print("PATH:", str(path), path.exists())
 
         execute(
             f'TEXMFCNF="{tex_mf}";',
@@ -191,8 +191,8 @@ class TexFile:
 
         log = path / f"{self.tex_file.stem}.log"
         pdf = path / f"{self.tex_file.stem}.pdf" if compile_pdf else None
-        print("LOG:", log, log.is_file())
-        print("PDF:", pdf, pdf.is_file())
+        # print("LOG:", log, log.is_file())
+        # print("PDF:", pdf, pdf.is_file())
         return log, pdf
 
     @staticmethod

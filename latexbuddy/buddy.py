@@ -72,7 +72,6 @@ class LatexBuddy(MainModule):
         LatexBuddy.instance.tex_file = TexFile(file_to_check)
         LatexBuddy.instance.path_list = path_list
 
-
         # file where the error should be saved
         LatexBuddy.instance.output_dir = Path(
             LatexBuddy.instance.cfg.get_config_option_or_default(
