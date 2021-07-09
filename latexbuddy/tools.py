@@ -10,12 +10,11 @@ import traceback
 from argparse import Namespace
 from logging import Logger
 from pathlib import Path
-from tempfile import mkdtemp, mkstemp
 from typing import Callable, List, Optional, Tuple
 
 from latexbuddy.exceptions import ExecutableNotFoundError
 from latexbuddy.log import Loggable
-from latexbuddy.messages import not_found, path_not_found, texfile_error
+from latexbuddy.messages import not_found, path_not_found
 from latexbuddy.problem import Problem, ProblemSeverity
 
 
@@ -38,7 +37,7 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
 
     command = get_command_string(cmd)
 
-    logger.debug(f"Executing {command}")
+    logger.debug(f"Executing '{command}'")
 
     error_list = subprocess.Popen(
         [command], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
@@ -54,6 +53,8 @@ def execute_background(*cmd: str) -> subprocess.Popen:
     :return: subprocess instance of the executed command
     """
     command = get_command_string(cmd)
+
+    logger.debug(f"Executing '{command}' in the background")
 
     process = subprocess.Popen(
         [command],
@@ -83,6 +84,8 @@ def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
     :return: command output
     """
     command = get_command_string(cmd)
+
+    logger.debug(f"Executing '{command}' (ignoring errors)")
 
     error_list = subprocess.Popen(
         [command], shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL
@@ -303,7 +306,6 @@ def get_all_paths_in_document(file_path: str):
     If the file includes more files, these files will also be checked.
 
     :param file_path:a string, containing file path
-    :param buddy: the latexbuddy instance
     """
     unchecked_files = []  # Holds all unchecked files
     checked_files = []  # Holds all checked file

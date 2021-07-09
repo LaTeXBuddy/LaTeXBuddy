@@ -1,11 +1,13 @@
 """This module defines the connection between LaTeXBuddy and LanguageTool."""
 
 import json
+import re
 import socket
 import time
 
 from contextlib import closing
 from enum import Enum
+from json import JSONDecodeError
 from logging import Logger
 from typing import AnyStr, Dict, List, Optional
 
@@ -36,75 +38,7 @@ class Mode(Enum):
 class LanguageTool(Module):
     """Wraps the LanguageTool API calls to check files."""
 
-    # removed ca-ES-valencia and de-DE-x-simple-language for compliance
-    # with LaTeXBuddy language standards
-    __SUPPORTED_LANGUAGES = [
-        "ar",
-        "ast",
-        "ast-ES",
-        "be",
-        "be-BY",
-        "br",
-        "br-FR",
-        "ca",
-        "ca-ES",
-        "zh",
-        "zh-CN",
-        "da",
-        "da-DK",
-        "nl",
-        "nl-BE",
-        "en",
-        "en-AU",
-        "en-CA",
-        "en-GB",
-        "en-NZ",
-        "en-ZA",
-        "en-US",
-        "eo",
-        "fr",
-        "gl",
-        "gl-ES",
-        "de",
-        "de-AT",
-        "de-DE",
-        "de-CH",
-        "el",
-        "el-GR",
-        "ga",
-        "ga-IE",
-        "it",
-        "ja",
-        "ja-JP",
-        "km",
-        "km-KH",
-        "nb",
-        "no",
-        "fa",
-        "pl",
-        "pl-PL",
-        "pt",
-        "pt-AO",
-        "pt-BR",
-        "pt-MZ",
-        "pt-PT",
-        "ro",
-        "ro-RO",
-        "ru",
-        "ru-RU",
-        "sk",
-        "sk-SK",
-        "sl",
-        "sl-SI",
-        "es",
-        "sv",
-        "tl",
-        "tl-PH",
-        "ta",
-        "ta-IN",
-        "uk",
-        "uk-UA",
-    ]
+    _REGEX_LANGUAGE_FLAG = re.compile(r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?")
 
     def __init__(self):
         """Creates a LanguageTool checking module."""
@@ -117,6 +51,7 @@ class LanguageTool(Module):
 
         self.local_server = None
         self.remote_url = None
+        self.remote_url_languages = None
         self.lt_console_command = None
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
@@ -128,30 +63,6 @@ class LanguageTool(Module):
         :param config: the configuration options of the calling LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex option)
         """
-
-        self.language = config.get_config_option_or_default(
-            LatexBuddy,
-            "language",
-            None,
-            verify_type=AnyStr,
-            verify_choices=LanguageTool.__SUPPORTED_LANGUAGES,
-        )
-
-        language_country = config.get_config_option_or_default(
-            LatexBuddy,
-            "language_country",
-            None,
-            verify_type=AnyStr,
-        )
-
-        if (
-            self.language is not None
-            and language_country is not None
-            and self.language + "-" + language_country in self.__SUPPORTED_LANGUAGES
-        ):
-            self.language = self.language + "-" + language_country
-
-        self.find_disabled_rules(config)
 
         cfg_mode = config.get_config_option_or_default(
             LanguageTool,
@@ -174,22 +85,99 @@ class LanguageTool(Module):
             # must include the port and api call (e.g. /v2/check)
             self.remote_url = config.get_config_option(
                 LanguageTool,
-                "remote_url",
+                "remote_url_check",
+                verify_type=AnyStr,
+                verify_regex="http(s?)://(\\S*)",
+            )
+
+            self.remote_url_languages = config.get_config_option_or_default(
+                LanguageTool,
+                "remote_url_languages",
+                None,
                 verify_type=AnyStr,
                 verify_regex="http(s?)://(\\S*)",
             )
 
         elif self.mode == Mode.COMMANDLINE:
-            self.find_languagetool_command()
+            pass
+
+        supported_languages = self.find_supported_languages()
+
+        self.language = config.get_config_option_or_default(
+            LatexBuddy,
+            "language",
+            None,
+            verify_type=AnyStr,
+            verify_choices=supported_languages,
+        )
+
+        language_country = config.get_config_option_or_default(
+            LatexBuddy,
+            "language_country",
+            None,
+            verify_type=AnyStr,
+        )
+
+        if (
+            self.language is not None
+            and language_country is not None
+            and self.language + "-" + language_country in supported_languages
+        ):
+            self.language = self.language + "-" + language_country
+
+        self.find_disabled_rules(config)
 
         result = self.check_tex(file)
 
         return result
 
-    def find_languagetool_command(self) -> None:
-        """Searches for the LanguageTool command line app.
+    def find_supported_languages(self) -> List[str]:
+        """
+        Acquires a list of supported languages from the version of LanguageTool that
+        is currently used.
+        """
 
-        This method also checks if Java is installed.
+        if self.mode == Mode.COMMANDLINE:
+
+            cmd = self.find_languagetool_command_prefix()
+            cmd.append("--list")
+
+            result = tools.execute(*cmd)
+
+            supported_languages = [lang.split(" ")[0] for lang in result.splitlines()]
+            supported_languages = list(
+                filter(self.matches_language_regex, supported_languages)
+            )
+
+            return supported_languages
+
+        elif self.mode == Mode.LOCAL_SERVER:
+
+            return self.lt_languages_get_request(
+                f"http://localhost:{self.local_server.port}/v2/languages"
+            )
+
+        elif self.mode == Mode.REMOTE_SERVER:
+
+            if not self.remote_url_languages:
+                return []
+
+            return self.lt_languages_get_request(self.remote_url_languages)
+
+        else:
+            return []
+
+    def matches_language_regex(self, language: str) -> bool:
+        """
+        Determines whether a given string is a language code by matching it against a
+        regular expression.
+        """
+
+        return self._REGEX_LANGUAGE_FLAG.fullmatch(language) is not None
+
+    def find_languagetool_command_prefix(self) -> List[str]:
+        """
+        Finds the prefix of the shell command executing LanguageTool in the commandline.
         """
 
         tools.find_executable("java", "JRE (Java Runtime Environment)", self.logger)
@@ -208,13 +196,24 @@ class LanguageTool(Module):
             executable_source = "java"
 
         lt_path = result
-        self.lt_console_command = []
+        command_prefix = []
 
         if executable_source == "java":
-            self.lt_console_command.append("java")
-            self.lt_console_command.append("-jar")
+            command_prefix.append("java")
+            command_prefix.append("-jar")
 
-        self.lt_console_command.append(lt_path)
+        command_prefix.append(lt_path)
+
+        return command_prefix
+
+    def find_languagetool_command(self) -> None:
+        """Searches for the LanguageTool command line app.
+
+        This method also checks if Java is installed.
+        """
+
+        self.lt_console_command = self.find_languagetool_command_prefix()
+
         self.lt_console_command.append("--json")
 
         if self.language:
@@ -232,6 +231,12 @@ class LanguageTool(Module):
             self.lt_console_command.append(self.disabled_categories)
 
     def find_disabled_rules(self, config: ConfigLoader) -> None:
+        """
+        Reads all disabled rules and categories from the specified configuration and
+        saves the result in the instance.
+
+        :param config: configuration options to be read
+        """
 
         self.disabled_rules = ",".join(
             config.get_config_option_or_default(
@@ -298,7 +303,31 @@ class LanguageTool(Module):
             request_data["disabledCategories"] = self.disabled_categories
 
         response = requests.post(url=server_url, data=request_data)
-        return response.json()
+
+        try:
+            return response.json()
+        except JSONDecodeError:
+            self.logger.error(
+                f"Could not decode the following POST response in JSON format: "
+                f"{response.text}"
+            )
+            return None
+
+    def lt_languages_get_request(self, server_url: str) -> List[str]:
+        """
+        Sends a GET request to the specified URL in order to retrieve a JSON formatted
+        list of supported languages by the server. If the response format is invalid,
+        this method will most likely fail with an exception.
+        """
+
+        response_json = requests.get(server_url).json()
+
+        supported_languages = [entry["longCode"] for entry in response_json]
+        supported_languages = list(
+            filter(self.matches_language_regex, supported_languages)
+        )
+
+        return supported_languages
 
     def execute_commandline_request(self, file: TexFile) -> Optional[Dict]:
         """Execute the LanguageTool command line app to check the text.
@@ -310,12 +339,17 @@ class LanguageTool(Module):
         if file is None:
             return None
 
+        self.find_languagetool_command()
+
         # cloning list to in order to append the file name
         # w/o changing lt_console_command
         cmd = list(self.lt_console_command)
         cmd.append(str(file.plain_file))
 
         output = tools.execute_no_errors(*cmd, encoding="utf_8")
+
+        if len(output) > 0:
+            output = output[output.find("{") :]
 
         try:
             json_output = json.loads(output)

@@ -17,6 +17,7 @@ from latexbuddy import __version__
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
+from latexbuddy.module_loader import ModuleLoader
 from latexbuddy.tools import get_all_paths_in_document, perform_whitelist_operations
 
 
@@ -139,24 +140,26 @@ def main():
     are fetched and Latexbuddy is executed """
 
     buddy = LatexBuddy.instance
+    module_loader = ModuleLoader(Path("latexbuddy/modules/"))
 
     for p in args.file:  # args.file is a list
         paths, problems = get_all_paths_in_document(p)
 
-        buddy.init(
-            config_loader=config_loader,
-            file_to_check=Path(paths[0]),  # set first file
-            path_list=paths,  # to be used later on in render html
-        )
-
-        #  TODO: this wont work
-        #  for problem in problems:
-        #      buddy.add_error(problem)
-
         for path in paths:
-            #  need to clear the error list of the previous file
-            buddy.clear_error_list()
-            buddy.change_file(Path(path))  # change file everytime
+
+            # re-initialize the buddy instance with a new path
+            buddy.init(
+                config_loader=config_loader,
+                module_provider=module_loader,
+                file_to_check=path,
+                path_list=paths,  # to be used later on in render html
+            )
+
+            # TODO: Moved this here, so added Problems are not immediately deleted
+            #  anymore. Please acknowledge by removing this comment.
+            for problem in problems:
+                buddy.add_error(problem)
+
             buddy.run_tools()
             buddy.check_whitelist()
             buddy.output_file()
