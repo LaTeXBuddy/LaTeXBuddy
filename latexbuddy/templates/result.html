@@ -11,7 +11,7 @@
         {% include "static/main_style.css" %}
         {% include "static/whitelist_button.css" %}
         {% include "static/popup_for_whitelist.css" %}
-        {% include "static/navigation_bar_and_pdf_button.css" %}
+        {% include "static/file_bar_and_slider.css" %}
     </style>
 </head>
 <body>
@@ -25,6 +25,7 @@
         {% set parent_list = [] %} {# the list contains all folder, included in this project #}
 
         {# get all folder names #}
+        {# TODO: Refactor Algo to work with multiple same named folders #}
         {% for path in paths %}
             {% set upper_folder = path.parents[0]|string() %}
             {% set sub_folder = path.parents[1] ~ "/" |string() %}
@@ -38,7 +39,7 @@
         {# set the style for each folder #}
         {% for folder in parent_list %}
             <style>
-                .{{ folder }} {
+                .{{ "_" ~ folder }} {
                     display: flex;
                     flex-direction: column;
                     align-items: center;
@@ -46,11 +47,11 @@
                     margin-right: 25px;
                     padding: 20px;
                 }
-                .{{ folder }} svg {
+                .{{ "_" ~ folder }} svg {
                     width: 45px;
                     height: 45px;
                 }
-                .{{ folder }}-content {
+                .{{ "_" ~ folder }}-content {
                   display: none;
                   position: absolute;
                   background-color: #f1f1f1;
@@ -60,17 +61,17 @@
                   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
                   z-index: 1;
                 }
-                .{{ folder }}-content a {
+                .{{ "_" ~ folder }}-content a {
                   color: black;
                   padding: 12px 16px;
                   text-decoration: none;
                   display: block;
                 }
-                .{{ folder }}-content a:hover {
+                .{{ "_" ~ folder }}-content a:hover {
                     background-color: silver;
                     border-radius: 5px 5px 5px 5px;
                 }
-                .{{ folder }}:hover .{{ folder }}-content {
+                .{{ "_" ~ folder }}:hover .{{ "_" ~ folder }}-content {
                     display: block;
                 }
             </style>
@@ -79,12 +80,12 @@
         {# get all file paths and add to the folder dropdown #}
 
         {% for folder in parent_list %}
-            <div class="{{ folder }}">{{ folder }}
+            <div class="{{ "_" ~ folder }}">{{ folder }}
                 <svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" enable-background="new 0 0 48 48">
                     <path fill="#00b6b6" d="M40,12H22l-4-4H8c-2.2,0-4,1.8-4,4v8h40v-4C44,13.8,42.2,12,40,12z" />
                     <path fill="#008281" d="M40,12H8c-2.2,0-4,1.8-4,4v20c0,2.2,1.8,4,4,4h32c2.2,0,4-1.8,4-4V16C44,13.8,42.2,12,40,12z" />
                 </svg>
-                <div class="{{ folder }}-content">
+                <div class="{{ "_" ~ folder }}-content">
                         {% for path in paths %}
                             {% set upper_folder = path.parents[0]|string() %}
                             {% set sub_folder = path.parents[1] ~ "/" |string() %}
@@ -98,21 +99,28 @@
             </div>
         {% endfor %}
     </div>
-
+    {# slider to switch to the pdf view #}
     <label class="switch">
         <input type="checkbox" id="pdfbutton">
         <div class="slider round">
-            <!--ADDED HTML -->
             <span class="on">PDF</span>
             <span class="off">TEX</span>
-            <!--END-->
         </div>
     </label>
 </header>
 <main>
     <div id="file-container">
         <div id="file-contents" style="position:relative;">
-            <pre style="line-height: 16px"><code>{{ file_text|safe }}</code></pre>
+        {# the tex-container is used to hold the file text line and the correspondign line number #}
+            <div class="text-container">
+                {% for line_num, text in file_text %}
+                    {# container that holds the line number and the coresponding text line #}
+                    <div class="line-container">
+                        <div class="line-number">{{ line_num }}</div>
+                        <code>{{ text|safe }}</code>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
         <div id="pdf-disp" style="position:relative;">
             {% if pdf_path is not none %}
@@ -127,13 +135,12 @@
     <div id="problems-list">
         <div class="problem-list-header">
             <h2>Problems</h2>
+            {# the slider, used to switch the problems #}
             <label class="switch">
                 <input type="checkbox" id="change_problems">
                 <div class="slider round">
-                    <!--ADDED HTML -->
                     <span class="on">Specific</span>
                     <span class="off">General</span>
-                    <!--END-->
                 </div>
             </label>
         </div>

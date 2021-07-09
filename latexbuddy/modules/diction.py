@@ -146,7 +146,7 @@ class Diction(Module):
                     checker=Diction,
                     p_type="0",
                     file=file,
-                    severity=ProblemSeverity.INFO,
+                    severity=ProblemSeverity.WARNING,
                     category="grammar",
                     suggestions=[sugg],
                     key=self.display_name + "_" + str(hashlib.md5(o_line.encode())),

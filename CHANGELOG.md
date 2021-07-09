@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- line numbers (!135)
 - new test cases for multiple occurrences of own_checkers problems (!110)
 - custom key for YaLafi problems (!109)
 - filter for log files (!121)
@@ -18,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - debug message for beginning and end of whitelist check in `LatexBuddy` (!141)
 
 ### Changed
+- the problem list and text is now scrollable (!135)
 - language selection for aspell now works dynamically and using the config (!105)
 - language codes are now standardized to fit different formats (!116)
 - methods in ConfigLoader now take an instance or a type-descriptor of type NamedModule instead of taking the name as a string (!108)
