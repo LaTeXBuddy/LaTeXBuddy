@@ -107,6 +107,14 @@
             <span class="off">TEX</span>
         </div>
     </label>
+    {# the slider, used to switch the problems #}
+    <label class="switch">
+        <input type="checkbox" id="change_problems">
+        <div class="slider round">
+            <span class="on">Specific</span>
+            <span class="off">General</span>
+        </div>
+    </label>
 </header>
 <main>
     <div id="file-container">
@@ -135,14 +143,6 @@
     <div id="problems-list">
         <div class="problem-list-header">
             <h2>Problems</h2>
-            {# the slider, used to switch the problems #}
-            <label class="switch">
-                <input type="checkbox" id="change_problems">
-                <div class="slider round">
-                    <span class="on">Specific</span>
-                    <span class="off">General</span>
-                </div>
-            </label>
         </div>
         <ol id="general-problem-disp">
             {% for problem in general_problems %}
