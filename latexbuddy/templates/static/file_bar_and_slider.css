@@ -12,7 +12,7 @@
     overflow: auto; /* if too much folders, make it scroll */
 }
 
-/* Slider-Switch */
+/* Slider-ForPDF-Switch */
 .switch {
   position: relative;
   display: inline-block;
