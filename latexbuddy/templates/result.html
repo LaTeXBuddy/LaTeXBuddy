@@ -22,17 +22,24 @@
     <h2><small>Results for</small> {{ file_name|e }}</h2>
     <div class="menu">
 
-        {% set parent_list = [] %} {# the list contains all folder, included in this project #}
+        {% set first_full_path = paths[0] %}
+        {% set parent_path = first_full_path.parents[1] ~ "/" |string() %}
+        {% set child_path = first_full_path.parents[0]|string() %}
+        {% set child = child_path|replace(parent_path, "") %}
+
+        TODOOOOOOOOOOOOOOOOOOO!
+        {% set name_for_css_list = [child] %}
+        {% set name_list = [child] %}
 
         {# get all folder names #}
-        {# TODO: Refactor Algo to work with multiple same named folders #}
         {% for path in paths %}
             {% set upper_folder = path.parents[0]|string() %}
-            {% set sub_folder = path.parents[1] ~ "/" |string() %}
-            {% set parent = upper_folder|replace(sub_folder, "") %}
+            {% set name = upper_folder|replace(child_path, "") %}
 
-            {% if parent not in parent_list %}
-                {% set parent_list = parent_list.append(parent) %}
+            {% set name = name|replace("/", "", 1) %}
+
+            {% if name not in parent_list %}
+                {% set parent_list = parent_list.append(name) %}
             {% endif %}
         {% endfor %}
 
