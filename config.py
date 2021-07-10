@@ -21,7 +21,7 @@ modules = {
         "enabled": True,
     },
     "Diction": {
-        "enabled": True,
+        "enabled": False,
     },
     "EmptySections": {
         "enabled": True,
@@ -64,9 +64,9 @@ modules = {
         "enabled": True
     },
     "NewerPublications": {
-        "enabled": True
+        "enabled": False
     },
     "BibtexDuplicates": {
-        "enabled": True
+        "enabled": False
     },
 }

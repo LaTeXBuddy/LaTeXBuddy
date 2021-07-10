@@ -376,7 +376,8 @@ def get_all_paths_in_document(file_path: str):
                 if not path.endswith(".tex"):
                     # TODO: Error message.
                     print("'.tex' is missing. Check all includes/inputs!")
-                    continue  # if file ending is not given, ignore file
+                    path = path + ".tex"
+                    #continue  # if file ending is not given, ignore file
 
                 path_line[path] = line
                 new_files.append(Path(path))  # if something was found, add it to a list
