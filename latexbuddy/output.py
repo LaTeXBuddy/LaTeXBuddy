@@ -148,6 +148,9 @@ class Interval:
         self._start = start if start else problems[0].position[1]
         self._end = end if end else self.start + problems[0].length
 
+        if self.end < self.start:
+            raise ValueError("End position can not be smaller than start position!")
+
     @property
     def problems(self):
         return self._problems
