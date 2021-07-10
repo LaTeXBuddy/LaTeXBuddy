@@ -244,7 +244,7 @@ def highlight(tex: str, problems: List[Problem]) -> str:
     tex_lines: List[str] = tex.splitlines(keepends=False)
     line_intervals: List[List[Interval]] = create_empty_line_interval_list(tex_lines)
 
-    add_basic_problem_intervals(line_intervals, problems)
+    add_basic_problem_intervals(line_intervals, problems, tex_lines)
 
     # old_highlighting(line_intervals, tex_lines)
     for intervals in line_intervals:
@@ -275,7 +275,7 @@ def create_empty_line_interval_list(tex_lines: List[str]) -> List[List[Interval]
 
 
 def add_basic_problem_intervals(
-    line_intervals: List[List[Interval]], problems: List[Problem]
+    line_intervals: List[List[Interval]], problems: List[Problem], tex_lines: List[str]
 ) -> None:
     """
     Filters out problems without a position attribute or with length zero and inserts
@@ -294,11 +294,36 @@ def add_basic_problem_intervals(
         if problem.length == 0:
             continue
 
-        # TODO: add more intervals for Problems that encompass multiple lines
         # FIXME: split intervals, if they encompass a latex command which has been
         #  removed in the detex process (issue #58)
         line = problem.position[0] - 1
-        line_intervals[line].append(Interval(problem))
+        interval = Interval(problem)
+
+        # move the interval down the lines until their start index is actually included
+        while interval.start > len(tex_lines[line]):
+            interval = Interval(
+                problem,
+                interval.start - len(tex_lines[line]),
+                interval.end - len(tex_lines[line]),
+            )
+            line += 1
+
+        # split the interval, if it reaches across lines
+        while interval.end - 1 > len(tex_lines[line]):
+
+            new_interval = Interval(problem, interval.start, len(tex_lines[line]) + 1)
+            line_intervals[line].append(new_interval)
+
+            interval = Interval(
+                problem,
+                1,
+                (interval.end - interval.start)
+                - (new_interval.end - new_interval.start)
+                + 1,
+            )
+            line += 1
+
+        line_intervals[line].append(interval)
 
 
 def resolve_interval_intersections(intervals: List[Interval]) -> None:
