@@ -20,12 +20,11 @@ def test_unit_frontend_render_html(script_dir):
     file_text = "\\begin{document} \nHello, how are you? \n I am fine, and you? \n " \
                 "\\end{document} "
 
-    aspell = Aspell()
     problems = {
         "uid": Problem(
             position=None,
             text="test_error",
-            checker=aspell,
+            checker=Aspell,
             file=file_path,
             severity=ProblemSeverity.INFO,
             p_type="123",
