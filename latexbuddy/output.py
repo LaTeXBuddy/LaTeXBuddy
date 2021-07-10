@@ -237,7 +237,7 @@ def highlight(tex: str, problems: List[Problem]) -> str:
     :return: HTML string with highlighted errors, ready to be put inside <pre>
     """
 
-    tex_lines: List[str] = tex.splitlines(keepends=True)
+    tex_lines: List[str] = tex.splitlines(keepends=False)
     line_intervals: List[List[Interval]] = create_empty_line_interval_list(tex_lines)
 
     add_basic_problem_intervals(line_intervals, problems)
@@ -248,7 +248,7 @@ def highlight(tex: str, problems: List[Problem]) -> str:
 
     mark_intervals_in_tex(tex_lines, line_intervals)
 
-    return "".join(tex_lines)
+    return "\n".join(tex_lines) + "\n"
 
 
 def create_empty_line_interval_list(tex_lines: List[str]) -> List[List[Interval]]:
