@@ -1,4 +1,6 @@
 import os
+from random import sample
+from typing import Tuple, List, Optional
 
 import pytest
 
@@ -42,21 +44,175 @@ def test_unit_frontend_render_html(script_dir):
     )
 
 
-def test_interval_intersection():
-    i1 = Interval(Problem((1, 3), "blub", Aspell, Path("./"), description="descr"))
-    i2 = Interval(Problem((1, 5), "blubbb", Aspell, Path("./"), description="descr"))
+def generate_test_problem(
+    position: Tuple[int, int], length: int, description: str
+) -> Problem:
 
-    assert i1.start == 3 and i1.end == 7
-    assert i2.start == 5 and i2.end == 11
+    return Problem(
+        position,
+        generate_random_text(length),
+        Aspell,
+        Path("./"),
+        description=description
+    )
 
-    assert i1.intersects(i2)
-    assert i2.intersects(i1)
 
-    result = i1.perform_intersection(i2)
+def generate_random_text(length: int) -> str:
+    alphabet = "abcdefghijklmnopqrstuvwxyz"
+    text = ""
 
-    assert len(result) == 3
-    assert len(i2.perform_intersection(i1)) == 3
+    for i in range(length):
+        text += sample(alphabet, 1)[0]
 
-    assert result[0].start == 3 and result[0].end == 5 and len(result[0].problems) == 1
-    assert result[1].start == 5 and result[1].end == 7 and len(result[1].problems) == 2
-    assert result[2].start == 7 and result[2].end == 11 and len(result[2].problems) == 1
+    return text
+
+
+def parse_interval_list(
+    interval_data: Optional[List[Tuple[Tuple[int, int], int, str]]]
+) -> Optional[List[Interval]]:
+
+    if interval_data is None:
+        return None
+
+    result = []
+
+    for result_interval in interval_data:
+        result.append(
+            Interval(
+                generate_test_problem(
+                    result_interval[0], result_interval[1], result_interval[2]
+                )
+            )
+        )
+
+    return result
+
+
+@pytest.mark.skip(reason="This is not actually a test.")
+def test_interval_equals(first: Interval, second: Interval) -> bool:
+    return (
+        first.start == second.start
+        and first.end == second.end
+        and first.severity == second.severity
+        and sorted(first.html_tag_title.split(", "))
+        == sorted(second.html_tag_title.split(", "))
+    )
+
+
+def interval_lists_equal(
+    first: Optional[List[Interval]], second: Optional[List[Interval]]
+) -> bool:
+
+    if first is None or second is None:
+        return first is None and second is None
+
+    if len(first) != len(second):
+        return False
+
+    if len(first) == 0:
+        return True
+
+    for interval0 in first:
+        equal_found = False
+
+        for interval1 in second:
+            if test_interval_equals(interval0, interval1):
+                equal_found = True
+                break
+
+        if not equal_found:
+            return False
+
+    return True
+
+
+@pytest.mark.parametrize(
+    "position, length, description",
+    [
+        ((0, 3), 5, "description_0"),
+        ((1, 5), 6, "description_1"),
+        ((42, 55), 15, "description_2"),
+    ]
+)
+def test_interval_creation(position, length, description):
+
+    problem = generate_test_problem(position, length, description)
+    interval = Interval(problem)
+
+    assert interval.start == position[1]
+    assert interval.end == position[1] + length
+    assert interval.problems == [problem]
+    assert interval.severity == problem.severity.value
+    assert interval.html_tag_title == problem.description
+
+
+@pytest.mark.parametrize(
+    "interval_data_in, result_interval_data",
+    [
+        (
+            [
+                ((5, 3), 4, "description_0"),
+                ((5, 5), 6, "description_1"),
+            ],
+            [
+                ((5, 3), 2, "description_0"),
+                ((5, 5), 2, "description_0, description_1"),
+                ((5, 7), 4, "description_1"),
+            ],
+        ),
+        (
+            [
+                ((4, 4), 7, "description_2"),
+                ((4, 6), 3, "description_3"),
+            ],
+            [
+                ((4, 4), 2, "description_2"),
+                ((4, 6), 3, "description_2, description_3"),
+                ((4, 9), 2, "description_2"),
+            ],
+        ),
+        (
+            [
+                ((45, 2), 5, "description_4"),
+                ((45, 4), 3, "description_5"),
+            ],
+            [
+                ((45, 2), 2, "description_4"),
+                ((45, 4), 3, "description_4, description_5"),
+            ],
+        ),
+        (
+            [
+                ((46, 2), 5, "description_6"),
+                ((46, 2), 3, "description_7"),
+            ],
+            [
+                ((46, 2), 3, "description_6, description_7"),
+                ((46, 5), 2, "description_6"),
+            ],
+        ),
+        (
+            [
+                ((6, 8), 4, "description_8"),
+                ((6, 14), 3, "description_9"),
+            ],
+            None,
+        ),
+    ]
+)
+def test_interval_intersection(
+    interval_data_in: List[Tuple[Tuple[int, int], int, str]],
+    result_interval_data: Optional[List[Tuple[Tuple[int, int], int, str]]]
+):
+
+    intervals_in = parse_interval_list(interval_data_in)
+    assert intervals_in is not None and len(intervals_in) == 2
+
+    i0 = intervals_in[0]
+    i1 = intervals_in[1]
+
+    result_intervals = i0.perform_intersection(i1)
+    assert interval_lists_equal(result_intervals, i1.perform_intersection(i0))
+
+    expected_result = parse_interval_list(result_interval_data)
+    assert interval_lists_equal(result_intervals, expected_result)
