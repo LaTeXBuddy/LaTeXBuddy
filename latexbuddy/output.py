@@ -332,12 +332,29 @@ def resolve_interval_intersections(intervals: List[Interval]) -> None:
 def mark_intervals_in_tex(
     tex_lines: List[str], line_intervals: List[List[Interval]]
 ) -> None:
+    """
+    Adds HTML marker-tags (span) for every interval in line_intervals to the respective
+    line in tex_lines and escapes all HTML control characters in tex_lines.
+
+    :param tex_lines: text lines from the .tex-file
+    :param line_intervals: list of non-intersecting intervals to be marked for every
+                           line in tex_lines
+    """
 
     for i in range(len(tex_lines)):
         tex_lines[i] = mark_intervals_in_tex_line(tex_lines[i], line_intervals[i])
 
 
 def mark_intervals_in_tex_line(tex_line: str, intervals: List[Interval]) -> str:
+    """
+    Adds HTML marker-tags (span) for every interval in intervals to the respective
+    tex_line string and returns the resulting line. This method also escapes all HTML
+    control characters included in tex_line.
+
+    :param tex_line: line from the .tex-file
+    :param intervals: list of non-intersecting intervals to be highlighted in the line
+    :returns: resulting line as a string, containing HTML span tags
+    """
 
     offset: int = 0
     for interval in intervals:
@@ -359,6 +376,15 @@ def mark_intervals_in_tex_line(tex_line: str, intervals: List[Interval]) -> str:
 
 
 def generate_wrapper_html_tags(interval: Interval) -> Tuple[str, str]:
+    """
+    Generates and returns a pair of HTML span tags to wrap the text in the specified
+    interval.
+
+    :param interval: interval, specifying the position and metadata of the tags
+    :returns: a tuple of two strings, containing an opening and a closing span tag for
+              the specified interval object
+    """
+
     opening_tag = (
         f"<span "
         f'class="under is-{str(ProblemSeverity(interval.severity))}" '
