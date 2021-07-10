@@ -362,20 +362,32 @@ def mark_intervals_in_tex_line(tex_line: str, intervals: List[Interval]) -> str:
     """
 
     offset: int = 0
-    for interval in intervals:
+    for i in range(len(intervals)):
+
+        interval = intervals[i]
         open_tag, close_tag = generate_wrapper_html_tags(interval)
 
         start: int = interval.start + offset - 1
         end: int = interval.end + offset - 1
 
-        # TODO: figure out HTML escaping
+        text_pre = tex_line[:start]
+        text_interval = tex_line[start:end]
+        text_post = tex_line[end:]
+
+        text_interval_escaped = escape(text_interval)
+        text_pre_escaped = escape(text_pre) if i == 0 else text_pre
+        text_post_escaped = escape(text_post) if i == len(intervals) - 1 else text_post
+
         tex_line = (
-            f"{tex_line[:start]}"
-            f"{open_tag}{tex_line[start:end]}{close_tag}"
-            f"{tex_line[end:]}"
+            f"{text_pre_escaped}"
+            f"{open_tag}{text_interval_escaped}{close_tag}"
+            f"{text_post_escaped}"
         )
 
         offset += len(open_tag) + len(close_tag)
+        offset += len(text_pre_escaped) - len(text_pre)
+        offset += len(text_interval_escaped) - len(text_interval)
+        offset += len(text_post_escaped) - len(text_post)
 
     return tex_line
 
