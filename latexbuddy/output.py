@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from jinja2 import Environment, PackageLoader
 
+from latexbuddy.buddy import LatexBuddy
 from latexbuddy.problem import Problem, ProblemSeverity
 
 
@@ -361,6 +362,12 @@ def mark_intervals_in_tex_line(tex_line: str, intervals: List[Interval]) -> str:
     :returns: resulting line as a string, containing HTML span tags
     """
 
+    # TODO: remove debug output
+    if len(intervals) > 0:
+        LatexBuddy.instance.logger.error(
+            f"marking intervals [{[ ';'.join([str(intv.start), str(intv.end), str(len(intv.problems))]) for intv in intervals ]}] in line: {tex_line}"
+        )
+
     offset: int = 0
     for i in range(len(intervals)):
 
@@ -383,6 +390,22 @@ def mark_intervals_in_tex_line(tex_line: str, intervals: List[Interval]) -> str:
             f"{open_tag}{text_interval_escaped}{close_tag}"
             f"{text_post_escaped}"
         )
+
+        # TODO: remove debug output
+        LatexBuddy.instance.logger.warning(
+            f"changing line to: {tex_line} (former pre: {text_pre}, intv: {text_interval}, post: {text_post})"
+        )
+        if (
+            text_pre != text_pre_escaped
+            or text_interval != text_interval_escaped
+            or text_post != text_post_escaped
+        ):
+            LatexBuddy.instance.logger.warning(
+                f"offset-additions: pre={len(text_pre_escaped) - len(text_pre)}, "
+                f"intv={len(text_interval_escaped) - len(text_interval)}, "
+                f"post={len(text_post_escaped) - len(text_post)}"
+            )
+            LatexBuddy.instance.logger.warning("")
 
         offset += len(open_tag) + len(close_tag)
         offset += len(text_pre_escaped) - len(text_pre)
