@@ -119,6 +119,11 @@ class Problem:
             length = 0
         self.length = length
 
+        if position is not None and len(text) < 1:
+            raise ValueError(
+                "A Problem with non-None position must have a problematic text with "
+                "length > 0"
+            )
         self.text = text
 
         if (
