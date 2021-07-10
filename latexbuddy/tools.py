@@ -374,10 +374,8 @@ def get_all_paths_in_document(file_path: str):
                     path = parent + "/" + path
                 # if missing .tex, add a problem
                 if not path.endswith(".tex"):
-                    # TODO: Error message.
-                    print("'.tex' is missing. Check all includes/inputs!")
-                    path = path + ".tex"
-                    #continue  # if file ending is not given, ignore file
+                    print("'.tex' is missing. Check: \\include{" + path + "}")
+                    continue  # if file ending is not given, ignore file
 
                 path_line[path] = line
                 new_files.append(Path(path))  # if something was found, add it to a list
@@ -388,7 +386,6 @@ def get_all_paths_in_document(file_path: str):
 
 
 def perform_whitelist_operations(args: Namespace):
-
     wl_file = args.whitelist if args.whitelist else Path("whitelist")
 
     if args.wl_add_keys:
