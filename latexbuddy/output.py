@@ -166,7 +166,12 @@ class Interval:
     @property
     def html_tag_title(self) -> str:
         return ", ".join(
-            [problem.description for problem in self.problems if problem.description]
+            [
+                problem.description
+                if problem.description
+                else f"{problem.checker}-problem ({str(problem.severity)})"
+                for problem in self.problems
+            ]
         )
 
     def intersects(self, other: Interval) -> bool:
