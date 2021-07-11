@@ -1,4 +1,5 @@
 import os
+import re
 from pathlib import Path
 from typing import Optional, List, Tuple
 
@@ -13,7 +14,7 @@ def script_dir():
 
 
 def generate_cli_command(
-    script_dir,
+    script_dir: str,
     language: Optional[str],
     whitelist: Optional[str],
     output: Optional[str],
@@ -22,7 +23,7 @@ def generate_cli_command(
     dis_modules: Optional[List[str]],
 ) -> List[str]:
 
-    cmd = ["latexbuddy"]
+    cmd = ["latexbuddy", "-v"]
 
     if language:
         cmd.append("--language")
@@ -53,7 +54,16 @@ def generate_cli_command(
     return cmd
 
 
+__REGEX_CLI_CONFIG_OPTIONS_MAIN = re.compile(
+    r"Parsed CLI config options \(main\):\n({.*})"
+)
+__REGEX_CLI_CONFIG_OPTIONS_MODULES = re.compile(
+    r"Parsed CLI config options \(modules\):\n({.*})"
+)
+
+
 def assert_flag_config_options(
+    cmd_output: str,
     language: Tuple[Optional[str], Optional[str]],
     whitelist: Optional[str],
     output: Optional[str],
@@ -61,7 +71,50 @@ def assert_flag_config_options(
     en_modules: Optional[List[str]],
     dis_modules: Optional[List[str]]
 ):
-    pass
+
+    main_match = __REGEX_CLI_CONFIG_OPTIONS_MAIN.search(cmd_output)
+    modules_match = __REGEX_CLI_CONFIG_OPTIONS_MODULES.search(cmd_output)
+
+    assert main_match
+    assert modules_match
+
+    main_dictionary = main_match.group(1)
+    # modules_dictionary = modules_match.group(1)
+
+    if language[0]:
+        assert f"'language': {language[0]}" in main_dictionary
+    else:
+        assert "'language': " not in main_dictionary
+
+    if language[1]:
+        assert f"'language_country': {language[1]}" in main_dictionary
+    else:
+        assert "'language_country': " not in main_dictionary
+
+    if whitelist:
+        assert f"'whitelist': {whitelist}" in main_dictionary
+    else:
+        assert "'whitelist': " not in main_dictionary
+
+    if output:
+        assert f"'output': {output}" in main_dictionary
+    else:
+        assert "'output': " not in main_dictionary
+
+    if format:
+        assert f"'format': {format}" in main_dictionary
+    else:
+        assert "'format': " not in main_dictionary
+
+    if en_modules:
+        assert f"'enable-modules-by-default': {False}" in main_dictionary
+    elif not dis_modules:
+        assert "'enable-modules-by-default': " not in main_dictionary
+
+    if dis_modules:
+        assert f"'enable-modules-by-default': {True}" in main_dictionary
+    elif not en_modules:
+        assert "enable-modules-by-default" not in main_dictionary
 
 
 @pytest.mark.parametrize(
@@ -75,9 +128,66 @@ def assert_flag_config_options(
             (None, None),
             (None, None),
         ),
+        (
+            ("de-DE", ("'de'", "'DE'")),
+            (None, None),
+            (None, None),
+            (None, None),
+            (None, None),
+            (None, None),
+        ),
+        (
+            ("de_DE", ("'de'", "'DE'")),
+            (None, None),
+            (None, None),
+            (None, None),
+            (None, None),
+            (None, None),
+        ),
+        (
+            (None, (None, None)),
+            ("resources/my_nonexistent_whitelist", "'resources/my_nonexistent_whitelist'"),
+            (None, None),
+            (None, None),
+            (None, None),
+            (None, None),
+        ),
+        (
+            (None, (None, None)),
+            (None, None),
+            ("resources/my_output_dir/", "'resources/my_output_dir/'"),
+            (None, None),
+            (None, None),
+            (None, None),
+        ),
+        (
+            (None, (None, None)),
+            (None, None),
+            (None, None),
+            ("HTML", "'HTML'"),
+            (None, None),
+            (None, None),
+        ),
+        (
+            (None, (None, None)),
+            (None, None),
+            (None, None),
+            (None, None),
+            (["LanguageTool", "Aspell", "FantasyModule"], ["LanguageTool", "Aspell", "FantasyModule"]),
+            (None, None),
+        ),
+        (
+            (None, (None, None)),
+            (None, None),
+            (None, None),
+            (None, None),
+            (None, None),
+            (["LanguageTool", "Diction", "FantasyModule2"], ["LanguageTool", "Diction", "FantasyModule2"]),
+        ),
     ],
 )
 def test_unit_cli_check_flag_parsing(
+    script_dir,
     language: Tuple[Optional[str], Tuple[Optional[str], Optional[str]]],
     whitelist: Tuple[Optional[str], Optional[str]],
     output: Tuple[Optional[str], Optional[str]],
@@ -87,6 +197,7 @@ def test_unit_cli_check_flag_parsing(
 ):
 
     cmd = generate_cli_command(
+        script_dir=script_dir,
         language=language[0],
         whitelist=whitelist[0],
         output=output[0],
@@ -94,4 +205,14 @@ def test_unit_cli_check_flag_parsing(
         en_modules=en_modules[0],
         dis_modules=dis_modules[0]
     )
-    execute_and_collect(*cmd)
+    result = execute_and_collect(*cmd)
+
+    assert_flag_config_options(
+        cmd_output=result,
+        language=language[1],
+        whitelist=whitelist[1],
+        output=output[1],
+        format=format[1],
+        en_modules=en_modules[1],
+        dis_modules=dis_modules[1]
+    )
