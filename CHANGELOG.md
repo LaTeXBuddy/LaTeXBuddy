@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - new module "NewerPublications" that checks for each entry in the BibTeX file if a newer publication exists (!120)
 - new module "BibtexDuplicates" that checks the BibTeX file for similar entries (!120)
 - debug message for beginning and end of whitelist check in `LatexBuddy` (!141)
+- pytest environment (!142)
+- all unit tests as per documentation (!142)
+- all integration tests as per documentation (!142)
 
 ### Changed
 - the problem list and text is now scrollable (!135)
