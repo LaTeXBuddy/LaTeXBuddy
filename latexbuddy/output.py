@@ -57,26 +57,24 @@ def render_html(
     ]
     template = env.get_template("result.html")
 
-    highlighted_tex = highlight(file_text, problem_values)
-
-    # add line numbers
-    splitted_text = highlighted_tex.splitlines(keepends=True)
-    new_text = []
+    # calculate amount of whitespaces needed for line numbers to be indented correctly
+    splitted_lines = file_text.split("\n")
+    line_numbers = []
     i = 1
-    line_count = len(splitted_text)
-    for line in splitted_text:
-        # calculate amount of whitespaces needed for correct indentation
+    line_count = len(splitted_lines)
+    for line in splitted_lines:
         diff = len(str(line_count)) - len(str(i))
-        new_line = str(i) + "    "
+        new_line = ""
 
-        # add diff whitespaces
+        # add whitespaces
         for x in range(0, diff):
-            new_line += " "
+            new_line += "&nbsp;" + "&nbsp;"
+        new_line += str(i) + "." + "&nbsp;"
 
-        new_line += line
-        new_text.append(new_line)
+        line_numbers.append(new_line)
         i += 1
-    new_text = "".join(new_text)
+
+    highlighted_tex = highlight(file_text, problem_values)
 
     if not Path(pdf_path).exists():
         pdf_path = None
@@ -84,9 +82,17 @@ def render_html(
         # TODO: temporary fix, might cause issues if another "compiled" directory is in pdf_path
         pdf_path = pdf_path[pdf_path.find("compiled") :]
 
+    #  list of lines
+    highlighted_tex = highlighted_tex.split("\n")
+
+    # map line number to lines
+    mapped = []
+    for i in range(0, len(line_numbers)):
+        mapped.append((line_numbers[i], highlighted_tex[i]))
+
     return template.render(
         file_name=file_name,
-        file_text=new_text,
+        file_text=mapped,
         problems=problem_values,
         general_problems=general_problems,
         paths=path_list,
