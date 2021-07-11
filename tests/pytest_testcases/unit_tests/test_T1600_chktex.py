@@ -15,7 +15,10 @@ def script_dir():
 
 def test_unit_chktex_run_checks(script_dir):
 
-    _ERROR_COUNT = 3
+    _ERROR_COUNT = 112
+    # added tolerance because of versional differences in ChkTeX
+    _ERROR_COUNT_TOLERANCE = 1
+
     document_path = script_dir + "/resources/T1600.tex"
     chktex_instance = Chktex()
 
@@ -23,4 +26,4 @@ def test_unit_chktex_run_checks(script_dir):
 
     output_problems = chktex_instance.run_checks(DriverCL(), test_file)
 
-    assert len(output_problems) > 0
+    assert _ERROR_COUNT <= len(output_problems) <= _ERROR_COUNT + _ERROR_COUNT_TOLERANCE

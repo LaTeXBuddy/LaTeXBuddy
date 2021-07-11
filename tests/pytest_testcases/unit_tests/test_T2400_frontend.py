@@ -15,7 +15,7 @@ def script_dir():
 
 def test_unit_frontend_render_html(script_dir):
 
-    file_name = "/home/lenni/Desktop/test.tex"  # FIXME: this is static!
+    file_name = "/home/lenni/Desktop/test.tex"  # this is not a real file_path
     file_path = Path(file_name)
     file_text = "\\begin{document} \nHello, how are you? \n I am fine, and you? \n " \
                 "\\end{document} "

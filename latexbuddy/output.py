@@ -80,7 +80,9 @@ def render_html(
         pdf_path = None
     else:
         # TODO: temporary fix, might cause issues if another "compiled" directory is in pdf_path
-        pdf_path = pdf_path[pdf_path.find("compiled") :]
+        cut_path = pdf_path.find("compiled")
+        if -1 < cut_path:
+            pdf_path = pdf_path[pdf_path.find("compiled") :]
 
     #  list of lines
     highlighted_tex = highlighted_tex.split("\n")
