@@ -99,7 +99,7 @@ class LatexBuddy(MainModule):
         # file that represents the whitelist
         LatexBuddy.instance.whitelist_file = Path(
             LatexBuddy.instance.cfg.get_config_option_or_default(
-                LatexBuddy, "whitelist", Path("whitelist"), verify_type=AnyStr
+                LatexBuddy, "whitelist", "whitelist", verify_type=AnyStr
             )
         )
 
@@ -237,6 +237,10 @@ class LatexBuddy(MainModule):
         LatexBuddy.instance.logger.debug(
             f"Using multiprocessing pool with {os.cpu_count()} "
             f"threads/processes for checks."
+        )
+        LatexBuddy.instance.logger.debug(
+            f"Executing the following modules in parallel: "
+            f"{[module.display_name for module in modules]}"
         )
 
         with mp.Pool(processes=os.cpu_count()) as pool:

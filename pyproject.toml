@@ -29,6 +29,7 @@ Unidecode = "^1.2.0"
 colorama = "^0.4.4"
 double-stream-handler = "^1.0.0"
 pydantic = "^1.8.2"
+pytest = "^6.2.4"
 bibtexparser = "^1.2.0"
 
 [tool.poetry.dev-dependencies]

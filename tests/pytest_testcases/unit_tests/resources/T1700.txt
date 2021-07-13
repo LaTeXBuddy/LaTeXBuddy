@@ -1,0 +1,5 @@
+This Sentence cause a double double Word Error.
+
+This Sentence causes a Error, thats why its important.
+
+This text is only written to test serval modules for Buddy.

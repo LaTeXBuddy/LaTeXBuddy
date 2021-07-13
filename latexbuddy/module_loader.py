@@ -9,6 +9,7 @@ from typing import List
 import latexbuddy.tools as tools
 
 from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.log import Loggable
 from latexbuddy.modules import Module
 
 
@@ -33,17 +34,8 @@ class ModuleProvider(ABC):
         """
         pass
 
-    @abstractmethod
-    def load_modules(self) -> List[Module]:
-        """
-        This method loads every module that is found in the ModuleLoader's directory.
 
-        :return: a list of instances of classes implementing the Module API
-        """
-        pass
-
-
-class ModuleLoader(ModuleProvider):
+class ModuleLoader(ModuleProvider, Loggable):
     """
     This class encapsulates all features necessary to load LaTeXBuddy modules from
     a specified directory.
@@ -78,6 +70,11 @@ class ModuleLoader(ModuleProvider):
         return selected
 
     def load_modules(self) -> List[Module]:
+        """
+        This method loads every module that is found in the ModuleLoader's directory.
+
+        :return: a list of instances of classes implementing the Module API
+        """
 
         imported_py_modules = self.import_py_files()
 
@@ -112,6 +109,8 @@ class ModuleLoader(ModuleProvider):
             def lambda_function() -> None:
 
                 module_path = str(py_file.with_suffix("")).replace("/", ".")
+
+                self.logger.debug(f"Attempting to load module from '{module_path}'")
                 module = importlib.import_module(module_path)
 
                 loaded_modules.append(module)
@@ -131,6 +130,21 @@ class ModuleLoader(ModuleProvider):
         """
 
         if not self.directory.is_dir():
+            self.logger.warning(
+                f"Specified path '{str(self.directory.absolute())}' is not a directory."
+                f" No modules could be loaded."
+            )
             return []
 
-        return sorted(self.directory.rglob("*.py"))
+        self.logger.debug(
+            f"Searching for .py-files in directory '{str(self.directory.absolute())}'"
+        )
+
+        files = sorted(self.directory.rglob("*.py"))
+
+        self.logger.debug(
+            f"Found the following .py-files in directory "
+            f"'{str(self.directory.absolute())}': {str(files)}"
+        )
+
+        return files
