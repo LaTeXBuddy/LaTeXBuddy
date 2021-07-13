@@ -10,8 +10,9 @@ osInfo[/etc/gentoo-release]="emerge"
 osInfo[/etc/SuSE-release]="zypper install -y"
 # rename apt-get
 packages=(python3-pip git default-jdk curl make autoconf automake libtool-bin texinfo autogen autopoint)
-packagespacman=(python-pip git )
-
+packagespacman=(python-pip git jdk11-openjdk curl make autoconf automake libtool texinfo autogen autopoint)
+pip="pip"
+python="python"
 for f in ${!osInfo[@]}
 do
     if [[ -f $f ]];then
@@ -23,6 +24,8 @@ for i in ${packages[@]}
 do
     if [[ $package_manager == "apt-get" ]]; then
         update="apt-get update -y"
+        pip="pip3"
+        python="python3"
         ${update}
     fi
     sudo ${package_manager} ${i}
@@ -38,10 +41,10 @@ do
 done
 
 # change name of pip for different distributions
-pip3 install poetry
-python3 -m poetry install
-python3 -m poetry build
-pip3 install dist/*.whl
+$pip install poetry
+$python -m poetry install
+$python -m poetry build
+$pip install dist/*.whl
 
 TPATH=$HOME/chktex-1.7.6.tar.gz
 TFPATH=chktex-1.7.6
