@@ -10,7 +10,7 @@ osInfo[/etc/gentoo-release]="emerge"
 osInfo[/etc/SuSE-release]="zypper install -y"
 # rename apt-get
 packages=(python3-pip git default-jdk curl make autoconf automake libtool-bin texinfo autogen autopoint)
-packagespacman=(pythonpip)
+packagespacman=(python-pip git )
 
 for f in ${!osInfo[@]}
 do
@@ -23,6 +23,15 @@ for i in ${packages[@]}
 do
     if [[ $package_manager == "apt-get" ]]; then
         update="apt-get update -y"
+        ${update}
+    fi
+    sudo ${package_manager} ${i}
+done
+
+for i in ${packagespacman[@]}
+do
+    if [[ $package_manager == "pacman" ]]; then
+        update="pacman -Syu"
         ${update}
     fi
     sudo ${package_manager} ${i}
