@@ -74,6 +74,11 @@ class Chktex(Module):
             position = (row, col)
             key = self.display_name + key_delimiter + str(internal_id)
 
+            # convert problems with text-length of zero to general problems
+            if len(text) < 1:
+                position = None
+                description += f" (in file {str(file)})"
+
             problems.append(
                 Problem(
                     position=position,
