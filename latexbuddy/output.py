@@ -206,7 +206,7 @@ class Interval:
         if not self.intersects(other):
             return None
 
-        # narrow down mirrored positions without restricting the input space
+        # narrow down mirrored positions without loss of generality
         if other.start < self.start:
             return other.perform_intersection(self)
 
