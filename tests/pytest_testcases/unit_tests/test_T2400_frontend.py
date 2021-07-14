@@ -88,8 +88,7 @@ def parse_interval_list(
     return result
 
 
-@pytest.mark.skip(reason="This is not actually a test.")
-def test_interval_equals(first: Interval, second: Interval) -> bool:
+def interval_equals(first: Interval, second: Interval) -> bool:
     return (
         first.start == second.start
         and first.end == second.end
@@ -116,7 +115,7 @@ def interval_lists_equal(
         equal_found = False
 
         for interval1 in second:
-            if test_interval_equals(interval0, interval1):
+            if interval_equals(interval0, interval1):
                 equal_found = True
                 break
 
