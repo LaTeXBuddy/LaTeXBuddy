@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - pytest environment (!142)
 - all unit tests as per documentation (!142)
 - all integration tests as per documentation (!142)
+- default tooltip in html for problems without a custom description (!150)
+- new test routines for HTML highlighter (!150)
 
 ### Changed
 - the problem list and text is now scrollable (!135)
@@ -35,11 +37,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - renamed tool_loader.py to module_loader.py and ToolLoader to ModuleLoader (!141)
 - extracted an interface `ModuleProvider` from `ModuleLoader` and adjusted `LatexBuddy` and cli.py accordingly (!141)
 - removed `LatexBuddy` methods `change_file` and `clear_error_list` and replaced their occurrences with `init` (!141)
+- reimplemented highlighting algorithm enabling markings for different problems to overlap (!150)
 
 ### Fixed
 - regex usage in own_checkers (!110)
 - inconsistent naming of some checkers in config, Problem API and classnames (!108)
 - shortened slightly lengthy methods in config_loader.py (!140)
+- fixed critical bug in the highlighting system with reimplementation (!150)
 
 ## [0.3.0] - 15 Jun 2021
 
