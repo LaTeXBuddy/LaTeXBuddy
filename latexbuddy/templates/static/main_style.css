@@ -204,6 +204,8 @@ main > div {
 .latex {
     background-color:lightblue;;
 }
+
+/* not yet set for every style TODO
 @media (prefers-color-scheme: dark) {
     html, body {
         background-color: #111;
@@ -222,3 +224,4 @@ main > div {
         border-bottom-color: #222;
     }
 }
+ */

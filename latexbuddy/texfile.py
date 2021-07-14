@@ -14,6 +14,7 @@ from chardet import detect
 # from latexbuddy.config_loader import ConfigLoader
 from yalafi.tex2txt import Options, tex2txt, translate_numbers
 
+from latexbuddy.log import Loggable
 from latexbuddy.messages import not_found, texfile_error
 from latexbuddy.tools import (
     absolute_to_linecol,
@@ -28,7 +29,7 @@ from latexbuddy.tools import (
 location_re = re.compile(r"line (\d+), column (\d+)")
 
 
-class TexFile:
+class TexFile(Loggable):
     """A simple TeX file. This class reads the file, detects its encoding and saves it
     as text for future editing."""
 
@@ -40,7 +41,6 @@ class TexFile:
 
         :param file: Path object of the file to be loaded
         """
-        self.__logger = None  # TODO: Resolve circular import
         self.tex_file = file
 
         tex_bytes = self.tex_file.read_bytes()
@@ -132,13 +132,12 @@ class TexFile:
         return str(self.tex_file)
 
     def __compile_tex(self, compile_pdf: bool) -> Tuple[Optional[Path], Optional[Path]]:
-        # from latexbuddy import __logger as root_logger
-        # self.__logger = root_logger.getChild("texfile")
+
         pdf_flag = ""
         try:
             find_executable("latex")
         except FileNotFoundError:
-            # self.__logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
+            self.logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
             return None, None
 
         if compile_pdf:
@@ -149,24 +148,26 @@ class TexFile:
         try:
             os.mkdir(html_directory)
         except FileExistsError:
-            # self.__logger.error(texfile_error(f'Directory {html_directory} exists.'))
-            pass  # TODO
+            self.logger.debug(f"Directory {html_directory} already exists.")
+            pass
         except Exception as exc:
-            # self.__logger.error(
-            #     texfile_error(f'{exc} ocurred while creating {html_directory}.'))
-            pass  # TODO
+            self.logger.error(
+                texfile_error(f"{exc} occurred while creating {html_directory}.")
+            )
+            pass
 
         compile_directory = html_directory + "/compiled"
 
         try:
             os.mkdir(compile_directory)
         except FileExistsError:
-            # self.__logger.error(texfile_error(f'Directory {compile_directory} exists.'))
-            pass  # TODO
+            self.logger.debug(f"Directory {compile_directory} already exists.")
+            pass
         except Exception as exc:
-            # self.__logger.error(
-            #     texfile_error(f'{exc} ocurred while creating {compile_directory}.'))
-            pass  # TODO
+            self.logger.error(
+                texfile_error(f"{exc} occurred while creating {compile_directory}.")
+            )
+            pass
 
         # for unique file names
         # TODO make it easier for the user
@@ -176,8 +177,10 @@ class TexFile:
 
         tex_mf = self.__create_tex_mf(path)
 
-        # print("TEXFILE:", str(self.tex_file), self.tex_file.exists())
-        # print("PATH:", str(path), path.exists())
+        self.logger.debug(
+            f"TEXFILE: {str(self.tex_file)}, exists: {self.tex_file.exists()}"
+        )
+        self.logger.debug(f"PATH: {str(path)}, exists: {path.exists()}")
 
         execute(
             f'TEXMFCNF="{tex_mf}";',
@@ -191,8 +194,8 @@ class TexFile:
 
         log = path / f"{self.tex_file.stem}.log"
         pdf = path / f"{self.tex_file.stem}.pdf" if compile_pdf else None
-        # print("LOG:", log, log.is_file())
-        # print("PDF:", pdf, pdf.is_file())
+        self.logger.debug(f"LOG: {str(log)}, isFile: {log.is_file()}")
+        self.logger.debug(f"PDF: {str(pdf)}, isFile: {pdf.is_file()}")
         return log, pdf
 
     @staticmethod

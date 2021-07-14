@@ -11,7 +11,7 @@ main = {
     "output": "./latexbuddy_html/",
     "format": "HTML",
     "enable-modules-by-default": True,
-    "pdf": False,
+    "pdf": True,
 }
 
 modules = {
@@ -22,13 +22,13 @@ modules = {
         "enabled": True,
     },
     "Diction": {
-        "enabled": True,
+        "enabled": False,
     },
     "EmptySections": {
         "enabled": True,
     },
     "LanguageTool": {
-        "enabled": True,
+        "enabled": False,
         "mode": "COMMANDLINE",
         "remote_url_check": "https://api.languagetoolplus.com/v2/check",
         "remote_url_languages": "https://api.languagetoolplus.com/v2/languages",
@@ -65,9 +65,9 @@ modules = {
         "enabled": True
     },
     "NewerPublications": {
-        "enabled": True
+        "enabled": False
     },
     "BibtexDuplicates": {
-        "enabled": True
+        "enabled": False
     },
 }

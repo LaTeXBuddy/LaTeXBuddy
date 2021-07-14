@@ -8,7 +8,7 @@ from tempfile import mkstemp
 from tests.pytest_testcases.tools import execute_and_collect
 from latexbuddy.modules.logfilter import LogFilter
 from latexbuddy.texfile import TexFile
-from resources.dummy_config_loader import ConfigLoader
+from resources.driver_config_loader import ConfigLoader
 
 
 @pytest.fixture
