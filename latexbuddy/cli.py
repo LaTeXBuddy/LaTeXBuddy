@@ -14,7 +14,7 @@ from colorama import Fore
 from latexbuddy import __app_name__
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
-from latexbuddy import __version__
+from latexbuddy import __version__, flask_app
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
@@ -142,8 +142,11 @@ def main():
     logger.debug(f"Parsed CLI args: {str(args)}")
 
     if args.wl_add_keys or args.wl_from_wordlist:
-
         perform_whitelist_operations(args)
+        return
+
+    if args.flask:
+        __execute_flask_startup(args)
         return
 
     __execute_latexbuddy_checks(args)
@@ -157,6 +160,10 @@ def __setup_logger(args: argparse.Namespace) -> logging.Logger:
 
     __setup_root_logger(root_logger, logging.DEBUG if display_debug else logging.INFO)
     return root_logger.getChild("cli")
+
+
+def __execute_flask_startup(args: argparse.Namespace) -> None:
+    flask_app.run_server()
 
 
 def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
