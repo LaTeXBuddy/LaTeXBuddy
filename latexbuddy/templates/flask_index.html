@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>LatexBuddy - Check</title>
+    <style>
+        {% include "static/modern-normalize.css" %}
+        {% include "static/main_style.css" %}
+        {% include "static/flask_index_style.css" %}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>
+            {% include "static/logo.svg" %}
+        </h1>
+    </header>
+    <form enctype="multipart/form-data" action="/check" method="POST">
+        <div class="inline-form-element">
+            <label>Select the file you want to be checked: </label>
+            <input type="file" name="file"/>
+        </div>
+        <input type="submit" value="Submit"/>
+    </form>
+</body>
+</html>
