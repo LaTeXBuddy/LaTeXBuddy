@@ -92,7 +92,14 @@ class LatexBuddy(MainModule):
                 "format",
                 "HTML",
                 verify_type=AnyStr,
-                verify_choices=["HTML", "html", "JSON", "json"],
+                verify_choices=[
+                    "HTML",
+                    "html",
+                    "JSON",
+                    "json",
+                    "HTML_FLASK",
+                    "html_flask",
+                ],
             )
         ).upper()
 
@@ -304,11 +311,41 @@ class LatexBuddy(MainModule):
         LatexBuddy.instance.logger.info(f"Output saved to {html_output_path.resolve()}")
 
     @staticmethod
+    def output_flask_html():
+
+        # importing this here to avoid circular import error
+        from latexbuddy.output import render_flask_html
+
+        html_output_path = Path(
+            str(LatexBuddy.instance.output_dir)
+            + "/"
+            + "output_"
+            + str(LatexBuddy.instance.file_to_check.stem)
+            + ".html"
+        )
+        html_output_path.write_text(
+            render_flask_html(
+                str(LatexBuddy.instance.tex_file.tex_file),
+                LatexBuddy.instance.tex_file.tex,
+                LatexBuddy.instance.errors,
+                LatexBuddy.instance.path_list,
+                str(
+                    LatexBuddy.instance.tex_file.pdf_file
+                ),  # TODO: this should be the path (str) where the pdf file is located
+            )
+        )
+
+        LatexBuddy.instance.logger.info(f"Output saved to {html_output_path.resolve()}")
+
+    @staticmethod
     def output_file():
         """Writes all current problems to the specified output file."""
 
         if LatexBuddy.instance.output_format == "JSON":
-            LatexBuddy.instance.output_json()
+            LatexBuddy.output_json()
+
+        elif LatexBuddy.instance.output_format == "HTML_FLASK":
+            LatexBuddy.output_flask_html()
 
         else:  # using HTML as default
-            LatexBuddy.instance.output_html()
+            LatexBuddy.output_html()

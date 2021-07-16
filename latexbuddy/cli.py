@@ -107,7 +107,7 @@ buddy_group.add_argument(
     "--format",
     "-f",
     type=str,
-    choices=["HTML", "html", "JSON", "json"],
+    choices=["HTML", "html", "JSON", "json", "HTML_FLASK", "html_flask"],
     default=None,
     help="Format of the output file (either HTML or JSON).",
 )
