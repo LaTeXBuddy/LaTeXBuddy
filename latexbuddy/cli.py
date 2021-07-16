@@ -25,59 +25,14 @@ from latexbuddy.tools import get_all_paths_in_document, perform_whitelist_operat
 parser = argparse.ArgumentParser(
     prog=name, description="The one-stop-shop for LaTeX checking."
 )
-parser.add_argument(
+
+mutex_group = parser.add_mutually_exclusive_group()
+
+mutex_group.add_argument(
     "--version", "-V", action="version", version=f"{__app_name__} v{__version__}"
 )
-# nargs="+" marks the beginning of a list
-parser.add_argument(
-    "file", nargs="+", type=Path, help="File(s) that will be processed."
-)
-parser.add_argument(
-    "--config",
-    "-c",
-    type=Path,
-    default=Path("config.py"),
-    help="Location of the config file.",
-)
-parser.add_argument(
-    "--verbose",
-    "-v",
-    action="store_true",
-    default=False,
-    help="Display debug output",
-)
-parser.add_argument(
-    "--language",
-    "-l",
-    type=str,
-    default=None,
-    help="Target language of the file.",
-)
-parser.add_argument(
-    "--whitelist",
-    "-w",
-    type=str,
-    default=None,
-    help="Location of the whitelist file.",
-)
-parser.add_argument(
-    "--output",
-    "-o",
-    type=str,
-    default=None,
-    help="Directory, in which to put the output file.",
-)
-parser.add_argument(
-    "--format",
-    "-f",
-    type=str,
-    choices=["HTML", "html", "JSON", "json"],
-    default=None,
-    help="Format of the output file (either HTML or JSON).",
-)
 
-# TODO changer parser so no file is required when adding words/ keys to whitelist
-parser.add_argument(
+mutex_group.add_argument(
     "--wl_add_keys",
     "-ak",
     nargs="+",
@@ -86,7 +41,7 @@ parser.add_argument(
     help="Arguments are valid keys that should be added to whitelist. Ideally"
     " the keys are copied from LaTeXBuddy HTML Output",
 )
-parser.add_argument(
+mutex_group.add_argument(
     "--wl_from_wordlist",
     "-awl",
     metavar=("WORD_LIST", "LANGUAGE"),
@@ -98,7 +53,67 @@ parser.add_argument(
     "spelling errors that will be ignored by LaTeXBuddy",
 )
 
-module_selection = parser.add_mutually_exclusive_group()
+mutex_group.add_argument(
+    "--flask",
+    action="store_true",
+    default=False,
+    help="This option starts a local webserver to check your documents with a GUI.",
+)
+
+# TODO: wait for argparse to support nesting of groups in order to make the whole
+#  buddy_group mutually exclusive to -V, -ak and -awl
+buddy_group = mutex_group.add_argument_group("buddy arguments")
+
+# nargs="+" marks the beginning of a list
+buddy_group.add_argument(
+    "file", nargs="+", type=Path, help="File(s) that will be processed."
+)
+buddy_group.add_argument(
+    "--config",
+    "-c",
+    type=Path,
+    default=Path("config.py"),
+    help="Location of the config file.",
+)
+buddy_group.add_argument(
+    "--verbose",
+    "-v",
+    action="store_true",
+    default=False,
+    help="Display debug output",
+)
+buddy_group.add_argument(
+    "--language",
+    "-l",
+    type=str,
+    default=None,
+    help="Target language of the file.",
+)
+buddy_group.add_argument(
+    "--whitelist",
+    "-w",
+    type=str,
+    default=None,
+    help="Location of the whitelist file.",
+)
+buddy_group.add_argument(
+    "--output",
+    "-o",
+    type=str,
+    default=None,
+    help="Directory, in which to put the output file.",
+)
+buddy_group.add_argument(
+    "--format",
+    "-f",
+    type=str,
+    choices=["HTML", "html", "JSON", "json"],
+    default=None,
+    help="Format of the output file (either HTML or JSON).",
+)
+
+
+module_selection = buddy_group.add_mutually_exclusive_group()
 module_selection.add_argument(
     "--enable-modules",
     type=str,
