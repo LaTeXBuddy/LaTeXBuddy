@@ -3,7 +3,7 @@ from operator import attrgetter
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, PackageLoader, Template
 
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.problem import Problem, ProblemSeverity
@@ -30,7 +30,44 @@ def problem_key(problem: Problem) -> int:
     return problem.position[0]
 
 
+def render_flask_html(
+    file_name: str,
+    file_text: str,
+    problems: Dict[str, Problem],
+    path_list: Path,
+    pdf_path: str,
+) -> str:
+
+    return render_general_html(
+        env.get_template("flask_result.html"),
+        file_name,
+        file_text,
+        problems,
+        path_list,
+        pdf_path,
+    )
+
+
 def render_html(
+    file_name: str,
+    file_text: str,
+    problems: Dict[str, Problem],
+    path_list: Path,
+    pdf_path: str,
+) -> str:
+
+    return render_general_html(
+        env.get_template("result.html"),
+        file_name,
+        file_text,
+        problems,
+        path_list,
+        pdf_path,
+    )
+
+
+def render_general_html(
+    template: Template,
     file_name: str,
     file_text: str,
     problems: Dict[str, Problem],
@@ -39,6 +76,7 @@ def render_html(
 ) -> str:
     """Renders an HTML page based on file contents and discovered problems.
 
+    :param template: HTML template to use for generation
     :param file_name: file name
     :param file_text: contents of the file
     :param problems: dictionary of errors returned from latexbuddy
@@ -46,33 +84,10 @@ def render_html(
     :param path_list: a list, containing all file paths to the checked files
     :return: generated HTML
     """
-    problem_values = sorted(problems.values(), key=problem_key)
-    general_problems = [
-        problem for problem in problem_values if problem_key(problem) < 0
-    ]
-    problem_values = [
-        problem_value
-        for problem_value in problem_values
-        if problem_value not in general_problems
-    ]
-    template = env.get_template("result.html")
 
-    # calculate amount of whitespaces needed for line numbers to be indented correctly
-    split_lines = file_text.split("\n")
-    line_numbers = []
-    i = 1
-    line_count = len(split_lines)
-    for line in split_lines:
-        diff = len(str(line_count)) - len(str(i))
-        new_line = ""
+    general_problems, problem_values = sort_problems(problems)
 
-        # add whitespaces
-        for x in range(0, diff):
-            new_line += "&nbsp;" + "&nbsp;"
-        new_line += str(i) + "." + "&nbsp;"
-
-        line_numbers.append(new_line)
-        i += 1
+    line_numbers = calculate_line_numbers(file_text)
 
     highlighted_tex = highlight(file_text, problem_values)
 
@@ -101,6 +116,40 @@ def render_html(
         paths=path_list,
         pdf_path=pdf_path,
     )
+
+
+def sort_problems(problems: Dict[str, Problem]) -> Tuple[List[Problem], List[Problem]]:
+    problem_values = sorted(problems.values(), key=problem_key)
+    general_problems = [
+        problem for problem in problem_values if problem_key(problem) < 0
+    ]
+    problem_values = [
+        problem_value
+        for problem_value in problem_values
+        if problem_value not in general_problems
+    ]
+    return general_problems, problem_values
+
+
+def calculate_line_numbers(file_text: str) -> List[str]:
+
+    split_lines = file_text.split("\n")
+    line_numbers = []
+    i = 1
+    line_count = len(split_lines)
+    for line in split_lines:
+        diff = len(str(line_count)) - len(str(i))
+        new_line = ""
+
+        # add whitespaces
+        for x in range(0, diff):
+            new_line += "&nbsp;" + "&nbsp;"
+        new_line += str(i) + "." + "&nbsp;"
+
+        line_numbers.append(new_line)
+        i += 1
+
+    return line_numbers
 
 
 class Interval:

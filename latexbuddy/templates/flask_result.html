@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ file_name|e }} | LaTeXBuddy</title>
+    <style>
+        {% include "static/modern-normalize.css" %}
+        {% include "static/main_style.css" %}
+        {% include "static/whitelist_button.css" %}
+        {% include "static/popup_for_whitelist.css" %}
+        {% include "static/file_bar_and_slider.css" %}
+    </style>
+</head>
+<body>
+<header>
+    <h1>
+        {% include "static/logo.svg" %}
+    </h1>
+    <h2><small>Results for</small> {{ file_name|e }}</h2>
+    <div class="menu">
+
+        {# this calculates the String between root path and .tex for later use #}
+        {% set first_full_path = paths[0] %}
+        {% set parent_path = first_full_path.parents[1] ~ "/" |string() %}
+        {% set child_path = first_full_path.parents[0]|string() %}
+        {% set child = child_path|replace(parent_path, "") %}
+
+        {# this sets up the list, containing the cutted paths #}
+        {% set name_list = [child] %} {# initial: add root child #}
+
+        {# get all folder names #}
+        {% for path in paths %}
+            {% set upper_folder = path.parents[0]|string() %}
+            {% set name = upper_folder|replace(child_path, "") %}
+
+            {# due to calculation we should ignore everything that is an emptyy string #}
+            {% if name not in name_list and name != "" %}
+                {% set name_list = name_list.append(name) %}
+            {% endif %}
+        {% endfor %}
+
+        {# set the style for each folder #}
+        {% for folder in name_list %}
+            <style>
+                .{{ "_" ~ folder|replace("/", "") }} { {# replace all /, because css cant deal with it #}
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-left: 25px;
+                    margin-right: 25px;
+                    padding: 20px;
+                }
+                .{{ "_" ~ folder|replace("/", "") }} svg {
+                    width: 45px;
+                    height: 45px;
+                }
+                .{{ "_" ~ folder|replace("/", "") }}-content {
+                  display: none;
+                  position: absolute;
+                  background-color: #f1f1f1;
+                  min-width: 160px;
+                  margin-top: 70px;
+                  border-radius: 5px 5px 5px 5px;
+                  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                  z-index: 1;
+                }
+                .{{ "_" ~ folder|replace("/", "") }}-content a {
+                  color: black;
+                  padding: 12px 16px;
+                  text-decoration: none;
+                  display: block;
+                }
+                .{{ "_" ~ folder|replace("/", "") }}-content a:hover {
+                    background-color: silver;
+                    border-radius: 5px 5px 5px 5px;
+                }
+                .{{ "_" ~ folder|replace("/", "") }}:hover .{{ "_" ~ folder|replace("/", "") }}-content {
+                    display: block;
+                }
+            </style>
+        {% endfor %}
+
+        {# get all file paths and add to the folder dropdown #}
+        {% for folder in name_list %}
+            <div class="{{ "_" ~ folder|replace("/", "") }}">{{ folder|replace("/", "", 1) }}
+                <svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" enable-background="new 0 0 48 48">
+                    <path fill="#00b6b6" d="M40,12H22l-4-4H8c-2.2,0-4,1.8-4,4v8h40v-4C44,13.8,42.2,12,40,12z" />
+                    <path fill="#008281" d="M40,12H8c-2.2,0-4,1.8-4,4v20c0,2.2,1.8,4,4,4h32c2.2,0,4-1.8,4-4V16C44,13.8,42.2,12,40,12z" />
+                </svg>
+                <div class="{{ "_" ~ folder|replace("/", "") }}-content">
+                        {% for path in paths %}
+                            {# this is only for the first folder in the list #}
+                            {% set upper_folder = path.parents[0]|string() %}
+                            {% set sub_folder = path.parents[1] ~ "/" |string() %}
+                            {% set parent = upper_folder|replace(sub_folder, "") %}
+                            {% if parent == folder %}
+                                <a href="output_{{ path.stem }}.html">{{ path.name }}</a>
+                            {% endif %}
+
+                            {# this is for each further folder #}
+                            {% set name = upper_folder|replace(child_path, "") %}
+                            {% if name == folder %}
+                                <a href="output_{{ path.stem }}.html">{{ path.name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="sliderholder">
+        <div class="pdfsliderdiv">
+        {# slider to switch to the pdf view #}
+        <label class="switch">
+            <input type="checkbox" id="pdfbutton">
+            <div class="slider round">
+                <span class="on">PDF</span>
+                <span class="off">TEX</span>
+            </div>
+        </label>
+        </div>
+        <div class="problemsliderdiv">
+            {# the slider, used to switch the problems #}
+            <label style="margin-left: 25px;" class="switch">
+                <input type="checkbox" id="change_problems">
+                <div class="slider round">
+                    <span style="" class="on">Specific</span>
+                    <span class="off">General</span>
+                </div>
+            </label>
+        </div>
+    </div>
+</header>
+<main>
+    <div id="file-container">
+        <div id="file-contents" style="position:relative;">
+        {# the tex-container is used to hold the file text line and the correspondign line number #}
+            <div class="text-container">
+                {% for line_num, text in file_text %}
+                    {# container that holds the line number and the coresponding text line #}
+                    <div class="line-container">
+                        <div class="line-number">{{ line_num }}</div>
+                        <code>{{ text|safe }}</code>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div id="pdf-disp" style="position:relative;">
+            {% if pdf_path is not none %}
+                <iframe id="pdf-ifr" src="{{ pdf_path }}" width="100%" height="100%"></iframe>
+            {% else %}
+                <h1>Nothing to show.</h1>
+                <h3>Maybe you disabled the pdf option, or an error during compile time occurred.</h3>
+                If an error occurred: See the box to the right for more.
+            {% endif %}
+        </div>
+    </div>
+    <div id="problems-list">
+        <div class="problem-list-header">
+            <h2>Problems</h2>
+        </div>
+        <ol id="general-problem-disp">
+            {% for problem in general_problems %}
+                <li class="problem is-{{ problem.severity }}">
+                    <h4 class="problem-context monospaced">
+                        {{ problem.context[0]|e }}<span class="problem-text">{{ problem.text|e }}</span>{{ problem.context[1]|e }}
+                    </h4>
+
+                    <p class="problem-description">
+                        {{ problem.description if problem.description != None }}
+                    </p>
+
+                    {% if problem.suggestions|length > 0 %}
+
+
+                        <p class="problem-suggestions">
+                            <strong>Suggestions:</strong>
+                            <br>
+                            {% if problem.suggestions|length <= 1 %}
+                                {{ "".join(problem.suggestions) }}
+                            {% else %}
+                                {{ ", ".join(problem['suggestions']) }}
+                            {% endif %}
+                        </p>
+                    {% endif %}
+
+                    <p class="problem-meta">
+                        {{ problem.category.capitalize() if problem.category != None }}
+                        {{ problem.severity | lower }}
+                        {% if problem.position %}
+                            at
+                            {{ problem.position[0] }}:{{ problem.position[1] }}
+                        {% endif %}
+                        <i>({{ problem.checker }}#{{ problem.p_type }})</i>
+                    </p>
+                    <!--Button section-->
+                    <div class="roboto-font">
+                        <button class="but" id="button{{ problem.uid }}" onclick="clicked('button{{ problem.uid }}','{{ problem.key }}')"></button>
+                    </div>
+                </li>
+            {% endfor %}
+        </ol>
+        <ol id="problem-disp">
+            {% for problem in problems %}
+                <li class="problem is-{{ problem.severity }}">
+                    <h4 class="problem-context monospaced">
+                        {{ problem.context[0]|e }}<span class="problem-text">{{ problem.text|e }}</span>{{ problem.context[1]|e }}
+                    </h4>
+
+                    <p class="problem-description">
+                        {{ problem.description if problem.description != None }}
+                    </p>
+
+                    {% if problem.suggestions|length > 0 %}
+
+
+                        <p class="problem-suggestions">
+                            <strong>Suggestions:</strong>
+                            <br>
+                            {% if problem.suggestions|length <= 1 %}
+                                {{ "".join(problem.suggestions) }}
+                            {% else %}
+                                {{ ", ".join(problem['suggestions']) }}
+                            {% endif %}
+                        </p>
+                    {% endif %}
+
+                    <p class="problem-meta">
+                        {{ problem.category.capitalize() if problem.category != None }}
+                        {{ problem.severity | lower }}
+                        {% if problem.position %}
+                            at
+                            {{ problem.position[0] }}:{{ problem.position[1] }}
+                        {% endif %}
+                        <i>({{ problem.checker }}#{{ problem.p_type }})</i>
+                    </p>
+                    <!--Button section-->
+                    <div class="roboto-font">
+                        <button class="but" id="button{{ problem.uid }}" onclick="clicked('button{{ problem.uid }}','{{ problem.key }}')"></button>
+                    </div>
+                </li>
+            {% endfor %}
+        </ol>
+
+    </div>
+</main>
+<!--Popup section-->
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <!--Buttons for accepting or rejecting-->
+        <a class="close">&times;</a>
+        <a class="accept">&check;</a>
+        <h2 class="text">Add this to your Whitelist:</h2>
+        <div class="header-box">
+            <h3 class="logo">{% include "static/logomark.svg" %}</h3>
+        </div>
+        <!--Text, inserted by JS-->
+    </div>
+</div>
+<script>
+    document.getElementById("pdfbutton").onclick = function () {
+        if (document.getElementById("pdf-disp").style.display == "block") {
+            document.getElementById("pdf-disp").style.display = "none";
+            document.getElementById("file-contents").style.display = "block";
+        } else {
+            document.getElementById("file-contents").style.display = "none";
+            document.getElementById("pdf-disp").style.display = "block";
+        }
+    };
+
+    document.getElementById("change_problems").onclick = function () {
+        if (document.getElementById("problem-disp").style.display == "block") {
+            document.getElementById("problem-disp").style.display = "none";
+            document.getElementById("general-problem-disp").style.display = "block";
+        } else {
+            document.getElementById("general-problem-disp").style.display = "none";
+            document.getElementById("problem-disp").style.display = "block";
+        }
+    };
+    var uid;
+    function clicked(uid, problem_key) {
+        let button = document.getElementById(uid);
+        button.className = "onclic"; //activate rotation
+        setUID(uid); //set uid to a global param to have access to it later on
+        showMessage(problem_key); //call Popup
+    }
+    function setUID(uid) {
+        this.uid = uid;
+    }
+    //gets the popup vars
+    const popup = document.getElementById("popup");
+    const popup_content = document.getElementsByClassName("popup-content")[0];
+
+    //appends the problem key to the popup and show it
+    function showMessage(problem_key) {
+        let p = document.createElement("p"); //paragraph
+        p.setAttribute("id", "txt"); //attribute used for the copy to clipboard function
+        let text = document.createTextNode(problem_key);
+        p.appendChild(text);
+        popup_content.appendChild(p);
+        popup.style.display = "block"; //show popup
+    }
+    //by clicking on the "close" button, remove the problem key and set the button back to "+" state
+    document.getElementsByClassName("close")[0].onclick = function() {
+        popup_content.removeChild(popup_content.lastChild); //remove last child: aka text node
+        popup.style.display = "none"; //hide popup
+        let button = document.getElementById(uid);
+        button.className = "button"; //normal button state
+    }
+    //by clicking on the "accept" button, remove the problem key and set the button to "accepted"
+    document.getElementsByClassName("accept")[0].onclick = function() {
+        copyDivToClipboard()
+        popup_content.removeChild(popup_content.lastChild); //remove last child: aka text node
+        popup.style.display = "none"; //hide popup
+        let button = document.getElementById(uid);
+        button.className = "validate"; //button state "accepted"
+    }
+    function copyDivToClipboard() {
+        const range = document.createRange();
+        range.selectNode(document.getElementById("txt"));
+        window.getSelection().removeAllRanges(); // clear current selection
+        window.getSelection().addRange(range); // to select text
+        document.execCommand("copy");
+        window.getSelection().removeAllRanges();// to deselect
+    }
+</script>
+</body>
+</html>
