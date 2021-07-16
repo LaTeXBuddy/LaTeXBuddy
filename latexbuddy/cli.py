@@ -121,19 +121,30 @@ def main():
 
     args = parser.parse_args()
 
-    display_debug = args.verbose or os.environ.get("LATEXBUDDY_DEBUG", False)
-
-    __setup_root_logger(root_logger, logging.DEBUG if display_debug else logging.INFO)
-    logger = root_logger.getChild("cli")
+    logger = __setup_logger(args)
 
     print(f"{Fore.CYAN}{__app_name__}{Fore.RESET} v{__version__}")
-
     logger.debug(f"Parsed CLI args: {str(args)}")
 
     if args.wl_add_keys or args.wl_from_wordlist:
 
         perform_whitelist_operations(args)
         return
+
+    __execute_latexbuddy_checks(args)
+
+    logger.debug(f"Execution finished in {round(perf_counter() - start, 2)}s")
+
+
+def __setup_logger(args: argparse.Namespace) -> logging.Logger:
+
+    display_debug = args.verbose or os.environ.get("LATEXBUDDY_DEBUG", False)
+
+    __setup_root_logger(root_logger, logging.DEBUG if display_debug else logging.INFO)
+    return root_logger.getChild("cli")
+
+
+def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
 
     config_loader = ConfigLoader(args)
 
@@ -170,5 +181,3 @@ def main():
             buddy.run_tools()
             buddy.check_whitelist()
             buddy.output_file()
-
-    logger.debug(f"Execution finished in {round(perf_counter() - start, 2)}s")
