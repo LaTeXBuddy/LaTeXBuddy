@@ -1,8 +1,10 @@
 import datetime
 import os
+import re
 import tempfile
 
 from pathlib import Path
+from typing import List, Optional
 
 from flask import Flask, abort, redirect, request
 from jinja2 import Environment, PackageLoader
@@ -36,7 +38,17 @@ ALLOWED_EXTENSIONS = [
 
 
 class FlaskConfigLoader(ConfigLoader):
-    def __init__(self, output_dir: Path):
+
+    _REGEX_LANGUAGE_FLAG = re.compile(r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?")
+
+    def __init__(
+        self,
+        output_dir: Path,
+        language: Optional[str],
+        module_selector_mode: Optional[str],
+        module_selection: Optional[str],
+        whitelist_id: Optional[str],
+    ):
         super().__init__()
 
         self.main_flags = {
@@ -44,7 +56,36 @@ class FlaskConfigLoader(ConfigLoader):
             "format": "HTML_FLASK",
             "enable-modules-by-default": True,
         }
+
         self.module_flags = {}
+
+        if language:
+            match = self._REGEX_LANGUAGE_FLAG.fullmatch(language)
+
+            if match:
+                self.main_flags["language"] = match.group(1)
+
+                if match.group(2):
+                    self.main_flags["language_country"] = match.group(2)
+
+        if module_selector_mode and module_selector_mode in ["blacklist", "whitelist"]:
+            self.main_flags["enable-modules-by-default"] = (
+                True if module_selector_mode == "blacklist" else False
+            )
+
+            if module_selection:
+                for module in module_selection.split(","):
+                    self.module_flags[module] = {}
+                    self.module_flags[module]["enabled"] = (
+                        False if module_selector_mode == "blacklist" else True
+                    )
+
+        if (
+            whitelist_id
+            and whitelist_id != "[none]"
+            and get_whitelist_path(whitelist_id)
+        ):
+            self.main_flags["whitelist"] = get_whitelist_path(whitelist_id)
 
 
 def run_server():
@@ -54,6 +95,16 @@ def run_server():
     results_folder = tempfile.TemporaryDirectory()
     app.config["RESULTS_FOLDER"] = results_folder.name
 
+    whitelist_folder = tempfile.TemporaryDirectory()
+    app.config["WHITELIST_FOLDER"] = whitelist_folder.name
+
+    # TODO: replace with actual default whitelist
+    defaul_wl = Path(whitelist_folder.name + "/default_whitelist")
+    defaul_wl.touch()
+
+    with open(defaul_wl, "w") as f:
+        f.write("YaLafi_tex2txt\n")
+
     app.run()
 
     # deleting temporary directories and their contents upon context exit
@@ -61,7 +112,9 @@ def run_server():
 
 @app.route("/")
 def index():
-    return env.get_template("flask_index.html").render()
+    return env.get_template("flask_index.html").render(
+        whitelist_ids=get_available_whitelist_ids(),
+    )
 
 
 @app.route("/check", methods=["GET", "POST"])
@@ -94,26 +147,6 @@ def document_check():
         run_buddy(Path(target_path), Path(result_path))
 
         return redirect(f"/result/{result_id}")
-
-
-def allowed_file(filename: str) -> bool:
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def run_buddy(file_path: Path, output_dir: Path):
-
-    if not output_dir.exists():
-        output_dir.mkdir()
-
-    LatexBuddy.init(
-        FlaskConfigLoader(output_dir),
-        ModuleLoader(Path("latexbuddy/modules/")),
-        file_path,
-        [file_path],
-    )
-
-    LatexBuddy.run_tools()
-    LatexBuddy.output_file()
 
 
 @app.route("/result/<result_id>")
@@ -155,3 +188,70 @@ def display_result(result_id, file_name):
 @app.route("/whitelist-api")
 def modify_whitelist():
     return "<p>Nope, not yet.</p>"
+
+
+def allowed_file(filename: str) -> bool:
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def run_buddy(file_path: Path, output_dir: Path):
+
+    if not output_dir.exists():
+        output_dir.mkdir()
+
+    # assume request.method == "POST"
+
+    language = request.form["language"] if "language" in request.form else None
+    module_selector_mode = (
+        request.form["module_selector_type"]
+        if "module_selector_type" in request.form
+        else None
+    )
+    module_selection = (
+        request.form["module_selector"] if "module_selector" in request.form else None
+    )
+    whitelist_id = (
+        request.form["whitelist_id"] if "whitelist_id" in request.form else None
+    )
+
+    LatexBuddy.init(
+        FlaskConfigLoader(
+            output_dir, language, module_selector_mode, module_selection, whitelist_id
+        ),
+        ModuleLoader(Path("latexbuddy/modules/")),
+        file_path,
+        [file_path],
+    )
+
+    LatexBuddy.run_tools()
+
+    if whitelist_id and whitelist_id != "[none]":
+        LatexBuddy.check_whitelist()
+
+    LatexBuddy.output_file()
+
+
+def get_available_whitelist_ids() -> List[str]:
+
+    whitelist_path = Path(app.config["WHITELIST_FOLDER"])
+
+    if not whitelist_path.exists() or not whitelist_path.is_dir():
+        return []
+
+    wl_ids = []
+    for child in whitelist_path.glob("./*"):
+
+        if child.is_dir():
+            continue
+
+        wl_ids.append(child.stem)
+
+    return wl_ids
+
+
+def get_whitelist_path(whitelist_id: str) -> Optional[str]:
+
+    if whitelist_id not in get_available_whitelist_ids():
+        return None
+
+    return os.path.join(app.config["WHITELIST_FOLDER"], whitelist_id)
