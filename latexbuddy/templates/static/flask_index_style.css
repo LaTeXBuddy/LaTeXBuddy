@@ -14,5 +14,9 @@ body form {
 }
 
 form div.inline-form-element {
+    margin-bottom: 5px;
+}
+
+form div.inline-form-element > * {
     display: inline;
 }
