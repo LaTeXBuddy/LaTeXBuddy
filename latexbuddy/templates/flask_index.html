@@ -20,8 +20,34 @@
     </header>
     <form enctype="multipart/form-data" action="/check" method="POST">
         <div class="inline-form-element">
-            <label>Select the file you want to be checked: </label>
+            <label>Select the file you want to be checked:</label>
             <input type="file" name="file"/>
+        </div>
+        <div class="collapsible">
+            <button type="button">Configuration options</button>
+            <div class="content">
+                <div class="inline-form-element">
+                    <label>selected whitelist:</label>
+                    <select name="whitelist_id">
+                        <option value="[none]">[none]</option>
+                        {% for whitelist_id in whitelist_ids %}
+                            <option value="{{ whitelist_id }}">{{ whitelist_id }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="inline-form-element">
+                    <label>language:</label>
+                    <input type="text" name="language">
+                </div>
+                <div class="inline-form-element">
+                    <label>select modules (comma-separated list of names):</label>
+                    <select name="module_selector_type">
+                        <option value="blacklist">blacklist</option>
+                        <option value="whitelist">whitelist</option>
+                    </select>
+                    <input type="text" name="module_selector">
+                </div>
+            </div>
         </div>
         <input type="submit" value="Submit"/>
     </form>
