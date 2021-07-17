@@ -60,7 +60,7 @@ def test_unit_empty_sections_run_checks(script_dir):
     output_problems = checker_instance.run_checks(DriverCL(), test_file)
 
     assert len(output_problems) == _ERROR_COUNT
-    assert str(output_problems[0]) == "Latex info on 13:1: : Sections may not be " \
+    assert str(output_problems[0]) == "Latex info on None: : Sections may not be " \
                                       "empty.."
 
 

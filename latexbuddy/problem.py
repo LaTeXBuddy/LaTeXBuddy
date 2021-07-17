@@ -12,8 +12,9 @@ from json import JSONEncoder
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
-
 # from latexbuddy.modules import NamedModule
+from latexbuddy.log import Loggable
+
 
 language = None  # static variable used for a uniform key generation
 
@@ -64,7 +65,7 @@ def set_language(lang):
     language = lang
 
 
-class Problem:
+class Problem(Loggable):
     """Describes a Problem object.
 
     A Problem object contains information about a problem detected by a checker. For
@@ -131,6 +132,14 @@ class Problem:
         else:
 
             self.checker = checker.display_name
+
+        if position is not None and len(text) < 1:
+            self.logger.warning(
+                f"A Problem created by {self.checker} has a non-None position, but "
+                f"does not have a problematic text with length > 0. It will be "
+                f"converted to a general problem without a position..."
+            )
+            self.position = None
 
         if p_type is None:
             p_type = ""
