@@ -8,9 +8,20 @@ header h1 {
     place-items: center;
 }
 
+body {
+    display: grid;
+    place-items: center;
+}
+
 body form {
     display: grid;
     place-items: center;
+    width: 70%;
+}
+
+form div.collapsible {
+    width: 100%;
+    margin: 2em 5em;
 }
 
 form div.inline-form-element {
