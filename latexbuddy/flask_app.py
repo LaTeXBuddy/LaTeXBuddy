@@ -123,30 +123,35 @@ def document_check():
     if request.method != "POST":
         return redirect("/")
 
-    if "file" not in request.files:
-        # flash("No files attached")
-        return redirect(request.url)
+    files = request.files.getlist("file")
+    print(files)
 
-    file = request.files["file"]
+    if len(files) < 1:
+        return redirect("/")
 
-    if file.filename == "":
-        # flash("No files attached")
-        return redirect(request.url)
+    date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    result_id = f"{date}_{files[0].filename.replace('.', '_')}"
+    result_path = os.path.join(app.config["RESULTS_FOLDER"], result_id)
 
-    if file and allowed_file(file.filename):
+    saved_files = []
+
+    for file in files:
+
+        if not allowed_file(file.filename):
+            continue
 
         filename = secure_filename(file.filename)
         target_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
         file.save(target_path)
 
-        date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        result_id = f"{date}_{filename.replace('.', '_')}"
-        result_path = os.path.join(app.config["RESULTS_FOLDER"], result_id)
+        saved_files.append(Path(target_path))
 
-        # TODO: multiprocessing?
-        run_buddy(Path(target_path), Path(result_path))
+    for file in saved_files:
 
-        return redirect(f"/result/{result_id}")
+        # TODO: multiprocessing/loading screen?
+        run_buddy(file, Path(result_path), saved_files)
+
+    return redirect(f"/result/{result_id}")
 
 
 @app.route("/result/<result_id>")
@@ -194,7 +199,7 @@ def allowed_file(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def run_buddy(file_path: Path, output_dir: Path):
+def run_buddy(file_path: Path, output_dir: Path, path_list: List[Path]):
 
     if not output_dir.exists():
         output_dir.mkdir()
@@ -220,7 +225,7 @@ def run_buddy(file_path: Path, output_dir: Path):
         ),
         ModuleLoader(Path("latexbuddy/modules/")),
         file_path,
-        [file_path],
+        path_list,
     )
 
     LatexBuddy.run_tools()
