@@ -152,6 +152,7 @@ def main():
     for p in args.file:  # args.file is a list
         p = get_abs_path(p)
         paths, problems = get_all_paths_in_document(p)
+        first_path = True
 
         for path in paths:
 
@@ -161,7 +162,9 @@ def main():
                 module_provider=module_loader,
                 file_to_check=path,
                 path_list=paths,  # to be used later on in render html
+                compile_tex=first_path,
             )
+            first_path = False
 
             # TODO: Moved this here, so added Problems are not immediately deleted
             #  anymore. Please acknowledge by removing this comment.

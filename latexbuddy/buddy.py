@@ -41,6 +41,7 @@ class LatexBuddy(MainModule):
         self.output_format: Optional[str] = None
         self.whitelist_file: Optional[Path] = None
         self.path_list: List[Path] = []  # all paths of the files to be used in html
+        self.compile_tex: bool = False
 
     @classproperty
     def instance(cls):
@@ -54,6 +55,7 @@ class LatexBuddy(MainModule):
         module_provider: ModuleProvider,
         file_to_check: Path,
         path_list: List[Path],
+        compile_tex: bool,
     ):
         """Initializes the LaTeXBuddy instance.
 
@@ -62,6 +64,7 @@ class LatexBuddy(MainModule):
                                 for running checks on the specified file
         :param file_to_check: file that will be checked
         :param path_list: a list of the paths for the html output
+        :param compile_tex: boolean if the tex file should be compiled
         """
 
         LatexBuddy.instance.errors = {}
@@ -69,7 +72,7 @@ class LatexBuddy(MainModule):
         LatexBuddy.instance.preprocessor = None
         LatexBuddy.instance.module_provider = module_provider
         LatexBuddy.instance.file_to_check = file_to_check
-        LatexBuddy.instance.tex_file = TexFile(file_to_check)
+        LatexBuddy.instance.tex_file = TexFile(file_to_check, compile_tex)
         LatexBuddy.instance.path_list = path_list
 
         # file where the error should be saved

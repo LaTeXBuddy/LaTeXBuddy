@@ -33,13 +33,14 @@ class TexFile(Loggable):
     """A simple TeX file. This class reads the file, detects its encoding and saves it
     as text for future editing."""
 
-    def __init__(self, file: Path):
+    def __init__(self, file: Path, compile_tex: bool):
         """Creates a new file instance.
 
         By default, the file is being read, but not detexed. The file can be detexed at
         any point using `detex()` method.
 
         :param file: Path object of the file to be loaded
+        :param compile_tex: Bool if the tex should be compiled
         """
         self.tex_file = file
 
@@ -60,7 +61,10 @@ class TexFile(Loggable):
         #     "buddy", "pdf", True, verify_type=bool
         # )
         compile_pdf = True
-        self.log_file, self.pdf_file = self.__compile_tex(compile_pdf)
+        if compile_tex:
+            self.log_file, self.pdf_file = self.__compile_tex(compile_pdf)
+        else:
+            self.log_file, self.pdf_file = (None, None)
 
     def __detex(self):
         opts = Options()  # use default options

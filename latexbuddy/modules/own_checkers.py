@@ -93,7 +93,7 @@ class SiUnitx(Module):
         threshold = 3
 
         def filter_big_numbers(n: re.Match):
-            return True if len(n.group(0)) > threshold else False
+            return len(n.group(0)) > threshold
 
         numbers = list(filter(filter_big_numbers, all_numbers))
 
