@@ -10,6 +10,7 @@
         {% include "static/modern-normalize.css" %}
         {% include "static/main_style.css" %}
         {% include "static/flask_index_style.css" %}
+        {% include "static/flask_collapsible_style.css" %}
     </style>
 </head>
 <body>
@@ -23,9 +24,10 @@
             <label>Select the file you want to be checked:</label>
             <input type="file" name="file"/>
         </div>
+        <input type="submit" value="Start Check"/>
         <div class="collapsible">
-            <button type="button">Configuration options</button>
-            <div class="content">
+            <button type="button" class="collapsible-toggle">Configuration options</button>
+            <div class="collapsible-content">
                 <div class="inline-form-element">
                     <label>selected whitelist:</label>
                     <select name="whitelist_id">
@@ -49,7 +51,35 @@
                 </div>
             </div>
         </div>
-        <input type="submit" value="Submit"/>
     </form>
+    <script type="text/javascript">
+        let collapsibles = document.getElementsByClassName("collapsible")
+        let i;
+
+        for (i = 0; i < collapsibles.length; i++) {
+
+            let possibleButtons = collapsibles[i].getElementsByClassName("collapsible-toggle");
+
+            if (possibleButtons.length === 0) {
+                continue;
+            }
+
+            possibleButtons[0].addEventListener("click", function () {
+
+                this.classList.toggle("active");
+
+                let contentFrames = this.parentNode.getElementsByClassName("collapsible-content");
+
+                let j;
+                for (j = 0; j < contentFrames.length; j++) {
+                    if (contentFrames[j].style.maxHeight) {
+                        contentFrames[j].style.maxHeight = null;
+                    } else {
+                        contentFrames[j].style.maxHeight = contentFrames[j].scrollHeight + "px";
+                    }
+                }
+            })
+        }
+    </script>
 </body>
 </html>
