@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - inconsistent naming of some checkers in config, Problem API and classnames (!108)
 - shortened slightly lengthy methods in config_loader.py (!140)
 - fixed critical bug in the highlighting system with reimplementation (!150)
+- fixed bug in output.py which would break the HTML document, if a problem description contained linebreaks (!155)
 
 ## [0.3.0] - 15 Jun 2021
 
