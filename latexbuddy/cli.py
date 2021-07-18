@@ -19,7 +19,7 @@ from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
 from latexbuddy.module_loader import ModuleLoader
-from latexbuddy.tools import get_all_paths_in_document, perform_whitelist_operations
+from latexbuddy.tools import get_all_paths_in_document, perform_whitelist_operations, get_abs_path
 
 
 parser = argparse.ArgumentParser(
@@ -150,6 +150,7 @@ def main():
     )
 
     for p in args.file:  # args.file is a list
+        p = get_abs_path(p)
         paths, problems = get_all_paths_in_document(p)
 
         for path in paths:
