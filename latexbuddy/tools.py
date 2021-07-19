@@ -25,6 +25,9 @@ class ToolLogger(Loggable):
 logger = ToolLogger().logger
 
 
+inc_re = re.compile(r"\\include{(?P<package_name>.*)}")
+inp_re = re.compile(r"\\input{(?P<package_name>.*)}")
+
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     """Executes a terminal command with subprocess.
 
@@ -298,6 +301,66 @@ def get_app_dir() -> Path:
     app_dir.mkdir(parents=True, exist_ok=True)
 
     return app_dir
+
+
+def get_all_paths_in_document_new(file_path: str):
+    unchecked_files = []
+    checked_files = []
+    problems = []
+
+    unchecked_files.append(file_path)
+
+    while len(unchecked_files) > 0:
+        unchecked_file = unchecked_files.pop(0)
+        unchecked_path = Path(unchecked_file)
+        try:
+            lines = unchecked_path.read_text().splitlines(keepends=False)
+        except FileNotFoundError:
+            logger.error(
+                path_not_found("the checking of imports", unchecked_path)
+            )
+
+            problems.append(
+                Problem(
+                    position=None,
+                    text=unchecked_file,
+                    checker="includes",
+                    category="latex",
+                    p_type="0",
+                    file="TBD",
+                    severity=ProblemSeverity.WARNING,
+                    description=f"File not found {unchecked_file}.",
+                    key="includes" + "_" + unchecked_file,
+                )
+            )
+
+            continue
+        except Exception as e:  # If the file cannot be found it is already removed
+            error_message = "Error while searching for files"
+            logger.error(
+                f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}"
+            )
+            continue
+
+        for line in lines:
+            match_inc = inc_re.match(line)
+            match_inp = inp_re.match(line)
+            if match_inc:
+                match = match_inc.group("package_name")
+                if not match in unchecked_files and not match in checked_files:
+                    unchecked_files.append(match_inc.group("package_name"))
+            if match_inp:
+                match = match_inp.group("package_name")
+                if not match in unchecked_files and not match in checked_files:
+                    unchecked_files.append(match_inp.group("package_name"))
+
+        checked_files.append(unchecked_file)
+
+    return pathify_list(checked_files), problems
+
+
+def pathify_list(list: List[str]) -> List[Path]:
+    return [Path(i) for i in list]
 
 
 def get_all_paths_in_document(file_path: str):
