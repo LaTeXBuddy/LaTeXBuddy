@@ -374,8 +374,11 @@ def get_all_paths_in_document(file_path: str):
                     path = parent + "/" + path
                 # if missing .tex, add a problem
                 if not path.endswith(".tex"):
-                    print("'.tex' is missing. Check: \\include{" + path + "}")
-                    continue  # if file ending is not given, ignore file
+                    if Path(path + ".tex").exists() and not Path(path + ".aux").exists():
+                        path += ".tex"
+                    else:
+                        print("'.tex' is missing. Check: \\include{" + path + "}")
+                        continue  # if file ending is not given, ignore file
 
                 path_line[path] = line
                 new_files.append(Path(path))  # if something was found, add it to a list
@@ -413,6 +416,15 @@ def add_whitelist_console(whitelist_file, to_add):
                 file.write(key)
                 file.write("\n")
 
+
+def get_abs_path(path):
+    path = str(path)
+    if path[0] == "~/" or path[0] == "/":
+        return Path(path)
+    p = Path(str(os.getcwd()) + "/" + str(path))
+    if not p.is_file() or path[-4:] != ".tex":
+        print("Path may not point to a TeX file")
+    return p
 
 def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
     """
