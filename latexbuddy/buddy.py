@@ -41,7 +41,7 @@ class LatexBuddy(MainModule):
         self.output_format: Optional[str] = None
         self.whitelist_file: Optional[Path] = None
         self.path_list: List[Path] = []  # all paths of the files to be used in html
-        self.compile_tex: bool = False
+        self.compile_tex: bool
 
     @classproperty
     def instance(cls):

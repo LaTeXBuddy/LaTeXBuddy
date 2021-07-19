@@ -136,8 +136,7 @@ class TexFile(Loggable):
         return str(self.tex_file)
 
     def __compile_tex(self, compile_pdf: bool) -> Tuple[Optional[Path], Optional[Path]]:
-
-        pdf_flag = ""
+        compiler = 'latex'
         try:
             find_executable("latex")
         except FileNotFoundError:
@@ -145,7 +144,7 @@ class TexFile(Loggable):
             return None, None
 
         if compile_pdf:
-            pdf_flag = "-output-format='pdf'"
+            compiler = 'pdflatex'
 
         html_directory = "./latexbuddy_html"
 
@@ -188,11 +187,10 @@ class TexFile(Loggable):
 
         execute(
             f'TEXMFCNF="{tex_mf}";',
-            "latex",
+            compiler,
             "-interaction=nonstopmode",
             "-8bit",
             f"-output-directory='{str(path)}'",
-            pdf_flag,
             str(self.tex_file),
         )
 
