@@ -136,7 +136,7 @@ class TexFile(Loggable):
         return str(self.tex_file)
 
     def __compile_tex(self, compile_pdf: bool) -> Tuple[Optional[Path], Optional[Path]]:
-        compiler = 'latex'
+        compiler = "latex"
         try:
             find_executable("latex")
         except FileNotFoundError:
@@ -144,7 +144,7 @@ class TexFile(Loggable):
             return None, None
 
         if compile_pdf:
-            compiler = 'pdflatex'
+            compiler = "pdflatex"
 
         html_directory = "./latexbuddy_html"
 
