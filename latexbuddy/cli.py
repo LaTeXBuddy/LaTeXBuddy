@@ -151,7 +151,7 @@ def main():
 
     for p in args.file:  # args.file is a list
         p = get_abs_path(p)
-        paths, problems = get_all_paths_in_document(p)
+        paths, problems = get_all_paths_in_document(Path(p))
 
         for path in paths:
 

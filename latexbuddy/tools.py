@@ -25,8 +25,8 @@ class ToolLogger(Loggable):
 logger = ToolLogger().logger
 
 
-inc_re = re.compile(r"\\include{(?P<package_name>.*)}")
-inp_re = re.compile(r"\\input{(?P<package_name>.*)}")
+inc_re = re.compile(r"\\include{(?P<file_name>.*)}")
+inp_re = re.compile(r"\\input{(?P<file_name>.*)}")
 
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     """Executes a terminal command with subprocess.
@@ -303,37 +303,26 @@ def get_app_dir() -> Path:
     return app_dir
 
 
-def get_all_paths_in_document_new(file_path: str):
+def get_all_paths_in_document(file_path: Path):
     unchecked_files = []
     checked_files = []
     problems = []
-
     unchecked_files.append(file_path)
+    root_dir = str(file_path.parent)
+    print(root_dir)
 
     while len(unchecked_files) > 0:
         unchecked_file = unchecked_files.pop(0)
-        unchecked_path = Path(unchecked_file)
+        if not(str(unchecked_file)[:2] == "~/" or str(unchecked_file)[0] == "/"):
+            unchecked_file = Path(root_dir + "/" + str(unchecked_file))
+        unchecked_file = texify_path(str(unchecked_file))
+        print("st: " + str(unchecked_file))
         try:
-            lines = unchecked_path.read_text().splitlines(keepends=False)
+            lines = unchecked_file.read_text().splitlines(keepends=False)
         except FileNotFoundError:
             logger.error(
-                path_not_found("the checking of imports", unchecked_path)
+                path_not_found("the checking of imports", unchecked_file)
             )
-
-            problems.append(
-                Problem(
-                    position=None,
-                    text=unchecked_file,
-                    checker="includes",
-                    category="latex",
-                    p_type="0",
-                    file="TBD",
-                    severity=ProblemSeverity.WARNING,
-                    description=f"File not found {unchecked_file}.",
-                    key="includes" + "_" + unchecked_file,
-                )
-            )
-
             continue
         except Exception as e:  # If the file cannot be found it is already removed
             error_message = "Error while searching for files"
@@ -346,24 +335,31 @@ def get_all_paths_in_document_new(file_path: str):
             match_inc = inc_re.match(line)
             match_inp = inp_re.match(line)
             if match_inc:
-                match = match_inc.group("package_name")
+                match = Path(match_inc.group("file_name"))
                 if not match in unchecked_files and not match in checked_files:
-                    unchecked_files.append(match_inc.group("package_name"))
+                    unchecked_files.append(match)
             if match_inp:
-                match = match_inp.group("package_name")
+                match = Path(match_inp.group("file_name"))
                 if not match in unchecked_files and not match in checked_files:
-                    unchecked_files.append(match_inp.group("package_name"))
+                    unchecked_files.append(match)
 
+        print("end: " + str(unchecked_file))
         checked_files.append(unchecked_file)
 
-    return pathify_list(checked_files), problems
+    return checked_files, problems
+
+def texify_path(path: str) -> Path:
+    if not path.endswith(".tex"):
+        if Path(path + ".tex").exists():
+            return Path(path + ".tex")
+    return Path(path)
 
 
 def pathify_list(list: List[str]) -> List[Path]:
     return [Path(i) for i in list]
 
 
-def get_all_paths_in_document(file_path: str):
+def get_all_paths_in_document_old(file_path: str):
     """Checks files that are included in a file.
 
     If the file includes more files, these files will also be checked.
@@ -482,10 +478,11 @@ def add_whitelist_console(whitelist_file, to_add):
 
 def get_abs_path(path):
     path = str(path)
-    if path[0] == "~/" or path[0] == "/":
+    if path[:2] == "~/" or path[0] == "/":
         return Path(path)
     p = Path(str(os.getcwd()) + "/" + str(path))
     if not p.is_file() or path[-4:] != ".tex":
+        # TODO: change to logger
         print("Path may not point to a TeX file")
     return p
 
