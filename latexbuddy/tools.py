@@ -28,6 +28,7 @@ logger = ToolLogger().logger
 inc_re = re.compile(r"\\include{(?P<file_name>.*)}")
 inp_re = re.compile(r"\\input{(?P<file_name>.*)}")
 
+
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     """Executes a terminal command with subprocess.
 
@@ -313,16 +314,14 @@ def get_all_paths_in_document(file_path: Path):
 
     while len(unchecked_files) > 0:
         unchecked_file = unchecked_files.pop(0)
-        if not(str(unchecked_file)[:2] == "~/" or str(unchecked_file)[0] == "/"):
+        if not (str(unchecked_file)[:2] == "~/" or str(unchecked_file)[0] == "/"):
             unchecked_file = Path(root_dir + "/" + str(unchecked_file))
         unchecked_file = texify_path(str(unchecked_file))
         print("st: " + str(unchecked_file))
         try:
             lines = unchecked_file.read_text().splitlines(keepends=False)
         except FileNotFoundError:
-            logger.error(
-                path_not_found("the checking of imports", unchecked_file)
-            )
+            logger.error(path_not_found("the checking of imports", unchecked_file))
             continue
         except Exception as e:  # If the file cannot be found it is already removed
             error_message = "Error while searching for files"
@@ -347,6 +346,7 @@ def get_all_paths_in_document(file_path: Path):
         checked_files.append(unchecked_file)
 
     return checked_files, problems
+
 
 def texify_path(path: str) -> Path:
     if not path.endswith(".tex"):
@@ -433,7 +433,10 @@ def get_all_paths_in_document_old(file_path: str):
                     path = parent + "/" + path
                 # if missing .tex, add a problem
                 if not path.endswith(".tex"):
-                    if Path(path + ".tex").exists() and not Path(path + ".aux").exists():
+                    if (
+                        Path(path + ".tex").exists()
+                        and not Path(path + ".aux").exists()
+                    ):
                         path += ".tex"
                     else:
                         print("'.tex' is missing. Check: \\include{" + path + "}")
@@ -485,6 +488,7 @@ def get_abs_path(path):
         # TODO: change to logger
         print("Path may not point to a TeX file")
     return p
+
 
 def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
     """
