@@ -374,7 +374,10 @@ def get_all_paths_in_document(file_path: str):
                     path = parent + "/" + path
                 # if missing .tex, add a problem
                 if not path.endswith(".tex"):
-                    if Path(path + ".tex").exists() and not Path(path + ".aux").exists():
+                    if (
+                        Path(path + ".tex").exists()
+                        and not Path(path + ".aux").exists()
+                    ):
                         path += ".tex"
                     else:
                         print("'.tex' is missing. Check: \\include{" + path + "}")
@@ -425,6 +428,7 @@ def get_abs_path(path):
     if not p.is_file() or path[-4:] != ".tex":
         print("Path may not point to a TeX file")
     return p
+
 
 def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
     """
