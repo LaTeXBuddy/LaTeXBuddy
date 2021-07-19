@@ -155,8 +155,8 @@ def main():
 
     for p in args.file:  # args.file is a list
         p = get_abs_path(p)
-        paths, problems = get_all_paths_in_document(p)
         first_path = True
+        paths = get_all_paths_in_document(Path(p))
 
         for path in paths:
 
@@ -169,11 +169,6 @@ def main():
                 compile_tex=first_path,
             )
             first_path = False
-
-            # TODO: Moved this here, so added Problems are not immediately deleted
-            #  anymore. Please acknowledge by removing this comment.
-            for problem in problems:
-                buddy.add_error(problem)
 
             buddy.run_tools()
             buddy.check_whitelist()

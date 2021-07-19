@@ -431,10 +431,13 @@ def generate_wrapper_html_tags(interval: Interval) -> Tuple[str, str]:
               the specified interval object
     """
 
+    # escape HTML control sequences and remove possible invalid linebreaks
+    escaped_title = escape(interval.html_tag_title.replace("\n", ""))
+
     opening_tag = (
         f"<span "
         f'class="under is-{str(ProblemSeverity(interval.severity))}" '
-        f'title="{escape(interval.html_tag_title)}"'
+        f'title="{escaped_title}"'
         f">"
     )
     closing_tag = f"</span>"

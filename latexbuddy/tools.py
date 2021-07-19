@@ -25,6 +25,10 @@ class ToolLogger(Loggable):
 logger = ToolLogger().logger
 
 
+inc_re = re.compile(r"\\include{(?P<file_name>.*)}")
+inp_re = re.compile(r"\\input{(?P<file_name>.*)}")
+
+
 def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     """Executes a terminal command with subprocess.
 
@@ -300,98 +304,96 @@ def get_app_dir() -> Path:
     return app_dir
 
 
-def get_all_paths_in_document(file_path: str):
+def get_all_paths_in_document(file_path: Path) -> List[Path]:
     """Checks files that are included in a file.
 
     If the file includes more files, these files will also be checked.
 
     :param file_path:a string, containing file path
+    :return: the files to check
     """
-    unchecked_files = []  # Holds all unchecked files
-    checked_files = []  # Holds all checked file
-    problems = []
-
-    # add all paths to list
-    # this is used for the command line input
+    unchecked_files = []
+    checked_files = []
     unchecked_files.append(file_path)
-    parent = str(Path(file_path).parent)
-    old_lines = ""  # need access to it in creating errors
+    root_dir = str(file_path.parent)
 
     while len(unchecked_files) > 0:
-        last_checked = checked_files[-1] if len(checked_files) > 0 else ""
-        unchecked_file = unchecked_files.pop(0)
-        new_files = []
-        path_line = {}
-        lines = ""  # might not be reset for new file otherwise
-
+        unchecked_file = convert_file_to_absolute(unchecked_files, root_dir)
         try:
             lines = unchecked_file.read_text().splitlines(keepends=False)
-            old_lines = lines
-        except FileNotFoundError:  # the file might not be included in path
-            logger.error(
-                path_not_found("the checking of imports", Path(unchecked_file))
-            )
-
-            # TODO: This wont work -->
-            line = path_line[unchecked_file]
-            if line.startswith("\\input"):
-                checker = "inputs"
-            else:
-                checker = "includes"
-
-            position = re.search(line, old_lines)
-            problems.append(
-                Problem(
-                    position=(1, 1),
-                    text=path_line[unchecked_file],
-                    checker=checker,
-                    category="latex",
-                    p_type="0",
-                    file=Path(last_checked),
-                    severity=ProblemSeverity.WARNING,
-                    description=f"File not found {unchecked_file}.",
-                    key=checker + "_" + unchecked_file,
-                    length=len(line),
-                )
-            )
-            # TODO: This wont work <--
+        except FileNotFoundError:
+            logger.error(path_not_found("the checking of imports", unchecked_file))
+            continue
         except Exception as e:  # If the file cannot be found it is already removed
-
             error_message = "Error while searching for files"
             logger.error(
                 f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}"
             )
+            continue
 
-        for line in lines:
-            # check for include and input statements
-            if line.startswith("\\include{") or line.startswith("\\input{"):
-                path = line
-                begin_of_path: int = path.find("{") + 1
-                end_of_path: int = path.find("}")
-                path = path[begin_of_path:end_of_path]
-                # if missing / at the beginning, add it.
-                if path[0] != "/":
-                    path = parent + "/" + path
-                # if missing .tex, add a problem
-                if not path.endswith(".tex"):
-                    if (
-                        Path(path + ".tex").exists()
-                        and not Path(path + ".aux").exists()
-                    ):
-                        path += ".tex"
-                    else:
-                        print("'.tex' is missing. Check: \\include{" + path + "}")
-                        continue  # if file ending is not given, ignore file
+        unchecked_files = match_lines(lines, unchecked_files, checked_files)
 
-                path_line[path] = line
-                new_files.append(Path(path))  # if something was found, add it to a list
-
-        unchecked_files.extend(new_files)  # add new
         checked_files.append(unchecked_file)
-    return checked_files, problems
+
+    return checked_files
+
+
+def convert_file_to_absolute(unchecked_files: List[Path], root_dir: str) -> Path:
+    """Converts a relative path to an absolute if needed
+
+    :param unchecked_files: the list of unchecked_files
+    :param root_dir: the root directory
+    :return: the absolute path
+    """
+    unchecked_file = unchecked_files.pop(0)
+    if not (str(unchecked_file)[:2] == "~/" or str(unchecked_file)[0] == "/"):
+        unchecked_file = Path(root_dir + "/" + str(unchecked_file))
+    return texify_path(str(unchecked_file))
+
+
+def match_lines(
+    lines: List[str], unchecked_files: List[Path], checked_files: List[Path]
+) -> List[Path]:
+    """
+    Matches the lines with the given regexes
+
+    :param lines: the lines
+    :unchecked_files: the unchecked_files
+    :checked_files: the checked_files
+    :return: the unchecked_files
+    """
+    for line in lines:
+        match_inc = inc_re.match(line)
+        match_inp = inp_re.match(line)
+        if match_inc:
+            match = Path(match_inc.group("file_name"))
+            if match not in unchecked_files and match not in checked_files:
+                unchecked_files.append(match)
+        if match_inp:
+            match = Path(match_inp.group("file_name"))
+            if match not in unchecked_files and match not in checked_files:
+                unchecked_files.append(match)
+    return unchecked_files
+
+
+def texify_path(path: str) -> Path:
+    """
+    Adds .tex to a file path if needed
+    :param path: the path
+    :return: the texified path
+    """
+    if not path.endswith(".tex"):
+        if Path(path + ".tex").exists():
+            return Path(path + ".tex")
+    return Path(path)
 
 
 def perform_whitelist_operations(args: Namespace):
+    """
+    Performs whitelist operations
+
+    :param args: the args
+    """
     wl_file = args.whitelist if args.whitelist else Path("whitelist")
 
     if args.wl_add_keys:
@@ -420,13 +422,18 @@ def add_whitelist_console(whitelist_file, to_add):
                 file.write("\n")
 
 
-def get_abs_path(path):
+def get_abs_path(path) -> Path:
+    """
+    Gets absolute path of a string
+    :param path: the path
+    :return: the absolute path
+    """
     path = str(path)
-    if path[0] == "~/" or path[0] == "/":
+    if path[:2] == "~/" or path[0] == "/":
         return Path(path)
     p = Path(str(os.getcwd()) + "/" + str(path))
     if not p.is_file() or path[-4:] != ".tex":
-        print("Path may not point to a TeX file")
+        logger.error(f"File {p} does not exist.")
     return p
 
 
