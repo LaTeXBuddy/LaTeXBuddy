@@ -19,7 +19,11 @@ from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
 from latexbuddy.module_loader import ModuleLoader
-from latexbuddy.tools import get_all_paths_in_document, perform_whitelist_operations, get_abs_path
+from latexbuddy.tools import (
+    get_abs_path,
+    get_all_paths_in_document,
+    perform_whitelist_operations,
+)
 
 
 parser = argparse.ArgumentParser(
@@ -151,7 +155,7 @@ def main():
 
     for p in args.file:  # args.file is a list
         p = get_abs_path(p)
-        paths, problems = get_all_paths_in_document(Path(p))
+        paths = get_all_paths_in_document(Path(p))
 
         for path in paths:
 
@@ -162,11 +166,6 @@ def main():
                 file_to_check=path,
                 path_list=paths,  # to be used later on in render html
             )
-
-            # TODO: Moved this here, so added Problems are not immediately deleted
-            #  anymore. Please acknowledge by removing this comment.
-            for problem in problems:
-                buddy.add_error(problem)
 
             buddy.run_tools()
             buddy.check_whitelist()
