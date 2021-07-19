@@ -193,7 +193,7 @@ class Problem(Loggable):
         ):
             return f"{language}_{key}"
 
-        return key
+        return key.replace("\n", "")
 
     def __generate_uid(self) -> str:
         """Creates the UID for the Problem object.
