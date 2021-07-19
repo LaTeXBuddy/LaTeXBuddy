@@ -20,17 +20,17 @@
         </h1>
     </header>
     <form enctype="multipart/form-data" action="/check" method="POST">
-        <div class="inline-form-element">
-            <label>Select the file you want to be checked:</label>
-            <input type="file" name="file" multiple=""/>
+        <div class="inline-form-element monospaced">
+            <label class="label_text">Select the file you want to be checked:</label>
+            <input class="file_input" type="file" name="file" multiple=""/>
         </div>
-        <input type="submit" value="Start Check"/>
-        <div class="collapsible">
+        <input class="submit_input" type="submit" value="Start Check"/>
+        <div class="collapsible monospaced">
             <button type="button" class="collapsible-toggle">Configuration options</button>
             <div class="collapsible-content">
                 <div class="inline-form-element">
                     <label>selected whitelist:</label>
-                    <select name="whitelist_id">
+                    <select class="list_selector" name="whitelist_id">
                         <option value="[none]">[none]</option>
                         {% for whitelist_id in whitelist_ids %}
                             <option value="{{ whitelist_id }}">{{ whitelist_id }}</option>
@@ -39,15 +39,15 @@
                 </div>
                 <div class="inline-form-element">
                     <label>language:</label>
-                    <input type="text" name="language">
+                    <input class="lang_input" type="text" name="language">
                 </div>
                 <div class="inline-form-element">
                     <label>select modules (comma-separated list of names):</label>
-                    <select name="module_selector_type">
+                    <select class="module_selector" name="module_selector_type">
                         <option value="blacklist">blacklist</option>
                         <option value="whitelist">whitelist</option>
                     </select>
-                    <input type="text" name="module_selector">
+                    <input class="module_input" type="text" name="module_selector">
                 </div>
             </div>
         </div>
