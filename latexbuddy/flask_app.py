@@ -32,6 +32,7 @@ ALLOWED_EXTENSIONS = [
     "pdf",
     "jpg",
     "jpeg",
+    "png",
     "gif",
     "svg",
 ]
