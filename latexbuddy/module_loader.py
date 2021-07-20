@@ -1,5 +1,6 @@
 import importlib
 import inspect
+import sys
 
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -101,6 +102,7 @@ class ModuleLoader(ModuleProvider, Loggable):
         """
 
         py_files = self.find_py_files()
+        sys.path.append(str(self.directory))
 
         loaded_modules = []
 
@@ -108,7 +110,7 @@ class ModuleLoader(ModuleProvider, Loggable):
 
             def lambda_function() -> None:
 
-                module_path = str(py_file.with_suffix("")).replace("/", ".")
+                module_path = str(py_file.stem)
 
                 self.logger.debug(f"Attempting to load module from '{module_path}'")
                 module = importlib.import_module(module_path)
