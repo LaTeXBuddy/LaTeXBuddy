@@ -237,6 +237,7 @@ def run_buddy(file_path: Path, output_dir: Path, path_list: List[Path]):
         ),
         file_path,
         path_list,
+        True,  # TODO: change this to only compile the first/main file
     )
 
     LatexBuddy.run_tools()
