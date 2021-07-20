@@ -20,9 +20,11 @@
         </h1>
     </header>
     <form enctype="multipart/form-data" action="/check" method="POST">
-        <div class="inline-form-element monospaced">
-            <label class="label_text">Select the file you want to be checked:</label>
-            <input class="file_input" type="file" name="file" multiple=""/>
+        <div id="dropzone" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+            <div class="inline-form-element monospaced">
+                <label class="label_text">Select the file you want to be checked:</label>
+                <input class="file_input" type="file" name="file" multiple=""/>
+            </div>
         </div>
         <input class="submit_input" type="submit" value="Start Check"/>
         <div class="collapsible monospaced">
@@ -80,6 +82,30 @@
                 }
             })
         }
+    </script>
+    <script type="text/javascript">
+
+        function handleDragOver(event) {
+            console.log("Files in dropzone.");
+            event.preventDefault();
+        }
+
+        function handleDrop(event) {
+
+            event.preventDefault();
+
+            if (event.dataTransfer.items) {
+
+                for (let i = 0; i < event.dataTransfer.items.length; i++) {
+
+                    //TODO: continue
+                }
+
+            } else {
+                console.log("not event.dataTrasfer.items");
+            }
+        }
+
     </script>
 </body>
 </html>
