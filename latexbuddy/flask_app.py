@@ -56,6 +56,8 @@ class FlaskConfigLoader(ConfigLoader):
             "output": str(output_dir),
             "format": "HTML_FLASK",
             "enable-modules-by-default": True,
+            # "module_dir": "/home/vmuser/PycharmProjects/latexbuddy/latexbuddy/modules/",
+            "module_dir": "latexbuddy/modules/",
         }
 
         self.module_flags = {}
@@ -220,11 +222,19 @@ def run_buddy(file_path: Path, output_dir: Path, path_list: List[Path]):
         request.form["whitelist_id"] if "whitelist_id" in request.form else None
     )
 
+    config_loader = FlaskConfigLoader(
+        output_dir, language, module_selector_mode, module_selection, whitelist_id
+    )
+
     LatexBuddy.init(
-        FlaskConfigLoader(
-            output_dir, language, module_selector_mode, module_selection, whitelist_id
+        config_loader,
+        ModuleLoader(
+            Path(
+                config_loader.get_config_option_or_default(
+                    LatexBuddy, "module_dir", "modules/"
+                )
+            )
         ),
-        ModuleLoader(Path("latexbuddy/modules/")),
         file_path,
         path_list,
     )
