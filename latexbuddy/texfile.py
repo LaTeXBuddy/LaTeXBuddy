@@ -146,7 +146,7 @@ class TexFile(Loggable):
         if compile_pdf:
             compiler = "pdflatex"
 
-        html_directory = "./latexbuddy_html"
+        html_directory = os.getcwd() + "/latexbuddy_html"
 
         try:
             os.mkdir(html_directory)
@@ -172,22 +172,29 @@ class TexFile(Loggable):
             )
             pass
 
-        # for unique file names
-        # TODO make it easier for the user
-        path = (
-            os.getcwd()
-            + "/"
-            + mkdtemp(
-                prefix="latexbuddy_", suffix="_compiled_tex", dir=compile_directory
-            )
+        compilation_path = Path(
+            compile_directory + "/" + str(self.tex_file.parent.name)
         )
 
-        tex_mf = self.__create_tex_mf(path)
+        try:
+            os.mkdir(str(compilation_path))
+        except FileExistsError:
+            self.logger.debug(f"Directory {str(compilation_path)} already exists.")
+            pass
+        except Exception as exc:
+            self.logger.error(
+                texfile_error(f"{exc} occurred while creating {str(compilation_path)}.")
+            )
+            pass
+
+        tex_mf = self.__create_tex_mf(compilation_path)
 
         self.logger.debug(
             f"TEXFILE: {str(self.tex_file)}, exists: {self.tex_file.exists()}"
         )
-        self.logger.debug(f"PATH: {str(path)}, exists: {path.exists()}")
+        self.logger.debug(
+            f"PATH: {str(compilation_path)}, exists: {compilation_path.exists()}"
+        )
 
         print(self.tex_file.name)
         print(self.tex_file.parent)
@@ -197,13 +204,13 @@ class TexFile(Loggable):
             f"{str(self.tex_file.parent)};",
             compiler,
             "-interaction=nonstopmode",
-            f"-output-directory='{str(path)}'",
+            f"-output-directory='{str(compilation_path)}'",
             "-8bit",
             str(self.tex_file.name),
         )
 
-        log = path / f"{self.tex_file.stem}.log"
-        pdf = path / f"{self.tex_file.stem}.pdf" if compile_pdf else None
+        log = compilation_path / f"{self.tex_file.stem}.log"
+        pdf = compilation_path / f"{self.tex_file.stem}.pdf" if compile_pdf else None
         self.logger.debug(f"LOG: {str(log)}, isFile: {log.is_file()}")
         self.logger.debug(f"PDF: {str(pdf)}, isFile: {pdf.is_file()}")
         return log, pdf
