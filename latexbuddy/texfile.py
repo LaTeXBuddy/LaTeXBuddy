@@ -33,13 +33,14 @@ class TexFile(Loggable):
     """A simple TeX file. This class reads the file, detects its encoding and saves it
     as text for future editing."""
 
-    def __init__(self, file: Path):
+    def __init__(self, file: Path, compile_tex: bool):
         """Creates a new file instance.
 
         By default, the file is being read, but not detexed. The file can be detexed at
         any point using `detex()` method.
 
         :param file: Path object of the file to be loaded
+        :param compile_tex: Bool if the tex should be compiled
         """
         self.tex_file = file
 
@@ -60,7 +61,10 @@ class TexFile(Loggable):
         #     "buddy", "pdf", True, verify_type=bool
         # )
         compile_pdf = True
-        self.log_file, self.pdf_file = self.__compile_tex(compile_pdf)
+        if compile_tex:
+            self.log_file, self.pdf_file = self.__compile_tex(compile_pdf)
+        else:
+            self.log_file, self.pdf_file = (None, None)
 
     def __detex(self):
         opts = Options()  # use default options
@@ -132,8 +136,7 @@ class TexFile(Loggable):
         return str(self.tex_file)
 
     def __compile_tex(self, compile_pdf: bool) -> Tuple[Optional[Path], Optional[Path]]:
-
-        pdf_flag = ""
+        compiler = "latex"
         try:
             find_executable("latex")
         except FileNotFoundError:
@@ -141,9 +144,9 @@ class TexFile(Loggable):
             return None, None
 
         if compile_pdf:
-            pdf_flag = "-output-format='pdf'"
+            compiler = "pdflatex"
 
-        html_directory = "./latexbuddy_html"
+        html_directory = os.getcwd() + "/latexbuddy_html"
 
         try:
             os.mkdir(html_directory)
@@ -169,31 +172,45 @@ class TexFile(Loggable):
             )
             pass
 
-        # for unique file names
-        # TODO make it easier for the user
-        path = Path(
-            mkdtemp(prefix="latexbuddy_", suffix="_compiled_tex", dir=compile_directory)
+        compilation_path = Path(
+            compile_directory + "/" + str(self.tex_file.parent.name)
         )
 
-        tex_mf = self.__create_tex_mf(path)
+        try:
+            os.mkdir(str(compilation_path))
+        except FileExistsError:
+            self.logger.debug(f"Directory {str(compilation_path)} already exists.")
+            pass
+        except Exception as exc:
+            self.logger.error(
+                texfile_error(f"{exc} occurred while creating {str(compilation_path)}.")
+            )
+            pass
+
+        tex_mf = self.__create_tex_mf(compilation_path)
 
         self.logger.debug(
             f"TEXFILE: {str(self.tex_file)}, exists: {self.tex_file.exists()}"
         )
-        self.logger.debug(f"PATH: {str(path)}, exists: {path.exists()}")
-
-        execute(
-            f'TEXMFCNF="{tex_mf}";',
-            "latex",
-            "-interaction=nonstopmode",
-            "-8bit",
-            f"-output-directory='{str(path)}'",
-            pdf_flag,
-            str(self.tex_file),
+        self.logger.debug(
+            f"PATH: {str(compilation_path)}, exists: {compilation_path.exists()}"
         )
 
-        log = path / f"{self.tex_file.stem}.log"
-        pdf = path / f"{self.tex_file.stem}.pdf" if compile_pdf else None
+        print(self.tex_file.name)
+        print(self.tex_file.parent)
+        execute(
+            f'TEXMFCNF="{tex_mf}";',
+            "cd",
+            f"{str(self.tex_file.parent)};",
+            compiler,
+            "-interaction=nonstopmode",
+            f"-output-directory='{str(compilation_path)}'",
+            "-8bit",
+            str(self.tex_file.name),
+        )
+
+        log = compilation_path / f"{self.tex_file.stem}.log"
+        pdf = compilation_path / f"{self.tex_file.stem}.pdf" if compile_pdf else None
         self.logger.debug(f"LOG: {str(log)}, isFile: {log.is_file()}")
         self.logger.debug(f"PDF: {str(pdf)}, isFile: {pdf.is_file()}")
         return log, pdf

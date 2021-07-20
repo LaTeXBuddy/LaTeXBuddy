@@ -155,6 +155,7 @@ def main():
 
     for p in args.file:  # args.file is a list
         p = get_abs_path(p)
+        first_path = True
         paths = get_all_paths_in_document(Path(p))
 
         for path in paths:
@@ -165,7 +166,9 @@ def main():
                 module_provider=module_loader,
                 file_to_check=path,
                 path_list=paths,  # to be used later on in render html
+                compile_tex=first_path,
             )
+            first_path = False
 
             buddy.run_tools()
             buddy.check_whitelist()
