@@ -24,6 +24,7 @@ from latexbuddy.tools import (
     is_binary,
 )
 
+
 # regex to parse out error location from tex2txt output
 location_re = re.compile(r"line (\d+), column (\d+)")
 
@@ -173,10 +174,13 @@ class TexFile(Loggable):
 
         # for unique file names
         # TODO make it easier for the user
-        path = (os.getcwd() + '/' +
-                mkdtemp(prefix="latexbuddy_", suffix="_compiled_tex",
-                        dir=compile_directory)
-                )
+        path = (
+            os.getcwd()
+            + "/"
+            + mkdtemp(
+                prefix="latexbuddy_", suffix="_compiled_tex", dir=compile_directory
+            )
+        )
 
         tex_mf = self.__create_tex_mf(path)
 
@@ -189,7 +193,8 @@ class TexFile(Loggable):
         print(self.tex_file.parent)
         execute(
             f'TEXMFCNF="{tex_mf}";',
-            'cd', f'{str(self.tex_file.parent)};',
+            "cd",
+            f"{str(self.tex_file.parent)};",
             compiler,
             "-interaction=nonstopmode",
             f"-output-directory='{str(path)}'",
