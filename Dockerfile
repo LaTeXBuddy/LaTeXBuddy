@@ -94,7 +94,8 @@ RUN apk update \
         aspell-ru \
         aspell-uk \
         libstdc++ \
-        openjdk11-jre-headless
+        openjdk11-jre-headless \
+        texlive
 
 WORKDIR /latexbuddy
 
