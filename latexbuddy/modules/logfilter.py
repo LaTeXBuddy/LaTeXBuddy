@@ -44,6 +44,9 @@ class LogFilter(Module):
             self.logger.error(not_found("awk", "AWK"))
 
         log_path = file.log_file
+        if log_path is None:
+            return []
+
         descriptor, raw_problems_path = mkstemp(
             prefix="latexbuddy", suffix="raw_log_errors"
         )

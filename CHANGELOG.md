@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - extracted an interface `ModuleProvider` from `ModuleLoader` and adjusted `LatexBuddy` and cli.py accordingly (!141)
 - removed `LatexBuddy` methods `change_file` and `clear_error_list` and replaced their occurrences with `init` (!141)
 - reimplemented highlighting algorithm enabling markings for different problems to overlap (!150)
+- updated the Docker image to add TeX Live (!157)
 
 ### Fixed
 - regex usage in own_checkers (!110)
@@ -45,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - shortened slightly lengthy methods in config_loader.py (!140)
 - fixed critical bug in the highlighting system with reimplementation (!150)
 - fixed bug in output.py which would break the HTML document, if a problem description contained linebreaks (!155)
+- fixed tool loader so the modules directory can be anywhere on the file system (!159)
 
 ## [0.3.0] - 15 Jun 2021
 

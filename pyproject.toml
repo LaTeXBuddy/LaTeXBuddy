@@ -32,6 +32,7 @@ pydantic = "^1.8.2"
 pytest = "^6.2.4"
 bibtexparser = "^1.2.0"
 Flask = "^2.0.1"
+PyLaTeX = "^1.4.1"
 
 [tool.poetry.dev-dependencies]
 black = "^21.5b1"
