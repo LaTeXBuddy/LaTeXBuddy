@@ -20,6 +20,7 @@ from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
 from latexbuddy.texfile import TexFile
 from latexbuddy.tools import classproperty
 
+
 equation_re = re.compile(r"^([A-Z])-\1-\1$")
 
 
@@ -126,10 +127,9 @@ class LatexBuddy(MainModule):
         """
 
         if (
-            (LatexBuddy.instance.preprocessor is None
-             or LatexBuddy.instance.preprocessor.matches_preprocessor_filter(problem))
-            and not equation_re.match(problem.text)
-        ):
+            LatexBuddy.instance.preprocessor is None
+            or LatexBuddy.instance.preprocessor.matches_preprocessor_filter(problem)
+        ) and not equation_re.match(problem.text):
             LatexBuddy.instance.errors[problem.uid] = problem
 
     @staticmethod
