@@ -136,6 +136,9 @@ class TexFile(Loggable):
         return str(self.tex_file)
 
     def __compile_tex(self, compile_pdf: bool) -> Tuple[Optional[Path], Optional[Path]]:
+
+        from latexbuddy.buddy import LatexBuddy
+
         compiler = "latex"
         try:
             find_executable("latex")
@@ -146,7 +149,9 @@ class TexFile(Loggable):
         if compile_pdf:
             compiler = "pdflatex"
 
-        html_directory = os.getcwd() + "/latexbuddy_html"
+        html_directory = LatexBuddy.instance.cfg.get_config_option_or_default(
+            LatexBuddy, "output", os.getcwd() + "/latexbuddy_html/"
+        )
 
         try:
             os.mkdir(html_directory)
