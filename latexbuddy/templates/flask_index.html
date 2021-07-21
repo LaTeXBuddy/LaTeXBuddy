@@ -52,6 +52,18 @@
             </div>
         </div>
     </form>
+    <form enctype="multipart/form-data" action="/whitelist-api/upload" method="POST">
+        <div class="collapsible monospaced">
+            <button type="button" class="collapsible-toggle">Upload your whitelist</button>
+            <div class="collapsible-content">
+                <div class="inline-form-element">
+                    <label>select additional whitelist:</label>
+                    <input type="file" name="whitelist-file"/>
+                    <input type="submit" value="Upload"/>
+                </div>
+            </div>
+        </div>
+    </form>
     <script type="text/javascript">
         let collapsibles = document.getElementsByClassName("collapsible")
         let i;
