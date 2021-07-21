@@ -2,11 +2,12 @@
 This is an example configuration for LaTeXBuddy and the tools that are supported
 out-of-the-box. You may move this file and specify its path using the --config flag.
 """
+import os.path
 
 main = {
     "language": "en",
     "language_country": "GB",
-    "module_dir": "latexbuddy/modules/",
+    "module_dir": os.path.dirname(os.path.realpath(__file__)) + "/latexbuddy/modules/",
     "whitelist": "whitelist",
     "output": "./latexbuddy_html/",
     "format": "HTML",
