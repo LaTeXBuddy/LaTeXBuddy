@@ -2,11 +2,12 @@ import datetime
 import os
 import re
 import tempfile
+import zipfile
 
 from pathlib import Path
 from typing import List, Optional
 
-from flask import Flask, abort, redirect, request
+from flask import Flask, abort, redirect, request, send_from_directory
 from jinja2 import Environment, PackageLoader
 from werkzeug.utils import secure_filename
 
@@ -35,6 +36,7 @@ ALLOWED_EXTENSIONS = [
     "png",
     "gif",
     "svg",
+    "zip",
 ]
 
 
@@ -127,7 +129,7 @@ def document_check():
         return redirect("/")
 
     files = request.files.getlist("file")
-    print(files)
+    # print(files)
 
     if len(files) < 1:
         return redirect("/")
@@ -136,7 +138,7 @@ def document_check():
     result_id = f"{date}_{files[0].filename.replace('.', '_')}"
     result_path = os.path.join(app.config["RESULTS_FOLDER"], result_id)
 
-    saved_files = []
+    saved_tex_files = []
 
     for file in files:
 
@@ -144,15 +146,23 @@ def document_check():
             continue
 
         filename = secure_filename(file.filename)
-        target_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-        file.save(target_path)
+        target_dir_path = os.path.join(app.config["UPLOAD_FOLDER"], result_id)
+        Path(target_dir_path).mkdir()
 
-        saved_files.append(Path(target_path))
+        target_file_path = os.path.join(target_dir_path, filename)
+        file.save(target_file_path)
 
-    for file in saved_files:
+        if zipfile.is_zipfile(target_file_path):
+            with zipfile.ZipFile(target_file_path) as archive:
+                archive.extractall(target_dir_path)
 
-        # TODO: multiprocessing/loading screen?
-        run_buddy(file, Path(result_path), saved_files)
+        tex_files = list(Path(target_dir_path).rglob("*.tex"))
+        saved_tex_files.extend(tex_files)
+
+    for file in saved_tex_files:
+
+        # TODO: compile PDF only in main document
+        run_buddy(file, Path(result_path), saved_tex_files)
 
     return redirect(f"/result/{result_id}")
 
@@ -193,13 +203,55 @@ def display_result(result_id, file_name):
     return file_contents
 
 
-@app.route("/whitelist-api")
-def modify_whitelist():
-    return "<p>Nope, not yet.</p>"
+@app.route("/result/<result_id_0>/compiled/<result_id_1>/<pdf_name>")
+def compiled_pdf(result_id_0, result_id_1, pdf_name):
+
+    result_id = result_id_0
+    if result_id_0 != result_id_1:
+        abort(404)
+
+    pdf_dir = os.path.join(
+        app.config["RESULTS_FOLDER"], result_id, "compiled", result_id
+    )
+
+    if not Path(pdf_dir + "/" + pdf_name).exists():
+        abort(404)
+
+    return send_from_directory(pdf_dir, pdf_name)
+
+
+@app.route("/whitelist-api/upload", methods=["GET", "POST"])
+def upload_whitelist():
+
+    if request.method != "POST":
+        return redirect("/")
+
+    files = request.files.getlist("whitelist-file")
+
+    if len(files) < 1:
+        return redirect("/")
+
+    date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    for wl_file in files:
+
+        if not allowed_whitelist_file(wl_file.filename):
+            continue
+
+        filename = f"{date}_{secure_filename(wl_file.filename)}"
+        target_path = os.path.join(app.config["WHITELIST_FOLDER"], filename)
+
+        wl_file.save(target_path)
+
+    return redirect("/")
 
 
 def allowed_file(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def allowed_whitelist_file(filename: str) -> bool:
+    return "." not in filename
 
 
 def run_buddy(file_path: Path, output_dir: Path, path_list: List[Path]):
