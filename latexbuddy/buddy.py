@@ -3,6 +3,7 @@
 import json
 import multiprocessing as mp
 import os
+import re
 import time
 
 from pathlib import Path
@@ -18,6 +19,8 @@ from latexbuddy.preprocessor import Preprocessor
 from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
 from latexbuddy.texfile import TexFile
 from latexbuddy.tools import classproperty
+
+equation_re = re.compile(r"^([A-Z])-\1-\1$")
 
 
 class LatexBuddy(MainModule):
@@ -123,8 +126,9 @@ class LatexBuddy(MainModule):
         """
 
         if (
-            LatexBuddy.instance.preprocessor is None
-            or LatexBuddy.instance.preprocessor.matches_preprocessor_filter(problem)
+            (LatexBuddy.instance.preprocessor is None
+             or LatexBuddy.instance.preprocessor.matches_preprocessor_filter(problem))
+            and not equation_re.match(problem.text)
         ):
             LatexBuddy.instance.errors[problem.uid] = problem
 
