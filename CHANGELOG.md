@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - all integration tests as per documentation (!142)
 - default tooltip in html for problems without a custom description (!150)
 - new test routines for HTML highlighter (!150)
+- flask server as a GUI for checking documents (!154)
 
 ### Changed
 - the problem list and text is now scrollable (!135)
