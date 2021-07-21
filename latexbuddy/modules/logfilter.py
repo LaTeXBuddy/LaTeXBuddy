@@ -75,13 +75,13 @@ class LogFilter(Module):
                 continue
             severity = match.group("severity").upper()
             file_path = file.tex_file
-            position = (int(match.group("line_no")), 1)
+            # position = (int(match.group("line_no")), 1)   # Does not work yet
             split_match = problem_line.split(f"{match.group()}")
             split = split_match[1].split("\n")
-            description, problem_text = split if len(split) > 1 else (None, split[0])
+            problem_text, description = split if len(split) > 1 else ("", split[0])
             problems.append(
                 Problem(
-                    position=position,
+                    position=None,
                     text=problem_text,
                     checker=LogFilter,
                     p_type=severity,
