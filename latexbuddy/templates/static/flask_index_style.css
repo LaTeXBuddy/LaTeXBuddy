@@ -21,19 +21,16 @@ body form {
 
 form div.collapsible {
     width: 100%;
-    margin: 2em 5em;
+    margin: 2em 5em 0em;
 }
 
-form div.inline-form-element {
+div.inline-form-element {
+    margin-top: 10px;
     margin-bottom: 5px;
 }
 
-form div.inline-form-element > * {
+div.inline-form-element > * {
     display: inline;
-}
-
-.inline-form-element {
-    margin-top: 10px;
 }
 
 .label_text {
@@ -42,6 +39,10 @@ form div.inline-form-element > * {
 
 .file_input {
     font-size: 16px;
+}
+
+.float_right {
+    float: right;
 }
 
 .submit_input {
