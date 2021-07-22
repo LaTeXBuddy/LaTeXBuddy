@@ -483,10 +483,12 @@ def generate_wrapper_html_tags(interval: Interval) -> Tuple[str, str]:
     # escape HTML control sequences and remove possible invalid linebreaks
     escaped_title = escape(interval.html_tag_title.replace("\n", ""))
 
+    lid = interval.problems[0].uid + "List"
     opening_tag = (
         f"<span "
         f'class="under is-{str(ProblemSeverity(interval.severity))}" '
-        f'title="{escaped_title}"'
+        f'title="{escaped_title}" '
+        f'onclick="jumpTo(\'{lid}\')"'
         f">"
     )
     closing_tag = f"</span>"

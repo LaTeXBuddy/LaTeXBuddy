@@ -204,7 +204,7 @@
         </ol>
         <ol id="problem-disp">
             {% for problem in problems %}
-                <li class="problem is-{{ problem.severity }}">
+                <li class="problem is-{{ problem.severity }}" id="{{ problem.uid }}List">
                     <h4 class="problem-context monospaced">
                         {{ problem.context[0]|e }}<span class="problem-text">{{ problem.text|e }}</span>{{ problem.context[1]|e }}
                     </h4>
@@ -260,6 +260,15 @@
     </div>
 </div>
 <script>
+    function jumpTo(pid) {
+        var but = document.getElementById("change_problems");
+        if (!but.checked) {
+            but.checked = !but.checked;
+            but.onclick();
+        }
+        document.getElementById(pid).scrollIntoView({behavior: 'smooth'});
+    }
+
     document.getElementById("pdfbutton").onclick = function () {
         if (document.getElementById("pdf-disp").style.display == "block") {
             document.getElementById("pdf-disp").style.display = "none";
