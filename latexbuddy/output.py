@@ -488,7 +488,7 @@ def generate_wrapper_html_tags(interval: Interval) -> Tuple[str, str]:
         f"<span "
         f'class="under is-{str(ProblemSeverity(interval.severity))}" '
         f'title="{escaped_title}" '
-        f'onclick="jumpTo(\'{lid}\')"'
+        f"onclick=\"jumpTo('{lid}')\""
         f">"
     )
     closing_tag = f"</span>"
