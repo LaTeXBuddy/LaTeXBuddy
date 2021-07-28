@@ -2,7 +2,32 @@
 <img src="assets/logotype.svg" width="400" alt="LaTeXBuddy">
 </h1>
 
-## Use with Docker
+> The only LaTeX checking tool you'll ever need.
+
+LaTeXBuddy is the checking tool for LaTeX, which combines the power of various
+other tools in one easy-to-use command-line tool with clear HTML output.
+
+Aspell, ChkTeX, LanguageTool: you name it! LaTeXBuddy is modular and 
+Python-based, so that implementing new functionality becomes a breeze!
+
+Project status
+--------------
+
+LaTeXBuddy is a work in progress. We are working on fixing bugs and cleaning up.
+Using LaTeXBuddy in its current state may come with a lot of inconveniences.
+
+Upon reaching the Beta status, we will open-source this project. For now, it 
+remains copyrighted, yet you're free to fork it and provide your edits and
+improvements to the code base.
+
+Install and Use
+---------------
+
+The following guide is an exeprimental Docker build of LaTeXBuddy. Proceed with
+caution.
+
+### Use with Docker
+
 
 **Prerequisites:** [Docker](https://www.docker.com/products/docker-desktop)
 
@@ -54,6 +79,20 @@ the image can be reused.
       docker rm lb
       ```
 
-## Licence
+Authors
+-------
 
-The LaTeXBuddy logo is based on the [Origami](https://www.flaticon.com/free-icon/origami_2972006) icon, made by [Freepik](https://www.freepik.com) from [www.flaticon.com](https://www.flaticon.com/).
+LaTeXBuddy was created as part of SEP (Software Development Internship) at the
+TU Braunchweig. You can find the complete author list in the [AUTHORS](AUTHORS)
+file.
+
+Licence
+-------
+
+LaTeXBuddy is temporarily copyrighted. You can expect it to become open-source
+later this year (we're thinking of GPL).
+
+The LaTeXBuddy logo is based on the
+[Origami](https://www.flaticon.com/free-icon/origami_2972006) icon,
+made by [Freepik](https://www.freepik.com)
+from [www.flaticon.com](https://www.flaticon.com/).
