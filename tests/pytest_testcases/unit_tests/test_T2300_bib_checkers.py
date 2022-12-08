@@ -35,4 +35,3 @@ def test_unit_bib_checkers_run_checks(script_dir):
 
     assert output_problems_new[0].text == "werner2018serverless"
     assert output_problems_new[1].text == "Anna:2019"
-
