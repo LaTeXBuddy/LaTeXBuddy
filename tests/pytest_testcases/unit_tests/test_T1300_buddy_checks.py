@@ -1,6 +1,7 @@
 import argparse
 import os
 import tempfile
+
 from pathlib import Path
 from typing import List
 
@@ -10,8 +11,10 @@ from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.module_loader import ModuleProvider
 from latexbuddy.modules import Module
-from tests.pytest_testcases.unit_tests.resources.T1300_dummy_modules.dummy_module \
-    import DummyModule0, DummyModule1
+from tests.pytest_testcases.unit_tests.resources.T1300_dummy_modules.dummy_module import (
+    DummyModule0,
+    DummyModule1,
+)
 
 
 @pytest.fixture

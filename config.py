@@ -4,6 +4,7 @@ out-of-the-box. You may move this file and specify its path using the --config f
 """
 import os.path
 
+
 main = {
     "language": "en",
     "language_country": "GB",

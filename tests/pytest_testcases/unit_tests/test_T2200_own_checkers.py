@@ -1,15 +1,20 @@
-import pytest
 import os
 
 from pathlib import Path
-from latexbuddy.modules.own_checkers import UnreferencedFigures
-from latexbuddy.modules.own_checkers import SiUnitx
-from latexbuddy.modules.own_checkers import EmptySections
-from latexbuddy.modules.own_checkers import URLCheck
-from latexbuddy.modules.own_checkers import NativeUseOfRef
+
+import pytest
+
+from latexbuddy.modules.own_checkers import (
+    EmptySections,
+    NativeUseOfRef,
+    SiUnitx,
+    UnreferencedFigures,
+    URLCheck,
+)
 from latexbuddy.texfile import TexFile
-from tests.pytest_testcases.unit_tests.resources.driver_config_loader import \
-    ConfigLoader as DriverCL
+from tests.pytest_testcases.unit_tests.resources.driver_config_loader import (
+    ConfigLoader as DriverCL,
+)
 
 
 @pytest.fixture

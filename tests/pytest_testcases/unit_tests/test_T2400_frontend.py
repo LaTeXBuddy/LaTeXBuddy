@@ -1,13 +1,14 @@
 import os
+
+from pathlib import Path
 from random import sample
-from typing import Tuple, List, Optional
+from typing import List, Optional, Tuple
 
 import pytest
 
 from latexbuddy.modules.aspell import Aspell
-from latexbuddy.output import render_html, Interval
+from latexbuddy.output import Interval, render_html
 from latexbuddy.problem import Problem, ProblemSeverity
-from pathlib import Path
 
 
 @pytest.fixture

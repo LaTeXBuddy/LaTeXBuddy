@@ -1,13 +1,17 @@
 import os
+
 from logging import DEBUG
 from pathlib import Path
 
 import pytest
+
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.problem import Problem, ProblemSeverity
-from tests.pytest_testcases.integration_tests.resources.T800_driver_ModuleProvider \
-    import DriverModuleProvider, DriverModule1
+from tests.pytest_testcases.integration_tests.resources.T800_driver_ModuleProvider import (
+    DriverModule1,
+    DriverModuleProvider,
+)
 
 
 @pytest.fixture

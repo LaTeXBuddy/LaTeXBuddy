@@ -1,6 +1,7 @@
 import argparse
 import os
 import tempfile
+
 from pathlib import Path
 from typing import AnyStr
 
@@ -10,8 +11,9 @@ from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules.aspell import Aspell
 from latexbuddy.problem import Problem, ProblemSeverity
-from tests.pytest_testcases.integration_tests.resources.T800_driver_ModuleProvider \
-    import DriverModuleProvider
+from tests.pytest_testcases.integration_tests.resources.T800_driver_ModuleProvider import (
+    DriverModuleProvider,
+)
 
 
 @pytest.fixture
