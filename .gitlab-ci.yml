@@ -35,7 +35,8 @@ stages:
 pre-commit-on-merge:
   <<: *pre-commit-base
   script:
-    - pre-commit run --from-ref "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" --to-ref "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
+    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - pre-commit run --from-ref origin/"$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" --to-ref "$CI_COMMIT_SHA"
   only:
     - merge_requests
 
