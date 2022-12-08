@@ -146,7 +146,7 @@ class LanguageTool(Module):
 
             supported_languages = [lang.split(" ")[0] for lang in result.splitlines()]
             supported_languages = list(
-                filter(self.matches_language_regex, supported_languages)
+                filter(self.matches_language_regex, supported_languages),
             )
 
             return supported_languages
@@ -154,7 +154,7 @@ class LanguageTool(Module):
         elif self.mode == Mode.LOCAL_SERVER:
 
             return self.lt_languages_get_request(
-                f"http://localhost:{self.local_server.port}/v2/languages"
+                f"http://localhost:{self.local_server.port}/v2/languages",
             )
 
         elif self.mode == Mode.REMOTE_SERVER:
@@ -184,14 +184,14 @@ class LanguageTool(Module):
 
         try:
             result = tools.find_executable(
-                "languagetool", "LanguageTool (CLI)", self.logger, log_errors=False
+                "languagetool", "LanguageTool (CLI)", self.logger, log_errors=False,
             )
             executable_source = "native"
 
         except ExecutableNotFoundError:
 
             result = tools.find_executable(
-                "languagetool-commandline.jar", "LanguageTool (CLI)", self.logger
+                "languagetool-commandline.jar", "LanguageTool (CLI)", self.logger,
             )
             executable_source = "java"
 
@@ -240,14 +240,14 @@ class LanguageTool(Module):
 
         self.disabled_rules = ",".join(
             config.get_config_option_or_default(
-                LanguageTool, "disabled-rules", [], verify_type=List[str]
-            )
+                LanguageTool, "disabled-rules", [], verify_type=List[str],
+            ),
         )
 
         self.disabled_categories = ",".join(
             config.get_config_option_or_default(
-                LanguageTool, "disabled-categories", [], verify_type=List[str]
-            )
+                LanguageTool, "disabled-categories", [], verify_type=List[str],
+            ),
         )
 
         if self.disabled_rules == "":
@@ -266,7 +266,7 @@ class LanguageTool(Module):
 
         if self.mode == Mode.LOCAL_SERVER:
             raw_problems = self.lt_post_request(
-                file, "http://localhost:" f"{self.local_server.port}" "/v2/check"
+                file, "http://localhost:" f"{self.local_server.port}" "/v2/check",
             )
 
         elif self.mode == Mode.REMOTE_SERVER:
@@ -309,7 +309,7 @@ class LanguageTool(Module):
         except JSONDecodeError:
             self.logger.error(
                 f"Could not decode the following POST response in JSON format: "
-                f"{response.text}"
+                f"{response.text}",
             )
             return None
 
@@ -324,7 +324,7 @@ class LanguageTool(Module):
 
         supported_languages = [entry["longCode"] for entry in response_json]
         supported_languages = list(
-            filter(self.matches_language_regex, supported_languages)
+            filter(self.matches_language_regex, supported_languages),
         )
 
         return supported_languages
@@ -401,17 +401,17 @@ class LanguageTool(Module):
                         match["context"]["text"][context_end:],
                     ),
                     suggestions=LanguageTool.parse_error_replacements(
-                        match["replacements"]
+                        match["replacements"],
                     ),
                     key=tool_name + "_" + match["rule"]["id"],
-                )
+                ),
             )
 
         return problems
 
     @staticmethod
     def parse_error_replacements(
-        json_replacements: List[Dict], max_elements: int = 5
+        json_replacements: List[Dict], max_elements: int = 5,
     ) -> List[str]:
         """Converts LanguageTool's replacements to LaTeXBuddy suggestions list.
 
@@ -468,7 +468,7 @@ class LanguageToolLocalServer:
         except ExecutableNotFoundError:
 
             result = tools.find_executable(
-                "languagetool-server.jar", "LanguageTool (local server)", self.logger
+                "languagetool-server.jar", "LanguageTool (local server)", self.logger,
             )
             executable_source = "java"
 

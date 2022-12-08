@@ -58,7 +58,7 @@ class Aspell(Module):
             if len(line) > 0:
                 escaped_line = line.replace("'", "\\'")
                 output = tools.execute(
-                    f"echo '{escaped_line}' | aspell -a -l {self.language}"
+                    f"echo '{escaped_line}' | aspell -a -l {self.language}",
                 )
                 out = output.splitlines()[1:]  # the first line specifies aspell version
                 if len(out) > 0:  # only if the list inst empty
@@ -83,7 +83,7 @@ class Aspell(Module):
         ]
 
     def format_errors(
-        self, out: List[str], line_number: int, file: TexFile
+        self, out: List[str], line_number: int, file: TexFile,
     ) -> List[Problem]:
         """Parses Aspell errors and returns list of Problems.
 
@@ -120,7 +120,7 @@ class Aspell(Module):
                     char_location = int(tmp_split[1]) + 1
 
                 location = file.get_position_in_tex_from_linecol(
-                    line_number, char_location
+                    line_number, char_location,
                 )
                 key = "spelling" + key_delimiter + text
 
@@ -135,6 +135,6 @@ class Aspell(Module):
                         category="spelling",
                         suggestions=suggestions,
                         key=key,
-                    )
+                    ),
                 )
         return problems

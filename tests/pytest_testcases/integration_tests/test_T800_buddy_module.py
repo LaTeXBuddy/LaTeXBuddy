@@ -55,5 +55,5 @@ def test_integration_buddy_module(script_dir, caplog, default_config_loader):
                 text="just a general problem",
                 checker=DriverModule1,
                 file=LatexBuddy.instance.tex_file.plain_file,
-                severity=ProblemSeverity.INFO
-            )
+                severity=ProblemSeverity.INFO,
+    )

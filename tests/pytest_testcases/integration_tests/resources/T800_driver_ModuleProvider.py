@@ -40,6 +40,6 @@ class DriverModule1(Module):
                 text="just a general problem",
                 checker=DriverModule1,
                 file=file.plain_file,
-                severity=ProblemSeverity.INFO
-            )
+                severity=ProblemSeverity.INFO,
+            ),
         ]

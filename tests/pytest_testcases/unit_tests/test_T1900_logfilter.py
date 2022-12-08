@@ -26,7 +26,7 @@ def test_unit_logfilter_all_problems_in_texfilt(script_dir):
     config_loader = ConfigLoader()
     tex_file = TexFile(document_path)
     descriptor, raw_problems_path = mkstemp(
-        prefix="latexbuddy", suffix="raw_log_errors"
+        prefix="latexbuddy", suffix="raw_log_errors",
     )
 
     problems = log_filter.run_checks(config_loader, tex_file)
@@ -54,7 +54,7 @@ def test_unit_logfilter_all_texfilt_in_problems(script_dir):
     config_loader = ConfigLoader()
     tex_file = TexFile(document_path)
     descriptor, raw_problems_path = mkstemp(
-        prefix="latexbuddy", suffix="raw_log_errors"
+        prefix="latexbuddy", suffix="raw_log_errors",
     )
 
     problems = log_filter.run_checks(config_loader, tex_file)
@@ -71,7 +71,7 @@ def test_unit_logfilter_all_texfilt_in_problems(script_dir):
     raw_problems = Path(raw_problems_path).read_text()
     texfilt_problems_split = raw_problems.split(' ')
     problem_re = re.compile(
-        r"(?P<line_no>\d+):"
+        r"(?P<line_no>\d+):",
     )
 
     test = True

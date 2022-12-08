@@ -56,10 +56,10 @@ def generate_cli_command(
 
 
 __REGEX_CLI_CONFIG_OPTIONS_MAIN = re.compile(
-    r"Parsed CLI config options \(main\):\n({.*})"
+    r"Parsed CLI config options \(main\):\n({.*})",
 )
 __REGEX_CLI_CONFIG_OPTIONS_MODULES = re.compile(
-    r"Parsed CLI config options \(modules\):\n({.*})"
+    r"Parsed CLI config options \(modules\):\n({.*})",
 )
 
 
@@ -70,7 +70,7 @@ def assert_flag_config_options(
     output: Optional[str],
     format: Optional[str],
     en_modules: Optional[List[str]],
-    dis_modules: Optional[List[str]]
+    dis_modules: Optional[List[str]],
 ):
 
     main_match = __REGEX_CLI_CONFIG_OPTIONS_MAIN.search(cmd_output)
@@ -194,7 +194,7 @@ def test_unit_cli_check_flag_parsing(
     output: Tuple[Optional[str], Optional[str]],
     format: Tuple[Optional[str], Optional[str]],
     en_modules: Tuple[Optional[List[str]], Optional[List[str]]],
-    dis_modules: Tuple[Optional[List[str]], Optional[List[str]]]
+    dis_modules: Tuple[Optional[List[str]], Optional[List[str]]],
 ):
 
     cmd = generate_cli_command(
@@ -204,7 +204,7 @@ def test_unit_cli_check_flag_parsing(
         output=output[0],
         format=format[0],
         en_modules=en_modules[0],
-        dis_modules=dis_modules[0]
+        dis_modules=dis_modules[0],
     )
     result = execute_and_collect(*cmd)
 
@@ -215,5 +215,5 @@ def test_unit_cli_check_flag_parsing(
         output=output[1],
         format=format[1],
         en_modules=en_modules[1],
-        dis_modules=dis_modules[1]
+        dis_modules=dis_modules[1],
     )

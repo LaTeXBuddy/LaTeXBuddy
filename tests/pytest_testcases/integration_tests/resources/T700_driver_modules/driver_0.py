@@ -20,8 +20,8 @@ class FirstDriver(Module):
                 text="just a general problem",
                 checker=FirstDriver,
                 file=file.plain_file,
-                severity=ProblemSeverity.ERROR
-            )
+                severity=ProblemSeverity.ERROR,
+            ),
         ]
 
         abs_pos = str(file.plain).find("This is")
@@ -32,8 +32,8 @@ class FirstDriver(Module):
                 checker=FirstDriver,
                 file=file.plain_file,
                 severity=ProblemSeverity.ERROR,
-                description="Not an actual error, just testing the software..."
-            )
+                description="Not an actual error, just testing the software...",
+            ),
         )
 
         return problems

@@ -113,7 +113,7 @@ class TexFile(Loggable):
         return aux.lin, aux.col
 
     def get_position_in_tex_from_linecol(
-        self, line: int, col: int
+        self, line: int, col: int,
     ) -> Optional[Tuple[int, int]]:
         offsets = get_line_offsets(self.plain)
         aux = translate_numbers(self.tex, self.plain, self._charmap, offsets, line, col)
@@ -150,7 +150,7 @@ class TexFile(Loggable):
             compiler = "pdflatex"
 
         html_directory = LatexBuddy.instance.cfg.get_config_option_or_default(
-            LatexBuddy, "output", os.getcwd() + "/latexbuddy_html/"
+            LatexBuddy, "output", os.getcwd() + "/latexbuddy_html/",
         )
 
         try:
@@ -160,7 +160,7 @@ class TexFile(Loggable):
             pass
         except Exception as exc:
             self.logger.error(
-                texfile_error(f"{exc} occurred while creating {html_directory}.")
+                texfile_error(f"{exc} occurred while creating {html_directory}."),
             )
             pass
 
@@ -173,12 +173,12 @@ class TexFile(Loggable):
             pass
         except Exception as exc:
             self.logger.error(
-                texfile_error(f"{exc} occurred while creating {compile_directory}.")
+                texfile_error(f"{exc} occurred while creating {compile_directory}."),
             )
             pass
 
         compilation_path = Path(
-            compile_directory + "/" + str(self.tex_file.parent.name)
+            compile_directory + "/" + str(self.tex_file.parent.name),
         )
 
         try:
@@ -188,17 +188,17 @@ class TexFile(Loggable):
             pass
         except Exception as exc:
             self.logger.error(
-                texfile_error(f"{exc} occurred while creating {str(compilation_path)}.")
+                texfile_error(f"{exc} occurred while creating {str(compilation_path)}."),
             )
             pass
 
         tex_mf = self.__create_tex_mf(compilation_path)
 
         self.logger.debug(
-            f"TEXFILE: {str(self.tex_file)}, exists: {self.tex_file.exists()}"
+            f"TEXFILE: {str(self.tex_file)}, exists: {self.tex_file.exists()}",
         )
         self.logger.debug(
-            f"PATH: {str(compilation_path)}, exists: {compilation_path.exists()}"
+            f"PATH: {str(compilation_path)}, exists: {compilation_path.exists()}",
         )
 
         print(self.tex_file.name)
@@ -228,7 +228,7 @@ class TexFile(Loggable):
         # https://tex.stackexchange.com/questions/52988/avoid-linebreaks-in-latex-console-log-output-or-increase-columns-in-terminal
         # https://tex.stackexchange.com/questions/410592/texlive-personal-texmf-cnf
         text = "\n".join(
-            ["max_print_line=1000", "error_line=254", "half_error_line=238"]
+            ["max_print_line=1000", "error_line=254", "half_error_line=238"],
         )
         cnf_path = path / "texmf.cnf"
         Path(cnf_path).resolve().write_text(text)

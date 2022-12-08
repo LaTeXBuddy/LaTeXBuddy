@@ -34,13 +34,15 @@ def config_loader(script_dir, temp_dir):
     parser.add_argument("--output", type=str)
     parser.add_argument("--format", type=str)
 
-    return ConfigLoader(parser.parse_args(
-        [
-            "--config", script_dir + "/resources/nonexistent_config.py",
-            "--output", temp_dir,
-            "--format", "JSON",
-        ]
-    ))
+    return ConfigLoader(
+        parser.parse_args(
+            [
+                "--config", script_dir + "/resources/nonexistent_config.py",
+                "--output", temp_dir,
+                "--format", "JSON",
+            ],
+        ),
+    )
 
 
 class DriverModuleProvider(ModuleProvider):

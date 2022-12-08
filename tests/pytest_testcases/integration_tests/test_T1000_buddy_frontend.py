@@ -32,10 +32,14 @@ def config_loader(script_dir, temp_dir):
     parser.add_argument("--config", type=Path)
     parser.add_argument("--output", type=str)
 
-    return ConfigLoader(parser.parse_args(
-        ["--config", script_dir + "/resources/T1000_config.py",
-         "--output", temp_dir]
-    ))
+    return ConfigLoader(
+        parser.parse_args(
+            [
+                "--config", script_dir + "/resources/T1000_config.py",
+                "--output", temp_dir,
+            ],
+        ),
+    )
 
 
 @pytest.fixture
@@ -59,8 +63,8 @@ def problem_list(script_dir):
                 ProblemSeverity.WARNING,
                 description="Hi, I am a problem too...",
                 suggestions=["goijsfzchbsrlt"],
-            )
-        ], ["ldkjfnglsdbliv", "goijsfzchbsrlt"]
+            ),
+        ], ["ldkjfnglsdbliv", "goijsfzchbsrlt"],
     )
 
 

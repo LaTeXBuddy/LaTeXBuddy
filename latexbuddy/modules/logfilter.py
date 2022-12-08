@@ -14,7 +14,7 @@ from latexbuddy.texfile import TexFile
 
 
 line_re = re.compile(
-    r"(?P<severity>Warning|Error)\s(?P<file_path>.*)?\s?(?P<line_no>\d+):"
+    r"(?P<severity>Warning|Error)\s(?P<file_path>.*)?\s?(?P<line_no>\d+):",
 )
 
 
@@ -48,10 +48,10 @@ class LogFilter(Module):
             return []
 
         descriptor, raw_problems_path = mkstemp(
-            prefix="latexbuddy", suffix="raw_log_errors"
+            prefix="latexbuddy", suffix="raw_log_errors",
         )
         tools.execute(
-            "awk", "-f", str(self.texfilt_path), f"{log_path} > {raw_problems_path}"
+            "awk", "-f", str(self.texfilt_path), f"{log_path} > {raw_problems_path}",
         )
 
         raw_problems_path = Path(raw_problems_path)
@@ -89,7 +89,7 @@ class LogFilter(Module):
                     description=description,
                     category="latex",
                     key=self.display_name + "_" + severity,
-                )
+                ),
             )
 
         return problems

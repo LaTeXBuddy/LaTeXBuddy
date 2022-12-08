@@ -34,19 +34,19 @@ def test_unit_frontend_render_html(script_dir):
             category="spelling",
             suggestions=["lel", "lol", "lul"],
             key="aspell_check",
-        )
+        ),
     }
     path_list = [file_path]  # this is static!
     pdf_path = script_dir + "/resources/test_T2400_pdf.pdf"
 
     path = Path("test_T2400_output.html")
     path.write_text(
-        render_html(file_name, file_text, problems, path_list, pdf_path)
+        render_html(file_name, file_text, problems, path_list, pdf_path),
     )
 
 
 def generate_test_problem(
-    position: Tuple[int, int], length: int, description: str
+    position: Tuple[int, int], length: int, description: str,
 ) -> Problem:
 
     return Problem(
@@ -54,7 +54,7 @@ def generate_test_problem(
         generate_random_text(length),
         Aspell,
         Path("./"),
-        description=description
+        description=description,
     )
 
 
@@ -69,7 +69,7 @@ def generate_random_text(length: int) -> str:
 
 
 def parse_interval_list(
-    interval_data: Optional[List[Tuple[Tuple[int, int], int, str]]]
+    interval_data: Optional[List[Tuple[Tuple[int, int], int, str]]],
 ) -> Optional[List[Interval]]:
 
     if interval_data is None:
@@ -81,9 +81,9 @@ def parse_interval_list(
         result.append(
             Interval(
                 generate_test_problem(
-                    result_interval[0], result_interval[1], result_interval[2]
-                )
-            )
+                    result_interval[0], result_interval[1], result_interval[2],
+                ),
+            ),
         )
 
     return result
@@ -100,7 +100,7 @@ def interval_equals(first: Interval, second: Interval) -> bool:
 
 
 def interval_lists_equal(
-    first: Optional[List[Interval]], second: Optional[List[Interval]]
+    first: Optional[List[Interval]], second: Optional[List[Interval]],
 ) -> bool:
 
     if first is None or second is None:
@@ -132,7 +132,7 @@ def interval_lists_equal(
         ((0, 3), 5, "description_0"),
         ((1, 5), 6, "description_1"),
         ((42, 55), 15, "description_2"),
-    ]
+    ],
 )
 def test_interval_creation(position, length, description):
 
@@ -198,11 +198,11 @@ def test_interval_creation(position, length, description):
             ],
             None,
         ),
-    ]
+    ],
 )
 def test_interval_intersection(
     interval_data_in: List[Tuple[Tuple[int, int], int, str]],
-    result_interval_data: Optional[List[Tuple[Tuple[int, int], int, str]]]
+    result_interval_data: Optional[List[Tuple[Tuple[int, int], int, str]]],
 ):
 
     intervals_in = parse_interval_list(interval_data_in)

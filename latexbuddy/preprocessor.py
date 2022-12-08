@@ -149,7 +149,7 @@ class ModuleProblemFilter(ProblemFilter):
     """
 
     def __init__(
-        self, module_name: str, start_line: int, end_line: Optional[int] = None
+        self, module_name: str, start_line: int, end_line: Optional[int] = None,
     ):
         """
         Initializes a new ModuleProblemFilter with a string representation of a module
@@ -181,7 +181,7 @@ class SeverityProblemFilter(ProblemFilter):
     """
 
     def __init__(
-        self, severity: ProblemSeverity, start_line: int, end_line: Optional[int] = None
+        self, severity: ProblemSeverity, start_line: int, end_line: Optional[int] = None,
     ):
         """
         Initializes a new SeverityProblemFilter with a string representation of a
@@ -241,36 +241,36 @@ class Preprocessor(Loggable):
     """
 
     __COMMAND_PATTERN = re.compile(
-        r"%\s?buddy (ignore-next|begin-ignore|end-ignore)( (\S+))*"
+        r"%\s?buddy (ignore-next|begin-ignore|end-ignore)( (\S+))*",
     )
 
     __COMMAND_PATTERN_IGNORE_NEXT_ONE_LINE = re.compile(
-        r"%\s?buddy ignore-next(?:(?: 1)? line)?"
+        r"%\s?buddy ignore-next(?:(?: 1)? line)?",
     )
     __COMMAND_PATTERN_IGNORE_NEXT_N_LINES = re.compile(
-        r"%\s?buddy ignore-next (\d+) lines"
+        r"%\s?buddy ignore-next (\d+) lines",
     )
 
     __COMMAND_PATTERN_BEGIN_IGNORE_ANYTHING = re.compile(r"%\s?buddy begin-ignore")
     __COMMAND_PATTERN_BEGIN_IGNORE_MODULES = re.compile(
-        r"%\s?buddy begin-ignore (modules?)((?: \S+)+)"
+        r"%\s?buddy begin-ignore (modules?)((?: \S+)+)",
     )
     __COMMAND_PATTERN_BEGIN_IGNORE_SEVERITIES = re.compile(
-        r"%\s?buddy begin-ignore (?:severity|severities)((?: \S+)+)"
+        r"%\s?buddy begin-ignore (?:severity|severities)((?: \S+)+)",
     )
     __COMMAND_PATTERN_BEGIN_IGNORE_WL_KEYS = re.compile(
-        r"%\s?buddy begin-ignore (whitelist-keys?)((?: \S+)+)"
+        r"%\s?buddy begin-ignore (whitelist-keys?)((?: \S+)+)",
     )
 
     __COMMAND_PATTERN_END_IGNORE_ANYTHING = re.compile(r"%\s?buddy end-ignore")
     __COMMAND_PATTERN_END_IGNORE_MODULES = re.compile(
-        r"%\s?buddy end-ignore (modules?)((?: \S+)+)"
+        r"%\s?buddy end-ignore (modules?)((?: \S+)+)",
     )
     __COMMAND_PATTERN_END_IGNORE_SEVERITIES = re.compile(
-        r"%\s?buddy end-ignore (?:severity|severities)((?: \S+)+)"
+        r"%\s?buddy end-ignore (?:severity|severities)((?: \S+)+)",
     )
     __COMMAND_PATTERN_END_IGNORE_WL_KEYS = re.compile(
-        r"%\s?buddy end-ignore (whitelist-keys?)((?: \S+)+)"
+        r"%\s?buddy end-ignore (whitelist-keys?)((?: \S+)+)",
     )
 
     def __init__(self):
@@ -303,7 +303,7 @@ class Preprocessor(Loggable):
                 self.filters.append(resulting_filter)
 
     def __regex_parse_cmd_args_to_filter(
-        self, line: str, line_num: int
+        self, line: str, line_num: int,
     ) -> List[ProblemFilter]:
         """
         Parses a single preprocessor command resulting in a list of zero or more
@@ -337,12 +337,12 @@ class Preprocessor(Loggable):
 
         self.logger.warning(
             f"Invalid Syntax: Could not parse preprocessing command "
-            f"in line {line_num}: \n{line}"
+            f"in line {line_num}: \n{line}",
         )
         return []
 
     def __regex_match_command_pattern_ignore_next_one_line(
-        self, line: str, line_num: int
+        self, line: str, line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command matches the regex pattern
@@ -356,14 +356,14 @@ class Preprocessor(Loggable):
         match = Preprocessor.__COMMAND_PATTERN_IGNORE_NEXT_ONE_LINE.fullmatch(line)
         if match is not None:
             self.logger.debug(
-                f"Created LineProblemFilter from line {line_num + 1} to {line_num + 1}"
+                f"Created LineProblemFilter from line {line_num + 1} to {line_num + 1}",
             )
             return [LineProblemFilter(line_num + 1, line_num + 1)]
 
         return None
 
     def __regex_match_command_pattern_ignore_next_n_lines(
-        self, line: str, line_num: int
+        self, line: str, line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command matches the regex pattern
@@ -380,14 +380,14 @@ class Preprocessor(Loggable):
         if match is not None:
             n = int(match.group(1))
             self.logger.debug(
-                f"Created LineProblemFilter from line {line_num + 1} to {line_num + n}"
+                f"Created LineProblemFilter from line {line_num + 1} to {line_num + n}",
             )
             return [LineProblemFilter(line_num + 1, line_num + n)]
 
         return None
 
     def __regex_match_command_pattern_begin_ignore_anything(
-        self, line: str, line_num: int
+        self, line: str, line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command matches the regex pattern
@@ -405,20 +405,20 @@ class Preprocessor(Loggable):
 
             if open_ended_filter is not None:
                 self.logger.info(
-                    f"Ignored duplicate command 'begin-ignore' in line {line_num}"
+                    f"Ignored duplicate command 'begin-ignore' in line {line_num}",
                 )
                 return []
             else:
                 self.logger.debug(
                     f"Created open-ended LineProblemFilter "
-                    f"beginning in line {line_num + 1}"
+                    f"beginning in line {line_num + 1}",
                 )
                 return [LineProblemFilter(line_num + 1)]
 
         return None
 
     def __regex_match_command_pattern_begin_ignore_modules(
-        self, line: str, line_num: int
+        self, line: str, line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command matches the regex pattern
@@ -439,18 +439,18 @@ class Preprocessor(Loggable):
             for module in modules:
 
                 open_ended_filter = self.__get_open_ended_filter(
-                    ModuleProblemFilter(module, 0)
+                    ModuleProblemFilter(module, 0),
                 )
 
                 if open_ended_filter is not None:
                     self.logger.info(
                         f"Ignored duplicate command 'begin-ignore' "
-                        f"for module '{module}' in line {line_num}"
+                        f"for module '{module}' in line {line_num}",
                     )
                 else:
                     self.logger.debug(
                         f"Created open-ended ModuleProblemFilter "
-                        f"for module '{module}' beginning in line {line_num + 1}"
+                        f"for module '{module}' beginning in line {line_num + 1}",
                     )
                     filters.append(ModuleProblemFilter(module, line_num + 1))
 
@@ -459,7 +459,7 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_begin_ignore_severities(
-        self, line: str, line_num: int
+        self, line: str, line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command matches the regex pattern
@@ -483,26 +483,26 @@ class Preprocessor(Loggable):
                     enum_severity = ProblemSeverity[severity.upper()]
 
                     open_ended_filter = self.__get_open_ended_filter(
-                        SeverityProblemFilter(enum_severity, 0)
+                        SeverityProblemFilter(enum_severity, 0),
                     )
 
                     if open_ended_filter is not None:
                         self.logger.info(
                             f"Ignored duplicate command 'begin-ignore' "
-                            f"for severity '{severity}' in line {line_num}"
+                            f"for severity '{severity}' in line {line_num}",
                         )
                     else:
                         self.logger.debug(
                             f"Created open-ended ModuleProblemFilter for severity "
-                            f"'{str(enum_severity)}' beginning in line {line_num + 1}"
+                            f"'{str(enum_severity)}' beginning in line {line_num + 1}",
                         )
                         filters.append(
-                            SeverityProblemFilter(enum_severity, line_num + 1)
+                            SeverityProblemFilter(enum_severity, line_num + 1),
                         )
                 except KeyError:
                     self.logger.warning(
                         f"Invalid syntax: Unknown ProblemSeverity '{severity}' "
-                        f"in line {line_num}"
+                        f"in line {line_num}",
                     )
 
             return filters
@@ -510,7 +510,7 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_begin_ignore_wl_keys(
-        self, line: str, line_num: int
+        self, line: str, line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command matches the regex pattern
@@ -531,18 +531,18 @@ class Preprocessor(Loggable):
             for key in keys:
 
                 open_ended_filter = self.__get_open_ended_filter(
-                    WhitelistKeyProblemFilter(key, 0)
+                    WhitelistKeyProblemFilter(key, 0),
                 )
 
                 if open_ended_filter is not None:
                     self.logger.info(
                         f"Ignored duplicate command 'begin-ignore' "
-                        f"for whitelist-key '{key}' in line {line_num}"
+                        f"for whitelist-key '{key}' in line {line_num}",
                     )
                 else:
                     self.logger.debug(
                         f"Created open-ended WhitelistKeyProblemFilter "
-                        f"for whitelist-key '{key}' beginning in line {line_num + 1}"
+                        f"for whitelist-key '{key}' beginning in line {line_num + 1}",
                     )
                     filters.append(WhitelistKeyProblemFilter(key, line_num + 1))
 
@@ -551,7 +551,7 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_end_ignore_anything(
-        self, line: str, line_num: int
+        self, line: str, line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command (line) matches the regex pattern
@@ -569,11 +569,11 @@ class Preprocessor(Loggable):
 
             if open_ended_filter is None:
                 self.logger.info(
-                    f"Ignored duplicate command 'end-ignore' in line {line_num}"
+                    f"Ignored duplicate command 'end-ignore' in line {line_num}",
                 )
             else:
                 self.logger.debug(
-                    f"Ended existing open-ended LineProblemFilter in line {line_num}"
+                    f"Ended existing open-ended LineProblemFilter in line {line_num}",
                 )
                 open_ended_filter.end(line_num)
 
@@ -582,7 +582,7 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_end_ignore_modules(
-        self, line: str, line_num: int
+        self, line: str, line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command (line) matches the regex pattern
@@ -600,18 +600,18 @@ class Preprocessor(Loggable):
             for module in modules:
 
                 open_ended_filter = self.__get_open_ended_filter(
-                    ModuleProblemFilter(module, 0)
+                    ModuleProblemFilter(module, 0),
                 )
 
                 if open_ended_filter is None:
                     self.logger.info(
                         f"Ignored duplicate command 'end-ignore' for module '{module}' "
-                        f"in line {line_num}"
+                        f"in line {line_num}",
                     )
                 else:
                     self.logger.debug(
                         f"Ended existing open-ended ModuleProblemFilter "
-                        f"for module '{module}' in line {line_num + 1}"
+                        f"for module '{module}' in line {line_num + 1}",
                     )
                     open_ended_filter.end(line_num)
 
@@ -620,7 +620,7 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_end_ignore_severities(
-        self, line: str, line_num: int
+        self, line: str, line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command (line) matches the regex pattern
@@ -641,24 +641,24 @@ class Preprocessor(Loggable):
                     enum_severity = ProblemSeverity[severity.upper()]
 
                     open_ended_filter = self.__get_open_ended_filter(
-                        SeverityProblemFilter(enum_severity, 0)
+                        SeverityProblemFilter(enum_severity, 0),
                     )
 
                     if open_ended_filter is None:
                         self.logger.info(
                             f"Ignored duplicate command 'end-ignore' "
-                            f"for severity '{severity}' in line {line_num}"
+                            f"for severity '{severity}' in line {line_num}",
                         )
                     else:
                         self.logger.debug(
                             f"Ended existing open-ended SeverityProblemFilter for "
-                            f"severity '{str(enum_severity)}' in line {line_num + 1}"
+                            f"severity '{str(enum_severity)}' in line {line_num + 1}",
                         )
                         open_ended_filter.end(line_num)
                 except KeyError:
                     self.logger.warning(
                         f"Invalid syntax: Unknown ProblemSeverity '{severity}' "
-                        f"in line {line_num}"
+                        f"in line {line_num}",
                     )
 
             return []
@@ -666,7 +666,7 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_end_ignore_wl_keys(
-        self, line: str, line_num: int
+        self, line: str, line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command (line) matches the regex pattern
@@ -684,18 +684,18 @@ class Preprocessor(Loggable):
             for key in keys:
 
                 open_ended_filter = self.__get_open_ended_filter(
-                    WhitelistKeyProblemFilter(key, 0)
+                    WhitelistKeyProblemFilter(key, 0),
                 )
 
                 if open_ended_filter is None:
                     self.logger.info(
                         f"Ignored duplicate command 'end-ignore' "
-                        f"for whitelist-key '{key}' in line {line_num}"
+                        f"for whitelist-key '{key}' in line {line_num}",
                     )
                 else:
                     self.logger.debug(
                         f"Ended existing open-ended WhitelistKeyProblemFilter "
-                        f"for whitelist-key '{key}' in line {line_num + 1}"
+                        f"for whitelist-key '{key}' in line {line_num + 1}",
                     )
                     open_ended_filter.end(line_num)
 
@@ -704,7 +704,7 @@ class Preprocessor(Loggable):
         return None
 
     def __get_open_ended_filter(
-        self, reference_filter: ProblemFilter
+        self, reference_filter: ProblemFilter,
     ) -> Optional[ProblemFilter]:
         """
         Searches for any open-ended (no end set) ProblemFilter matching

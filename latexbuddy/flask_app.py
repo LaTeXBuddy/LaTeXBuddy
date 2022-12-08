@@ -171,7 +171,7 @@ def document_check():
 def check_result(result_id):
 
     result_path = Path(
-        os.path.join(app.config["RESULTS_FOLDER"], secure_filename(result_id))
+        os.path.join(app.config["RESULTS_FOLDER"], secure_filename(result_id)),
     )
 
     if not result_path.exists():
@@ -189,7 +189,7 @@ def check_result(result_id):
 def display_result(result_id, file_name):
 
     result_path = Path(
-        os.path.join(app.config["RESULTS_FOLDER"], secure_filename(result_id))
+        os.path.join(app.config["RESULTS_FOLDER"], secure_filename(result_id)),
     )
 
     if not result_path.exists():
@@ -211,7 +211,7 @@ def compiled_pdf(result_id_0, result_id_1, pdf_name):
         abort(404)
 
     pdf_dir = os.path.join(
-        app.config["RESULTS_FOLDER"], result_id, "compiled", result_id
+        app.config["RESULTS_FOLDER"], result_id, "compiled", result_id,
     )
 
     if not Path(pdf_dir + "/" + pdf_name).exists():
@@ -275,7 +275,7 @@ def run_buddy(file_path: Path, output_dir: Path, path_list: List[Path]):
     )
 
     config_loader = FlaskConfigLoader(
-        output_dir, language, module_selector_mode, module_selection, whitelist_id
+        output_dir, language, module_selector_mode, module_selection, whitelist_id,
     )
 
     LatexBuddy.init(
@@ -283,9 +283,9 @@ def run_buddy(file_path: Path, output_dir: Path, path_list: List[Path]):
         ModuleLoader(
             Path(
                 config_loader.get_config_option_or_default(
-                    LatexBuddy, "module_dir", "modules/"
-                )
-            )
+                    LatexBuddy, "module_dir", "modules/",
+                ),
+            ),
         ),
         file_path,
         path_list,

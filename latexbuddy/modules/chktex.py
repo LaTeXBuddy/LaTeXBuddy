@@ -32,14 +32,14 @@ class Chktex(Module):
 
         format_str = (
             self.DELIMITER.join(
-                ["%f", "%l", "%c", "%d", "%n", "%s", "%m", "%k", "%r", "%t"]
+                ["%f", "%l", "%c", "%d", "%n", "%s", "%m", "%k", "%r", "%t"],
             )
             + "\n\n"
         )
 
         file_path = str(file.tex_file)
         command_output = tools.execute(
-            "chktex", "-f", f"'{format_str}'", "-q", file_path
+            "chktex", "-f", f"'{format_str}'", "-q", file_path,
         )
         out_split = command_output.split("\n")
 
@@ -91,7 +91,7 @@ class Chktex(Module):
                     description=description,
                     key=key,
                     context=(out_split[8], out_split[9]),
-                )
+                ),
             )
 
         return problems

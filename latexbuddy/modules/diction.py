@@ -48,7 +48,7 @@ class Diction(Module):
 
         # execute diction and collect output
         errors = tools.execute(
-            f"diction --suggest --language {self.language} {str(cleaned_file)}"
+            f"diction --suggest --language {self.language} {str(cleaned_file)}",
         )
 
         # remove unnecessary information and split lines
@@ -66,14 +66,14 @@ class Diction(Module):
         os.remove(cleaned_file)
 
         result = self.format_errors(
-            cleaned_errors, original_lines, file.plain_file, file
+            cleaned_errors, original_lines, file.plain_file, file,
         )
 
         # return list of Problems
         return result
 
     def format_errors(
-        self, out: List[str], original: List[str], file, texfile
+        self, out: List[str], original: List[str], file, texfile,
     ) -> List[Problem]:
         """Parses diction errors and returns list of Problems.
 
@@ -136,7 +136,7 @@ class Diction(Module):
                         else:
                             o_line = o_line + original[x - 1]
                 location = texfile.get_position_in_tex_from_linecol(
-                    start_line, start_char
+                    start_line, start_char,
                 )
 
             problems.append(
@@ -150,7 +150,7 @@ class Diction(Module):
                     category="grammar",
                     suggestions=[sugg],
                     key=self.display_name + "_" + str(hashlib.md5(o_line.encode())),
-                )
+                ),
             )
 
         return problems

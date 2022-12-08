@@ -42,13 +42,13 @@ class ConfigLoader(Loggable):
 
         if cli_arguments is None:
             self.logger.debug(
-                "No CLI arguments specified. Default values will be used."
+                "No CLI arguments specified. Default values will be used.",
             )
             return
 
         if not cli_arguments.config:
             self.logger.warning(
-                "No configuration file specified. Default values will be used."
+                "No configuration file specified. Default values will be used.",
             )
             return
 
@@ -57,13 +57,13 @@ class ConfigLoader(Loggable):
         else:
             self.logger.warning(
                 f"File not found: {cli_arguments.config}. "
-                f"Default configuration values will be used."
+                f"Default configuration values will be used.",
             )
 
         self.main_flags, self.module_flags = self.__parse_flags(cli_arguments)
 
     def __parse_flags(
-        self, args: Namespace
+        self, args: Namespace,
     ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
         """
         This private helper-function parses commandline arguments into two dictionaries:
@@ -83,13 +83,13 @@ class ConfigLoader(Loggable):
 
         self.logger.debug(
             f"Parsed CLI config options (main):\n{str(parsed_main)}\n\n"
-            f"Parsed CLI config options (modules):\n{str(parsed_modules)}"
+            f"Parsed CLI config options (modules):\n{str(parsed_modules)}",
         )
 
         return parsed_main, parsed_modules
 
     def __parse_args_dict(
-        self, args_dict: Dict[str, Any]
+        self, args_dict: Dict[str, Any],
     ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
         """
         This private helper function parses the preprocessed args_dict (without
@@ -119,7 +119,7 @@ class ConfigLoader(Loggable):
             if key in flag_function_map:
 
                 parsed_main, parsed_modules = flag_function_map[key](
-                    args_dict[key], parsed_main, parsed_modules
+                    args_dict[key], parsed_main, parsed_modules,
                 )
 
             else:
@@ -201,7 +201,7 @@ class ConfigLoader(Loggable):
             self.logger.warning(
                 f"Specified language '{flag_value}' is not a valid "
                 f"language key. Please use a key in the following syntax: "
-                f"<language>[-<country>] (e.g.: en-GB, en_US, de-DE)"
+                f"<language>[-<country>] (e.g.: en-GB, en_US, de-DE)",
             )
 
         return parsed_main, parsed_modules
@@ -275,7 +275,7 @@ class ConfigLoader(Loggable):
 
             if key not in config_dict:
                 raise ConfigOptionNotFoundError(
-                    f"Module: {module_name}, key: {key} " f"({error_indicator})"
+                    f"Module: {module_name}, key: {key} " f"({error_indicator})",
                 )
 
             entry = config_dict[key]
@@ -286,7 +286,7 @@ class ConfigLoader(Loggable):
 
             if module_name not in config_dict or key not in config_dict[module_name]:
                 raise ConfigOptionNotFoundError(
-                    f"Module: {module_name}, key: {key} ({error_indicator})"
+                    f"Module: {module_name}, key: {key} ({error_indicator})",
                 )
 
             entry = config_dict[module_name][key]
@@ -317,12 +317,12 @@ class ConfigLoader(Loggable):
 
             raise ConfigOptionVerificationError(
                 f"config entry '{key}' for module '{module_name}' is of "
-                f"type '{str(type(entry))}' (expected '{str(verify_type)}')"
+                f"type '{str(type(entry))}' (expected '{str(verify_type)}')",
             )
 
     @staticmethod
     def __verify_regex(
-        entry: Any, verify_regex: Optional[str], key: str, module_name: str
+        entry: Any, verify_regex: Optional[str], key: str, module_name: str,
     ):
         # TODO: Documentation
 
@@ -335,7 +335,7 @@ class ConfigLoader(Loggable):
             raise ConfigOptionVerificationError(
                 f"config entry '{key}' for module '{module_name}' does not match "
                 f"the provided regular expression: entry: '{entry}', "
-                f"regex: '{verify_regex}'"
+                f"regex: '{verify_regex}'",
             )
 
     @staticmethod
@@ -354,7 +354,7 @@ class ConfigLoader(Loggable):
             raise ConfigOptionVerificationError(
                 f"value '{str(entry)}' of config entry '{key}' for "
                 f"module '{module_name}' is not contained in the specified list of "
-                f"valid values: {str(verify_choices)}"
+                f"valid values: {str(verify_choices)}",
             )
 
     # TODO: resolve circular import error between config_loader.py and
@@ -494,7 +494,7 @@ class ConfigLoader(Loggable):
         except ConfigOptionNotFoundError:
             self.logger.info(
                 f"Config entry '{key}' for module '{module.display_name}' not found. "
-                f"Using default value '{str(default_value)}' instead..."
+                f"Using default value '{str(default_value)}' instead...",
             )
 
             return default_value
@@ -502,7 +502,7 @@ class ConfigLoader(Loggable):
         except ConfigOptionVerificationError as e:
             self.logger.warning(
                 f"Config entry invalid. Using default value '{str(default_value)}' "
-                f"instead. Details: {str(e)}"
+                f"instead. Details: {str(e)}",
             )
 
             return default_value
