@@ -29,14 +29,16 @@ Unidecode = "^1.2.0"
 colorama = "^0.4.6"
 double-stream-handler = "^1.0.0"
 pydantic = "^1.10.2"
-pytest = "^7.2.0"
 bibtexparser = "^1.4.0"
 Flask = "^2.0.1"
 PyLaTeX = "^1.4.1"
 
-[tool.poetry.dev-dependencies]
+
+[tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
 isort = "^5.10.1"
+pytest = "^7.2.0"
+
 
 [tool.poetry.scripts]
 latexbuddy = "latexbuddy.cli:main"
