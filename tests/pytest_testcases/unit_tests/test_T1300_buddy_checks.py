@@ -68,7 +68,7 @@ def test_unit_buddy_checks(script_dir, config_loader):
 
     temp_dir = config_loader.get_config_option(LatexBuddy, "output")
 
-    with open(temp_dir + "/latexbuddy_output.json", "r") as f:
+    with open(temp_dir + "/latexbuddy_output.json") as f:
         json_contents = f.read()
 
     assert "\n" + json_contents + "\n" == """

@@ -76,7 +76,7 @@ def init_buddy(scd, cl):
 
 
 def write_original_to_temp_wl(script_dir: str) -> str:
-    wl = open(script_dir + "/resources/T1200_whitelist", "r")
+    wl = open(script_dir + "/resources/T1200_whitelist")
     original_content = wl.readlines()
     wl.close()
 
@@ -150,7 +150,7 @@ def test_unit_buddy_whitelist_add_successful(script_dir, config_loader_temp_wl):
     LatexBuddy.add_to_whitelist(uid)
     assert len(LatexBuddy.instance.errors) == 0
 
-    with open(script_dir + "/resources/T1200_whitelist_temp", "r") as f:
+    with open(script_dir + "/resources/T1200_whitelist_temp") as f:
         modified_content = f.readlines()
 
     assert len(original_content) + 1 == len(modified_content)
@@ -184,7 +184,7 @@ def test_unit_buddy_whitelist_add_unsuccessful(script_dir, config_loader_temp_wl
 
     LatexBuddy.add_to_whitelist(uid + "nonexistent")
 
-    with open(script_dir + "/resources/T1200_whitelist_temp", "r") as f:
+    with open(script_dir + "/resources/T1200_whitelist_temp") as f:
         modified_content = f.readlines()
 
     assert len(original_content) == len(modified_content)

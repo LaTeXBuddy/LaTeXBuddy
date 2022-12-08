@@ -197,7 +197,7 @@ def display_result(result_id, file_name):
 
     file_path = Path(os.path.join(str(result_path), secure_filename(file_name)))
 
-    with open(file_path, "r") as f:
+    with open(file_path) as f:
         file_contents = f.read()
 
     return file_contents
