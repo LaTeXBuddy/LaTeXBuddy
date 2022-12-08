@@ -2,14 +2,24 @@ image: python:latest
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pypoetry"
+  PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
   SRC_DIR: "$CI_PROJECT_DIR/latexbuddy"
+  XDG_CACHE_HOME: "$CI_PROJECT_DIR/.cache"
 
 cache:
-  paths:
-    - .cache/pip
-
-before_script:
-  - python --version
+  - key:
+      files:
+        - pyproject.toml
+        - poetry.lock
+    paths:
+      - ${PIP_CACHE_DIR}
+      - ${POETRY_CACHE_DIR}
+  - key:
+      files:
+        - .pre-commit-config.yaml
+    paths:
+      - ${PRE_COMMIT_HOME}
 
 stages:
   - Lint
@@ -19,16 +29,12 @@ stages:
 
 .pre-commit: &pre-commit-base
   stage: Lint
-  variables:
-    PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
-  cache:
-    paths:
-      - "$PRE_COMMIT_HOME"
+  before_script:
+    - pip install pre-commit
 
 pre-commit-on-merge:
   <<: *pre-commit-base
   script:
-    - pip install pre-commit
     - pre-commit run --from-ref "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" --to-ref "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
   only:
     - merge_requests
@@ -36,7 +42,6 @@ pre-commit-on-merge:
 pre-commit-all-files:
   <<: *pre-commit-base
   script:
-    - pip install pre-commit
     - pre-commit run --all-files
   only:
     - master
@@ -45,8 +50,8 @@ pre-commit-all-files:
   stage: Smoke Test
   before_script:
     - pip install poetry
-  script:
     - poetry install
+  script:
     - poetry run latexbuddy --help
   only:
     - master
@@ -64,8 +69,8 @@ build:
   stage: Build
   before_script:
     - pip install poetry
-  script:
     - poetry install
+  script:
     - poetry build
   artifacts:
     public: false
