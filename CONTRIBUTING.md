@@ -1,31 +1,26 @@
-LaTeXBuddy / Contributing
-=========================
+# LaTeXBuddy / Contributing
 
 This file contains a short guide that will get you started with _LaTeXBuddy_
 development. For more information please consult the [wiki].
 
-
-Prerequisities
---------------
+## Prerequisities
 
 _LaTeXBuddy_ is a Python-based application.
 
-* **Required** for development
-  * [Python] version 3.7 or newer. It is recommended, that the newest version is
-    used for development. At the time of writing it is `3.11.1`
-  * [Poetry] is used for dependency management and building. You can install it
-    using any method you like. Use the latest version
-* **Needed for modules to work**
-  * [chktex]
-  * [languagetool]
+-   **Required** for development
+    -   [Python] version 3.7 or newer. It is recommended, that the newest version is
+        used for development. At the time of writing it is `3.11.1`
+    -   [Poetry] is used for dependency management and building. You can install it
+        using any method you like. Use the latest version
+-   **Needed for modules to work**
+    -   [chktex]
+    -   [languagetool]
 
-It is recommended that you use a *nix-based OS for development (like GNU/Linux
+It is recommended that you use a \*nix-based OS for development (like GNU/Linux
 or macOS). We do not guarantee complete tech support for developers running
 Windows.
 
-
-Preparation
------------
+## Preparation
 
 After you've installed the prerequisities and cloned the repo, it is time to
 prepare it for work.
@@ -52,14 +47,13 @@ packages available in your terminal. Note that you'll need to do this every time
 you open a new terminal window.
 
 > #### Helpful!
+>
 > If you use VSCode or PyCharm with Poetry plugin, every in-IDE terminal window
 > will activate the environment automatically
 
 To deactivate the shell, simply type `deactivate` and hit Enter.
 
-
-Building
---------
+## Building
 
 To build the package, run
 
@@ -70,9 +64,7 @@ script/build
 This will create the `dist/` directory and generate the .tar.gz and .whl files,
 which can be used to install the package
 
-
-Developing
-----------
+## Developing
 
 If you want to implement a feature or fix a bug, create a separate branch. The
 branch name should be a very short explanation of what you want to do, written
@@ -111,8 +103,7 @@ it. Provide additional description, when needed. Now, just wait for a review!
 **Don't** use one branch for fixing multiple, not related features. **Don't**
 ping reviewers endlessly. **Don't** push directly to master.
 
-Installing from wheel
----------------------
+## Installing from wheel
 
 If you want to poke around your app, and you have the environment activated, you
 can simply run `latexbuddy` in your terminal. If, however, you want to test the
@@ -133,17 +124,15 @@ uninstall it, run
 pip uninstall latexbuddy
 ```
 
-Further reading
----------------
+## Further reading
 
 In project's [wiki] there is a lot more information about using our GitLab repo,
 creating issues and merge requests, CI and CD as well as many other topics, well
 organized and structured. If you don't find something you're looking for, create
 an issue, and we'll look into it!
 
-
 [chktex]: https://www.nongnu.org/chktex/
 [languagetool]: https://github.com/languagetool-org/languagetool
-[Poetry]: https://python-poetry.org/
-[Python]: https://www.python.org/
+[poetry]: https://python-poetry.org/
+[python]: https://www.python.org/
 [wiki]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/wikis/Development%20Guide

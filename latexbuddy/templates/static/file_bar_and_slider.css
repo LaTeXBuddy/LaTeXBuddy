@@ -14,69 +14,68 @@
 
 /* Slider-ForPDF-Switch */
 .switch {
-  position: relative;
-  display: inline-block;
-  width: 100px;
-  height: 36px;
+    position: relative;
+    display: inline-block;
+    width: 100px;
+    height: 36px;
 }
 
 .switch input {
-    display:none;
+    display: none;
 }
 
 .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  -webkit-transition: .4s;
-  transition: .4s;
-  border: 2px solid silver;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border: 2px solid silver;
 }
 
 .slider:before {
-  position: absolute;
-  content: "";
-  height: 24px;
-  width: 24px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  border: 5px solid silver;
-  -webkit-transition: .4s;
-  transition: .4s;
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border: 5px solid silver;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
 }
 
 input:checked + .slider {
-  border: 2px solid #009694;
+    border: 2px solid #009694;
 }
 
 input:checked + .slider:before {
-  border: 5px solid #009694;
+    border: 5px solid #009694;
 }
 
 input:checked + .slider:before {
-  -webkit-transform: translateX(65px);
-  -ms-transform: translateX(65px);
-  transform: translateX(65px);
+    -webkit-transform: translateX(65px);
+    -ms-transform: translateX(65px);
+    transform: translateX(65px);
 }
 
-.on
-{
-  display: none;
+.on {
+    display: none;
 }
 
-.on, .off
-{
-  color: black;
-  position: absolute;
-  transform: translate(-50%,-50%);
-  top: 50%;
-  left: 70%;
-  font-size: 10px;
-  font-family: Verdana, sans-serif;
+.on,
+.off {
+    color: black;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 70%;
+    font-size: 10px;
+    font-family: Verdana, sans-serif;
 }
 
 input:checked + .slider .on {
@@ -89,11 +88,11 @@ input:checked + .slider .off {
 }
 
 .slider.round {
-  border-radius: 34px;
+    border-radius: 34px;
 }
 
 .slider.round:before {
-  border-radius: 50%;
+    border-radius: 50%;
 }
 
 .sliderholder {
