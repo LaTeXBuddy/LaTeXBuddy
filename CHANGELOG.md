@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### BREAKING CHANGES
+- minimal Python version set to 3.7 (!168)
+
 ### Added
 - line numbers (!135)
 - new test cases for multiple occurrences of own_checkers problems (!110)

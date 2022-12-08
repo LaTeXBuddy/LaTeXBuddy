@@ -11,8 +11,8 @@ Prerequisities
 _LaTeXBuddy_ is a Python-based application.
 
 * **Required** for development
-  * [Python] version 3.6 or newer. It is recommended, that the newest version is
-    used for development. At the time of writing it is `3.9.4`
+  * [Python] version 3.7 or newer. It is recommended, that the newest version is
+    used for development. At the time of writing it is `3.11.1`
   * [Poetry] is used for dependency management and building. You can install it
     using any method you like. Use the latest version
 * **Needed for modules to work**
