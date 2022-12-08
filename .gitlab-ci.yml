@@ -46,13 +46,13 @@ black:
     - master
     - merge_requests
 
-smoke-py36:
+smoke-py37:
   <<: *smoke_base
-  image: python:3.6
+  image: python:3.7
 
-smoke-py39:
+smoke-py311:
   <<: *smoke_base
-  image: python:3.9
+  image: python:3.11
 
 build:
   stage: Build
