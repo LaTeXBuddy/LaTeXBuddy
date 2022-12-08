@@ -193,7 +193,7 @@ class TexFile(Loggable):
         except Exception as exc:
             self.logger.error(
                 texfile_error(
-                    f"{exc} occurred while creating {str(compilation_path)}."
+                    f"{exc} occurred while creating {str(compilation_path)}.",
                 ),
             )
             pass

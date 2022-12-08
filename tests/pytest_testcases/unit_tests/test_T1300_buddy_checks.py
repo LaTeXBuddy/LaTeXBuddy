@@ -122,6 +122,7 @@ def test_unit_buddy_checks(script_dir, config_loader):
     }
 ]
 """.replace(
-            "{file_str}", file_str
+            "{file_str}",
+            file_str,
         )
     )
