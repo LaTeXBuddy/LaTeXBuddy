@@ -116,7 +116,9 @@ class NewerPublications(Module):
 
                 # Check if the title is somewhat similar to the one from BibTeX
                 sim = SequenceMatcher(
-                    None, title.upper(), publication[0].upper(),
+                    None,
+                    title.upper(),
+                    publication[0].upper(),
                 ).ratio()
                 if sim < 0.85:
                     continue
@@ -216,7 +218,9 @@ class BibtexDuplicates(Module):
         total_ratio = 0
         for key in same_keys:
             total_ratio += SequenceMatcher(
-                None, self.clean_str(entry_1[key]), self.clean_str(entry_2[key]),
+                None,
+                self.clean_str(entry_1[key]),
+                self.clean_str(entry_2[key]),
             ).ratio()
         ratio = total_ratio / len(same_keys)
         if ratio > 0.85:

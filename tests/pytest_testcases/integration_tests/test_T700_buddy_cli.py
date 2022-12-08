@@ -23,9 +23,12 @@ def test_integration_buddy_cli(script_dir):
     cmd = [
         "latexbuddy",
         "--verbose",
-        "--config", config_path,
-        "--whitelist", whitelist_path,
-        "--output", output_path,
+        "--config",
+        config_path,
+        "--whitelist",
+        whitelist_path,
+        "--output",
+        output_path,
         document_path,
     ]
     result = execute_and_collect(*cmd)

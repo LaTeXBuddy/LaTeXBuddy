@@ -27,7 +27,9 @@ def test_unit_languagetool_run_checks(script_dir):
     output_problems = languagetool_instance.run_checks(DriverCL(), test_file)
 
     assert len(output_problems) == _ERROR_COUNT
-    assert str(output_problems[0]) == "Grammar error on 15:43:   : Whitespace " \
-                                      "repetition (bad formatting)."
-    assert str(output_problems[1]) == "Grammar error on 19:276: \": Smart quotes (“”)."
-    assert str(output_problems[2]) == "Grammar error on 19:286: \": Smart quotes (“”)."
+    assert (
+        str(output_problems[0]) == "Grammar error on 15:43:   : Whitespace "
+        "repetition (bad formatting)."
+    )
+    assert str(output_problems[1]) == 'Grammar error on 19:276: ": Smart quotes (“”).'
+    assert str(output_problems[2]) == 'Grammar error on 19:286: ": Smart quotes (“”).'

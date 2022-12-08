@@ -39,7 +39,11 @@ class Chktex(Module):
 
         file_path = str(file.tex_file)
         command_output = tools.execute(
-            "chktex", "-f", f"'{format_str}'", "-q", file_path,
+            "chktex",
+            "-f",
+            f"'{format_str}'",
+            "-q",
+            file_path,
         )
         out_split = command_output.split("\n")
 

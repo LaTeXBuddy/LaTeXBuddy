@@ -26,13 +26,15 @@ def test_unit_logfilter_all_problems_in_texfilt(script_dir):
     config_loader = ConfigLoader()
     tex_file = TexFile(document_path)
     descriptor, raw_problems_path = mkstemp(
-        prefix="latexbuddy", suffix="raw_log_errors",
+        prefix="latexbuddy",
+        suffix="raw_log_errors",
     )
 
     problems = log_filter.run_checks(config_loader, tex_file)
 
     cmd = [
-        "awk", "-f",
+        "awk",
+        "-f",
         texfilt_path,
         f"{str(tex_file.log_file)} > {raw_problems_path}",
     ]
@@ -54,7 +56,8 @@ def test_unit_logfilter_all_texfilt_in_problems(script_dir):
     config_loader = ConfigLoader()
     tex_file = TexFile(document_path)
     descriptor, raw_problems_path = mkstemp(
-        prefix="latexbuddy", suffix="raw_log_errors",
+        prefix="latexbuddy",
+        suffix="raw_log_errors",
     )
 
     problems = log_filter.run_checks(config_loader, tex_file)
@@ -63,13 +66,14 @@ def test_unit_logfilter_all_texfilt_in_problems(script_dir):
         problem_line_nos.append(problem.position[0])
 
     cmd = [
-        "awk", "-f",
+        "awk",
+        "-f",
         texfilt_path,
         f"{str(tex_file.log_file)} > {raw_problems_path}",
     ]
     execute_and_collect(*cmd)  # output not used
     raw_problems = Path(raw_problems_path).read_text()
-    texfilt_problems_split = raw_problems.split(' ')
+    texfilt_problems_split = raw_problems.split(" ")
     problem_re = re.compile(
         r"(?P<line_no>\d+):",
     )
@@ -79,6 +83,6 @@ def test_unit_logfilter_all_texfilt_in_problems(script_dir):
         match = problem_re.match(problem)
         if not match:
             continue
-        line_no = match.group('line_no')
+        line_no = match.group("line_no")
         test = test and line_no in problem_line_nos
     assert test

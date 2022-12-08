@@ -34,8 +34,10 @@ def config_loader(script_dir, temp_dir):
     return ConfigLoader(
         parser.parse_args(
             [
-                "--config", script_dir + "/resources/T1200_config.py",
-                "--output", temp_dir,
+                "--config",
+                script_dir + "/resources/T1200_config.py",
+                "--output",
+                temp_dir,
             ],
         ),
     )
@@ -50,15 +52,16 @@ def config_loader_temp_wl(script_dir, temp_dir):
     return ConfigLoader(
         parser.parse_args(
             [
-                "--config", script_dir + "/resources/T1200_config_temp_wl.py",
-                "--output", temp_dir,
+                "--config",
+                script_dir + "/resources/T1200_config_temp_wl.py",
+                "--output",
+                temp_dir,
             ],
         ),
     )
 
 
 class DummyModuleProvider(ModuleProvider):
-
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
         return []
 

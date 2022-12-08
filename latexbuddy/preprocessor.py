@@ -149,7 +149,10 @@ class ModuleProblemFilter(ProblemFilter):
     """
 
     def __init__(
-        self, module_name: str, start_line: int, end_line: Optional[int] = None,
+        self,
+        module_name: str,
+        start_line: int,
+        end_line: Optional[int] = None,
     ):
         """
         Initializes a new ModuleProblemFilter with a string representation of a module
@@ -181,7 +184,10 @@ class SeverityProblemFilter(ProblemFilter):
     """
 
     def __init__(
-        self, severity: ProblemSeverity, start_line: int, end_line: Optional[int] = None,
+        self,
+        severity: ProblemSeverity,
+        start_line: int,
+        end_line: Optional[int] = None,
     ):
         """
         Initializes a new SeverityProblemFilter with a string representation of a
@@ -303,7 +309,9 @@ class Preprocessor(Loggable):
                 self.filters.append(resulting_filter)
 
     def __regex_parse_cmd_args_to_filter(
-        self, line: str, line_num: int,
+        self,
+        line: str,
+        line_num: int,
     ) -> List[ProblemFilter]:
         """
         Parses a single preprocessor command resulting in a list of zero or more
@@ -342,7 +350,9 @@ class Preprocessor(Loggable):
         return []
 
     def __regex_match_command_pattern_ignore_next_one_line(
-        self, line: str, line_num: int,
+        self,
+        line: str,
+        line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command matches the regex pattern
@@ -363,7 +373,9 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_ignore_next_n_lines(
-        self, line: str, line_num: int,
+        self,
+        line: str,
+        line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command matches the regex pattern
@@ -387,7 +399,9 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_begin_ignore_anything(
-        self, line: str, line_num: int,
+        self,
+        line: str,
+        line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command matches the regex pattern
@@ -418,7 +432,9 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_begin_ignore_modules(
-        self, line: str, line_num: int,
+        self,
+        line: str,
+        line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command matches the regex pattern
@@ -459,7 +475,9 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_begin_ignore_severities(
-        self, line: str, line_num: int,
+        self,
+        line: str,
+        line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command matches the regex pattern
@@ -510,7 +528,9 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_begin_ignore_wl_keys(
-        self, line: str, line_num: int,
+        self,
+        line: str,
+        line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command matches the regex pattern
@@ -551,7 +571,9 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_end_ignore_anything(
-        self, line: str, line_num: int,
+        self,
+        line: str,
+        line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command (line) matches the regex pattern
@@ -582,7 +604,9 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_end_ignore_modules(
-        self, line: str, line_num: int,
+        self,
+        line: str,
+        line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command (line) matches the regex pattern
@@ -620,7 +644,9 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_end_ignore_severities(
-        self, line: str, line_num: int,
+        self,
+        line: str,
+        line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command (line) matches the regex pattern
@@ -666,7 +692,9 @@ class Preprocessor(Loggable):
         return None
 
     def __regex_match_command_pattern_end_ignore_wl_keys(
-        self, line: str, line_num: int,
+        self,
+        line: str,
+        line_num: int,
     ) -> Optional[List[ProblemFilter]]:
         """
         Checks, if the provided command (line) matches the regex pattern
@@ -704,7 +732,8 @@ class Preprocessor(Loggable):
         return None
 
     def __get_open_ended_filter(
-        self, reference_filter: ProblemFilter,
+        self,
+        reference_filter: ProblemFilter,
     ) -> Optional[ProblemFilter]:
         """
         Searches for any open-ended (no end set) ProblemFilter matching

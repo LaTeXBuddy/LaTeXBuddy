@@ -63,7 +63,8 @@ class ConfigLoader(Loggable):
         self.main_flags, self.module_flags = self.__parse_flags(cli_arguments)
 
     def __parse_flags(
-        self, args: Namespace,
+        self,
+        args: Namespace,
     ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
         """
         This private helper-function parses commandline arguments into two dictionaries:
@@ -89,7 +90,8 @@ class ConfigLoader(Loggable):
         return parsed_main, parsed_modules
 
     def __parse_args_dict(
-        self, args_dict: Dict[str, Any],
+        self,
+        args_dict: Dict[str, Any],
     ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
         """
         This private helper function parses the preprocessed args_dict (without
@@ -119,7 +121,9 @@ class ConfigLoader(Loggable):
             if key in flag_function_map:
 
                 parsed_main, parsed_modules = flag_function_map[key](
-                    args_dict[key], parsed_main, parsed_modules,
+                    args_dict[key],
+                    parsed_main,
+                    parsed_modules,
                 )
 
             else:
@@ -322,7 +326,10 @@ class ConfigLoader(Loggable):
 
     @staticmethod
     def __verify_regex(
-        entry: Any, verify_regex: Optional[str], key: str, module_name: str,
+        entry: Any,
+        verify_regex: Optional[str],
+        key: str,
+        module_name: str,
     ):
         # TODO: Documentation
 

@@ -35,8 +35,10 @@ def config_loader(script_dir, temp_dir):
     return ConfigLoader(
         parser.parse_args(
             [
-                "--config", script_dir + "/resources/T1000_config.py",
-                "--output", temp_dir,
+                "--config",
+                script_dir + "/resources/T1000_config.py",
+                "--output",
+                temp_dir,
             ],
         ),
     )
@@ -64,7 +66,8 @@ def problem_list(script_dir):
                 description="Hi, I am a problem too...",
                 suggestions=["goijsfzchbsrlt"],
             ),
-        ], ["ldkjfnglsdbliv", "goijsfzchbsrlt"],
+        ],
+        ["ldkjfnglsdbliv", "goijsfzchbsrlt"],
     )
 
 

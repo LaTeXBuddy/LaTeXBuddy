@@ -44,7 +44,10 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     logger.debug(f"Executing '{command}'")
 
     error_list = subprocess.Popen(
-        [command], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        [command],
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
     )
     out, err_out = error_list.communicate()
     return out.decode(encoding)
@@ -92,7 +95,10 @@ def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
     logger.debug(f"Executing '{command}' (ignoring errors)")
 
     error_list = subprocess.Popen(
-        [command], shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+        [command],
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
     )
     out, err_out = error_list.communicate()
     return out.decode(encoding)
@@ -352,7 +358,9 @@ def convert_file_to_absolute(unchecked_files: List[Path], root_dir: str) -> Path
 
 
 def match_lines(
-    lines: List[str], unchecked_files: List[Path], checked_files: List[Path],
+    lines: List[str],
+    unchecked_files: List[Path],
+    checked_files: List[Path],
 ) -> List[Path]:
     """
     Matches the lines with the given regexes
@@ -401,7 +409,9 @@ def perform_whitelist_operations(args: Namespace):
 
     if args.wl_from_wordlist:
         add_whitelist_from_file(
-            wl_file, Path(args.wl_from_wordlist[0]), args.wl_from_wordlist[1],
+            wl_file,
+            Path(args.wl_from_wordlist[0]),
+            args.wl_from_wordlist[1],
         )
 
 

@@ -9,7 +9,6 @@ from latexbuddy.texfile import TexFile
 
 
 class DriverModuleProvider(ModuleProvider, Loggable):
-
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
         return self.load_modules()
 
@@ -19,7 +18,6 @@ class DriverModuleProvider(ModuleProvider, Loggable):
 
 
 class DriverModule0(Module):
-
     def __init__(self):
         return
 
@@ -29,7 +27,6 @@ class DriverModule0(Module):
 
 
 class DriverModule1(Module):
-
     def __init__(self):
         return
 

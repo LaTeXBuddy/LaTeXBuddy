@@ -63,7 +63,9 @@ class ModuleLoader(ModuleProvider, Loggable):
                 module,
                 "enabled",
                 cfg.get_config_option_or_default(
-                    LatexBuddy, "enable-modules-by-default", True,
+                    LatexBuddy,
+                    "enable-modules-by-default",
+                    True,
                 ),
             )
         ]

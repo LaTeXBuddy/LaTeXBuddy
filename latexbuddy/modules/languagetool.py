@@ -184,14 +184,19 @@ class LanguageTool(Module):
 
         try:
             result = tools.find_executable(
-                "languagetool", "LanguageTool (CLI)", self.logger, log_errors=False,
+                "languagetool",
+                "LanguageTool (CLI)",
+                self.logger,
+                log_errors=False,
             )
             executable_source = "native"
 
         except ExecutableNotFoundError:
 
             result = tools.find_executable(
-                "languagetool-commandline.jar", "LanguageTool (CLI)", self.logger,
+                "languagetool-commandline.jar",
+                "LanguageTool (CLI)",
+                self.logger,
             )
             executable_source = "java"
 
@@ -240,13 +245,19 @@ class LanguageTool(Module):
 
         self.disabled_rules = ",".join(
             config.get_config_option_or_default(
-                LanguageTool, "disabled-rules", [], verify_type=List[str],
+                LanguageTool,
+                "disabled-rules",
+                [],
+                verify_type=List[str],
             ),
         )
 
         self.disabled_categories = ",".join(
             config.get_config_option_or_default(
-                LanguageTool, "disabled-categories", [], verify_type=List[str],
+                LanguageTool,
+                "disabled-categories",
+                [],
+                verify_type=List[str],
             ),
         )
 
@@ -266,7 +277,8 @@ class LanguageTool(Module):
 
         if self.mode == Mode.LOCAL_SERVER:
             raw_problems = self.lt_post_request(
-                file, "http://localhost:" f"{self.local_server.port}" "/v2/check",
+                file,
+                "http://localhost:" f"{self.local_server.port}" "/v2/check",
             )
 
         elif self.mode == Mode.REMOTE_SERVER:
@@ -411,7 +423,8 @@ class LanguageTool(Module):
 
     @staticmethod
     def parse_error_replacements(
-        json_replacements: List[Dict], max_elements: int = 5,
+        json_replacements: List[Dict],
+        max_elements: int = 5,
     ) -> List[str]:
         """Converts LanguageTool's replacements to LaTeXBuddy suggestions list.
 
@@ -468,7 +481,9 @@ class LanguageToolLocalServer:
         except ExecutableNotFoundError:
 
             result = tools.find_executable(
-                "languagetool-server.jar", "LanguageTool (local server)", self.logger,
+                "languagetool-server.jar",
+                "LanguageTool (local server)",
+                self.logger,
             )
             executable_source = "java"
 

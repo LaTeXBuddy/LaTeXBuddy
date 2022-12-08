@@ -113,7 +113,9 @@ class TexFile(Loggable):
         return aux.lin, aux.col
 
     def get_position_in_tex_from_linecol(
-        self, line: int, col: int,
+        self,
+        line: int,
+        col: int,
     ) -> Optional[Tuple[int, int]]:
         offsets = get_line_offsets(self.plain)
         aux = translate_numbers(self.tex, self.plain, self._charmap, offsets, line, col)
@@ -150,7 +152,9 @@ class TexFile(Loggable):
             compiler = "pdflatex"
 
         html_directory = LatexBuddy.instance.cfg.get_config_option_or_default(
-            LatexBuddy, "output", os.getcwd() + "/latexbuddy_html/",
+            LatexBuddy,
+            "output",
+            os.getcwd() + "/latexbuddy_html/",
         )
 
         try:
@@ -188,7 +192,9 @@ class TexFile(Loggable):
             pass
         except Exception as exc:
             self.logger.error(
-                texfile_error(f"{exc} occurred while creating {str(compilation_path)}."),
+                texfile_error(
+                    f"{exc} occurred while creating {str(compilation_path)}."
+                ),
             )
             pass
 

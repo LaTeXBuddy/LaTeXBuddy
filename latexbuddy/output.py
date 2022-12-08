@@ -266,7 +266,9 @@ class Interval:
 
         new_intervals.append(
             Interval(
-                self.problems + other.problems, other.start, min(self.end, other.end),
+                self.problems + other.problems,
+                other.start,
+                min(self.end, other.end),
             ),
         )
 
@@ -323,7 +325,9 @@ def create_empty_line_interval_list(tex_lines: List[str]) -> List[List[Interval]
 
 
 def add_basic_problem_intervals(
-    line_intervals: List[List[Interval]], problems: List[Problem], tex_lines: List[str],
+    line_intervals: List[List[Interval]],
+    problems: List[Problem],
+    tex_lines: List[str],
 ) -> None:
     """
     Filters out problems without a position attribute or with length zero and inserts
@@ -413,7 +417,8 @@ def resolve_interval_intersections(intervals: List[Interval]) -> None:
 
 
 def mark_intervals_in_tex(
-    tex_lines: List[str], line_intervals: List[List[Interval]],
+    tex_lines: List[str],
+    line_intervals: List[List[Interval]],
 ) -> None:
     """
     Adds HTML marker-tags (span) for every interval in line_intervals to the respective

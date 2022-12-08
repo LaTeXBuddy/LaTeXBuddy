@@ -82,7 +82,10 @@ class LatexBuddy(MainModule):
         # file where the error should be saved
         LatexBuddy.instance.output_dir = Path(
             LatexBuddy.instance.cfg.get_config_option_or_default(
-                LatexBuddy, "output", "./latexbuddy_html/", verify_type=AnyStr,
+                LatexBuddy,
+                "output",
+                "./latexbuddy_html/",
+                verify_type=AnyStr,
             ),
         )
 
@@ -113,7 +116,10 @@ class LatexBuddy(MainModule):
         # file that represents the whitelist
         LatexBuddy.instance.whitelist_file = Path(
             LatexBuddy.instance.cfg.get_config_option_or_default(
-                LatexBuddy, "whitelist", "whitelist", verify_type=AnyStr,
+                LatexBuddy,
+                "whitelist",
+                "whitelist",
+                verify_type=AnyStr,
             ),
         )
 
@@ -209,7 +215,8 @@ class LatexBuddy(MainModule):
             module.logger.debug(f"{module.display_name} started checks")
 
             result = module.run_checks(
-                LatexBuddy.instance.cfg, LatexBuddy.instance.tex_file,
+                LatexBuddy.instance.cfg,
+                LatexBuddy.instance.tex_file,
             )
 
             module.logger.debug(

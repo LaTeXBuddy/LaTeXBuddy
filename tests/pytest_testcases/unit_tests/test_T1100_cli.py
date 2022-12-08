@@ -147,7 +147,10 @@ def assert_flag_config_options(
         ),
         (
             (None, (None, None)),
-            ("resources/my_nonexistent_whitelist", "'resources/my_nonexistent_whitelist'"),
+            (
+                "resources/my_nonexistent_whitelist",
+                "'resources/my_nonexistent_whitelist'",
+            ),
             (None, None),
             (None, None),
             (None, None),
@@ -174,7 +177,10 @@ def assert_flag_config_options(
             (None, None),
             (None, None),
             (None, None),
-            (["LanguageTool", "Aspell", "FantasyModule"], ["LanguageTool", "Aspell", "FantasyModule"]),
+            (
+                ["LanguageTool", "Aspell", "FantasyModule"],
+                ["LanguageTool", "Aspell", "FantasyModule"],
+            ),
             (None, None),
         ),
         (
@@ -183,7 +189,10 @@ def assert_flag_config_options(
             (None, None),
             (None, None),
             (None, None),
-            (["LanguageTool", "Diction", "FantasyModule2"], ["LanguageTool", "Diction", "FantasyModule2"]),
+            (
+                ["LanguageTool", "Diction", "FantasyModule2"],
+                ["LanguageTool", "Diction", "FantasyModule2"],
+            ),
         ),
     ],
 )

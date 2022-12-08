@@ -36,7 +36,8 @@ class UnreferencedFigures(Module):
             split = figure_match.group(0).split("\\")
             for word in split:
                 label_match = re.search(
-                    re.escape("label{") + "(.*)" + re.escape("}"), word,
+                    re.escape("label{") + "(.*)" + re.escape("}"),
+                    word,
                 )
                 if label_match is not None:
                     label = label_match.group(1)

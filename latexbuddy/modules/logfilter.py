@@ -48,10 +48,14 @@ class LogFilter(Module):
             return []
 
         descriptor, raw_problems_path = mkstemp(
-            prefix="latexbuddy", suffix="raw_log_errors",
+            prefix="latexbuddy",
+            suffix="raw_log_errors",
         )
         tools.execute(
-            "awk", "-f", str(self.texfilt_path), f"{log_path} > {raw_problems_path}",
+            "awk",
+            "-f",
+            str(self.texfilt_path),
+            f"{log_path} > {raw_problems_path}",
         )
 
         raw_problems_path = Path(raw_problems_path)

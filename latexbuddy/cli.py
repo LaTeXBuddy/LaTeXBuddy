@@ -27,13 +27,17 @@ from latexbuddy.tools import (
 
 
 parser = argparse.ArgumentParser(
-    prog=name, description="The one-stop-shop for LaTeX checking.",
+    prog=name,
+    description="The one-stop-shop for LaTeX checking.",
 )
 
 mutex_group = parser.add_mutually_exclusive_group()
 
 mutex_group.add_argument(
-    "--version", "-V", action="version", version=f"{__app_name__} v{__version__}",
+    "--version",
+    "-V",
+    action="version",
+    version=f"{__app_name__} v{__version__}",
 )
 
 mutex_group.add_argument(
@@ -70,7 +74,10 @@ buddy_group = mutex_group.add_argument_group("buddy arguments")
 
 # nargs="+" marks the beginning of a list
 buddy_group.add_argument(
-    "file", nargs="+", type=Path, help="File(s) that will be processed.",
+    "file",
+    nargs="+",
+    type=Path,
+    help="File(s) that will be processed.",
 )
 buddy_group.add_argument(
     "--config",
@@ -181,7 +188,10 @@ def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
     module_loader = ModuleLoader(
         Path(
             config_loader.get_config_option_or_default(
-                LatexBuddy, "module_dir", "latexbuddy/modules/", verify_type=AnyStr,
+                LatexBuddy,
+                "module_dir",
+                "latexbuddy/modules/",
+                verify_type=AnyStr,
             ),
         ),
     )

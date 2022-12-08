@@ -20,8 +20,10 @@ def test_unit_frontend_render_html(script_dir):
 
     file_name = "/home/lenni/Desktop/test.tex"  # this is not a real file_path
     file_path = Path(file_name)
-    file_text = "\\begin{document} \nHello, how are you? \n I am fine, and you? \n " \
-                "\\end{document} "
+    file_text = (
+        "\\begin{document} \nHello, how are you? \n I am fine, and you? \n "
+        "\\end{document} "
+    )
 
     problems = {
         "uid": Problem(
@@ -46,7 +48,9 @@ def test_unit_frontend_render_html(script_dir):
 
 
 def generate_test_problem(
-    position: Tuple[int, int], length: int, description: str,
+    position: Tuple[int, int],
+    length: int,
+    description: str,
 ) -> Problem:
 
     return Problem(
@@ -81,7 +85,9 @@ def parse_interval_list(
         result.append(
             Interval(
                 generate_test_problem(
-                    result_interval[0], result_interval[1], result_interval[2],
+                    result_interval[0],
+                    result_interval[1],
+                    result_interval[2],
                 ),
             ),
         )
@@ -100,7 +106,8 @@ def interval_equals(first: Interval, second: Interval) -> bool:
 
 
 def interval_lists_equal(
-    first: Optional[List[Interval]], second: Optional[List[Interval]],
+    first: Optional[List[Interval]],
+    second: Optional[List[Interval]],
 ) -> bool:
 
     if first is None or second is None:

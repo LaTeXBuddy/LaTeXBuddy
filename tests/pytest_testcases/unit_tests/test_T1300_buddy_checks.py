@@ -37,16 +37,18 @@ def config_loader(script_dir, temp_dir):
     return ConfigLoader(
         parser.parse_args(
             [
-                "--config", script_dir + "/resources/nonexistent_config.py",
-                "--output", temp_dir,
-                "--format", "JSON",
+                "--config",
+                script_dir + "/resources/nonexistent_config.py",
+                "--output",
+                temp_dir,
+                "--format",
+                "JSON",
             ],
         ),
     )
 
 
 class DriverModuleProvider(ModuleProvider):
-
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
         return [DummyModule0(), DummyModule1()]
 
@@ -71,7 +73,9 @@ def test_unit_buddy_checks(script_dir, config_loader):
     with open(temp_dir + "/latexbuddy_output.json") as f:
         json_contents = f.read()
 
-    assert "\n" + json_contents + "\n" == """
+    assert (
+        "\n" + json_contents + "\n"
+        == """
 [
     {
         "position": [
@@ -117,4 +121,7 @@ def test_unit_buddy_checks(script_dir, config_loader):
         "key": "DummyModule0__text2"
     }
 ]
-""".replace("{file_str}", file_str)
+""".replace(
+            "{file_str}", file_str
+        )
+    )
