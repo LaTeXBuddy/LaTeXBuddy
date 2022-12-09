@@ -9,14 +9,13 @@ Aspell, ChkTeX, LanguageTool: you name it! LaTeXBuddy is modular and
 Python-based, so that implementing new functionality becomes a breeze!
 
 
-Current status
---------------
+.. important::
 
-LaTeXBuddy is a work in progress. We are working on fixing bugs and cleaning up.
-Using LaTeXBuddy in its current state may come with a lot of inconveniences.
-Upon reaching the Beta status, we will open-source this project. For now, it
-remains copyrighted, yet you're free to fork it and provide your edits and
-improvements to the code base.
+   LaTeXBuddy is a **work in progress**. We are working on fixing bugs and cleaning up.
+   Using LaTeXBuddy in its current state may come with a lot of inconveniences.
+   Upon reaching the Beta status, we will open-source this project. For now, it technically
+   remains copyrighted, yet you're free to fork it and provide your edits and
+   improvements to the code base.
 
 ----
 
@@ -25,6 +24,9 @@ improvements to the code base.
 
    about/changelog.md
    about/licence.md
+
+User's guide
+------------
 
 .. toctree::
    :caption: Tutorial
@@ -48,15 +50,11 @@ improvements to the code base.
    :caption: Background
    :maxdepth: 2
 
+Developer's guide
+-----------------
+
 .. toctree::
    :caption: Developer's guide
    :maxdepth: 2
 
-----
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   developer/environment.md
