@@ -25,21 +25,17 @@ Windows.
 After you've installed the prerequisities and cloned the repo, it is time to
 prepare it for work.
 
-In the `script/` directory you will find various scripts that will help you
-when developing. This way you don't need to memorize specific commands. Please
-note that these scripts are meant for POSIX-like shells
-
 To install needed dependencies, run
 
 ```sh
-script/bootstrap
+poetry install --sync
 ```
 
 This will install all dependencies in a virtual environment. Your terminal
-doesn't have acces to it yet. If you run
+doesn't have access to it yet. If you run
 
 ```sh
-script/console
+poetry shell
 ```
 
 you will spawn a shell within your terminal. This will make all installed
@@ -48,7 +44,7 @@ you open a new terminal window.
 
 > #### Helpful!
 >
-> If you use VSCode or PyCharm with Poetry plugin, every in-IDE terminal window
+> If you use VSCode or PyCharm, every in-IDE terminal window
 > will activate the environment automatically
 
 To deactivate the shell, simply type `deactivate` and hit Enter.
@@ -58,7 +54,7 @@ To deactivate the shell, simply type `deactivate` and hit Enter.
 To build the package, run
 
 ```sh
-script/build
+poetry build
 ```
 
 This will create the `dist/` directory and generate the .tar.gz and .whl files,
@@ -86,15 +82,8 @@ one would try to run latexbuddy on Ubuntu 20.04 LTS...
 In commit body aka description, mention the issue number, if applicable. This
 way it'll be easier to track changes and issues.
 
-Upon sending your changes, check that your code is correctly formatted. We use
-Black code style with isort. Everything is set up; just run the following
-command:
-
-```sh
-script/lint
-```
-
-and it will fix every needed file.
+On commit, a tool called pre-commit will lint your file for errors, wrong
+formatting, etc.
 
 Push your branch and create a merge request to the `master` branch. Please name
 your merge request in such a way, that it is clear what it does without opening
