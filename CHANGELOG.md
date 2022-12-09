@@ -5,7 +5,7 @@ All notable changes to LaTeXBuddy will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.0] - 09 Dec 2022
 
 ### BREAKING CHANGES
 
@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   new test cases for multiple occurrences of own_checkers problems (!110)
 -   custom key for YaLafi problems (!109)
 -   filter for log files (!121)
--   new base class for all modules and LatexBuddy (NamedModule`) (!108)
+-   new base class for all modules and LatexBuddy (`NamedModule`) (!108)
 -   new `Loggable` base class which provides a properly named logger to any class inheriting from it (!108)
 -   new module "NewerPublications" that checks for each entry in the BibTeX file if a newer publication exists (!120)
 -   new module "BibtexDuplicates" that checks the BibTeX file for similar entries (!120)
@@ -156,7 +156,8 @@ This is the first (pre-)release of LaTeXBuddy.
 -   draft of the abstract module API (!22)
 -   logo (!38)
 
-[unreleased]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.3.0...master
+[unreleased]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.4.0...master
+[0.4.0]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.3.0...v0.4.0
 [0.3.0]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.2.0...v0.3.0
 [0.2.0]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.1.0...v0.2.0
 [0.1.0]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/124d0730...v0.1.0
