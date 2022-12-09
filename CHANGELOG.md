@@ -162,7 +162,8 @@ This is the first (pre-)release of LaTeXBuddy.
 -   draft of the abstract module API (!22)
 -   logo (!38)
 
-[unreleased]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.4.0...master
+[unreleased]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.4.1...master
+[0.4.1]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.4.0...v0.4.1
 [0.4.0]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.3.0...v0.4.0
 [0.3.0]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.2.0...v0.3.0
 [0.2.0]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.1.0...v0.2.0
