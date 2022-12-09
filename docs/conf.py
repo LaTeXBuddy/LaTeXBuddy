@@ -17,6 +17,7 @@ release = "0.3.0"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
+    "sphinxarg.ext",
     "myst_parser",
 ]
 
