@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   removed `LatexBuddy` methods `change_file` and `clear_error_list` and replaced their occurrences with `init` (!141)
 -   reimplemented highlighting algorithm enabling markings for different problems to overlap (!150)
 -   updated the Docker image to add TeX Live (!157)
+-   new logo (!173)
 
 ### Fixed
 
