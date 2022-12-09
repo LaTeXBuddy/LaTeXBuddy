@@ -1,5 +1,5 @@
-<h1 align="center">
-<img src="latexbuddy/templates/static/logo.svg" width="400" alt="LaTeXBuddy">
+<h1>
+<img src="docs/_static/logotype-light@2x.png" width="240" alt="LaTeXBuddy">
 </h1>
 
 > The only LaTeX checking tool you'll ever need.
