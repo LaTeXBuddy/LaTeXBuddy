@@ -2,7 +2,7 @@
 name = "latexbuddy"
 version = "0.4.2"
 description = ""
-license = "Proprietary"
+license = "GPL-3.0-or-later"
 authors = [
     "Niklas Pieninck <n.pieninck@tu-braunschweig.de>",
     "Levi Elsner <levi.elsner@tu-braunschweig.de>",
