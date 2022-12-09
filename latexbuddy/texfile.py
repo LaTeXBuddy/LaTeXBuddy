@@ -6,7 +6,7 @@ import sys
 
 from io import StringIO
 from pathlib import Path
-from tempfile import mkdtemp, mkstemp
+from tempfile import mkstemp
 from typing import Optional, Tuple
 
 from chardet import detect
@@ -45,10 +45,13 @@ class TexFile(Loggable):
         self.tex_file = file
 
         tex_bytes = self.tex_file.read_bytes()
-        tex_encoding = detect(tex_bytes)["encoding"]
-        if tex_encoding is None:
-            tex_encoding = "UTF-8"
-        self.tex = tex_bytes.decode(encoding=tex_encoding)
+        if len(tex_bytes) > 0:
+            tex_encoding = detect(tex_bytes)["encoding"]
+            if tex_encoding is None:
+                tex_encoding = "UTF-8"
+            self.tex = tex_bytes.decode(encoding=tex_encoding)
+        else:
+            self.tex = ""
 
         self.plain, self._charmap, self._parse_problems = self.__detex()
 
