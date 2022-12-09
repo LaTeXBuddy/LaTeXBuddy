@@ -14,7 +14,7 @@ div.collapsible > button.collapsible-toggle {
 }
 
 div.collapsible > button.collapsible-toggle:after {
-    content: '\02795'; /* plus sign in unicode */
+    content: "\02795"; /* plus sign in unicode */
     font-size: 13px;
     color: #005a5b;
     float: right;
@@ -22,7 +22,7 @@ div.collapsible > button.collapsible-toggle:after {
 }
 
 div.collapsible > button.collapsible-toggle.active:after {
-    content: '\02796'; /* minus sign in unicode*/
+    content: "\02796"; /* minus sign in unicode*/
 }
 
 div.collapsible > div.collapsible-content {

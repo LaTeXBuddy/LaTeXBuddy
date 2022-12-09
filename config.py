@@ -4,6 +4,7 @@ out-of-the-box. You may move this file and specify its path using the --config f
 """
 import os.path
 
+
 main = {
     "language": "en",
     "language_country": "GB",
@@ -45,7 +46,7 @@ modules = {
         "enabled": True,
     },
     "ProseLint": {
-        "enabled": True
+        "enabled": True,
     },
     "SiUnitx": {
         "enabled": True,
@@ -63,12 +64,12 @@ modules = {
         "enabled": True,
     },
     "YaLafi": {
-        "enabled": True
+        "enabled": True,
     },
     "NewerPublications": {
-        "enabled": False
+        "enabled": False,
     },
     "BibtexDuplicates": {
-        "enabled": False
+        "enabled": False,
     },
 }

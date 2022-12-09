@@ -24,7 +24,7 @@ class DummyModule0(Module):
                 context=("", "totally made up"),
                 suggestions=["idk", "try harder next time"],
                 key="my_very_unique_key",
-            )
+            ),
         ]
 
 
@@ -40,5 +40,5 @@ class DummyModule1(Module):
                 DummyModule0,
                 file.tex_file,
                 ProblemSeverity.WARNING,
-            )
+            ),
         ]

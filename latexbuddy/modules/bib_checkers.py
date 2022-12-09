@@ -61,7 +61,7 @@ def parse_bibfile(bibfile: Path) -> (str, str, str):
         # catch error that is raised if the bibtex file is not correctly formatted
         except UndefinedString as e:
             raise ValueError(
-                f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}'
+                f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}',
             )
 
     results = []
@@ -95,7 +95,7 @@ class NewerPublications(Module):
 
         c_returns = 4  # number of max returns from the request
         x = s.get(
-            f"https://dblp.org/search/publ/api?format=json&h={c_returns}&q={publication[0]}"
+            f"https://dblp.org/search/publ/api?format=json&h={c_returns}&q={publication[0]}",
         )
         ret = json.loads(x.text)["result"]
 
@@ -116,7 +116,9 @@ class NewerPublications(Module):
 
                 # Check if the title is somewhat similar to the one from BibTeX
                 sim = SequenceMatcher(
-                    None, title.upper(), publication[0].upper()
+                    None,
+                    title.upper(),
+                    publication[0].upper(),
                 ).ratio()
                 if sim < 0.85:
                     continue
@@ -186,7 +188,7 @@ class NewerPublications(Module):
                     description=suggestion,
                     context=(problem_text, ""),
                     key=self.display_name + "_" + bibtex_id,
-                )
+                ),
             )
         return problems
 
@@ -216,12 +218,14 @@ class BibtexDuplicates(Module):
         total_ratio = 0
         for key in same_keys:
             total_ratio += SequenceMatcher(
-                None, self.clean_str(entry_1[key]), self.clean_str(entry_2[key])
+                None,
+                self.clean_str(entry_1[key]),
+                self.clean_str(entry_2[key]),
             ).ratio()
         ratio = total_ratio / len(same_keys)
         if ratio > 0.85:
             self.logger.debug(
-                f"------------------\n{ratio}\n{entry_1}\n{entry_2}\n------------------"
+                f"------------------\n{ratio}\n{entry_1}\n{entry_2}\n------------------",
             )
             self.found_duplicates.append(ids)
 
@@ -240,7 +244,7 @@ class BibtexDuplicates(Module):
             # catch error that is raised if the bibtex file is not correctly formatted
             except UndefinedString as e:
                 raise ValueError(
-                    f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}'
+                    f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}',
                 )
 
         for i in range(len(entries)):
@@ -267,7 +271,7 @@ class BibtexDuplicates(Module):
                     description=description,
                     context=(context, ""),
                     key=f"{self.display_name}_{dup_ids[0]}_{dup_ids[1]}",
-                )
+                ),
             )
 
         return problems

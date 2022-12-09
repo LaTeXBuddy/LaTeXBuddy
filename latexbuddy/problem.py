@@ -137,7 +137,7 @@ class Problem(Loggable):
             self.logger.warning(
                 f"A Problem created by {self.checker} has a non-None position, but "
                 f"does not have a problematic text with length > 0. It will be "
-                f"converted to a general problem without a position..."
+                f"converted to a general problem without a position...",
             )
             self.position = None
 

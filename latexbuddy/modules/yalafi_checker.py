@@ -27,7 +27,7 @@ class YaLafi(Module):
                         severity=ProblemSeverity.ERROR,
                         category="latex",
                         key=self.display_name + "_tex2txt",
-                    )
+                    ),
                 )
 
         return problems

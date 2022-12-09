@@ -1,10 +1,6 @@
 .monospaced {
-    font-family: ui-monospace,
-    SFMono-Regular,
-    Consolas,
-    'Liberation Mono',
-    Menlo,
-    monospace;
+    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono",
+        Menlo, monospace;
 }
 
 body {
@@ -41,7 +37,7 @@ main {
 }
 
 main > div {
-    padding: .5rem;
+    padding: 0.5rem;
 }
 
 #file-contents {
@@ -58,18 +54,18 @@ main > div {
 }
 
 .problem {
-    padding: .666rem 0;
+    padding: 0.666rem 0;
     border-bottom: 1px solid #eeeeee;
 }
 
 .problem-context {
-    margin: 0 0 .5em;
+    margin: 0 0 0.5em;
 }
 
 .problem-text {
     text-decoration-style: wavy;
     text-decoration-line: underline;
-    text-decoration-thickness: .07em;
+    text-decoration-thickness: 0.07em;
 }
 
 .under {
@@ -99,7 +95,7 @@ main > div {
 }
 
 .problem p {
-    margin: 0 0 .5rem;
+    margin: 0 0 0.5rem;
 }
 
 .problem p:last-child {
@@ -134,11 +130,11 @@ main > div {
     text-decoration-style: wavy;
     text-decoration-line: underline;
     text-decoration-color: lightcoral;
-    text-decoration-thickness: .07em;
+    text-decoration-thickness: 0.07em;
 }
 
 .grammar {
-    background-color:lightyellow;
+    background-color: lightyellow;
 }
 
 #problem-disp {
@@ -179,14 +175,13 @@ main > div {
     width: 100%;
     height: 100%;
     background-color: #eeeeee;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
     overflow: auto;
 }
 
 .line-container {
     display: flex;
     flex-direction: row;
-
 }
 
 .line-container code {
@@ -202,7 +197,7 @@ main > div {
 }
 
 .latex {
-    background-color:lightblue;;
+    background-color: lightblue;
 }
 
 /* not yet set for every style TODO

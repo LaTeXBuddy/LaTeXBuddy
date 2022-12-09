@@ -61,7 +61,9 @@ def __setup_root_logger(logger: Logger, console_level: int = INFO) -> None:
         logger.removeHandler(handler)
 
     fh = RotatingFileHandler(
-        latexbuddy.tools.get_app_dir() / "debug.log", maxBytes=4000000, backupCount=8
+        latexbuddy.tools.get_app_dir() / "debug.log",
+        maxBytes=4000000,
+        backupCount=8,
     )
     fh.setLevel(DEBUG)  # output everything to file
     fh.setFormatter(
@@ -71,8 +73,8 @@ def __setup_root_logger(logger: Logger, console_level: int = INFO) -> None:
             "%(name)s "
             "%(filename)s:%(lineno)d "
             "%(funcName)s() "
-            "%(message)s"
-        )
+            "%(message)s",
+        ),
     )
 
     ch = DoubleStreamHandler()
@@ -97,7 +99,7 @@ class Loggable(ABC):
         its name.
         """
         return self.__logger.getChild(
-            ".".join(self.__module__.split(".")[1:])
+            ".".join(self.__module__.split(".")[1:]),
         ).getChild(self.__class__.__name__)
 
     @logger.setter

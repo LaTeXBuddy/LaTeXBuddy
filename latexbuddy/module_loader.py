@@ -63,7 +63,9 @@ class ModuleLoader(ModuleProvider, Loggable):
                 module,
                 "enabled",
                 cfg.get_config_option_or_default(
-                    LatexBuddy, "enable-modules-by-default", True
+                    LatexBuddy,
+                    "enable-modules-by-default",
+                    True,
                 ),
             )
         ]
@@ -134,19 +136,19 @@ class ModuleLoader(ModuleProvider, Loggable):
         if not self.directory.is_dir():
             self.logger.warning(
                 f"Specified path '{str(self.directory.absolute())}' is not a directory."
-                f" No modules could be loaded."
+                f" No modules could be loaded.",
             )
             return []
 
         self.logger.debug(
-            f"Searching for .py-files in directory '{str(self.directory.absolute())}'"
+            f"Searching for .py-files in directory '{str(self.directory.absolute())}'",
         )
 
         files = sorted(self.directory.rglob("*.py"))
 
         self.logger.debug(
             f"Found the following .py-files in directory "
-            f"'{str(self.directory.absolute())}': {str(files)}"
+            f"'{str(self.directory.absolute())}': {str(files)}",
         )
 
         return files

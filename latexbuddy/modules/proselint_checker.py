@@ -61,7 +61,7 @@ class ProseLint(Module):
                     suggestions=replacements,
                     key=key,
                     length=length,
-                )
+                ),
             )
         return problems
 

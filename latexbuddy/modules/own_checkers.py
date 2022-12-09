@@ -36,7 +36,8 @@ class UnreferencedFigures(Module):
             split = figure_match.group(0).split("\\")
             for word in split:
                 label_match = re.search(
-                    re.escape("label{") + "(.*)" + re.escape("}"), word
+                    re.escape("label{") + "(.*)" + re.escape("}"),
+                    word,
                 )
                 if label_match is not None:
                     label = label_match.group(1)
@@ -58,7 +59,7 @@ class UnreferencedFigures(Module):
                         key=self.display_name + "_" + label,
                         length=length,
                         context=("\\label{", "}"),
-                    )
+                    ),
                 )
 
         return problems
@@ -113,7 +114,7 @@ class SiUnitx(Module):
                     description=f"For number {number_match.group(0)} \\num from siunitx may be used.",
                     key=self.display_name + "_" + number_match.group(0),
                     length=length,
-                )
+                ),
             )
         return problems
 
@@ -215,7 +216,7 @@ class SiUnitx(Module):
                         description=f"For unit {unit_match.group(0)} siunitx may be used.",
                         key=self.display_name + "_" + unit_match.group(0),
                         length=length,
-                    )
+                    ),
                 )
 
         return problems
@@ -249,7 +250,7 @@ class EmptySections(Module):
                     key=self.display_name + "_" + text,
                     length=length,
                     context=("\\section{", "}"),
-                )
+                ),
             )
         return problems
 
@@ -286,7 +287,7 @@ class URLCheck(Module):
                     description=f"For URLs use \\url.",
                     key=self.display_name + "_" + url_match.group(0),
                     length=length,
-                )
+                ),
             )
         return problems
 
@@ -350,7 +351,7 @@ class CheckFigureResolution(Module):
                             description=f"Figure might have low resolution due to file format {ending}",
                             key=self.display_name + "_" + current_file,
                             length=1,
-                        )
+                        ),
                     )
 
         return problems
@@ -384,7 +385,7 @@ class NativeUseOfRef(Module):
                     context=("", problem_text[5:]),
                     key=self.display_name + "_" + problem_text[5:-1],
                     length=len(ref_pattern),
-                )
+                ),
             )
             # find next problem for next iteration
             curr_problem_start = tex.find(ref_pattern, curr_problem_start + 1)

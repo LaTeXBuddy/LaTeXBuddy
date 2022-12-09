@@ -1,6 +1,7 @@
 import argparse
 import os
 import tempfile
+
 from pathlib import Path
 from typing import List
 
@@ -30,10 +31,16 @@ def config_loader(script_dir, temp_dir):
     parser.add_argument("--config", type=Path)
     parser.add_argument("--output", type=str)
 
-    return ConfigLoader(parser.parse_args(
-        ["--config", script_dir + "/resources/T1200_config.py",
-         "--output", temp_dir]
-    ))
+    return ConfigLoader(
+        parser.parse_args(
+            [
+                "--config",
+                script_dir + "/resources/T1200_config.py",
+                "--output",
+                temp_dir,
+            ],
+        ),
+    )
 
 
 @pytest.fixture
@@ -42,14 +49,19 @@ def config_loader_temp_wl(script_dir, temp_dir):
     parser.add_argument("--config", type=Path)
     parser.add_argument("--output", type=str)
 
-    return ConfigLoader(parser.parse_args(
-        ["--config", script_dir + "/resources/T1200_config_temp_wl.py",
-         "--output", temp_dir]
-    ))
+    return ConfigLoader(
+        parser.parse_args(
+            [
+                "--config",
+                script_dir + "/resources/T1200_config_temp_wl.py",
+                "--output",
+                temp_dir,
+            ],
+        ),
+    )
 
 
 class DummyModuleProvider(ModuleProvider):
-
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
         return []
 
@@ -67,7 +79,7 @@ def init_buddy(scd, cl):
 
 
 def write_original_to_temp_wl(script_dir: str) -> str:
-    wl = open(script_dir + "/resources/T1200_whitelist", "r")
+    wl = open(script_dir + "/resources/T1200_whitelist")
     original_content = wl.readlines()
     wl.close()
 
@@ -88,7 +100,7 @@ def test_unit_buddy_whitelist_check_filter(script_dir, config_loader):
             Aspell,
             Path("/"),
             key="en_spelling_Dongbei",
-        )
+        ),
     )
 
     assert len(LatexBuddy.instance.errors) == 1
@@ -109,7 +121,7 @@ def test_unit_buddy_whitelist_check_non_filter(script_dir, config_loader):
             Aspell,
             Path("/"),
             key="en_spelling_Dongbeiii",
-        )
+        ),
     )
 
     assert len(LatexBuddy.instance.errors) == 1
@@ -132,7 +144,7 @@ def test_unit_buddy_whitelist_add_successful(script_dir, config_loader_temp_wl):
             Aspell,
             Path("/"),
             key="en_spelling_Dongbeiii",
-        )
+        ),
     )
 
     assert len(LatexBuddy.instance.errors) == 1
@@ -141,7 +153,7 @@ def test_unit_buddy_whitelist_add_successful(script_dir, config_loader_temp_wl):
     LatexBuddy.add_to_whitelist(uid)
     assert len(LatexBuddy.instance.errors) == 0
 
-    with open(script_dir + "/resources/T1200_whitelist_temp", "r") as f:
+    with open(script_dir + "/resources/T1200_whitelist_temp") as f:
         modified_content = f.readlines()
 
     assert len(original_content) + 1 == len(modified_content)
@@ -167,7 +179,7 @@ def test_unit_buddy_whitelist_add_unsuccessful(script_dir, config_loader_temp_wl
             Aspell,
             Path("/"),
             key="en_spelling_Dongbei",
-        )
+        ),
     )
 
     assert len(LatexBuddy.instance.errors) == 1
@@ -175,7 +187,7 @@ def test_unit_buddy_whitelist_add_unsuccessful(script_dir, config_loader_temp_wl
 
     LatexBuddy.add_to_whitelist(uid + "nonexistent")
 
-    with open(script_dir + "/resources/T1200_whitelist_temp", "r") as f:
+    with open(script_dir + "/resources/T1200_whitelist_temp") as f:
         modified_content = f.readlines()
 
     assert len(original_content) == len(modified_content)

@@ -82,14 +82,17 @@ class LatexBuddy(MainModule):
         # file where the error should be saved
         LatexBuddy.instance.output_dir = Path(
             LatexBuddy.instance.cfg.get_config_option_or_default(
-                LatexBuddy, "output", "./latexbuddy_html/", verify_type=AnyStr
-            )
+                LatexBuddy,
+                "output",
+                "./latexbuddy_html/",
+                verify_type=AnyStr,
+            ),
         )
 
         if not LatexBuddy.instance.output_dir.is_dir():
             LatexBuddy.instance.logger.warning(
                 f"'{str(LatexBuddy.instance.output_dir)}' is not a directory. "
-                f"Current directory will be used instead."
+                f"Current directory will be used instead.",
             )
             LatexBuddy.instance.output_dir = Path.cwd()
 
@@ -107,14 +110,17 @@ class LatexBuddy(MainModule):
                     "HTML_FLASK",
                     "html_flask",
                 ],
-            )
+            ),
         ).upper()
 
         # file that represents the whitelist
         LatexBuddy.instance.whitelist_file = Path(
             LatexBuddy.instance.cfg.get_config_option_or_default(
-                LatexBuddy, "whitelist", "whitelist", verify_type=AnyStr
-            )
+                LatexBuddy,
+                "whitelist",
+                "whitelist",
+                verify_type=AnyStr,
+            ),
         )
 
     @staticmethod
@@ -156,7 +162,7 @@ class LatexBuddy(MainModule):
 
         LatexBuddy.instance.logger.debug(
             f"Finished whitelist-check in {round(time.perf_counter() - start_time, 2)} "
-            f"seconds"
+            f"seconds",
         )
 
     @staticmethod
@@ -172,7 +178,7 @@ class LatexBuddy(MainModule):
         if uid not in LatexBuddy.instance.errors:
             LatexBuddy.instance.logger.error(
                 f"UID not found: {uid}. "
-                "Specified problem will not be added to whitelist."
+                "Specified problem will not be added to whitelist.",
             )
             return
 
@@ -209,12 +215,13 @@ class LatexBuddy(MainModule):
             module.logger.debug(f"{module.display_name} started checks")
 
             result = module.run_checks(
-                LatexBuddy.instance.cfg, LatexBuddy.instance.tex_file
+                LatexBuddy.instance.cfg,
+                LatexBuddy.instance.tex_file,
             )
 
             module.logger.debug(
                 f"{module.display_name} finished after "
-                f"{round(time.perf_counter() - start_time, 2)} seconds"
+                f"{round(time.perf_counter() - start_time, 2)} seconds",
             )
 
         tools.execute_no_exceptions(
@@ -240,21 +247,21 @@ class LatexBuddy(MainModule):
         # initialize Preprocessor
         LatexBuddy.instance.preprocessor = Preprocessor()
         LatexBuddy.instance.preprocessor.regex_parse_preprocessor_comments(
-            LatexBuddy.instance.tex_file
+            LatexBuddy.instance.tex_file,
         )
 
         # acquire Module instances
         modules = LatexBuddy.instance.module_provider.load_selected_modules(
-            LatexBuddy.instance.cfg
+            LatexBuddy.instance.cfg,
         )
 
         LatexBuddy.instance.logger.debug(
             f"Using multiprocessing pool with {os.cpu_count()} "
-            f"threads/processes for checks."
+            f"threads/processes for checks.",
         )
         LatexBuddy.instance.logger.debug(
             f"Executing the following modules in parallel: "
-            f"{[module.display_name for module in modules]}"
+            f"{[module.display_name for module in modules]}",
         )
 
         with mp.Pool(processes=os.cpu_count()) as pool:
@@ -281,7 +288,7 @@ class LatexBuddy(MainModule):
             list_of_problems.append(LatexBuddy.instance.errors[problem_uid])
 
         json_output_path = Path(
-            str(LatexBuddy.instance.output_dir) + "/latexbuddy_output.json"
+            str(LatexBuddy.instance.output_dir) + "/latexbuddy_output.json",
         )
 
         with json_output_path.open("w") as file:
@@ -301,7 +308,7 @@ class LatexBuddy(MainModule):
             + "/"
             + "output_"
             + str(LatexBuddy.instance.file_to_check.stem)
-            + ".html"
+            + ".html",
         )
         html_output_path.write_text(
             render_html(
@@ -310,9 +317,9 @@ class LatexBuddy(MainModule):
                 LatexBuddy.instance.errors,
                 LatexBuddy.instance.path_list,
                 str(
-                    LatexBuddy.instance.tex_file.pdf_file
+                    LatexBuddy.instance.tex_file.pdf_file,
                 ),  # TODO: this should be the path (str) where the pdf file is located
-            )
+            ),
         )
 
         LatexBuddy.instance.logger.info(f"Output saved to {html_output_path.resolve()}")
@@ -328,7 +335,7 @@ class LatexBuddy(MainModule):
             + "/"
             + "output_"
             + str(LatexBuddy.instance.file_to_check.stem)
-            + ".html"
+            + ".html",
         )
         html_output_path.write_text(
             render_flask_html(
@@ -337,9 +344,9 @@ class LatexBuddy(MainModule):
                 LatexBuddy.instance.errors,
                 LatexBuddy.instance.path_list,
                 str(
-                    LatexBuddy.instance.tex_file.pdf_file
+                    LatexBuddy.instance.tex_file.pdf_file,
                 ),  # TODO: this should be the path (str) where the pdf file is located
-            )
+            ),
         )
 
         LatexBuddy.instance.logger.info(f"Output saved to {html_output_path.resolve()}")

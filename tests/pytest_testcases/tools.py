@@ -24,7 +24,10 @@ def execute_and_collect(*cmd, encoding="ISO8859-1"):
     command = get_command_string(cmd)
 
     error_list = subprocess.Popen(
-        [command], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+        [command],
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
     )
     out, err_out = error_list.communicate()
     return out.decode(encoding)

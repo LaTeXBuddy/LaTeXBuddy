@@ -1,6 +1,7 @@
 import argparse
 import os
 import tempfile
+
 from pathlib import Path
 from typing import List
 
@@ -10,8 +11,10 @@ from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.module_loader import ModuleProvider
 from latexbuddy.modules import Module
-from tests.pytest_testcases.unit_tests.resources.T1300_dummy_modules.dummy_module \
-    import DummyModule0, DummyModule1
+from tests.pytest_testcases.unit_tests.resources.T1300_dummy_modules.dummy_module import (
+    DummyModule0,
+    DummyModule1,
+)
 
 
 @pytest.fixture
@@ -31,17 +34,21 @@ def config_loader(script_dir, temp_dir):
     parser.add_argument("--output", type=str)
     parser.add_argument("--format", type=str)
 
-    return ConfigLoader(parser.parse_args(
-        [
-            "--config", script_dir + "/resources/nonexistent_config.py",
-            "--output", temp_dir,
-            "--format", "JSON",
-        ]
-    ))
+    return ConfigLoader(
+        parser.parse_args(
+            [
+                "--config",
+                script_dir + "/resources/nonexistent_config.py",
+                "--output",
+                temp_dir,
+                "--format",
+                "JSON",
+            ],
+        ),
+    )
 
 
 class DriverModuleProvider(ModuleProvider):
-
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
         return [DummyModule0(), DummyModule1()]
 
@@ -63,10 +70,12 @@ def test_unit_buddy_checks(script_dir, config_loader):
 
     temp_dir = config_loader.get_config_option(LatexBuddy, "output")
 
-    with open(temp_dir + "/latexbuddy_output.json", "r") as f:
+    with open(temp_dir + "/latexbuddy_output.json") as f:
         json_contents = f.read()
 
-    assert "\n" + json_contents + "\n" == """
+    assert (
+        "\n" + json_contents + "\n"
+        == """
 [
     {
         "position": [
@@ -112,4 +121,8 @@ def test_unit_buddy_checks(script_dir, config_loader):
         "key": "DummyModule0__text2"
     }
 ]
-""".replace("{file_str}", file_str)
+""".replace(
+            "{file_str}",
+            file_str,
+        )
+    )

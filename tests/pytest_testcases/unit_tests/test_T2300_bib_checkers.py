@@ -1,11 +1,14 @@
-import pytest
 import os
 
 from pathlib import Path
-from latexbuddy.modules.bib_checkers import NewerPublications, BibtexDuplicates
+
+import pytest
+
+from latexbuddy.modules.bib_checkers import BibtexDuplicates, NewerPublications
 from latexbuddy.texfile import TexFile
-from tests.pytest_testcases.unit_tests.resources.driver_config_loader import \
-    ConfigLoader as DriverCL
+from tests.pytest_testcases.unit_tests.resources.driver_config_loader import (
+    ConfigLoader as DriverCL,
+)
 
 
 @pytest.fixture
@@ -35,4 +38,3 @@ def test_unit_bib_checkers_run_checks(script_dir):
 
     assert output_problems_new[0].text == "werner2018serverless"
     assert output_problems_new[1].text == "Anna:2019"
-
