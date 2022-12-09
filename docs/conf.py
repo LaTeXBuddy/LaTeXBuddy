@@ -15,12 +15,19 @@ release = "0.3.0"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
     "myst_parser",
 ]
 
+autodoc_typehints = "description"
+
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
-
+add_module_names = True
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3/", None),
+}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

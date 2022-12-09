@@ -47,6 +47,9 @@ User's guide
    :caption: Reference
    :maxdepth: 2
 
+   reference/api.rst
+   reference/module-api.rst
+   reference/server-api.rst
 
 .. toctree::
    :caption: Background
