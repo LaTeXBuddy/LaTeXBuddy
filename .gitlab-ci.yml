@@ -74,9 +74,9 @@ build:
   script:
     - poetry build
   artifacts:
-    public: false
     paths:
-      - dist/
+      - dist/*.whl
+      - dist/*.tar.gz
     expire_in: 1 week
   only:
     - tags
@@ -85,9 +85,9 @@ publish:
   stage: Publish
   before_script:
     - pip install poetry
-    - poetry config repositories.gitz "https://git.rz.tu-bs.de/api/v4/projects/${CI_PROJECT_ID}/packages/pypi"
+    - poetry config repositories.gitlab ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi
   script:
-    - poetry publish --repository gitz -u gitlab-ci-token -p ${CI_JOB_TOKEN}
+    - poetry publish --repository gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
   only:
     - tags
   dependencies:

@@ -156,7 +156,7 @@ This is the first (pre-)release of LaTeXBuddy.
 -   draft of the abstract module API (!22)
 -   logo (!38)
 
-[unreleased]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.3.0...master
-[0.3.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.2.0...v0.3.0
-[0.2.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.1.0...v0.2.0
-[0.1.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/124d0730...v0.1.0
+[unreleased]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.3.0...master
+[0.3.0]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.2.0...v0.3.0
+[0.2.0]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.1.0...v0.2.0
+[0.1.0]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/124d0730...v0.1.0

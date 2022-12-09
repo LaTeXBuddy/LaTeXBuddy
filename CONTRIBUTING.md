@@ -135,4 +135,4 @@ an issue, and we'll look into it!
 [languagetool]: https://github.com/languagetool-org/languagetool
 [poetry]: https://python-poetry.org/
 [python]: https://www.python.org/
-[wiki]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/wikis/Development%20Guide
+[wiki]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/wikis/Development%20Guide
