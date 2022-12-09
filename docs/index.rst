@@ -28,9 +28,10 @@ improvements to the code base.
 
 .. toctree::
    :caption: Tutorial
-   :maxdepth: 1
+   :maxdepth: 2
 
    tutorial/install.md
+   tutorial/build.md
 
 
 .. toctree::

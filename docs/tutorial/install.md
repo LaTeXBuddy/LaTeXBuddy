@@ -1,10 +1,12 @@
 # Install
 
-```{attention}
-This documentation is outdated. It relies on the GITZ server, where we used to host our project at.
-```
+LaTeXBuddy is a Python package and thus can be installed with `pip`
 
-Currently, LaTeXBuddy is distributed via a PyPI-compatible package registry hosted by GITZ. This adds extra steps to the installation, but we'll guide you through it!
+## GITZ registry
+
+```{attention}
+This section is outdated. It relies on the GITZ server, where we used to host our project at.
+```
 
 ### Create a token
 
