@@ -25,6 +25,7 @@ Modules
 -------
 
 .. automodule:: latexbuddy.module_loader
+   :members:
 
 Problems
 --------
