@@ -37,9 +37,11 @@ User's guide
 
 
 .. toctree::
-   :caption: How to...
+   :caption: How do I...
    :maxdepth: 2
 
+   ...develop my own module? <how-to/module-development>
+   ...use the API? <how-to/use-api>
 
 .. toctree::
    :caption: Reference
