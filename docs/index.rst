@@ -1,16 +1,57 @@
-.. LaTeXBuddy documentation master file, created by
-   sphinx-quickstart on Thu Dec  8 13:34:35 2022.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+LaTeXBuddy
+==========
 
-Welcome to LaTeXBuddy's documentation!
-======================================
+| The only LaTeX checking tool you'll ever need.
+
+LaTeXBuddy is the checking tool for LaTeX, which combines the power of various
+other tools in one easy-to-use command-line tool with clear HTML output.
+Aspell, ChkTeX, LanguageTool: you name it! LaTeXBuddy is modular and
+Python-based, so that implementing new functionality becomes a breeze!
+
+
+Current status
+--------------
+
+LaTeXBuddy is a work in progress. We are working on fixing bugs and cleaning up.
+Using LaTeXBuddy in its current state may come with a lot of inconveniences.
+Upon reaching the Beta status, we will open-source this project. For now, it
+remains copyrighted, yet you're free to fork it and provide your edits and
+improvements to the code base.
+
+----
 
 .. toctree::
+   :hidden:
+
+   about/changelog.md
+   about/licence.md
+
+.. toctree::
+   :caption: Tutorial
    :maxdepth: 2
-   :caption: Contents:
+
+   tutorial/install.md
 
 
+.. toctree::
+   :caption: How to...
+   :maxdepth: 2
+
+
+.. toctree::
+   :caption: Reference
+   :maxdepth: 2
+
+
+.. toctree::
+   :caption: Background
+   :maxdepth: 2
+
+.. toctree::
+   :caption: Developer's guide
+   :maxdepth: 2
+
+----
 
 Indices and tables
 ==================
