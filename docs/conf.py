@@ -6,28 +6,27 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'LaTeXBuddy'
-copyright = '2022, LaTeXBuddy team'
-author = 'LaTeXBuddy team'
-release = '0.3.0'
+project = "LaTeXBuddy"
+copyright = "2022, LaTeXBuddy team"
+author = "LaTeXBuddy team"
+release = "0.3.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    "myst_parser"
+    "myst_parser",
 ]
 
-templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_title = f"{project} documentation"
-html_static_path = ['_static']
+html_static_path = ["_static"]
 html_theme = "furo"
 html_theme_options = {
     "light_logo": "logotype-light@2x.png",
@@ -36,11 +35,12 @@ html_theme_options = {
     "source_repository": "https://gitlab.com/LaTeXBuddy/LaTeXBuddy",
     "source_branch": "master",
     "source_directory": "docs/",
-
     "light_css_variables": {
         "color-brand-primary": "#008281",
     },
-
+    "dark_css_variables": {
+        "color-brand-primary": "#009694",
+    },
     "footer_icons": [
         {
             "name": "GitLab",
