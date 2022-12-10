@@ -66,7 +66,7 @@ Windows users can also install both Python 3.7 and Python 3.11 from .exe install
 
 ## pre-commit
 
-Last but not least, we use [pre-commit] for Git hook management. It will run all the extra tools, like `isort`, `autopep8`, etc. every time you commit, so you won't forget it.
+Last but not least, we use [pre-commit] for Git hook management. It will run all the linting and formatting tools every time you commit, so you won't forget it.
 
 Install [pre-commit] as described on the website, and install the hooks:
 

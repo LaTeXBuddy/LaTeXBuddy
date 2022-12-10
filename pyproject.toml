@@ -35,7 +35,6 @@ PyLaTeX = "^1.4.1"
 
 
 [tool.poetry.group.dev.dependencies]
-isort = "^5.10.1"
 pytest = "^7.2.0"
 
 
@@ -54,14 +53,6 @@ latexbuddy = "latexbuddy.cli:main"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.isort]
-profile = "black"
-known_first_party = "latexbuddy"
-src_paths = ["latexbuddy", "tests"]
-atomic = true
-lines_after_imports = 2
-lines_between_types = 1
 
 [tool.autopep8]
 ignore = ["W503"]
