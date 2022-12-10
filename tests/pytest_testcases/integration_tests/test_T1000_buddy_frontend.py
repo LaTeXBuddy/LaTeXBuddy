@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import argparse
 import os
 import tempfile
-
 from pathlib import Path
 from typing import AnyStr
 
@@ -10,7 +11,8 @@ import pytest
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules.aspell import Aspell
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
 from tests.pytest_testcases.integration_tests.resources.T800_driver_ModuleProvider import (
     DriverModuleProvider,
 )
@@ -72,7 +74,6 @@ def problem_list(script_dir):
 
 
 def test_integration_buddy_frontend(script_dir, problem_list, config_loader):
-
     LatexBuddy.init(
         config_loader,
         DriverModuleProvider(),
@@ -85,7 +86,9 @@ def test_integration_buddy_frontend(script_dir, problem_list, config_loader):
 
     LatexBuddy.output_html()
 
-    temp_dir = config_loader.get_config_option(LatexBuddy, "output", verify_type=AnyStr)
+    temp_dir = config_loader.get_config_option(
+        LatexBuddy, "output", verify_type=AnyStr,
+    )
 
     with open(temp_dir + "/output_T1000_test_document.html") as file:
         contents = file.read()

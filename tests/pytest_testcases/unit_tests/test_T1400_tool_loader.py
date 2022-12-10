@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import argparse
 import os
-
 from pathlib import Path
 
 import pytest
@@ -30,7 +31,6 @@ def config_loader(script_dir):
 
 
 def test_unit_tool_loader(config_loader):
-
     module_loader = ModuleLoader(
         Path("tests/pytest_testcases/unit_tests/resources/T1400_dummy_modules/"),
     )

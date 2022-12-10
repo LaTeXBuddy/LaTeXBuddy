@@ -1,5 +1,6 @@
-import os
+from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
@@ -17,7 +18,6 @@ def script_dir():
 
 
 def test_unit_diction_run_checks(script_dir):
-
     _ERROR_COUNT = 3
     document_path = script_dir + "/resources/T1700.txt"
     diction_instance = Diction()

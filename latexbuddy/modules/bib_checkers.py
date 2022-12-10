@@ -1,37 +1,38 @@
+from __future__ import annotations
+
 import json
 import re
 import time
-
 from difflib import SequenceMatcher
-from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
-from typing import List, Optional
 
 import bibtexparser
 import requests
-
 from bibtexparser.bibdatabase import UndefinedString
 
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
 # TODO: logger
 
 
-def get_bibfile(file: TexFile) -> Optional[Path]:
-    """Checks the given file text for a \bibliography{} command and returns the full
-    path of the input BibTeX file. For now only works with a single BibTeX file.
+def get_bibfile(file: TexFile) -> Path | None:
+    """Checks the given file text for a \bibliography{} command and returns the
+    full path of the input BibTeX file. For now only works with a single BibTeX
+    file.
 
     :param file: TexFile object of the LaTeX file to check
     :return:
     """
     tex = file.tex
     path = file.tex_file
-    pattern = r"\\bibliography\{([A-Za-z0-9_/-]+)\}"  # TODO: improve the pattern
+    # TODO: improve the pattern
+    pattern = r"\\bibliography\{([A-Za-z0-9_/-]+)\}"
     # in particular space
     m = re.search(pattern, tex)
 
@@ -49,7 +50,7 @@ def get_bibfile(file: TexFile) -> Optional[Path]:
 
 
 def parse_bibfile(bibfile: Path) -> (str, str, str):
-    """Parses the given BibTeX file to extract the publications
+    """Parses the given BibTeX file to extract the publications.
 
     :param bibfile: Path object of the BibTeX file to be parsed
     :return: the title, year, and BibTeX Id of each publication as 3-Tuple
@@ -136,7 +137,7 @@ class NewerPublications(Module):
         except KeyError:
             pass  # if no hit found or incomplete
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         bib_file = get_bibfile(file)
 
         if bib_file is None:
@@ -156,7 +157,9 @@ class NewerPublications(Module):
             p.map(self.check_for_new, used_pubs)
         """
 
-        self.logger.debug(f"\n\ndblp requests took {round(time.time() - a, 3)} seconds")
+        self.logger.debug(
+            f"\n\ndblp requests took {round(time.time() - a, 3)} seconds",
+        )
         self.logger.debug(self.time)
         self.logger.debug(f'{len(used_pubs)} entries found in "{bib_file}"\n')
 
@@ -229,7 +232,7 @@ class BibtexDuplicates(Module):
             )
             self.found_duplicates.append(ids)
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
 
         bib_file = get_bibfile(file)
 

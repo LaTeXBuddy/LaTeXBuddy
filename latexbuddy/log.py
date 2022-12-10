@@ -1,12 +1,22 @@
+from __future__ import annotations
+
 from abc import ABC
-from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING, Formatter, Logger, LogRecord
+from logging import CRITICAL
+from logging import DEBUG
+from logging import ERROR
+from logging import Formatter
+from logging import INFO
+from logging import Logger
+from logging import LogRecord
+from logging import WARNING
 from logging.handlers import RotatingFileHandler
 
-from colorama import Back, Fore, Style
+from colorama import Back
+from colorama import Fore
+from colorama import Style
 from double_stream_handler import DoubleStreamHandler
 
 import latexbuddy
-
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
 
@@ -86,18 +96,15 @@ def __setup_root_logger(logger: Logger, console_level: int = INFO) -> None:
 
 
 class Loggable(ABC):
-    """
-    This class provides logging functionality to any class that inherits from it.
-    """
+    """This class provides logging functionality to any class that inherits
+    from it."""
 
     __logger = root_logger
 
     @property
     def logger(self):
-        """
-        Returns a logger that includes the full module path and the classname in
-        its name.
-        """
+        """Returns a logger that includes the full module path and the
+        classname in its name."""
         return self.__logger.getChild(
             ".".join(self.__module__.split(".")[1:]),
         ).getChild(self.__class__.__name__)
@@ -105,4 +112,3 @@ class Loggable(ABC):
     @logger.setter
     def logger(self, value: Logger) -> None:
         """Ignores any overwrite operations for property 'logger'."""
-        pass

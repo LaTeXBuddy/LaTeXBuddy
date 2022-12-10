@@ -1,46 +1,40 @@
+from __future__ import annotations
+
 import importlib
 import inspect
 import sys
-
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from pathlib import Path
 from types import ModuleType
-from typing import List
 
 import latexbuddy.tools as tools
-
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import Loggable
 from latexbuddy.modules import Module
 
 
 class ModuleProvider(ABC):
-    """
-    This interface class defines all methods necessary to provide a list of instances
-    of modules that implement the Module API, which is required in order for the
-    instances to be executed by the main LatexBuddy instance.
-    """
+    """This interface class defines all methods necessary to provide a list of
+    instances of modules that implement the Module API, which is required in
+    order for the instances to be executed by the main LatexBuddy instance."""
 
     @abstractmethod
-    def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
-        """
-        This method loads every module that is found in the ModuleLoader's directory
-        and only returns instances of modules that are enabled in the specified
-        configuration context.
+    def load_selected_modules(self, cfg: ConfigLoader) -> list[Module]:
+        """This method loads every module that is found in the ModuleLoader's
+        directory and only returns instances of modules that are enabled in the
+        specified configuration context.
 
         :param cfg: ConfigLoader instance containing config options for
                     enabled/disabled tools
         :return: a list of instances of classes implementing the Module API which have
                  been enabled in the specified configuration context
         """
-        pass
 
 
 class ModuleLoader(ModuleProvider, Loggable):
-    """
-    This class encapsulates all features necessary to load LaTeXBuddy modules from
-    a specified directory.
-    """
+    """This class encapsulates all features necessary to load LaTeXBuddy
+    modules from a specified directory."""
 
     def __init__(self, directory: Path):
         """Initializes the ModuleLoader for a specific directory.
@@ -49,7 +43,7 @@ class ModuleLoader(ModuleProvider, Loggable):
         """
         self.directory = directory
 
-    def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
+    def load_selected_modules(self, cfg: ConfigLoader) -> list[Module]:
 
         # importing this here to avoid circular import error
         from latexbuddy.buddy import LatexBuddy
@@ -72,9 +66,9 @@ class ModuleLoader(ModuleProvider, Loggable):
 
         return selected
 
-    def load_modules(self) -> List[Module]:
-        """
-        This method loads every module that is found in the ModuleLoader's directory.
+    def load_modules(self) -> list[Module]:
+        """This method loads every module that is found in the ModuleLoader's
+        directory.
 
         :return: a list of instances of classes implementing the Module API
         """
@@ -96,9 +90,9 @@ class ModuleLoader(ModuleProvider, Loggable):
 
         return modules
 
-    def import_py_files(self) -> List[ModuleType]:
-        """This method loads a python module from the specified file path for a list
-            of file paths.
+    def import_py_files(self) -> list[ModuleType]:
+        """This method loads a python module from the specified file path for a
+        list of file paths.
 
         :return: a list of python modules ready to be used
         """
@@ -114,7 +108,9 @@ class ModuleLoader(ModuleProvider, Loggable):
 
                 module_path = str(py_file.stem)
 
-                self.logger.debug(f"Attempting to load module from '{module_path}'")
+                self.logger.debug(
+                    f"Attempting to load module from '{module_path}'",
+                )
                 module = importlib.import_module(module_path)
 
                 loaded_modules.append(module)
@@ -126,9 +122,9 @@ class ModuleLoader(ModuleProvider, Loggable):
 
         return loaded_modules
 
-    def find_py_files(self) -> List[Path]:
-        """This method finds all .py files within the ModuleLoader's directory or any
-            subdirectories and returns a list of their paths.
+    def find_py_files(self) -> list[Path]:
+        """This method finds all .py files within the ModuleLoader's directory
+        or any subdirectories and returns a list of their paths.
 
         :return: a list of all .py files in the ModuleLoader's directory (or subfolders)
         """

@@ -1,14 +1,16 @@
-import os
+from __future__ import annotations
 
+import os
 from pathlib import Path
 from random import sample
-from typing import List, Optional, Tuple
 
 import pytest
 
 from latexbuddy.modules.aspell import Aspell
-from latexbuddy.output import Interval, render_html
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.output import Interval
+from latexbuddy.output import render_html
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
 
 
 @pytest.fixture
@@ -17,7 +19,6 @@ def script_dir():
 
 
 def test_unit_frontend_render_html(script_dir):
-
     file_name = "/home/lenni/Desktop/test.tex"  # this is not a real file_path
     file_path = Path(file_name)
     file_text = (
@@ -48,7 +49,7 @@ def test_unit_frontend_render_html(script_dir):
 
 
 def generate_test_problem(
-    position: Tuple[int, int],
+    position: tuple[int, int],
     length: int,
     description: str,
 ) -> Problem:
@@ -73,8 +74,8 @@ def generate_random_text(length: int) -> str:
 
 
 def parse_interval_list(
-    interval_data: Optional[List[Tuple[Tuple[int, int], int, str]]],
-) -> Optional[List[Interval]]:
+    interval_data: list[tuple[tuple[int, int], int, str]] | None,
+) -> list[Interval] | None:
 
     if interval_data is None:
         return None
@@ -106,8 +107,8 @@ def interval_equals(first: Interval, second: Interval) -> bool:
 
 
 def interval_lists_equal(
-    first: Optional[List[Interval]],
-    second: Optional[List[Interval]],
+    first: list[Interval] | None,
+    second: list[Interval] | None,
 ) -> bool:
 
     if first is None or second is None:
@@ -142,7 +143,6 @@ def interval_lists_equal(
     ],
 )
 def test_interval_creation(position, length, description):
-
     problem = generate_test_problem(position, length, description)
     interval = Interval(problem)
 
@@ -208,8 +208,8 @@ def test_interval_creation(position, length, description):
     ],
 )
 def test_interval_intersection(
-    interval_data_in: List[Tuple[Tuple[int, int], int, str]],
-    result_interval_data: Optional[List[Tuple[Tuple[int, int], int, str]]],
+    interval_data_in: list[tuple[tuple[int, int], int, str]],
+    result_interval_data: list[tuple[tuple[int, int], int, str]] | None,
 ):
 
     intervals_in = parse_interval_list(interval_data_in)

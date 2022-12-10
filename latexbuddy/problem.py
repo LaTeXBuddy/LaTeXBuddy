@@ -3,17 +3,17 @@
 *Problems* are found by *Checkers*. *Checkers* are free to implement their own Problem
 types, however LaTeXBuddy will most probably not display extra metadata.
 """
+from __future__ import annotations
 
 import time
-
 from enum import Enum
 from functools import total_ordering
 from json import JSONEncoder
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
-# from latexbuddy.modules import NamedModule
 from latexbuddy.log import Loggable
+# from latexbuddy.modules import NamedModule
 
 
 language = None  # static variable used for a uniform key generation
@@ -57,7 +57,7 @@ class ProblemSeverity(Enum):
 
 
 def set_language(lang):
-    """Sets the static variable language used for key generation
+    """Sets the static variable language used for key generation.
 
     :param lang: global language that the modules currently work with
     """
@@ -68,26 +68,27 @@ def set_language(lang):
 class Problem(Loggable):
     """Describes a Problem object.
 
-    A Problem object contains information about a problem detected by a checker. For
-    example, it can be wrong LaTeX code or a misspelled word.
+    A Problem object contains information about a problem detected by a
+    checker. For example, it can be wrong LaTeX code or a misspelled
+    word.
     """
 
     # TODO: resolve circular import error with modules.__init__.py in order to have
     #       type hints for attribute 'checker'
     def __init__(
         self,
-        position: Optional[Tuple[int, int]],
+        position: tuple[int, int] | None,
         text: str,
         checker,  # : Union[Type[NamedModule], NamedModule],
         file: Path,
         severity: ProblemSeverity = ProblemSeverity.WARNING,
-        p_type: Optional[str] = None,
-        length: Optional[int] = None,
-        category: Optional[str] = None,
-        description: Optional[str] = None,
-        context: Optional[Tuple[str, str]] = None,
-        suggestions: Optional[List[str]] = None,
-        key: Optional[str] = None,
+        p_type: str | None = None,
+        length: int | None = None,
+        category: str | None = None,
+        description: str | None = None,
+        context: tuple[str, str] | None = None,
+        suggestions: list[str] | None = None,
+        key: str | None = None,
     ):
         """
 
@@ -127,7 +128,9 @@ class Problem(Loggable):
             or isinstance(checker, LatexBuddy)
             or (isinstance(checker, type) and checker == LatexBuddy)
         ):
-            raise ValueError("Checker module can not be main LatexBuddy instance.")
+            raise ValueError(
+                "Checker module can not be main LatexBuddy instance.",
+            )
 
         else:
 
@@ -165,7 +168,8 @@ class Problem(Loggable):
         self.__cut_suggestions(10)
 
     def __cut_suggestions(self, n):
-        """Cuts the suggestions list down to the first n elements if there are more
+        """Cuts the suggestions list down to the first n elements if there are
+        more.
 
         :param n: maximum number of suggestions that should be shown
         """
@@ -213,7 +217,7 @@ class Problem(Loggable):
         return f"{self.position[0]}:{self.position[1]}"
 
     def better_eq(self, key: str) -> bool:
-        """equal method based on the key/CompareID"""
+        """equal method based on the key/CompareID."""
         return self.key == key
 
     def __eq__(self, o: object) -> bool:
@@ -238,7 +242,7 @@ class Problem(Loggable):
 
 
 class ProblemJSONEncoder(JSONEncoder):
-    """Provides JSON serializability for class Problem"""
+    """Provides JSON serializability for class Problem."""
 
     def default(self, obj: Any):
 

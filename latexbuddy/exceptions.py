@@ -1,26 +1,20 @@
 """This module defines standard exceptions that are to be raised when certain
 application-specific errors occur."""
+from __future__ import annotations
 
 
 class ExecutableNotFoundError(Exception):
-    """This error is raised when LaTeXBuddy can not locate a third-party executable
-    dependency on the system it is running on."""
-
-    pass
+    """This error is raised when LaTeXBuddy can not locate a third-party
+    executable dependency on the system it is running on."""
 
 
 class LanguageNotSupportedError(Exception):
     """This error is raised when LaTeXBuddy or a submodule does not support the
-    configured language.
-    """
-
-    pass
+    configured language."""
 
 
 class ConfigOptionError(Exception):
-    """Base Exception for errors related to loading configurations"""
-
-    pass
+    """Base Exception for errors related to loading configurations."""
 
 
 class ConfigOptionNotFoundError(ConfigOptionError):
@@ -29,14 +23,10 @@ class ConfigOptionNotFoundError(ConfigOptionError):
     This error is raised when a requested config entry doesn't exist.
     """
 
-    pass
-
 
 class ConfigOptionVerificationError(ConfigOptionError):
-    """Describes a ConfigOptionVerificationError
+    """Describes a ConfigOptionVerificationError.
 
     This error is raised when a requested config entry does not meet the
     specified criteria.
     """
-
-    pass

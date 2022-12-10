@@ -1,11 +1,10 @@
-import re
+from __future__ import annotations
 
+import re
 from pathlib import Path
 from tempfile import mkstemp
-from typing import List
 
 import latexbuddy.tools as tools
-
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
@@ -19,20 +18,17 @@ line_re = re.compile(
 
 
 class LogFilter(Module):
-    """
-    A Filter for log files. Using TexFilt:
-    https://www.ctan.org/tex-archive/support/texfilt
+    """A Filter for log files.
+
+    Using TexFilt: https://www.ctan.org/tex-archive/support/texfilt
     """
 
     def __init__(self):
-        """
-        Initializes the LogFilter
-        """
+        """Initializes the LogFilter."""
         self.texfilt_path = Path("latexbuddy/modules/texfilt.awk")
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-        """
-        Runs the Texfilt checks on a file and returns the results as a list.
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
+        """Runs the Texfilt checks on a file and returns the results as a list.
 
         :param config: configurations of the LaTeXBuddy instance
         :param file: the file to run checks on
@@ -61,9 +57,8 @@ class LogFilter(Module):
         raw_problems_path = Path(raw_problems_path)
         return self.format_problems(raw_problems_path, file)
 
-    def format_problems(self, raw_problems_path: Path, file: TexFile) -> List[Problem]:
-        """
-        Formats the output to a List of Problems
+    def format_problems(self, raw_problems_path: Path, file: TexFile) -> list[Problem]:
+        """Formats the output to a List of Problems.
 
         :param raw_problems_path: Path to TexFilt output
         :param file: file to check
@@ -80,9 +75,13 @@ class LogFilter(Module):
             severity = match.group("severity").upper()
             file_path = file.tex_file
             # position = (int(match.group("line_no")), 1)   # Does not work yet
+
+            # TODO: refactor this
             split_match = problem_line.split(f"{match.group()}")
             split = split_match[1].split("\n")
-            problem_text, description = split if len(split) > 1 else ("", split[0])
+            problem_text, description = split if len(
+                split,
+            ) > 1 else ("", split[0])
             problems.append(
                 Problem(
                     position=None,

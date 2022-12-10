@@ -1,7 +1,10 @@
+"""This is an example configuration for LaTeXBuddy and the tools that are
+supported out-of-the-box.
+
+You may move this file and specify its path using the --config flag.
 """
-This is an example configuration for LaTeXBuddy and the tools that are supported
-out-of-the-box. You may move this file and specify its path using the --config flag.
-"""
+from __future__ import annotations
+
 import os.path
 
 

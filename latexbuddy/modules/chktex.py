@@ -2,15 +2,13 @@
 
 ChkTeX Documentation: https://www.nongnu.org/chktex/ChkTeX.pdf
 """
-import os
-
-from typing import List
+from __future__ import annotations
 
 import latexbuddy.tools as tools
-
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
@@ -19,8 +17,9 @@ class Chktex(Module):
         self.DELIMITER = ":::"
         self.problem_type = "latex"
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-        """Runs the chktex checks on a file and converts them to a list of Problems
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
+        """Runs the chktex checks on a file and converts them to a list of
+        Problems.
 
         Requires chktex to be installed separately
 
@@ -51,8 +50,8 @@ class Chktex(Module):
 
         return result
 
-    def format_problems(self, out: List[str], file: TexFile) -> List[Problem]:
-        """Converts the output of chktex to a list of Problems
+    def format_problems(self, out: list[str], file: TexFile) -> list[Problem]:
+        """Converts the output of chktex to a list of Problems.
 
         :param out: line-split output of the chktex command
         :param file: the checked file

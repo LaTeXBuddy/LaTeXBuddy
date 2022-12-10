@@ -1,11 +1,11 @@
+from __future__ import annotations
+
 import os
 import re
-
 from pathlib import Path
 from tempfile import mkstemp
 
 import pytest
-
 from resources.driver_config_loader import ConfigLoader
 
 from latexbuddy.modules.logfilter import LogFilter

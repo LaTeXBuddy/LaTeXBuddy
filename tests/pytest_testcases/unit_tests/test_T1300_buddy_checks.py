@@ -1,9 +1,9 @@
+from __future__ import annotations
+
 import argparse
 import os
 import tempfile
-
 from pathlib import Path
-from typing import List
 
 import pytest
 
@@ -11,10 +11,8 @@ from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.module_loader import ModuleProvider
 from latexbuddy.modules import Module
-from tests.pytest_testcases.unit_tests.resources.T1300_dummy_modules.dummy_module import (
-    DummyModule0,
-    DummyModule1,
-)
+from tests.pytest_testcases.unit_tests.resources.T1300_dummy_modules.dummy_module import DummyModule0
+from tests.pytest_testcases.unit_tests.resources.T1300_dummy_modules.dummy_module import DummyModule1
 
 
 @pytest.fixture
@@ -49,12 +47,11 @@ def config_loader(script_dir, temp_dir):
 
 
 class DriverModuleProvider(ModuleProvider):
-    def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
+    def load_selected_modules(self, cfg: ConfigLoader) -> list[Module]:
         return [DummyModule0(), DummyModule1()]
 
 
 def test_unit_buddy_checks(script_dir, config_loader):
-
     file_str = script_dir + "/resources/T1300_test_document.tex"
     file = Path(file_str)
 

@@ -1,28 +1,28 @@
-"""This module defines new TexFile class used to abstract files LaTeXBuddy is working
-with."""
+"""This module defines new TexFile class used to abstract files LaTeXBuddy is
+working with."""
+from __future__ import annotations
+
 import os
 import re
 import sys
-
 from io import StringIO
 from pathlib import Path
 from tempfile import mkstemp
-from typing import Optional, Tuple
 
 from chardet import detect
-
-# from latexbuddy.config_loader import ConfigLoader
-from yalafi.tex2txt import Options, tex2txt, translate_numbers
+from yalafi.tex2txt import Options
+from yalafi.tex2txt import tex2txt
+from yalafi.tex2txt import translate_numbers
 
 from latexbuddy.log import Loggable
-from latexbuddy.messages import not_found, texfile_error
-from latexbuddy.tools import (
-    absolute_to_linecol,
-    execute,
-    find_executable,
-    get_line_offsets,
-    is_binary,
-)
+from latexbuddy.messages import not_found
+from latexbuddy.messages import texfile_error
+from latexbuddy.tools import absolute_to_linecol
+from latexbuddy.tools import execute
+from latexbuddy.tools import find_executable
+from latexbuddy.tools import get_line_offsets
+from latexbuddy.tools import is_binary
+# from latexbuddy.config_loader import ConfigLoader
 
 
 # regex to parse out error location from tex2txt output
@@ -30,8 +30,11 @@ location_re = re.compile(r"line (\d+), column (\d+)")
 
 
 class TexFile(Loggable):
-    """A simple TeX file. This class reads the file, detects its encoding and saves it
-    as text for future editing."""
+    """A simple TeX file.
+
+    This class reads the file, detects its encoding and saves it as text
+    for future editing.
+    """
 
     def __init__(self, file: Path, compile_tex: bool):
         """Creates a new file instance.
@@ -92,7 +95,10 @@ class TexFile(Loggable):
 
             location_match = location_re.match(location_str)
             if location_match:
-                location = (int(location_match.group(1)), int(location_match.group(2)))
+                location = (
+                    int(location_match.group(1)),
+                    int(location_match.group(2)),
+                )
             else:
                 location = None
 
@@ -100,7 +106,7 @@ class TexFile(Loggable):
 
         return plain, charmap, err
 
-    def get_position_in_tex(self, char_pos: int) -> Optional[Tuple[int, int]]:
+    def get_position_in_tex(self, char_pos: int) -> tuple[int, int] | None:
         """Gets position of a character in the original file.
 
         :param char_pos: absolute char position
@@ -108,7 +114,10 @@ class TexFile(Loggable):
         """
         line, col, offsets = absolute_to_linecol(self.plain, char_pos)
 
-        aux = translate_numbers(self.tex, self.plain, self._charmap, offsets, line, col)
+        aux = translate_numbers(
+            self.tex, self.plain,
+            self._charmap, offsets, line, col,
+        )
 
         if aux is None:
             return None
@@ -119,9 +128,12 @@ class TexFile(Loggable):
         self,
         line: int,
         col: int,
-    ) -> Optional[Tuple[int, int]]:
+    ) -> tuple[int, int] | None:
         offsets = get_line_offsets(self.plain)
-        aux = translate_numbers(self.tex, self.plain, self._charmap, offsets, line, col)
+        aux = translate_numbers(
+            self.tex, self.plain,
+            self._charmap, offsets, line, col,
+        )
 
         if aux is None:
             return None
@@ -140,7 +152,7 @@ class TexFile(Loggable):
     def __str__(self) -> str:
         return str(self.tex_file)
 
-    def __compile_tex(self, compile_pdf: bool) -> Tuple[Optional[Path], Optional[Path]]:
+    def __compile_tex(self, compile_pdf: bool) -> tuple[Path | None, Path | None]:
 
         from latexbuddy.buddy import LatexBuddy
 
@@ -148,7 +160,9 @@ class TexFile(Loggable):
         try:
             find_executable("latex")
         except FileNotFoundError:
-            self.logger.error(not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"))
+            self.logger.error(
+                not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"),
+            )
             return None, None
 
         if compile_pdf:
@@ -164,12 +178,12 @@ class TexFile(Loggable):
             os.mkdir(html_directory)
         except FileExistsError:
             self.logger.debug(f"Directory {html_directory} already exists.")
-            pass
         except Exception as exc:
             self.logger.error(
-                texfile_error(f"{exc} occurred while creating {html_directory}."),
+                texfile_error(
+                    f"{exc} occurred while creating {html_directory}.",
+                ),
             )
-            pass
 
         compile_directory = html_directory + "/compiled"
 
@@ -177,12 +191,12 @@ class TexFile(Loggable):
             os.mkdir(compile_directory)
         except FileExistsError:
             self.logger.debug(f"Directory {compile_directory} already exists.")
-            pass
         except Exception as exc:
             self.logger.error(
-                texfile_error(f"{exc} occurred while creating {compile_directory}."),
+                texfile_error(
+                    f"{exc} occurred while creating {compile_directory}.",
+                ),
             )
-            pass
 
         compilation_path = Path(
             compile_directory + "/" + str(self.tex_file.parent.name),
@@ -191,15 +205,15 @@ class TexFile(Loggable):
         try:
             os.mkdir(str(compilation_path))
         except FileExistsError:
-            self.logger.debug(f"Directory {str(compilation_path)} already exists.")
-            pass
+            self.logger.debug(
+                f"Directory {str(compilation_path)} already exists.",
+            )
         except Exception as exc:
             self.logger.error(
                 texfile_error(
                     f"{exc} occurred while creating {str(compilation_path)}.",
                 ),
             )
-            pass
 
         tex_mf = self.__create_tex_mf(compilation_path)
 
@@ -224,16 +238,15 @@ class TexFile(Loggable):
         )
 
         log = compilation_path / f"{self.tex_file.stem}.log"
-        pdf = compilation_path / f"{self.tex_file.stem}.pdf" if compile_pdf else None
+        pdf = compilation_path / \
+            f"{self.tex_file.stem}.pdf" if compile_pdf else None
         self.logger.debug(f"LOG: {str(log)}, isFile: {log.is_file()}")
         self.logger.debug(f"PDF: {str(pdf)}, isFile: {pdf.is_file()}")
         return log, pdf
 
     @staticmethod
     def __create_tex_mf(path: Path) -> str:
-        """
-        This method makes the log file be written correctly
-        """
+        """This method makes the log file be written correctly."""
         # https://tex.stackexchange.com/questions/52988/avoid-linebreaks-in-latex-console-log-output-or-increase-columns-in-terminal
         # https://tex.stackexchange.com/questions/410592/texlive-personal-texmf-cnf
         text = "\n".join(

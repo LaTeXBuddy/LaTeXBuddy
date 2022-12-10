@@ -1,17 +1,18 @@
+from __future__ import annotations
+
 import hashlib
 import os
-
 from pathlib import Path
-from typing import AnyStr, List
+from typing import AnyStr
 
 from unidecode import unidecode
 
 import latexbuddy.tools as tools
-
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
@@ -22,7 +23,7 @@ class Diction(Module):
     def __init__(self):
         self.language = None
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
 
         # check, if diction is installed
         tools.find_executable("diction", "Diction", self.logger)
@@ -77,11 +78,11 @@ class Diction(Module):
 
     def format_errors(
         self,
-        out: List[str],
-        original: List[str],
+        out: list[str],
+        original: list[str],
         file,
         texfile,
-    ) -> List[Problem]:
+    ) -> list[Problem]:
         """Parses diction errors and returns list of Problems.
 
         :param original: lines of file to check as list
@@ -112,8 +113,9 @@ class Diction(Module):
                 split_chars = chars.split("-")
                 split_lines_int = [int(a) for a in split_lines]
                 split_chars_int = [int(a) for a in split_chars]
-                start_line, end_line = split_lines_int[0], split_lines_int[1]
-                start_char, end_char = split_chars_int[0] - 1, split_chars_int[1]
+                start_line, end_line = split_lines_int[0:1]
+                start_char, end_char = split_chars_int[0:1]
+                start_char -= 1  # zero-index chars
                 if start_line == end_line:
                     o_line = original[start_line - 1][start_char:end_char]
                 else:
@@ -133,7 +135,7 @@ class Diction(Module):
                 end_line = int(location.split("-")[1].split(".")[0])
                 end_char = int(location.split("-")[1].split(".")[1])
                 if start_line == end_line:
-                    o_line = original[start_line - 1][start_char - 1 : end_char]
+                    o_line = original[start_line - 1][start_char - 1: end_char]
                 else:
                     for x in range(start_line, end_line + 1):
                         if x == end_line:
@@ -147,6 +149,8 @@ class Diction(Module):
                     start_char,
                 )
 
+            line_hash = hashlib.md5(o_line.encode()).hexdigest()
+
             problems.append(
                 Problem(
                     position=location,
@@ -157,7 +161,7 @@ class Diction(Module):
                     severity=ProblemSeverity.WARNING,
                     category="grammar",
                     suggestions=[sugg],
-                    key=self.display_name + "_" + str(hashlib.md5(o_line.encode())),
+                    key=f"{self.display_name}_{line_hash}",
                 ),
             )
 

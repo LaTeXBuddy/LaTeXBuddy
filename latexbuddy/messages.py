@@ -1,6 +1,7 @@
-"""This module defines standard messages that are to be printed to the command line
-as well as builders for those.
-"""
+"""This module defines standard messages that are to be printed to the command
+line as well as builders for those."""
+from __future__ import annotations
+
 from pathlib import Path
 
 

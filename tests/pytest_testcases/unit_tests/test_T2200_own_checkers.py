@@ -1,16 +1,15 @@
-import os
+from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
 
-from latexbuddy.modules.own_checkers import (
-    EmptySections,
-    NativeUseOfRef,
-    SiUnitx,
-    UnreferencedFigures,
-    URLCheck,
-)
+from latexbuddy.modules.own_checkers import EmptySections
+from latexbuddy.modules.own_checkers import NativeUseOfRef
+from latexbuddy.modules.own_checkers import SiUnitx
+from latexbuddy.modules.own_checkers import UnreferencedFigures
+from latexbuddy.modules.own_checkers import URLCheck
 from latexbuddy.texfile import TexFile
 from tests.pytest_testcases.unit_tests.resources.driver_config_loader import (
     ConfigLoader as DriverCL,
@@ -23,24 +22,21 @@ def script_dir():
 
 
 def test_unit_unreferenced_figures_run_checks(script_dir):
-
     _ERROR_COUNT = 1
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = UnreferencedFigures()
 
     test_file = TexFile(Path(document_path))
 
-    output_problems = checker_instance.run_checks(DriverCL(), test_file)
+    problems = checker_instance.run_checks(DriverCL(), test_file)
 
-    assert len(output_problems) == _ERROR_COUNT
-    assert (
-        str(output_problems[0]) == "Latex info on 2:1: gantt: Figure gantt not "
-        "referenced.."
-    )
+    assert len(problems) == _ERROR_COUNT
+    assert str(
+        problems[0],
+    ) == "Latex info on 2:1: gantt: Figure gantt not referenced.."
 
 
 def test_unit_si_unit_run_checks(script_dir):
-
     _ERROR_COUNT = 3
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = SiUnitx()
@@ -61,7 +57,6 @@ def test_unit_si_unit_run_checks(script_dir):
 
 
 def test_unit_empty_sections_run_checks(script_dir):
-
     _ERROR_COUNT = 1
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = EmptySections()
@@ -78,7 +73,6 @@ def test_unit_empty_sections_run_checks(script_dir):
 
 
 def test_unit_url_check_run_checks(script_dir):
-
     _ERROR_COUNT = 1
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = URLCheck()
@@ -92,7 +86,6 @@ def test_unit_url_check_run_checks(script_dir):
 
 
 def test_unit_native_use_of_ref_run_checks(script_dir):
-
     _ERROR_COUNT = 1
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = NativeUseOfRef()

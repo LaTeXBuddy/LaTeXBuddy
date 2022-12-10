@@ -1,5 +1,6 @@
-import os
+from __future__ import annotations
 
+import os
 from logging import DEBUG
 from pathlib import Path
 
@@ -7,11 +8,10 @@ import pytest
 
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.problem import Problem, ProblemSeverity
-from tests.pytest_testcases.integration_tests.resources.T800_driver_ModuleProvider import (
-    DriverModule1,
-    DriverModuleProvider,
-)
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
+from tests.pytest_testcases.integration_tests.resources.T800_driver_ModuleProvider import DriverModule1
+from tests.pytest_testcases.integration_tests.resources.T800_driver_ModuleProvider import DriverModuleProvider
 
 
 @pytest.fixture
@@ -25,7 +25,6 @@ def default_config_loader():
 
 
 def test_integration_buddy_module(script_dir, caplog, default_config_loader):
-
     # initializing logger on DEBUG level
     caplog.set_level(DEBUG)
 
@@ -47,7 +46,10 @@ def test_integration_buddy_module(script_dir, caplog, default_config_loader):
     # asserting that the correct problem has been returned (unfortunately, due to the
     # checking process being parallelized, the logs during the checks are unavailable)
 
-    problem_list = [problem for uid, problem in LatexBuddy.instance.errors.items()]
+    problem_list = [
+        problem for uid,
+        problem in LatexBuddy.instance.errors.items()
+    ]
     assert len(problem_list) == 1
 
     assert problem_list[0] == Problem(
