@@ -21,32 +21,30 @@ cache:
 
 stages:
   - Lint
-  - Smoke Test
+  - Test
   - Build
   - Publish
 
-.pre-commit: &pre-commit-base
+pre-commit:
   stage: Lint
   before_script:
     - pip install pre-commit
-
-pre-commit-on-merge:
-  <<: *pre-commit-base
   script:
-    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - pre-commit run --from-ref origin/"$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" --to-ref "$CI_COMMIT_SHA"
-  only:
-    - merge_requests
-
-pre-commit-all-files:
-  <<: *pre-commit-base
-  script:
-    - pre-commit run --all-files
+    - |
+      if [[ "$CI_PIPELINE_SOURCE" == "merge_request_event" ]]; then
+        git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+        pre-commit run --from-ref origin/"$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" --to-ref "$CI_COMMIT_SHA"
+      else
+        pre-commit run --all-files
+      fi
   only:
     - master
+    - merge_requests
 
 .smoke: &smoke_base
-  stage: Smoke Test
+  stage: Test
+  needs:
+    - pre-commit
   before_script:
     - pip install .
   script:
@@ -55,11 +53,23 @@ pre-commit-all-files:
     - master
     - merge_requests
 
-smoke-py37:
+Smoke test 37/5:
   <<: *smoke_base
   image: python:3.7
 
-smoke-py311:
+Smoke test 38/5:
+  <<: *smoke_base
+  image: python:3.8
+
+Smoke test 39/5:
+  <<: *smoke_base
+  image: python:3.9
+
+Smoke test 310/5:
+  <<: *smoke_base
+  image: python:3.10
+
+Smoke test 311/5:
   <<: *smoke_base
   image: python:3.11
 
@@ -79,6 +89,8 @@ build:
 
 publish:
   stage: Publish
+  needs:
+    - build
   before_script:
     - pip install --upgrade twine
   script:
