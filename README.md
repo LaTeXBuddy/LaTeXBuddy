@@ -84,10 +84,49 @@ file.
 
 ## Licence
 
-LaTeXBuddy is temporarily copyrighted. You can expect it to become open-source
-later this year (we're thinking of GPL).
+Generally speaking, LaTeXBuddy is licensed under the
+[GNU General Public License v3.0 or later][gpl-3.0-or-later] with docs licensed
+under the [GNU Free Documentation License v1.3 or later][gfdl-1.3-or-later].
 
-The LaTeXBuddy logo is based on the
-[Origami](https://www.flaticon.com/free-icon/origami_2972006) icon,
-made by [Freepik](https://www.freepik.com)
-from [www.flaticon.com](https://www.flaticon.com/).
+For information on which file is licensed under which licence, take a look at
+the [DEP-5 (`debian/copyright`)](./.reuse/dep5) file.
+
+### Source code
+
+LaTeXBuddy\
+Copyright © 2021-2022 [LaTeXBuddy authors](./AUTHORS)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+### Documentation
+
+LaTeXBuddy documentation\
+Copyright © 2021-2022 [LaTeXBuddy authors](./AUTHORS)
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+### Complementary files
+
+Smaller files are licensed either under the [Apache License 2.0][apache-2.0] or
+are in public domain as per [Creative Commons Zero v1.0 Universal][cc0-1.0].
+
+---
+
+This project is hosted on GitLab:
+<https://gitlab.com/LaTeXBuddy/LaTeXBuddy.git>
+
+[apache-2.0]: https://spdx.org/licenses/Apache-2.0.html
+[cc0-1.0]: https://spdx.org/licenses/CC0-1.0.html
+[gfdl-1.3-or-later]: https://spdx.org/licenses/GFDL-1.3-or-later.html
+[gpl-3.0-or-later]: https://spdx.org/licenses/GPL-3.0-or-later.html
