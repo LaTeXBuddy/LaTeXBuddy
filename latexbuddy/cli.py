@@ -1,10 +1,10 @@
-"""This module contains code for the command-line interface used to run and manage
-LaTeXBuddy."""
+"""This module contains code for the command-line interface used to run and
+manage LaTeXBuddy."""
+from __future__ import annotations
 
 import argparse
 import logging
 import os
-
 from pathlib import Path
 from time import perf_counter
 from typing import AnyStr
@@ -14,16 +14,15 @@ from colorama import Fore
 from latexbuddy import __app_name__
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
-from latexbuddy import __version__, flask_app
+from latexbuddy import __version__
+from latexbuddy import flask_app
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import __setup_root_logger
 from latexbuddy.module_loader import ModuleLoader
-from latexbuddy.tools import (
-    get_abs_path,
-    get_all_paths_in_document,
-    perform_whitelist_operations,
-)
+from latexbuddy.tools import get_abs_path
+from latexbuddy.tools import get_all_paths_in_document
+from latexbuddy.tools import perform_whitelist_operations
 
 
 def _get_parser() -> argparse.ArgumentParser:
@@ -167,10 +166,11 @@ def main():
 
 
 def __setup_logger(args: argparse.Namespace) -> logging.Logger:
-
     display_debug = args.verbose or os.environ.get("LATEXBUDDY_DEBUG", False)
 
-    __setup_root_logger(root_logger, logging.DEBUG if display_debug else logging.INFO)
+    __setup_root_logger(
+        root_logger, logging.DEBUG if display_debug else logging.INFO,
+    )
     return root_logger.getChild("cli")
 
 
@@ -179,7 +179,6 @@ def __execute_flask_startup(args: argparse.Namespace) -> None:
 
 
 def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
-
     config_loader = ConfigLoader(args)
 
     """ For each Tex file transferred, all paths

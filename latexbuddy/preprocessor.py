@@ -1,25 +1,26 @@
-import re
+from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import Callable, List, Optional
+import re
+from abc import ABC
+from abc import abstractmethod
+from typing import Callable
 
 from latexbuddy.log import Loggable
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
 # forward-declare
 class ProblemFilter(ABC):
-    """forward-declaring ProblemFilter because type hints will break otherwise"""
-
-    pass
+    """forward-declaring ProblemFilter because type hints will break
+    otherwise."""
 
 
 class ProblemFilter(ABC):
-    """
-    Describes the base class for any filter for Problem objects.
-    ProblemFilter provides functionality to define a start and end line and to match a
-    problem based on its line position.
+    """Describes the base class for any filter for Problem objects.
+    ProblemFilter provides functionality to define a start and end line and to
+    match a problem based on its line position.
 
     ProblemFilters can be created open-ended by omitting the end_line parameter
     resulting in the filter matching any Problem located at or below the start line.
@@ -37,9 +38,9 @@ class ProblemFilter(ABC):
                                    current one
     """
 
-    def __init__(self, start_line: int, end_line: Optional[int] = None):
-        """
-        Initializes a new ProblemFilter with a start_line and possibly an end_line.
+    def __init__(self, start_line: int, end_line: int | None = None):
+        """Initializes a new ProblemFilter with a start_line and possibly an
+        end_line.
 
         :param start_line: beginning of the filter's area
         :param end_line: end of the filter's area (open-ended, if omitted)
@@ -48,8 +49,7 @@ class ProblemFilter(ABC):
         self.end_line = end_line
 
     def end(self, end_line: int) -> bool:
-        """
-        Sets the end line of ProblemFilter, if not already done.
+        """Sets the end line of ProblemFilter, if not already done.
 
         :param end_line: line number of the filter's end
         :return: true if end_line was set; false otherwise
@@ -61,9 +61,8 @@ class ProblemFilter(ABC):
             return False
 
     def __match_line(self, problem: Problem) -> bool:
-        """
-        Determines, whether a given problem is located within the ProblemFilter's
-        line boundaries.
+        """Determines, whether a given problem is located within the
+        ProblemFilter's line boundaries.
 
         :param problem: Problem object to examine
         :return: True, if the problem is located in the area covered by the
@@ -79,10 +78,9 @@ class ProblemFilter(ABC):
             return self.start_line <= problem.position[0] <= self.end_line
 
     def match(self, problem: Problem) -> bool:
-        """
-        Determines, whether a given problem is located within the ProblemFilter's
-        line boundaries and matches all custom requirements that the subclass
-        implementation imposes.
+        """Determines, whether a given problem is located within the
+        ProblemFilter's line boundaries and matches all custom requirements
+        that the subclass implementation imposes.
 
         :param problem: Problem object to examine
         :return: True, if the problem is located in the area covered by the
@@ -93,19 +91,17 @@ class ProblemFilter(ABC):
 
     @abstractmethod
     def custom_match(self, problem: Problem) -> bool:
-        """
-        Matches a given Problem object based on custom parameters of the subclass
-        implementation.
+        """Matches a given Problem object based on custom parameters of the
+        subclass implementation.
 
         :param problem: Problem object to be examined
         :return: True, if the problem matches all custom requirements, False otherwise
         """
-        pass
 
     @abstractmethod
     def custom_parameters_equal(self, other: ProblemFilter) -> bool:
-        """
-        Determines, if two custom ProblemFilters are:
+        """Determines, if two custom ProblemFilters are:
+
             - of the same type
             - equal in terms of their custom parameters
 
@@ -115,17 +111,14 @@ class ProblemFilter(ABC):
         :return: True, if the other custom ProblemFilter is equal to the current one
                  with respect to its type and custom parameters, False otherwise
         """
-        pass
 
 
 class LineProblemFilter(ProblemFilter):
-    """
-    ProblemFilter implementation that only considers a problem's line position.
-    """
+    """ProblemFilter implementation that only considers a problem's line
+    position."""
 
-    def __init__(self, start_line: int, end_line: Optional[int] = None):
-        """
-        Initializes a new LineProblemFilter with no custom parameters.
+    def __init__(self, start_line: int, end_line: int | None = None):
+        """Initializes a new LineProblemFilter with no custom parameters.
 
         :param start_line: beginning of the filter's area
         :param end_line: end of the filter's area
@@ -143,20 +136,17 @@ class LineProblemFilter(ProblemFilter):
 
 
 class ModuleProblemFilter(ProblemFilter):
-    """
-    ProblemFilter implementation that filters problems, if they have been created by a
-    specified LaTeXBuddy module.
-    """
+    """ProblemFilter implementation that filters problems, if they have been
+    created by a specified LaTeXBuddy module."""
 
     def __init__(
         self,
         module_name: str,
         start_line: int,
-        end_line: Optional[int] = None,
+        end_line: int | None = None,
     ):
-        """
-        Initializes a new ModuleProblemFilter with a string representation of a module
-        name as its custom parameter.
+        """Initializes a new ModuleProblemFilter with a string representation
+        of a module name as its custom parameter.
 
         :param module_name: name of the module which created a problem object
         :param start_line: beginning of the filter's area
@@ -178,20 +168,17 @@ class ModuleProblemFilter(ProblemFilter):
 
 
 class SeverityProblemFilter(ProblemFilter):
-    """
-    ProblemFilter implementation that filters problems, if they have been created with a
-    specified ProblemSeverity.
-    """
+    """ProblemFilter implementation that filters problems, if they have been
+    created with a specified ProblemSeverity."""
 
     def __init__(
         self,
         severity: ProblemSeverity,
         start_line: int,
-        end_line: Optional[int] = None,
+        end_line: int | None = None,
     ):
-        """
-        Initializes a new SeverityProblemFilter with a string representation of a
-        ProblemSeverity level as its custom parameter.
+        """Initializes a new SeverityProblemFilter with a string representation
+        of a ProblemSeverity level as its custom parameter.
 
         :param severity: ProblemSeverity level of a problem
         :param start_line: beginning of the filter's area
@@ -211,15 +198,12 @@ class SeverityProblemFilter(ProblemFilter):
 
 
 class WhitelistKeyProblemFilter(ProblemFilter):
-    """
-    WhitelistKeyProblemFilter implementation that filters problems, if they have been
-    created with a specified whitelist key.
-    """
+    """WhitelistKeyProblemFilter implementation that filters problems, if they
+    have been created with a specified whitelist key."""
 
-    def __init__(self, wl_key: str, start_line: int, end_line: Optional[int] = None):
-        """
-        Initializes a new WhitelistKeyProblemFilter with a whitelist key as its custom
-        parameter.
+    def __init__(self, wl_key: str, start_line: int, end_line: int | None = None):
+        """Initializes a new WhitelistKeyProblemFilter with a whitelist key as
+        its custom parameter.
 
         :param wl_key: whitelist key of a problem
         :param start_line: beginning of the filter's area
@@ -239,58 +223,59 @@ class WhitelistKeyProblemFilter(ProblemFilter):
 
 
 class Preprocessor(Loggable):
-    """
-    This class represents the LaTeXBuddy in-file preprocessor.
-    the Preprocessor is capable of parsing buddy commands disguised as LaTeX comments
-    from a TexFile object using regexes and is able to filter any given Problem or list
-    of Problems accordingly.
+    """This class represents the LaTeXBuddy in-file preprocessor.
+
+    the Preprocessor is capable of parsing buddy commands disguised as
+    LaTeX comments from a TexFile object using regexes and is able to
+    filter any given Problem or list of Problems accordingly.
     """
 
-    __COMMAND_PATTERN = re.compile(
+    __RE_COMMAND = re.compile(
         r"%\s?buddy (ignore-next|begin-ignore|end-ignore)( (\S+))*",
     )
 
-    __COMMAND_PATTERN_IGNORE_NEXT_ONE_LINE = re.compile(
+    __RE_IGNORE_NEXT_ONE_LINE = re.compile(
         r"%\s?buddy ignore-next(?:(?: 1)? line)?",
     )
-    __COMMAND_PATTERN_IGNORE_NEXT_N_LINES = re.compile(
+    __RE_IGNORE_NEXT_N_LINES = re.compile(
         r"%\s?buddy ignore-next (\d+) lines",
     )
 
-    __COMMAND_PATTERN_BEGIN_IGNORE_ANYTHING = re.compile(r"%\s?buddy begin-ignore")
-    __COMMAND_PATTERN_BEGIN_IGNORE_MODULES = re.compile(
+    __RE_BEGIN_IGNORE_ANYTHING = re.compile(
+        r"%\s?buddy begin-ignore",
+    )
+    __RE_BEGIN_IGNORE_MODULES = re.compile(
         r"%\s?buddy begin-ignore (modules?)((?: \S+)+)",
     )
-    __COMMAND_PATTERN_BEGIN_IGNORE_SEVERITIES = re.compile(
+    __RE_BEGIN_IGNORE_SEVERITIES = re.compile(
         r"%\s?buddy begin-ignore (?:severity|severities)((?: \S+)+)",
     )
-    __COMMAND_PATTERN_BEGIN_IGNORE_WL_KEYS = re.compile(
+    __RE_BEGIN_IGNORE_WL_KEYS = re.compile(
         r"%\s?buddy begin-ignore (whitelist-keys?)((?: \S+)+)",
     )
 
-    __COMMAND_PATTERN_END_IGNORE_ANYTHING = re.compile(r"%\s?buddy end-ignore")
-    __COMMAND_PATTERN_END_IGNORE_MODULES = re.compile(
+    __RE_END_IGNORE_ANYTHING = re.compile(r"%\s?buddy end-ignore")
+    __RE_END_IGNORE_MODULES = re.compile(
         r"%\s?buddy end-ignore (modules?)((?: \S+)+)",
     )
-    __COMMAND_PATTERN_END_IGNORE_SEVERITIES = re.compile(
+    __RE_END_IGNORE_SEVERITIES = re.compile(
         r"%\s?buddy end-ignore (?:severity|severities)((?: \S+)+)",
     )
-    __COMMAND_PATTERN_END_IGNORE_WL_KEYS = re.compile(
+    __RE_END_IGNORE_WL_KEYS = re.compile(
         r"%\s?buddy end-ignore (whitelist-keys?)((?: \S+)+)",
     )
 
     def __init__(self):
-        """
-        Initializes a new Preprocessor instance with an empty list of filters.
-        """
+        """Initializes a new Preprocessor instance with an empty list of
+        filters."""
 
-        self.filters: List[ProblemFilter] = []
+        self.filters: list[ProblemFilter] = []
 
     def regex_parse_preprocessor_comments(self, file: TexFile) -> None:
-        """
-        This method takes in a TexFile object and parses all contained preprocessor
-        commands resulting in a set of ProblemFilters which are added to this instance's
-        list of filters to be applied to any given problem.
+        """This method takes in a TexFile object and parses all contained
+        preprocessor commands resulting in a set of ProblemFilters which are
+        added to this instance's list of filters to be applied to any given
+        problem.
 
         :param file: TexFile object containing the LaTeX sourcecode to be parsed
         """
@@ -300,10 +285,12 @@ class Preprocessor(Loggable):
 
             line_num += 1  # lines are 1-based
 
-            if not Preprocessor.__COMMAND_PATTERN.fullmatch(line):
+            if not Preprocessor.__RE_COMMAND.fullmatch(line):
                 continue
 
-            resulting_filters = self.__regex_parse_cmd_args_to_filter(line, line_num)
+            resulting_filters = self.__regex_parse_cmd_args_to_filter(
+                line, line_num,
+            )
 
             for resulting_filter in resulting_filters:
                 self.filters.append(resulting_filter)
@@ -312,10 +299,9 @@ class Preprocessor(Loggable):
         self,
         line: str,
         line_num: int,
-    ) -> List[ProblemFilter]:
-        """
-        Parses a single preprocessor command resulting in a list of zero or more
-        ProblemFilters which are returned.
+    ) -> list[ProblemFilter]:
+        """Parses a single preprocessor command resulting in a list of zero or
+        more ProblemFilters which are returned.
 
         :param line: the LaTeX code line which contains the preprocessor command to be
                      parsed
@@ -324,7 +310,7 @@ class Preprocessor(Loggable):
                  command
         """
 
-        matchers: List[Callable[[str, int], Optional[List[ProblemFilter]]]] = [
+        matchers: list[Callable[[str, int], list[ProblemFilter] | None]] = [
             self.__regex_match_command_pattern_ignore_next_one_line,
             self.__regex_match_command_pattern_ignore_next_n_lines,
             self.__regex_match_command_pattern_begin_ignore_anything,
@@ -353,17 +339,16 @@ class Preprocessor(Loggable):
         self,
         line: str,
         line_num: int,
-    ) -> Optional[List[ProblemFilter]]:
-        """
-        Checks, if the provided command matches the regex pattern
-        and creates LineProblemFilters beginning and ending at line_num + 1.
+    ) -> list[ProblemFilter] | None:
+        """Checks, if the provided command matches the regex pattern and
+        creates LineProblemFilters beginning and ending at line_num + 1.
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
         :return: LineProblemFilter as a list, None if regex not matching
         """
 
-        match = Preprocessor.__COMMAND_PATTERN_IGNORE_NEXT_ONE_LINE.fullmatch(line)
+        match = Preprocessor.__RE_IGNORE_NEXT_ONE_LINE.fullmatc(line)
         if match is not None:
             self.logger.debug(
                 f"Created LineProblemFilter from line {line_num + 1} to {line_num + 1}",
@@ -376,19 +361,18 @@ class Preprocessor(Loggable):
         self,
         line: str,
         line_num: int,
-    ) -> Optional[List[ProblemFilter]]:
-        """
-        Checks, if the provided command matches the regex pattern
-        and creates a LineProblemFilter beginning at line_num + 1
-        and ending at line_num + n.
-        The number of lines to ignore (n) is drawn from the command.
+    ) -> list[ProblemFilter] | None:
+        """Checks, if the provided command matches the regex pattern and
+        creates a LineProblemFilter beginning at line_num + 1 and ending at
+        line_num + n. The number of lines to ignore (n) is drawn from the
+        command.
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
         :return: LineProblemFilter as a list, None if regex not matching
         """
 
-        match = Preprocessor.__COMMAND_PATTERN_IGNORE_NEXT_N_LINES.fullmatch(line)
+        match = Preprocessor.__RE_IGNORE_NEXT_N_LINES.fullmatch(line)
         if match is not None:
             n = int(match.group(1))
             self.logger.debug(
@@ -402,20 +386,21 @@ class Preprocessor(Loggable):
         self,
         line: str,
         line_num: int,
-    ) -> Optional[List[ProblemFilter]]:
-        """
-        Checks, if the provided command matches the regex pattern
-        and creates a LineProblemFilter beginning at line_num + 1.
+    ) -> list[ProblemFilter] | None:
+        """Checks, if the provided command matches the regex pattern and
+        creates a LineProblemFilter beginning at line_num + 1.
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
         :return: open-ended LineProblemFilter as a list, None if regex not matching
         """
 
-        match = Preprocessor.__COMMAND_PATTERN_BEGIN_IGNORE_ANYTHING.fullmatch(line)
+        match = Preprocessor.__RE_BEGIN_IGNORE_ANYTHING.fullmatch(line)
         if match is not None:
 
-            open_ended_filter = self.__get_open_ended_filter(LineProblemFilter(0))
+            open_ended_filter = self.__get_open_ended_filter(
+                LineProblemFilter(0),
+            )
 
             if open_ended_filter is not None:
                 self.logger.info(
@@ -435,11 +420,10 @@ class Preprocessor(Loggable):
         self,
         line: str,
         line_num: int,
-    ) -> Optional[List[ProblemFilter]]:
-        """
-        Checks, if the provided command matches the regex pattern
-        and creates ModuleProblemFilters corresponding to the provided
-        module names beginning at line_num + 1.
+    ) -> list[ProblemFilter] | None:
+        """Checks, if the provided command matches the regex pattern and
+        creates ModuleProblemFilters corresponding to the provided module names
+        beginning at line_num + 1.
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
@@ -447,7 +431,7 @@ class Preprocessor(Loggable):
                 None if regex not matching
         """
 
-        match = Preprocessor.__COMMAND_PATTERN_BEGIN_IGNORE_MODULES.fullmatch(line)
+        match = Preprocessor.__RE_BEGIN_IGNORE_MODULES.fullmatch(line)
         if match is not None:
             modules = match.group(1).strip().split(" ")
 
@@ -478,10 +462,9 @@ class Preprocessor(Loggable):
         self,
         line: str,
         line_num: int,
-    ) -> Optional[List[ProblemFilter]]:
-        """
-        Checks, if the provided command matches the regex pattern
-        and creates SeverityProblemFilters corresponding to the provided severities
+    ) -> list[ProblemFilter] | None:
+        """Checks, if the provided command matches the regex pattern and
+        creates SeverityProblemFilters corresponding to the provided severities
         beginning at line_num + 1.
 
         :param line: inserted command from .tex file
@@ -490,7 +473,7 @@ class Preprocessor(Loggable):
                  to match the provided severities, None if regex not matching
         """
 
-        match = Preprocessor.__COMMAND_PATTERN_BEGIN_IGNORE_SEVERITIES.fullmatch(line)
+        match = Preprocessor.__RE_BEGIN_IGNORE_SEVERITIES.fullmatch(line)
         if match is not None:
             severities = match.group(1).strip().split(" ")
 
@@ -531,10 +514,9 @@ class Preprocessor(Loggable):
         self,
         line: str,
         line_num: int,
-    ) -> Optional[List[ProblemFilter]]:
-        """
-        Checks, if the provided command matches the regex pattern
-        and creates WhitelistKeyProblemFilters corresponding to the provided
+    ) -> list[ProblemFilter] | None:
+        """Checks, if the provided command matches the regex pattern and
+        creates WhitelistKeyProblemFilters corresponding to the provided
         whitelist keys beginning at line_num + 1.
 
         :param line: inserted command from .tex file
@@ -543,7 +525,7 @@ class Preprocessor(Loggable):
                  to match the provided whitelist keys, None if regex not matching
         """
 
-        match = Preprocessor.__COMMAND_PATTERN_BEGIN_IGNORE_WL_KEYS.fullmatch(line)
+        match = Preprocessor.__RE_BEGIN_IGNORE_WL_KEYS.fullmatch(line)
         if match is not None:
             keys = match.group(1).strip().split(" ")
 
@@ -564,7 +546,9 @@ class Preprocessor(Loggable):
                         f"Created open-ended WhitelistKeyProblemFilter "
                         f"for whitelist-key '{key}' beginning in line {line_num + 1}",
                     )
-                    filters.append(WhitelistKeyProblemFilter(key, line_num + 1))
+                    filters.append(
+                        WhitelistKeyProblemFilter(key, line_num + 1),
+                    )
 
             return filters
 
@@ -574,20 +558,21 @@ class Preprocessor(Loggable):
         self,
         line: str,
         line_num: int,
-    ) -> Optional[List[ProblemFilter]]:
-        """
-        Checks, if the provided command (line) matches the regex pattern
-        and sets the end line for the matching open-ended ProblemFilter.
+    ) -> list[ProblemFilter] | None:
+        """Checks, if the provided command (line) matches the regex pattern and
+        sets the end line for the matching open-ended ProblemFilter.
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
         :return: empty list, if successful; None otherwise
         """
 
-        match = Preprocessor.__COMMAND_PATTERN_END_IGNORE_ANYTHING.fullmatch(line)
+        match = Preprocessor.__RE_END_IGNORE_ANYTHING.fullmatch(line)
         if match is not None:
 
-            open_ended_filter = self.__get_open_ended_filter(LineProblemFilter(0))
+            open_ended_filter = self.__get_open_ended_filter(
+                LineProblemFilter(0),
+            )
 
             if open_ended_filter is None:
                 self.logger.info(
@@ -607,17 +592,16 @@ class Preprocessor(Loggable):
         self,
         line: str,
         line_num: int,
-    ) -> Optional[List[ProblemFilter]]:
-        """
-        Checks, if the provided command (line) matches the regex pattern
-        and sets the end line for the matching open-ended ProblemFilter.
+    ) -> list[ProblemFilter] | None:
+        """Checks, if the provided command (line) matches the regex pattern and
+        sets the end line for the matching open-ended ProblemFilter.
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
         :return: empty list, if successful; None otherwise
         """
 
-        match = Preprocessor.__COMMAND_PATTERN_END_IGNORE_MODULES.fullmatch(line)
+        match = Preprocessor.__RE_END_IGNORE_MODULES.fullmatch(line)
         if match is not None:
             modules = match.group(1).strip().split(" ")
 
@@ -647,17 +631,16 @@ class Preprocessor(Loggable):
         self,
         line: str,
         line_num: int,
-    ) -> Optional[List[ProblemFilter]]:
-        """
-        Checks, if the provided command (line) matches the regex pattern
-        and sets the end line for the matching open-ended ProblemFilter.
+    ) -> list[ProblemFilter] | None:
+        """Checks, if the provided command (line) matches the regex pattern and
+        sets the end line for the matching open-ended ProblemFilter.
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
         :return: empty list, if successful; None otherwise
         """
 
-        match = Preprocessor.__COMMAND_PATTERN_END_IGNORE_SEVERITIES.fullmatch(line)
+        match = Preprocessor.__RE_END_IGNORE_SEVERITIES.fullmatch(line)
         if match is not None:
             severities = match.group(1).strip().split(" ")
 
@@ -695,17 +678,16 @@ class Preprocessor(Loggable):
         self,
         line: str,
         line_num: int,
-    ) -> Optional[List[ProblemFilter]]:
-        """
-        Checks, if the provided command (line) matches the regex pattern
-        and sets the end line for the matching open-ended ProblemFilter.
+    ) -> list[ProblemFilter] | None:
+        """Checks, if the provided command (line) matches the regex pattern and
+        sets the end line for the matching open-ended ProblemFilter.
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
         :return: empty list, if successful; None otherwise
         """
 
-        match = Preprocessor.__COMMAND_PATTERN_END_IGNORE_WL_KEYS.fullmatch(line)
+        match = Preprocessor.__RE_END_IGNORE_WL_KEYS.fullmatch(line)
         if match is not None:
             keys = match.group(1).strip().split(" ")
 
@@ -734,10 +716,9 @@ class Preprocessor(Loggable):
     def __get_open_ended_filter(
         self,
         reference_filter: ProblemFilter,
-    ) -> Optional[ProblemFilter]:
-        """
-        Searches for any open-ended (no end set) ProblemFilter matching
-        the provided reference ProblemFilter.
+    ) -> ProblemFilter | None:
+        """Searches for any open-ended (no end set) ProblemFilter matching the
+        provided reference ProblemFilter.
 
         :param reference_filter: reference to find matching open-ended filter
         :return: matching open-ended filter, if found
@@ -750,8 +731,7 @@ class Preprocessor(Loggable):
         return None
 
     def matches_preprocessor_filter(self, problem: Problem) -> bool:
-        """
-        Checks, if the provided Problem matches any filter.
+        """Checks, if the provided Problem matches any filter.
 
         :param problem: Problem to check
         :return: false if matching; true otherwise
@@ -761,9 +741,9 @@ class Preprocessor(Loggable):
                 return False
         return True
 
-    def apply_preprocessor_filter(self, problems: List[Problem]) -> List[Problem]:
-        """
-        Applies all parsed ProblemFilters and returns all non-matching Problems.
+    def apply_preprocessor_filter(self, problems: list[Problem]) -> list[Problem]:
+        """Applies all parsed ProblemFilters and returns all non-matching
+        Problems.
 
         :param problems: list of Problems to filter
         :return: filtered list of Problems

@@ -1,9 +1,8 @@
-"""This module defines the abstract class for a LaTeXBuddy module, that others can
-inherit from.
-"""
+"""This module defines the abstract class for a LaTeXBuddy module, that others
+can inherit from."""
+from __future__ import annotations
 
 from abc import abstractmethod
-from typing import List
 
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import Loggable
@@ -13,9 +12,8 @@ from latexbuddy.tools import classproperty
 
 
 class NamedModule(Loggable):
-    """Interface class adding the ability to provide a display name to any module
-    instance.
-    """
+    """Interface class adding the ability to provide a display name to any
+    module instance."""
 
     @classproperty
     def display_name(cls) -> str:
@@ -26,8 +24,6 @@ class NamedModule(Loggable):
 class MainModule(NamedModule):
     """Superclass intended for the main LatexBuddy instance."""
 
-    pass
-
 
 class Module(NamedModule):
     """Abstract class that defines a simple LaTeXBuddy module."""
@@ -35,13 +31,11 @@ class Module(NamedModule):
     @abstractmethod
     def __init__(self):
         """Creates and initializes a new instance of this module."""
-        pass
 
     @abstractmethod
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         """Runs the checks and returns a list of discovered problems.
 
         :param config: the configuration options of the calling LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex option)
         """
-        pass

@@ -1,14 +1,19 @@
+from __future__ import annotations
+
 import datetime
 import os
 import re
 import tempfile
 import zipfile
-
 from pathlib import Path
-from typing import List, Optional
 
-from flask import Flask, abort, redirect, request, send_from_directory
-from jinja2 import Environment, PackageLoader
+from flask import abort
+from flask import Flask
+from flask import redirect
+from flask import request
+from flask import send_from_directory
+from jinja2 import Environment
+from jinja2 import PackageLoader
 from werkzeug.utils import secure_filename
 
 from latexbuddy import __name__ as name
@@ -42,15 +47,17 @@ ALLOWED_EXTENSIONS = [
 
 class FlaskConfigLoader(ConfigLoader):
 
-    _REGEX_LANGUAGE_FLAG = re.compile(r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?")
+    _REGEX_LANGUAGE_FLAG = re.compile(
+        r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?",
+    )
 
     def __init__(
         self,
         output_dir: Path,
-        language: Optional[str],
-        module_selector_mode: Optional[str],
-        module_selection: Optional[str],
-        whitelist_id: Optional[str],
+        language: str | None,
+        module_selector_mode: str | None,
+        module_selection: str | None,
+        whitelist_id: str | None,
     ):
         super().__init__()
 
@@ -124,7 +131,6 @@ def index():
 
 @app.route("/check", methods=["GET", "POST"])
 def document_check():
-
     if request.method != "POST":
         return redirect("/")
 
@@ -169,7 +175,6 @@ def document_check():
 
 @app.route("/result/<result_id>")
 def check_result(result_id):
-
     result_path = Path(
         os.path.join(app.config["RESULTS_FOLDER"], secure_filename(result_id)),
     )
@@ -187,7 +192,6 @@ def check_result(result_id):
 
 @app.route("/result/<result_id>/<file_name>")
 def display_result(result_id, file_name):
-
     result_path = Path(
         os.path.join(app.config["RESULTS_FOLDER"], secure_filename(result_id)),
     )
@@ -195,7 +199,11 @@ def display_result(result_id, file_name):
     if not result_path.exists():
         abort(404)
 
-    file_path = Path(os.path.join(str(result_path), secure_filename(file_name)))
+    file_path = Path(
+        os.path.join(
+            str(result_path), secure_filename(file_name),
+        ),
+    )
 
     with open(file_path) as f:
         file_contents = f.read()
@@ -205,7 +213,6 @@ def display_result(result_id, file_name):
 
 @app.route("/result/<result_id_0>/compiled/<result_id_1>/<pdf_name>")
 def compiled_pdf(result_id_0, result_id_1, pdf_name):
-
     result_id = result_id_0
     if result_id_0 != result_id_1:
         abort(404)
@@ -225,7 +232,6 @@ def compiled_pdf(result_id_0, result_id_1, pdf_name):
 
 @app.route("/whitelist-api/upload", methods=["GET", "POST"])
 def upload_whitelist():
-
     if request.method != "POST":
         return redirect("/")
 
@@ -257,8 +263,7 @@ def allowed_whitelist_file(filename: str) -> bool:
     return "." not in filename
 
 
-def run_buddy(file_path: Path, output_dir: Path, path_list: List[Path]):
-
+def run_buddy(file_path: Path, output_dir: Path, path_list: list[Path]):
     if not output_dir.exists():
         output_dir.mkdir()
 
@@ -309,8 +314,7 @@ def run_buddy(file_path: Path, output_dir: Path, path_list: List[Path]):
     LatexBuddy.output_file()
 
 
-def get_available_whitelist_ids() -> List[str]:
-
+def get_available_whitelist_ids() -> list[str]:
     whitelist_path = Path(app.config["WHITELIST_FOLDER"])
 
     if not whitelist_path.exists() or not whitelist_path.is_dir():
@@ -327,8 +331,7 @@ def get_available_whitelist_ids() -> List[str]:
     return wl_ids
 
 
-def get_whitelist_path(whitelist_id: str) -> Optional[str]:
-
+def get_whitelist_path(whitelist_id: str) -> str | None:
     if whitelist_id not in get_available_whitelist_ids():
         return None
 

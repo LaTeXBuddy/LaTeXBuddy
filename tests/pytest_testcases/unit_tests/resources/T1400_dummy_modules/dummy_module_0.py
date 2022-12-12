@@ -1,4 +1,4 @@
-from typing import List
+from __future__ import annotations
 
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
@@ -10,5 +10,5 @@ class DummyModule0(Module):
     def __init__(self):
         pass
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         return []

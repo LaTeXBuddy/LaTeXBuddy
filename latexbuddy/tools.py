@@ -1,4 +1,5 @@
 """This module contains various utility tools."""
+from __future__ import annotations
 
 import os
 import re
@@ -6,16 +7,17 @@ import signal
 import subprocess
 import sys
 import traceback
-
 from argparse import Namespace
 from logging import Logger
 from pathlib import Path
-from typing import Callable, List, Optional, Tuple
+from typing import Callable
 
 from latexbuddy.exceptions import ExecutableNotFoundError
 from latexbuddy.log import Loggable
-from latexbuddy.messages import not_found, path_not_found
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.messages import not_found
+from latexbuddy.messages import path_not_found
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
 
 
 class ToolLogger(Loggable):
@@ -104,7 +106,7 @@ def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
     return out.decode(encoding)
 
 
-def get_command_string(cmd: Tuple[str]) -> str:
+def get_command_string(cmd: tuple[str]) -> str:
     """Constructs a command string from a tuple of arguments.
 
     :param cmd: tuple of command line arguments
@@ -118,13 +120,13 @@ def get_command_string(cmd: Tuple[str]) -> str:
 
 def find_executable(
     name: str,
-    to_install: Optional[str] = None,
+    to_install: str | None = None,
     err_logger: Logger = logger,
     log_errors: bool = True,
 ) -> str:
-    """Finds path to an executable. If the executable can not be located, an error
-    message is logged to the specified logger, otherwise the executable's path is logged
-    as a debug message.
+    """Finds path to an executable. If the executable can not be located, an
+    error message is logged to the specified logger, otherwise the executable's
+    path is logged as a debug message.
 
     This uses 'which', i.e. the executable should at least be in user's $PATH
 
@@ -168,7 +170,7 @@ def find_executable(
 location_re = re.compile(r"line (\d+), column (\d+)")
 
 
-def absolute_to_linecol(text: str, position: int) -> Tuple[int, int, List[int]]:
+def absolute_to_linecol(text: str, position: int) -> tuple[int, int, list[int]]:
     """Calculates line and column number for an absolute character position.
 
     :param text: text of file to find line:col position for
@@ -187,7 +189,7 @@ def absolute_to_linecol(text: str, position: int) -> Tuple[int, int, List[int]]:
     return line, column, line_offsets
 
 
-def get_line_offsets(text: str) -> List[int]:
+def get_line_offsets(text: str) -> list[int]:
     """Calculates character offsets for each line in the file.
 
     Indices correspond to the line numbers, but are 0-based. For example, if first
@@ -222,14 +224,15 @@ def is_binary(file_bytes: bytes) -> bool:
     :param file_bytes: bytes of a file
     :return: True, if the file is binary, False otherwise
     """
-    textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7F})
+    textchars = bytearray({7, 8, 9, 10, 12, 13, 27}
+                          | set(range(0x20, 0x100)) - {0x7F})
     return bool(file_bytes.translate(None, textchars))
 
 
 def execute_no_exceptions(
     function_call: Callable[[], None],
     error_message: str = "An error occurred while executing lambda function",
-    traceback_log_level: Optional[str] = None,
+    traceback_log_level: str | None = None,
 ) -> None:
     """Calls a function and catches any Exception that is raised during this.
 
@@ -310,7 +313,7 @@ def get_app_dir() -> Path:
     return app_dir
 
 
-def get_all_paths_in_document(file_path: Path) -> List[Path]:
+def get_all_paths_in_document(file_path: Path) -> list[Path]:
     """Checks files that are included in a file.
 
     If the file includes more files, these files will also be checked.
@@ -328,7 +331,11 @@ def get_all_paths_in_document(file_path: Path) -> List[Path]:
         try:
             lines = unchecked_file.read_text().splitlines(keepends=False)
         except FileNotFoundError:
-            logger.error(path_not_found("the checking of imports", unchecked_file))
+            logger.error(
+                path_not_found(
+                    "the checking of imports", unchecked_file,
+                ),
+            )
             continue
         except Exception as e:  # If the file cannot be found it is already removed
             error_message = "Error while searching for files"
@@ -344,8 +351,8 @@ def get_all_paths_in_document(file_path: Path) -> List[Path]:
     return checked_files
 
 
-def convert_file_to_absolute(unchecked_files: List[Path], root_dir: str) -> Path:
-    """Converts a relative path to an absolute if needed
+def convert_file_to_absolute(unchecked_files: list[Path], root_dir: str) -> Path:
+    """Converts a relative path to an absolute if needed.
 
     :param unchecked_files: the list of unchecked_files
     :param root_dir: the root directory
@@ -358,12 +365,11 @@ def convert_file_to_absolute(unchecked_files: List[Path], root_dir: str) -> Path
 
 
 def match_lines(
-    lines: List[str],
-    unchecked_files: List[Path],
-    checked_files: List[Path],
-) -> List[Path]:
-    """
-    Matches the lines with the given regexes
+    lines: list[str],
+    unchecked_files: list[Path],
+    checked_files: list[Path],
+) -> list[Path]:
+    """Matches the lines with the given regexes.
 
     :param lines: the lines
     :unchecked_files: the unchecked_files
@@ -385,8 +391,8 @@ def match_lines(
 
 
 def texify_path(path: str) -> Path:
-    """
-    Adds .tex to a file path if needed
+    """Adds .tex to a file path if needed.
+
     :param path: the path
     :return: the texified path
     """
@@ -397,8 +403,7 @@ def texify_path(path: str) -> Path:
 
 
 def perform_whitelist_operations(args: Namespace):
-    """
-    Performs whitelist operations
+    """Performs whitelist operations.
 
     :param args: the args
     """
@@ -416,9 +421,8 @@ def perform_whitelist_operations(args: Namespace):
 
 
 def add_whitelist_console(whitelist_file, to_add):
-    """
-    Adds a list of keys to the Whitelist.
-    Keys should be valid keys, ideally copied from LaTeXBuddy HTML Output.
+    """Adds a list of keys to the Whitelist. Keys should be valid keys, ideally
+    copied from LaTeXBuddy HTML Output.
 
     :param whitelist_file: Path to whitelist file
     :param to_add: list of keys
@@ -433,8 +437,8 @@ def add_whitelist_console(whitelist_file, to_add):
 
 
 def get_abs_path(path) -> Path:
-    """
-    Gets absolute path of a string
+    """Gets absolute path of a string.
+
     :param path: the path
     :return: the absolute path
     """
@@ -448,11 +452,9 @@ def get_abs_path(path) -> Path:
 
 
 def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
-    """
-    Takes in a list of words and creates their respective keys,
-    then adds them to whitelist.
-    Words in the file_to_parse should all be from the same language.
-    Each line represents a single Word.
+    """Takes in a list of words and creates their respective keys, then adds
+    them to whitelist. Words in the file_to_parse should all be from the same
+    language. Each line represents a single Word.
 
     :param whitelist_file: Path to whitelist file
     :param file_to_parse: Path to wordlist
@@ -473,7 +475,8 @@ def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
 
 
 class classproperty(property):
-    """Provides a way to implement a python property with class-level accessibility"""
+    """Provides a way to implement a python property with class-level
+    accessibility."""
 
     def __get__(self, cls, owner):
         return classmethod(self.fget).__get__(None, owner)()

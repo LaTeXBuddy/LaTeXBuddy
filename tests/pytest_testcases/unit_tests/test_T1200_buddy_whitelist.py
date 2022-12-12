@@ -1,9 +1,9 @@
+from __future__ import annotations
+
 import argparse
 import os
 import tempfile
-
 from pathlib import Path
-from typing import List
 
 import pytest
 
@@ -62,12 +62,11 @@ def config_loader_temp_wl(script_dir, temp_dir):
 
 
 class DummyModuleProvider(ModuleProvider):
-    def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
+    def load_selected_modules(self, cfg: ConfigLoader) -> list[Module]:
         return []
 
 
 def init_buddy(scd, cl):
-
     file = Path(scd + "/resources/T1200_test_document.tex")
 
     LatexBuddy.init(
@@ -90,7 +89,6 @@ def write_original_to_temp_wl(script_dir: str) -> str:
 
 
 def test_unit_buddy_whitelist_check_filter(script_dir, config_loader):
-
     init_buddy(script_dir, config_loader)
 
     LatexBuddy.add_error(
@@ -111,7 +109,6 @@ def test_unit_buddy_whitelist_check_filter(script_dir, config_loader):
 
 
 def test_unit_buddy_whitelist_check_non_filter(script_dir, config_loader):
-
     init_buddy(script_dir, config_loader)
 
     LatexBuddy.add_error(
@@ -132,7 +129,6 @@ def test_unit_buddy_whitelist_check_non_filter(script_dir, config_loader):
 
 
 def test_unit_buddy_whitelist_add_successful(script_dir, config_loader_temp_wl):
-
     original_content = write_original_to_temp_wl(script_dir)
 
     init_buddy(script_dir, config_loader_temp_wl)
@@ -167,7 +163,6 @@ def test_unit_buddy_whitelist_add_successful(script_dir, config_loader_temp_wl):
 
 
 def test_unit_buddy_whitelist_add_unsuccessful(script_dir, config_loader_temp_wl):
-
     original_content = write_original_to_temp_wl(script_dir)
 
     init_buddy(script_dir, config_loader_temp_wl)

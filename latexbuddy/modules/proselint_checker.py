@@ -1,11 +1,12 @@
-from typing import List
+from __future__ import annotations
 
 import proselint
 
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
@@ -13,12 +14,16 @@ class ProseLint(Module):
     def __init__(self):
         self.problem_type = "grammar"
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
 
-        lang = config.get_config_option_or_default(LatexBuddy, "language", None)
+        lang = config.get_config_option_or_default(
+            LatexBuddy, "language", None,
+        )
 
         if lang != "en":
-            self.logger.info("Proselint only supports documents written in English.")
+            self.logger.info(
+                "Proselint only supports documents written in English.",
+            )
             return []
 
         suggestions = proselint.tools.lint(file.plain)
@@ -27,7 +32,7 @@ class ProseLint(Module):
 
         return result
 
-    def format_errors(self, suggestions: List, file: TexFile):
+    def format_errors(self, suggestions: list, file: TexFile):
         problems = []
         for suggestion in suggestions:
             p_type = suggestion[0]
@@ -68,4 +73,4 @@ class ProseLint(Module):
     @staticmethod
     def get_text(start_char: int, length: int, file: TexFile):
         text = file.plain
-        return text[start_char : start_char + length]
+        return text[start_char: start_char + length]

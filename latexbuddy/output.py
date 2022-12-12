@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 from html import escape
 from operator import attrgetter
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
 
-from jinja2 import Environment, PackageLoader, Template
+from jinja2 import Environment
+from jinja2 import PackageLoader
+from jinja2 import Template
 
 from latexbuddy.buddy import LatexBuddy
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
 
 
 env = Environment(loader=PackageLoader("latexbuddy"))
@@ -33,7 +37,7 @@ def problem_key(problem: Problem) -> int:
 def render_flask_html(
     file_name: str,
     file_text: str,
-    problems: Dict[str, Problem],
+    problems: dict[str, Problem],
     path_list: Path,
     pdf_path: str,
 ) -> str:
@@ -51,7 +55,7 @@ def render_flask_html(
 def render_html(
     file_name: str,
     file_text: str,
-    problems: Dict[str, Problem],
+    problems: dict[str, Problem],
     path_list: Path,
     pdf_path: str,
 ) -> str:
@@ -70,7 +74,7 @@ def render_general_html(
     template: Template,
     file_name: str,
     file_text: str,
-    problems: Dict[str, Problem],
+    problems: dict[str, Problem],
     path_list: Path,
     pdf_path: str,
 ) -> str:
@@ -98,7 +102,7 @@ def render_general_html(
         #  is in pdf_path
         cut_path = pdf_path.find("compiled")
         if -1 < cut_path:
-            pdf_path = pdf_path[pdf_path.find("compiled") :]
+            pdf_path = pdf_path[pdf_path.find("compiled"):]
 
     #  list of lines
     highlighted_tex = highlighted_tex.split("\n")
@@ -118,7 +122,7 @@ def render_general_html(
     )
 
 
-def sort_problems(problems: Dict[str, Problem]) -> Tuple[List[Problem], List[Problem]]:
+def sort_problems(problems: dict[str, Problem]) -> tuple[list[Problem], list[Problem]]:
     problem_values = sorted(problems.values(), key=problem_key)
     general_problems = [
         problem for problem in problem_values if problem_key(problem) < 0
@@ -131,8 +135,7 @@ def sort_problems(problems: Dict[str, Problem]) -> Tuple[List[Problem], List[Pro
     return general_problems, problem_values
 
 
-def calculate_line_numbers(file_text: str) -> List[str]:
-
+def calculate_line_numbers(file_text: str) -> list[str]:
     split_lines = file_text.split("\n")
     line_numbers = []
     i = 1
@@ -153,7 +156,7 @@ def calculate_line_numbers(file_text: str) -> List[str]:
 
 
 class Interval:
-    """forward declaration to enable type-hinting within class"""
+    """forward declaration to enable type-hinting within class."""
 
     @property
     def start(self) -> int:
@@ -181,9 +184,9 @@ class Interval:
 class Interval:
     def __init__(
         self,
-        problems: Union[Problem, List[Problem]],
-        start: Optional[int] = None,
-        end: Optional[int] = None,
+        problems: Problem | list[Problem],
+        start: int | None = None,
+        end: int | None = None,
     ) -> None:
 
         if isinstance(problems, Problem):
@@ -198,7 +201,9 @@ class Interval:
         self._end = end if end else self.start + problems[0].length
 
         if self.end < self.start:
-            raise ValueError("End position can not be smaller than start position!")
+            raise ValueError(
+                "End position can not be smaller than start position!",
+            )
 
     @property
     def problems(self):
@@ -228,8 +233,7 @@ class Interval:
         )
 
     def intersects(self, other: Interval) -> bool:
-        """
-        Determines whether or not the other interval intersects with 'self'
+        """Determines whether or not the other interval intersects with 'self'.
 
         :param other: other interval to consider
         """
@@ -239,15 +243,13 @@ class Interval:
         else:
             return other.start < self.end
 
-    def perform_intersection(self, other: Interval) -> Optional[List[Interval]]:
-        """
-        Performs an intersection of two intervals and returns a list of new
-        non-intersecting intervals to replace the two specified intervals 'self' and
-        'other', if the intervals actually intersect. Should the intervals not
-        intersect, None is returned, indicating that there is no need to replace the
-        two intervals.
-        The intervals in the returned list are sorted by their start index in ascending
-        order.
+    def perform_intersection(self, other: Interval) -> list[Interval] | None:
+        """Performs an intersection of two intervals and returns a list of new
+        non-intersecting intervals to replace the two specified intervals
+        'self' and 'other', if the intervals actually intersect. Should the
+        intervals not intersect, None is returned, indicating that there is no
+        need to replace the two intervals. The intervals in the returned list
+        are sorted by their start index in ascending order.
 
         :param other: other interval to intersect with 'self'
         """
@@ -259,10 +261,12 @@ class Interval:
         if other.start < self.start:
             return other.perform_intersection(self)
 
-        new_intervals: List[Interval] = []
+        new_intervals: list[Interval] = []
 
         if other.start > self.start:
-            new_intervals.append(Interval(self.problems, self.start, other.start))
+            new_intervals.append(
+                Interval(self.problems, self.start, other.start),
+            )
 
         new_intervals.append(
             Interval(
@@ -284,7 +288,7 @@ class Interval:
         return f"({self.start}, {self.end}, {self.severity})"
 
 
-def highlight(tex: str, problems: List[Problem]) -> str:
+def highlight(tex: str, problems: list[Problem]) -> str:
     """Highlights the TeX code using the problems' data.
 
     :param tex: TeX source
@@ -292,8 +296,9 @@ def highlight(tex: str, problems: List[Problem]) -> str:
     :return: HTML string with highlighted errors, ready to be put inside <pre>
     """
 
-    tex_lines: List[str] = tex.splitlines(keepends=False)
-    line_intervals: List[List[Interval]] = create_empty_line_interval_list(tex_lines)
+    tex_lines: list[str] = tex.splitlines(keepends=False)
+    line_intervals: list[list[Interval]] = \
+        create_empty_line_interval_list(tex_lines)
 
     add_basic_problem_intervals(line_intervals, problems, tex_lines)
 
@@ -305,16 +310,15 @@ def highlight(tex: str, problems: List[Problem]) -> str:
     return "\n".join(tex_lines) + "\n"
 
 
-def create_empty_line_interval_list(tex_lines: List[str]) -> List[List[Interval]]:
-    """
-    Creates and returns a list of (empty) lists of Intervals. The outer list will
-    contain exactly len(tex_lines) + 1 empty lists.
+def create_empty_line_interval_list(tex_lines: list[str]) -> list[list[Interval]]:
+    """Creates and returns a list of (empty) lists of Intervals. The outer list
+    will contain exactly len(tex_lines) + 1 empty lists.
 
     :param tex_lines: individual lines of a .tex-file as a list of strings
     :returns: a list of empty lists that meet the specified dimensions
     """
 
-    line_intervals: List[List[Interval]] = []
+    line_intervals: list[list[Interval]] = []
     for _ in tex_lines:
         line_intervals.append([])
 
@@ -325,13 +329,12 @@ def create_empty_line_interval_list(tex_lines: List[str]) -> List[List[Interval]
 
 
 def add_basic_problem_intervals(
-    line_intervals: List[List[Interval]],
-    problems: List[Problem],
-    tex_lines: List[str],
+    line_intervals: list[list[Interval]],
+    problems: list[Problem],
+    tex_lines: list[str],
 ) -> None:
-    """
-    Filters out problems without a position attribute or with length zero and inserts
-    the remaining ones into the line_intervals list.
+    """Filters out problems without a position attribute or with length zero
+    and inserts the remaining ones into the line_intervals list.
 
     :param line_intervals: List of lists of Intervals for any given line
     :param problems: list of problems to be inserted as Intervals
@@ -364,7 +367,9 @@ def add_basic_problem_intervals(
         # split the interval, if it reaches across lines
         while interval.end - 1 > len(tex_lines[line]):
 
-            new_interval = Interval(problem, interval.start, len(tex_lines[line]) + 1)
+            new_interval = Interval(
+                problem, interval.start, len(tex_lines[line]) + 1,
+            )
             line_intervals[line].append(new_interval)
 
             interval = Interval(
@@ -379,10 +384,9 @@ def add_basic_problem_intervals(
         line_intervals[line].append(interval)
 
 
-def resolve_interval_intersections(intervals: List[Interval]) -> None:
-    """
-    Finds any intersecting intervals and replaces them with non-intersecting intervals
-    that may contain more than one problem.
+def resolve_interval_intersections(intervals: list[Interval]) -> None:
+    """Finds any intersecting intervals and replaces them with non-intersecting
+    intervals that may contain more than one problem.
 
     :param intervals: list of intervals in one line to be checked for intersections
     """
@@ -417,12 +421,12 @@ def resolve_interval_intersections(intervals: List[Interval]) -> None:
 
 
 def mark_intervals_in_tex(
-    tex_lines: List[str],
-    line_intervals: List[List[Interval]],
+    tex_lines: list[str],
+    line_intervals: list[list[Interval]],
 ) -> None:
-    """
-    Adds HTML marker-tags (span) for every interval in line_intervals to the respective
-    line in tex_lines and escapes all HTML control characters in tex_lines.
+    """Adds HTML marker-tags (span) for every interval in line_intervals to the
+    respective line in tex_lines and escapes all HTML control characters in
+    tex_lines.
 
     :param tex_lines: text lines from the .tex-file
     :param line_intervals: list of non-intersecting intervals to be marked for every
@@ -430,14 +434,15 @@ def mark_intervals_in_tex(
     """
 
     for i in range(len(tex_lines)):
-        tex_lines[i] = mark_intervals_in_tex_line(tex_lines[i], line_intervals[i])
+        tex_lines[i] = mark_intervals_in_tex_line(
+            tex_lines[i], line_intervals[i],
+        )
 
 
-def mark_intervals_in_tex_line(tex_line: str, intervals: List[Interval]) -> str:
-    """
-    Adds HTML marker-tags (span) for every interval in intervals to the respective
-    tex_line string and returns the resulting line. This method also escapes all HTML
-    control characters included in tex_line.
+def mark_intervals_in_tex_line(tex_line: str, intervals: list[Interval]) -> str:
+    """Adds HTML marker-tags (span) for every interval in intervals to the
+    respective tex_line string and returns the resulting line. This method also
+    escapes all HTML control characters included in tex_line.
 
     :param tex_line: line from the .tex-file
     :param intervals: list of non-intersecting intervals to be highlighted in the line
@@ -445,40 +450,39 @@ def mark_intervals_in_tex_line(tex_line: str, intervals: List[Interval]) -> str:
     """
 
     offset: int = 0
-    for i in range(len(intervals)):
-
-        interval = intervals[i]
+    for i, interval in enumerate(intervals):
         open_tag, close_tag = generate_wrapper_html_tags(interval)
 
         start: int = interval.start + offset - 1
         end: int = interval.end + offset - 1
 
-        text_pre = tex_line[:start]
-        text_interval = tex_line[start:end]
-        text_post = tex_line[end:]
+        preface = tex_line[:start]
+        content = tex_line[start:end]
+        appendix = tex_line[end:]
 
-        text_interval_escaped = escape(text_interval)
-        text_pre_escaped = escape(text_pre) if i == 0 else text_pre
-        text_post_escaped = escape(text_post) if i == len(intervals) - 1 else text_post
+        escaped_content = escape(content)
+        escaped_preface = escape(preface) if i == 0 else preface
+        escaped_appendix = escape(appendix) \
+            if i == len(intervals) - 1 \
+            else appendix
 
         tex_line = (
-            f"{text_pre_escaped}"
-            f"{open_tag}{text_interval_escaped}{close_tag}"
-            f"{text_post_escaped}"
+            f"{escaped_preface}"
+            f"{open_tag}{escaped_content}{close_tag}"
+            f"{escaped_appendix}"
         )
 
         offset += len(open_tag) + len(close_tag)
-        offset += len(text_pre_escaped) - len(text_pre)
-        offset += len(text_interval_escaped) - len(text_interval)
-        offset += len(text_post_escaped) - len(text_post)
+        offset += len(escaped_preface) - len(preface)
+        offset += len(escaped_content) - len(content)
+        offset += len(escaped_appendix) - len(appendix)
 
     return tex_line
 
 
-def generate_wrapper_html_tags(interval: Interval) -> Tuple[str, str]:
-    """
-    Generates and returns a pair of HTML span tags to wrap the text in the specified
-    interval.
+def generate_wrapper_html_tags(interval: Interval) -> tuple[str, str]:
+    """Generates and returns a pair of HTML span tags to wrap the text in the
+    specified interval.
 
     :param interval: interval, specifying the position and metadata of the tags
     :returns: a tuple of two strings, containing an opening and a closing span tag for

@@ -1,10 +1,12 @@
-import os
+from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
 
-from latexbuddy.modules.bib_checkers import BibtexDuplicates, NewerPublications
+from latexbuddy.modules.bib_checkers import BibtexDuplicates
+from latexbuddy.modules.bib_checkers import NewerPublications
 from latexbuddy.texfile import TexFile
 from tests.pytest_testcases.unit_tests.resources.driver_config_loader import (
     ConfigLoader as DriverCL,
@@ -17,7 +19,6 @@ def script_dir():
 
 
 def test_unit_bib_checkers_run_checks(script_dir):
-
     _ERROR_COUNT_DUP = 2
     _ERROR_COUNT_NEW = 2
 

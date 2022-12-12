@@ -1,12 +1,14 @@
-import os
+from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
 
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules.yalafi_checker import YaLafi
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
@@ -16,7 +18,6 @@ def script_dir():
 
 
 def test_unit_yalafi_detex_run_checks(script_dir):
-
     test_document = Path(script_dir + "/resources/T2100_test_document.tex")
     tf = TexFile(test_document)
     cl = ConfigLoader()

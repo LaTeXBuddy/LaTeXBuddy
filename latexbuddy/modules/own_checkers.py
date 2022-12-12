@@ -1,13 +1,13 @@
+from __future__ import annotations
+
 import os
 import re
 
-from typing import List
-
 import latexbuddy.tools as tools
-
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
@@ -17,8 +17,9 @@ class UnreferencedFigures(Module):
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         """Finds unreferenced figures.
+
         :param config: the configuration options of the calling LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex option)
         :return: a list of found problems
@@ -27,7 +28,6 @@ class UnreferencedFigures(Module):
         problems = []
         pattern = r"\\begin{figure}[\w\W]*?\\end{figure}"
         figures = re.finditer(pattern, tex)
-        len_label = len("label{")
         labels = {}
 
         for figure_match in figures:
@@ -70,8 +70,9 @@ class SiUnitx(Module):
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         """Finds units and long numbers used without siunitx package.
+
         :param: config: configurations of the buddy instance
         :param: file: the file to check
         :return: a list of found problems
@@ -83,8 +84,9 @@ class SiUnitx(Module):
             problems.append(problem)
         return problems
 
-    def find_long_numbers(self, file: TexFile) -> List[Problem]:
+    def find_long_numbers(self, file: TexFile) -> list[Problem]:
         """Finds long numbers used without siunitx package.
+
         :param: file: the file to check
         :return: a list of found problems
         """
@@ -118,8 +120,9 @@ class SiUnitx(Module):
             )
         return problems
 
-    def find_units(self, file: TexFile) -> List[Problem]:
+    def find_units(self, file: TexFile) -> list[Problem]:
         """Finds units used without siunitx package.
+
         :param: file: the file to check
         :return: a list of found problems
         """
@@ -227,7 +230,7 @@ class EmptySections(Module):
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         tex = file.tex
         problems = []
         pattern = r"\\section{(.*)}\s+\\subsection"
@@ -260,7 +263,7 @@ class URLCheck(Module):
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         tex = file.tex
         problems = []
         # https://stackoverflow.com/questions/6038061/regular-expression-to-find-urls-within-a-string
@@ -272,7 +275,7 @@ class URLCheck(Module):
             start, end = url_match.span()
             length = end - start
             command_len = len("\\url{")
-            if tex[start - command_len : start] == "\\url{":
+            if tex[start - command_len: start] == "\\url{":
                 continue
             line, col, offset = tools.absolute_to_linecol(tex, start)
             problems.append(
@@ -321,8 +324,9 @@ class CheckFigureResolution(Module):
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         """Finds potential low resolution figures.
+
         :param: config: configurations of the buddy instance
         :param: file: the file to check
         :return: a list of found problems
@@ -335,24 +339,27 @@ class CheckFigureResolution(Module):
             root_name = os.path.basename(root)
             for current_file in files:
                 name, ending = os.path.splitext(current_file)
-                if str.lower(ending) in self.file_endings or (
-                    str.lower(root_name) == "figures" and str.lower(ending) == ".pdf"
-                ):
-                    figures.append(current_file)
-                    problems.append(
-                        Problem(
-                            position=None,
-                            text=name,
-                            checker=CheckFigureResolution,
-                            category=self.category,
-                            p_type="0",
-                            file=file.tex_file,
-                            severity=self.severity,
-                            description=f"Figure might have low resolution due to file format {ending}",
-                            key=self.display_name + "_" + current_file,
-                            length=1,
-                        ),
-                    )
+                if ending.lower() not in self.file_endings:
+                    if root_name.lower() != figures:
+                        continue
+                    if ending.lower() != ".pdf":
+                        continue
+
+                figures.append(current_file)
+                problems.append(
+                    Problem(
+                        position=None,
+                        text=name,
+                        checker=CheckFigureResolution,
+                        category=self.category,
+                        p_type="0",
+                        file=file.tex_file,
+                        severity=self.severity,
+                        description=f"Figure might have low resolution due to file format {ending}",
+                        key=self.display_name + "_" + current_file,
+                        length=1,
+                    ),
+                )
 
         return problems
 
@@ -362,7 +369,7 @@ class NativeUseOfRef(Module):
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         description = "Instead of \\ref{} use a more precise command e.g. \\cref{}"
         tex = file.tex
         problems = []
@@ -370,7 +377,9 @@ class NativeUseOfRef(Module):
 
         curr_problem_start = tex.find(ref_pattern)  # init
         while curr_problem_start != -1:
-            line, col, offset = tools.absolute_to_linecol(tex, curr_problem_start)
+            line, col, offset = tools.absolute_to_linecol(
+                tex, curr_problem_start,
+            )
             end_command = tex.find("}", curr_problem_start) + 1
             problem_text = tex[curr_problem_start:end_command]
             problems.append(

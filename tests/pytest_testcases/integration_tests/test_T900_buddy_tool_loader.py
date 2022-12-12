@@ -1,5 +1,6 @@
-import os
+from __future__ import annotations
 
+import os
 from logging import DEBUG
 from pathlib import Path
 
@@ -21,7 +22,6 @@ def default_config_loader():
 
 
 def test_integration_buddy_tool_loader(script_dir, caplog, default_config_loader):
-
     # initializing logger on DEBUG level
     caplog.set_level(DEBUG)
 

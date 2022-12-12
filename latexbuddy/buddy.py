@@ -1,22 +1,24 @@
 """This module describes the main LaTeXBuddy instance class."""
+from __future__ import annotations
 
 import json
 import multiprocessing as mp
 import os
 import re
 import time
-
 from pathlib import Path
-from typing import AnyStr, List, Optional
+from typing import AnyStr
 
 import latexbuddy.tools as tools
-
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
 from latexbuddy.module_loader import ModuleProvider
-from latexbuddy.modules import MainModule, Module
+from latexbuddy.modules import MainModule
+from latexbuddy.modules import Module
 from latexbuddy.preprocessor import Preprocessor
-from latexbuddy.problem import Problem, ProblemJSONEncoder, set_language
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemJSONEncoder
+from latexbuddy.problem import set_language
 from latexbuddy.texfile import TexFile
 from latexbuddy.tools import classproperty
 
@@ -25,9 +27,11 @@ equation_re = re.compile(r"^([A-Z])-\1-\1$")
 
 
 class LatexBuddy(MainModule):
-    """
-    The main instance of the applications that controls all the internal tools.
-    This is a singleton class with only one instance and exclusively static methods.
+    """The main instance of the applications that controls all the internal
+    tools.
+
+    This is a singleton class with only one instance and exclusively
+    static methods.
     """
 
     __current_instance = None
@@ -37,14 +41,17 @@ class LatexBuddy(MainModule):
 
         self.errors = {}  # all current errors
         self.cfg: ConfigLoader = ConfigLoader()  # configuration
-        self.preprocessor: Optional[Preprocessor] = None  # in-file preprocessing
-        self.module_provider: Optional[ModuleProvider] = None
-        self.file_to_check: Optional[Path] = None  # .tex file to be error checked
-        self.tex_file: Optional[TexFile] = None
-        self.output_dir: Optional[Path] = None
-        self.output_format: Optional[str] = None
-        self.whitelist_file: Optional[Path] = None
-        self.path_list: List[Path] = []  # all paths of the files to be used in html
+        # in-file preprocessing
+        self.preprocessor: Preprocessor | None = None
+        self.module_provider: ModuleProvider | None = None
+        # .tex file to be error checked
+        self.file_to_check: Path | None = None
+        self.tex_file: TexFile | None = None
+        self.output_dir: Path | None = None
+        self.output_format: str | None = None
+        self.whitelist_file: Path | None = None
+        # all paths of the files to be used in html
+        self.path_list: list[Path] = []
         self.compile_tex: bool
 
     @classproperty
@@ -58,7 +65,7 @@ class LatexBuddy(MainModule):
         config_loader: ConfigLoader,
         module_provider: ModuleProvider,
         file_to_check: Path,
-        path_list: List[Path],
+        path_list: list[Path],
         compile_tex: bool,
     ):
         """Initializes the LaTeXBuddy instance.
@@ -167,7 +174,7 @@ class LatexBuddy(MainModule):
 
     @staticmethod
     def add_to_whitelist(uid):
-        """Adds the error identified by the given UID to the whitelist
+        """Adds the error identified by the given UID to the whitelist.
 
         Afterwards this method deletes all other errors that are the same as the one
         just whitelisted.
@@ -198,10 +205,9 @@ class LatexBuddy(MainModule):
                 del LatexBuddy.instance.errors[curr_uid]
 
     @staticmethod
-    def execute_module(module: Module) -> List[Problem]:
-        """
-        Executes checks for provided module and returns its Problems.
-        This method is used to parallelize the module execution.
+    def execute_module(module: Module) -> list[Problem]:
+        """Executes checks for provided module and returns its Problems. This
+        method is used to parallelize the module execution.
 
         :param module: module to execute
         :return: list of resulting problems
@@ -234,7 +240,7 @@ class LatexBuddy(MainModule):
 
     @staticmethod
     def run_tools():
-        """Runs all modules in the LaTeXBuddy toolchain in parallel"""
+        """Runs all modules in the LaTeXBuddy toolchain in parallel."""
 
         language = LatexBuddy.instance.cfg.get_config_option_or_default(
             LatexBuddy,
@@ -242,7 +248,8 @@ class LatexBuddy(MainModule):
             None,
             verify_type=AnyStr,
         )
-        set_language(language)  # set global variable in problem.py for key generation
+        # set global variable in problem.py for key generation
+        set_language(language)
 
         # initialize Preprocessor
         LatexBuddy.instance.preprocessor = Preprocessor()
@@ -294,7 +301,9 @@ class LatexBuddy(MainModule):
         with json_output_path.open("w") as file:
             json.dump(list_of_problems, file, indent=4, cls=ProblemJSONEncoder)
 
-        LatexBuddy.instance.logger.info(f"Output saved to {json_output_path.resolve()}")
+        LatexBuddy.instance.logger.info(
+            f"Output saved to {json_output_path.resolve()}",
+        )
 
     @staticmethod
     def output_html():
@@ -322,7 +331,9 @@ class LatexBuddy(MainModule):
             ),
         )
 
-        LatexBuddy.instance.logger.info(f"Output saved to {html_output_path.resolve()}")
+        LatexBuddy.instance.logger.info(
+            f"Output saved to {html_output_path.resolve()}",
+        )
 
     @staticmethod
     def output_flask_html():
@@ -349,7 +360,9 @@ class LatexBuddy(MainModule):
             ),
         )
 
-        LatexBuddy.instance.logger.info(f"Output saved to {html_output_path.resolve()}")
+        LatexBuddy.instance.logger.info(
+            f"Output saved to {html_output_path.resolve()}",
+        )
 
     @staticmethod
     def output_file():

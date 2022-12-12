@@ -1,8 +1,8 @@
+from __future__ import annotations
+
 import os
 import re
-
 from pathlib import Path
-from typing import List, Optional, Tuple
 
 import pytest
 
@@ -16,13 +16,13 @@ def script_dir():
 
 def generate_cli_command(
     script_dir: str,
-    language: Optional[str],
-    whitelist: Optional[str],
-    output: Optional[str],
-    format: Optional[str],
-    en_modules: Optional[List[str]],
-    dis_modules: Optional[List[str]],
-) -> List[str]:
+    language: str | None,
+    whitelist: str | None,
+    output: str | None,
+    format: str | None,
+    en_modules: list[str] | None,
+    dis_modules: list[str] | None,
+) -> list[str]:
 
     cmd = ["latexbuddy", "-v"]
 
@@ -65,12 +65,12 @@ __REGEX_CLI_CONFIG_OPTIONS_MODULES = re.compile(
 
 def assert_flag_config_options(
     cmd_output: str,
-    language: Tuple[Optional[str], Optional[str]],
-    whitelist: Optional[str],
-    output: Optional[str],
-    format: Optional[str],
-    en_modules: Optional[List[str]],
-    dis_modules: Optional[List[str]],
+    language: tuple[str | None, str | None],
+    whitelist: str | None,
+    output: str | None,
+    format: str | None,
+    en_modules: list[str] | None,
+    dis_modules: list[str] | None,
 ):
 
     main_match = __REGEX_CLI_CONFIG_OPTIONS_MAIN.search(cmd_output)
@@ -198,12 +198,12 @@ def assert_flag_config_options(
 )
 def test_unit_cli_check_flag_parsing(
     script_dir,
-    language: Tuple[Optional[str], Tuple[Optional[str], Optional[str]]],
-    whitelist: Tuple[Optional[str], Optional[str]],
-    output: Tuple[Optional[str], Optional[str]],
-    format: Tuple[Optional[str], Optional[str]],
-    en_modules: Tuple[Optional[List[str]], Optional[List[str]]],
-    dis_modules: Tuple[Optional[List[str]], Optional[List[str]]],
+    language: tuple[str | None, tuple[str | None, str | None]],
+    whitelist: tuple[str | None, str | None],
+    output: tuple[str | None, str | None],
+    format: tuple[str | None, str | None],
+    en_modules: tuple[list[str] | None, list[str] | None],
+    dis_modules: tuple[list[str] | None, list[str] | None],
 ):
 
     cmd = generate_cli_command(

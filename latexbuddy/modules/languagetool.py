@@ -1,33 +1,34 @@
 """This module defines the connection between LaTeXBuddy and LanguageTool."""
+from __future__ import annotations
 
 import json
 import re
 import socket
 import time
-
 from contextlib import closing
 from enum import Enum
 from json import JSONDecodeError
 from logging import Logger
-from typing import AnyStr, Dict, List, Optional
+from typing import AnyStr
+from typing import List
 
 import requests
 
 import latexbuddy.tools as tools
-
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.exceptions import ExecutableNotFoundError
 from latexbuddy.modules import Module
-from latexbuddy.problem import Problem, ProblemSeverity
+from latexbuddy.problem import Problem
+from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
 class Mode(Enum):
     """Describes the LanguageTool mode.
 
-    LanguageTool can be run as a command line program, a local server, or a remote
-    server.
+    LanguageTool can be run as a command line program, a local server,
+    or a remote server.
     """
 
     COMMANDLINE = "COMMANDLINE"
@@ -38,7 +39,9 @@ class Mode(Enum):
 class LanguageTool(Module):
     """Wraps the LanguageTool API calls to check files."""
 
-    _REGEX_LANGUAGE_FLAG = re.compile(r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?")
+    _REGEX_LANGUAGE_FLAG = re.compile(
+        r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?",
+    )
 
     def __init__(self):
         """Creates a LanguageTool checking module."""
@@ -54,8 +57,9 @@ class LanguageTool(Module):
         self.remote_url_languages = None
         self.lt_console_command = None
 
-    def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-        """Runs the LanguageTool checks on a file and returns the results as a list.
+    def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
+        """Runs the LanguageTool checks on a file and returns the results as a
+        list.
 
         Requires LanguageTool (server) to be set up.
         Local or global servers can be used.
@@ -131,11 +135,9 @@ class LanguageTool(Module):
 
         return result
 
-    def find_supported_languages(self) -> List[str]:
-        """
-        Acquires a list of supported languages from the version of LanguageTool that
-        is currently used.
-        """
+    def find_supported_languages(self) -> list[str]:
+        """Acquires a list of supported languages from the version of
+        LanguageTool that is currently used."""
 
         if self.mode == Mode.COMMANDLINE:
 
@@ -144,7 +146,10 @@ class LanguageTool(Module):
 
             result = tools.execute(*cmd)
 
-            supported_languages = [lang.split(" ")[0] for lang in result.splitlines()]
+            supported_languages = [
+                lang.split(" ")[0]
+                for lang in result.splitlines()
+            ]
             supported_languages = list(
                 filter(self.matches_language_regex, supported_languages),
             )
@@ -168,19 +173,18 @@ class LanguageTool(Module):
             return []
 
     def matches_language_regex(self, language: str) -> bool:
-        """
-        Determines whether a given string is a language code by matching it against a
-        regular expression.
-        """
+        """Determines whether a given string is a language code by matching it
+        against a regular expression."""
 
         return self._REGEX_LANGUAGE_FLAG.fullmatch(language) is not None
 
-    def find_languagetool_command_prefix(self) -> List[str]:
-        """
-        Finds the prefix of the shell command executing LanguageTool in the commandline.
-        """
+    def find_languagetool_command_prefix(self) -> list[str]:
+        """Finds the prefix of the shell command executing LanguageTool in the
+        commandline."""
 
-        tools.find_executable("java", "JRE (Java Runtime Environment)", self.logger)
+        tools.find_executable(
+            "java", "JRE (Java Runtime Environment)", self.logger,
+        )
 
         try:
             result = tools.find_executable(
@@ -236,9 +240,8 @@ class LanguageTool(Module):
             self.lt_console_command.append(self.disabled_categories)
 
     def find_disabled_rules(self, config: ConfigLoader) -> None:
-        """
-        Reads all disabled rules and categories from the specified configuration and
-        saves the result in the instance.
+        """Reads all disabled rules and categories from the specified
+        configuration and saves the result in the instance.
 
         :param config: configuration options to be read
         """
@@ -267,7 +270,7 @@ class LanguageTool(Module):
         if self.disabled_categories == "":
             self.disabled_categories = None
 
-    def check_tex(self, file: TexFile) -> List[Problem]:
+    def check_tex(self, file: TexFile) -> list[Problem]:
         """Runs the LanguageTool checks on a file.
 
         :param file: the file to run checks on
@@ -289,7 +292,7 @@ class LanguageTool(Module):
 
         return self.format_errors(raw_problems, file)
 
-    def lt_post_request(self, file: TexFile, server_url: str) -> Optional[Dict]:
+    def lt_post_request(self, file: TexFile, server_url: str) -> dict | None:
         """Send a POST request to the LanguageTool server to check the text.
 
         :param file: TexFile object representing the file to be checked
@@ -325,11 +328,12 @@ class LanguageTool(Module):
             )
             return None
 
-    def lt_languages_get_request(self, server_url: str) -> List[str]:
-        """
-        Sends a GET request to the specified URL in order to retrieve a JSON formatted
-        list of supported languages by the server. If the response format is invalid,
-        this method will most likely fail with an exception.
+    def lt_languages_get_request(self, server_url: str) -> list[str]:
+        """Sends a GET request to the specified URL in order to retrieve a JSON
+        formatted list of supported languages by the server.
+
+        If the response format is invalid, this method will most likely
+        fail with an exception.
         """
 
         response_json = requests.get(server_url).json()
@@ -341,7 +345,7 @@ class LanguageTool(Module):
 
         return supported_languages
 
-    def execute_commandline_request(self, file: TexFile) -> Optional[Dict]:
+    def execute_commandline_request(self, file: TexFile) -> dict | None:
         """Execute the LanguageTool command line app to check the text.
 
         :param file: TexFile object representing the file to be checked
@@ -361,7 +365,7 @@ class LanguageTool(Module):
         output = tools.execute_no_errors(*cmd, encoding="utf_8")
 
         if len(output) > 0:
-            output = output[output.find("{") :]
+            output = output[output.find("{"):]
 
         try:
             json_output = json.loads(output)
@@ -371,8 +375,9 @@ class LanguageTool(Module):
         return json_output
 
     @staticmethod
-    def format_errors(raw_problems: Dict, file: TexFile) -> List[Problem]:
-        """Parses LanguageTool errors and converts them to LaTeXBuddy Error objects.
+    def format_errors(raw_problems: dict, file: TexFile) -> list[Problem]:
+        """Parses LanguageTool errors and converts them to LaTeXBuddy Error
+        objects.
 
         :param raw_problems: LanguageTool's error output
         :param file: TexFile object representing the file to be checked
@@ -423,9 +428,9 @@ class LanguageTool(Module):
 
     @staticmethod
     def parse_error_replacements(
-        json_replacements: List[Dict],
+        json_replacements: list[dict],
         max_elements: int = 5,
-    ) -> List[str]:
+    ) -> list[str]:
         """Converts LanguageTool's replacements to LaTeXBuddy suggestions list.
 
         :param json_replacements: list of LT's replacements for a particular word
@@ -467,7 +472,9 @@ class LanguageToolLocalServer:
         This method also checks if Java is installed.
         """
 
-        tools.find_executable("java", "JRE (Java Runtime Environment)", self.logger)
+        tools.find_executable(
+            "java", "JRE (Java Runtime Environment)", self.logger,
+        )
 
         try:
             result = tools.find_executable(
