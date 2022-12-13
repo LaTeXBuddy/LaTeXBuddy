@@ -169,7 +169,9 @@ def main(args: Sequence[str] | None = None) -> int:
 
     __execute_latexbuddy_checks(parsed_args)
 
-    LOG.debug(f"Execution finished in {round(perf_counter() - start, 2)}s")
+    LOG.debug(
+        f"Execution finished in {round(perf_counter() - start, 3)} seconds",
+    )
     return 0
 
 
