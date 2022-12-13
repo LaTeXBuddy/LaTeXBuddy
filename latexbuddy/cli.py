@@ -50,6 +50,13 @@ def _get_parser() -> argparse.ArgumentParser:
         default=Path("config.py"),
         help="Location of the config file.",
     )
+    parser.add_argument(
+        "--output",
+        "-o",
+        type=str,
+        default=None,
+        help="Directory, in which to put the output file.",
+    )
 
     mutex_group = parser.add_mutually_exclusive_group()
 
@@ -105,13 +112,6 @@ def _get_parser() -> argparse.ArgumentParser:
         type=str,
         default=None,
         help="Location of the whitelist file.",
-    )
-    buddy_group.add_argument(
-        "--output",
-        "-o",
-        type=str,
-        default=None,
-        help="Directory, in which to put the output file.",
     )
     buddy_group.add_argument(
         "--format",
