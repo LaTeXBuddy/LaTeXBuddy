@@ -30,15 +30,14 @@ def _get_parser() -> argparse.ArgumentParser:
         description="The one-stop-shop for LaTeX checking.",
         epilog="More documentation at <https://latexbuddy.readthedocs.io/>.",
     )
-
-    mutex_group = parser.add_mutually_exclusive_group()
-
-    mutex_group.add_argument(
+    parser.add_argument(
         "--version",
         "-V",
         action="version",
         version=f"{__app_name__} v{__version__}",
     )
+
+    mutex_group = parser.add_mutually_exclusive_group()
 
     mutex_group.add_argument(
         "--wl_add_keys",
