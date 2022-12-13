@@ -27,8 +27,8 @@ LOG = logging.getLogger(__name__)
 
 def _get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog=name,
         description="The one-stop-shop for LaTeX checking.",
+        epilog="More documentation at <https://latexbuddy.readthedocs.io/>.",
     )
 
     mutex_group = parser.add_mutually_exclusive_group()
