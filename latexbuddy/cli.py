@@ -36,6 +36,13 @@ def _get_parser() -> argparse.ArgumentParser:
         action="version",
         version=f"{__app_name__} v{__version__}",
     )
+    parser.add_argument(
+        "--verbose",
+        "-v",
+        action="count",
+        default=0,
+        help="Display debug output",
+    )
 
     mutex_group = parser.add_mutually_exclusive_group()
 
@@ -84,13 +91,6 @@ def _get_parser() -> argparse.ArgumentParser:
         type=Path,
         default=Path("config.py"),
         help="Location of the config file.",
-    )
-    buddy_group.add_argument(
-        "--verbose",
-        "-v",
-        action="count",
-        default=0,
-        help="Display debug output",
     )
     buddy_group.add_argument(
         "--language",
