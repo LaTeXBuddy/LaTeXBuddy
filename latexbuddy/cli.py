@@ -5,9 +5,11 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+import sys
 from pathlib import Path
 from time import perf_counter
 from typing import AnyStr
+from typing import Sequence
 
 import latexbuddy
 from latexbuddy import __app_name__
@@ -140,13 +142,14 @@ def _get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main():
+def main(args: Sequence[str] | None = None) -> int:
     """Parses CLI arguments and launches the LaTeXBuddy instance."""
     start = perf_counter()
 
-    args = _get_parser().parse_args()
+    args = args if args is not None else sys.argv[1:]
+    parsed_args = _get_parser().parse_args(args)
 
-    verbosity = args.verbose
+    verbosity = parsed_args.verbose
     if os.environ.get("LATEXBUDDY_DEBUG"):
         verbosity = 2
     latexbuddy.configure_logging(
@@ -154,19 +157,20 @@ def main():
     )
 
     print(f"{colour.CYAN}{__app_name__}{colour.RESET_ALL} v{__version__}")
-    LOG.debug(f"Parsed CLI args: {str(args)}")
+    LOG.debug(f"Parsed CLI args: {str(parsed_args)}")
 
-    if args.wl_add_keys or args.wl_from_wordlist:
-        perform_whitelist_operations(args)
-        return
+    if parsed_args.wl_add_keys or parsed_args.wl_from_wordlist:
+        perform_whitelist_operations(parsed_args)
+        return 0
 
-    if args.flask:
-        __execute_flask_startup(args)
-        return
+    if parsed_args.flask:
+        __execute_flask_startup(parsed_args)
+        return 0
 
-    __execute_latexbuddy_checks(args)
+    __execute_latexbuddy_checks(parsed_args)
 
     LOG.debug(f"Execution finished in {round(perf_counter() - start, 2)}s")
+    return 0
 
 
 def __execute_flask_startup(args: argparse.Namespace) -> None:
