@@ -43,6 +43,13 @@ def _get_parser() -> argparse.ArgumentParser:
         default=0,
         help="Display debug output",
     )
+    parser.add_argument(
+        "--config",
+        "-c",
+        type=Path,
+        default=Path("config.py"),
+        help="Location of the config file.",
+    )
 
     mutex_group = parser.add_mutually_exclusive_group()
 
@@ -84,13 +91,6 @@ def _get_parser() -> argparse.ArgumentParser:
         nargs="+",
         type=Path,
         help="File(s) that will be processed.",
-    )
-    buddy_group.add_argument(
-        "--config",
-        "-c",
-        type=Path,
-        default=Path("config.py"),
-        help="Location of the config file.",
     )
     buddy_group.add_argument(
         "--language",
