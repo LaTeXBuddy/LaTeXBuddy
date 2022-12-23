@@ -1,0 +1,44 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: LaTeXBuddy
+Upstream-Contact: LaTeXBuddy <latexbuddy@mailbox.org>
+Source: https://latexbuddy.gitlab.io/
+
+Files:
+ .editorconfig
+ .gitignore
+ .gitlab-ci.yml
+ .pre-commit-config.yaml
+ .readthedocs.yaml
+ docs/*.bat
+ docs/Makefile
+ docs/*.py
+ config.py
+ Dockerfile
+ pyproject.toml
+Copyright: 2021-2022 LaTeXBuddy <latexbuddy@mailbox.org>
+License: Apache-2.0
+
+Files:
+ .git-blame-ignore-revs
+ AUTHORS
+ NOTICE
+ poetry.lock
+Copyright: 2021-2022 LaTeXBuddy <latexbuddy@mailbox.org>
+License: CC0-1.0
+
+Files:
+ docs/*.ico
+ docs/*.md
+ docs/*.rst
+ docs/*.png
+ CHANGELOG.md
+ CONTRIBUTING.md
+ README.md
+Copyright: 2022 LaTeXBuddy <latexbuddy@mailbox.org>
+License: GFDL-1.3-or-later
+
+Files:
+ latexbuddy/*
+ tests/*
+Copyright: 2021-2022 LaTeXBuddy <latexbuddy@mailbox.org>
+License: GPL-3.0-or-later
