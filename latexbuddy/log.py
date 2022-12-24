@@ -7,6 +7,7 @@ from logging import INFO
 from logging import Logger
 from logging import LogRecord
 from logging import StreamHandler
+from logging import WARNING
 from logging.handlers import RotatingFileHandler
 
 from colorama import Back
@@ -16,6 +17,11 @@ from colorama import Style
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
 
+_VERBOSITY_TO_LOG_LEVEL = {
+    0: WARNING,
+    1: INFO,
+    2: DEBUG,
+}
 
 LOG_LEVEL_COLORS: dict[str, str] = {
     "DEBUG": Back.WHITE + Fore.BLACK,
@@ -47,7 +53,7 @@ class ConsoleFormatter(Formatter):
         return f"{level_msg} {record.getMessage()}"
 
 
-def __setup_root_logger(logger: Logger, console_level: int = INFO) -> None:
+def __setup_root_logger(logger: Logger, verbosity: int = 0) -> None:
     """Sets up a logger.
 
     Intended to be used on the root logger, this module adds a file and a console
@@ -56,6 +62,9 @@ def __setup_root_logger(logger: Logger, console_level: int = INFO) -> None:
     :param logger: the logger to set up
     :param console_level: level of the console output
     """
+    if verbosity < 0:
+        raise ValueError("verbosity level cannot be negative")
+
     logger.name = name  # set root logger name
     logger.setLevel(DEBUG)  # output at most everything
 
@@ -79,7 +88,9 @@ def __setup_root_logger(logger: Logger, console_level: int = INFO) -> None:
     )
 
     ch = StreamHandler()
-    ch.setLevel(console_level)
+    # clamp verbosity between 0 and maximum supported level (2)
+    verbosity = min(verbosity, max(_VERBOSITY_TO_LOG_LEVEL))
+    ch.setLevel(_VERBOSITY_TO_LOG_LEVEL[verbosity])
     ch.setFormatter(ConsoleFormatter())
 
     logger.addHandler(fh)

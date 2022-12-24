@@ -89,8 +89,8 @@ def _get_parser() -> argparse.ArgumentParser:
     buddy_group.add_argument(
         "--verbose",
         "-v",
-        action="store_true",
-        default=False,
+        action="count",
+        default=0,
         help="Display debug output",
     )
     buddy_group.add_argument(
@@ -166,10 +166,13 @@ def main():
 
 
 def __setup_logger(args: argparse.Namespace) -> logging.Logger:
-    display_debug = args.verbose or os.environ.get("LATEXBUDDY_DEBUG", False)
+    verbosity = args.verbose
+    if os.environ.get("LATEXBUDDY_DEBUG"):
+        verbosity = 2
 
     __setup_root_logger(
-        root_logger, logging.DEBUG if display_debug else logging.INFO,
+        root_logger,
+        verbosity,
     )
     return root_logger.getChild("cli")
 
