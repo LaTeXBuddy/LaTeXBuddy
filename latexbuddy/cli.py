@@ -9,12 +9,11 @@ from pathlib import Path
 from time import perf_counter
 from typing import AnyStr
 
-from colorama import Fore
-
 from latexbuddy import __app_name__
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
 from latexbuddy import __version__
+from latexbuddy import colour
 from latexbuddy import flask_app
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
@@ -149,7 +148,7 @@ def main():
 
     logger = __setup_logger(args)
 
-    print(f"{Fore.CYAN}{__app_name__}{Fore.RESET} v{__version__}")
+    print(f"{colour.CYAN}{__app_name__}{colour.RESET_ALL} v{__version__}")
     logger.debug(f"Parsed CLI args: {str(args)}")
 
     if args.wl_add_keys or args.wl_from_wordlist:

@@ -3,8 +3,6 @@ from __future__ import annotations
 from logging import getLogger
 from pkgutil import extend_path
 
-import colorama
-
 
 # package metadata
 __app_name__ = "LaTeXBuddy"  # proper name
@@ -14,4 +12,13 @@ __version__ = "0.4.1"
 
 __logger = getLogger(__name__)
 
-colorama.init()
+try:
+    from colorama import just_fix_windows_console
+
+    just_fix_windows_console()
+except ModuleNotFoundError:
+    LOG.debug("colorama not found, we are not on Windows")
+except ImportError:
+    LOG.debug("Old colorama version installed, using legacy init")
+    import colorama
+    colorama.init()

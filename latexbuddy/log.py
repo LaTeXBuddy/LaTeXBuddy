@@ -10,13 +10,10 @@ from logging import StreamHandler
 from logging import WARNING
 from logging.handlers import RotatingFileHandler
 
-from colorama import Back
-from colorama import Fore
-from colorama import Style
-
 import latexbuddy.tools
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
+from latexbuddy import colour
 
 _VERBOSITY_TO_LOG_LEVEL = {
     0: WARNING,
@@ -25,11 +22,11 @@ _VERBOSITY_TO_LOG_LEVEL = {
 }
 
 LOG_LEVEL_COLORS: dict[str, str] = {
-    "DEBUG": Back.WHITE + Fore.BLACK,
+    "DEBUG": colour.BLACK_ON_WHITE,
     "INFO": "",
-    "WARNING": Back.YELLOW + Fore.BLACK,
-    "ERROR": Back.RED,
-    "CRITICAL": Back.RED,
+    "WARNING": colour.BLACK_ON_YELLOW,
+    "ERROR": colour.ON_RED,
+    "CRITICAL": colour.ON_RED,
 }
 
 
@@ -47,7 +44,7 @@ class ConsoleFormatter(Formatter):
         if self.colour:
             level_msg = f"{LOG_LEVEL_COLORS[record.levelname]}" \
                         f"[{record.levelname}]" \
-                        f"{Style.RESET_ALL}"
+                        f"{colour.RESET_ALL}"
         else:
             level_msg = f"[{record.levelname}]"
 
