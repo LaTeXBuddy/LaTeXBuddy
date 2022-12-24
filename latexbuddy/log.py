@@ -8,15 +8,14 @@ from logging import Formatter
 from logging import INFO
 from logging import Logger
 from logging import LogRecord
+from logging import StreamHandler
 from logging import WARNING
 from logging.handlers import RotatingFileHandler
 
 from colorama import Back
 from colorama import Fore
 from colorama import Style
-from double_stream_handler import DoubleStreamHandler
 
-import latexbuddy
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
 
@@ -87,7 +86,7 @@ def __setup_root_logger(logger: Logger, console_level: int = INFO) -> None:
         ),
     )
 
-    ch = DoubleStreamHandler()
+    ch = StreamHandler()
     ch.setLevel(console_level)
     ch.setFormatter(ConsoleFormatter())
 
