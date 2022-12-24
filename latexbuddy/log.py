@@ -14,6 +14,7 @@ from colorama import Back
 from colorama import Fore
 from colorama import Style
 
+import latexbuddy.tools
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
 
