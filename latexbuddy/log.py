@@ -1,15 +1,12 @@
 from __future__ import annotations
 
 from abc import ABC
-from logging import CRITICAL
 from logging import DEBUG
-from logging import ERROR
 from logging import Formatter
 from logging import INFO
 from logging import Logger
 from logging import LogRecord
 from logging import StreamHandler
-from logging import WARNING
 from logging.handlers import RotatingFileHandler
 
 from colorama import Back
@@ -18,6 +15,15 @@ from colorama import Style
 
 from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
+
+
+LOG_LEVEL_COLORS: dict[str, str] = {
+    "DEBUG": Back.WHITE + Fore.BLACK,
+    "INFO": "",
+    "WARNING": Back.YELLOW + Fore.BLACK,
+    "ERROR": Back.RED,
+    "CRITICAL": Back.RED,
+}
 
 
 class ConsoleFormatter(Formatter):
@@ -31,26 +37,14 @@ class ConsoleFormatter(Formatter):
         self.colour: bool = enable_colour
 
     def format(self, record: LogRecord) -> str:
-        level = record.levelno
-        prefix = ""
+        if self.colour:
+            level_msg = f"{LOG_LEVEL_COLORS[record.levelname]}" \
+                        f"[{record.levelname}]" \
+                        f"{Style.RESET_ALL}"
+        else:
+            level_msg = f"[{record.levelname}]"
 
-        if level < INFO:
-            if self.colour:
-                prefix += Fore.LIGHTBLACK_EX
-        elif WARNING <= level < ERROR:
-            if self.colour:
-                prefix += Style.BRIGHT + Fore.YELLOW
-            prefix += "Warning: "
-        elif ERROR <= level < CRITICAL:
-            if self.colour:
-                prefix += Style.BRIGHT + Fore.RED
-            prefix += "Error: "
-        elif CRITICAL <= level:
-            if self.colour:
-                prefix += Back.RED + Fore.BLACK
-            prefix += "FATAL ERROR: "
-
-        return prefix + super().format(record) + Style.RESET_ALL
+        return f"{level_msg} {record.getMessage()}"
 
 
 def __setup_root_logger(logger: Logger, console_level: int = INFO) -> None:
