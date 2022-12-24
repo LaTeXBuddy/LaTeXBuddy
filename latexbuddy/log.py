@@ -77,11 +77,9 @@ def __setup_root_logger(logger: Logger, console_level: int = INFO) -> None:
     fh.setLevel(DEBUG)  # output everything to file
     fh.setFormatter(
         Formatter(
-            "%(asctime)s "
-            "%(levelname)s "
-            "%(name)s "
-            "%(filename)s:%(lineno)d "
-            "%(funcName)s() "
+            "%(name)-30s"
+            "%(relativeCreated)6d "
+            "%(levelname)-8s "
             "%(message)s",
         ),
     )
