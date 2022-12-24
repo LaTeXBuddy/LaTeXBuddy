@@ -72,8 +72,8 @@ def __setup_root_logger(logger: Logger, console_level: int = INFO) -> None:
 
     fh = RotatingFileHandler(
         latexbuddy.tools.get_app_dir() / "debug.log",
-        maxBytes=4000000,
-        backupCount=8,
+        maxBytes=2_097_152,  # 2 Mebibytes
+        backupCount=4,
     )
     fh.setLevel(DEBUG)  # output everything to file
     fh.setFormatter(
