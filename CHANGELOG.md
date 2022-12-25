@@ -7,9 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+-   fixed regression introduced in ef2e4e2f9ff2ac3e1a9772cfec0985b6b4e20d9c
+    where the app would crash because of a weird typing error (!180)
+
 ### Changed
 
 -   `TexFile` will not try reading a file if it's empty, but return an empty string (#22, !177)
+-   Logging was simplified (!181)
 
 ## [0.4.1] - 09 Dec 2022
 
