@@ -13,16 +13,13 @@ from typing import Sequence
 
 import latexbuddy
 from latexbuddy import __app_name__
-from latexbuddy import __name__ as name
 from latexbuddy import __version__
 from latexbuddy import colour
-from latexbuddy import flask_app
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.module_loader import ModuleLoader
 from latexbuddy.tools import get_abs_path
 from latexbuddy.tools import get_all_paths_in_document
-from latexbuddy.tools import perform_whitelist_operations
 
 LOG = logging.getLogger(__name__)
 
@@ -61,26 +58,6 @@ def _get_parser() -> argparse.ArgumentParser:
     )
 
     mutex_group = parser.add_mutually_exclusive_group()
-
-    mutex_group.add_argument(
-        "--add-to-whitelist",
-        "-W",
-        nargs="+",
-        metavar="KEY",
-        default=None,
-        help="Arguments are valid keys that should be added to whitelist. Ideally"
-        " the keys are copied from LaTeXBuddy HTML Output",
-    )
-    mutex_group.add_argument(
-        "--whitelist-from-wordlist",
-        "-L",
-        metavar=("WORD_LIST", "LANGUAGE"),
-        nargs=2,
-        default=None,
-        help="First argument is a file containing a single word per line, "
-        "second argument is the language of the words. The words get added "
-        "to the whitelist as spelling errors to be ignored by LaTeXBuddy.",
-    )
 
     # TODO: wait for argparse to support nesting of groups in order to make the whole
     #  buddy_group mutually exclusive to -V, -ak and -awl
@@ -150,10 +127,6 @@ def main(args: Sequence[str] | None = None) -> int:
 
     print(f"{colour.CYAN}{__app_name__}{colour.RESET_ALL} v{__version__}")
     LOG.debug(f"Parsed CLI args: {str(parsed_args)}")
-
-    if parsed_args.add_to_whitelist or parsed_args.whitelist_from_wordlist:
-        perform_whitelist_operations(parsed_args)
-        return 0
 
     __execute_latexbuddy_checks(parsed_args)
 
