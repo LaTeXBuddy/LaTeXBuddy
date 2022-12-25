@@ -1,5 +1,6 @@
 """This module describes the LaTeXBuddy config loader and its properties."""
 import importlib.util as importutil
+import logging
 import re
 from argparse import Namespace
 from pathlib import Path
@@ -21,6 +22,9 @@ import latexbuddy.tools as tools
 from latexbuddy.exceptions import ConfigOptionNotFoundError
 from latexbuddy.exceptions import ConfigOptionVerificationError
 from latexbuddy.log import Loggable
+
+
+LOG = logging.getLogger(__name__)
 
 
 class ConfigLoader(Loggable):
@@ -49,13 +53,13 @@ class ConfigLoader(Loggable):
         self.module_flags: Dict[str, Dict[str, Any]] = {}
 
         if cli_arguments is None:
-            self.logger.debug(
+            LOG.debug(
                 "No CLI arguments specified. Default values will be used.",
             )
             return
 
         if not cli_arguments.config:
-            self.logger.warning(
+            LOG.warning(
                 "No configuration file specified. Default values will be used.",
             )
             return
@@ -63,7 +67,7 @@ class ConfigLoader(Loggable):
         if cli_arguments.config.exists():
             self.load_configurations(cli_arguments.config)
         else:
-            self.logger.warning(
+            LOG.warning(
                 f"File not found: {cli_arguments.config}. "
                 f"Default configuration values will be used.",
             )
@@ -91,7 +95,7 @@ class ConfigLoader(Loggable):
 
         parsed_main, parsed_modules = self.__parse_args_dict(args_dict)
 
-        self.logger.debug(
+        LOG.debug(
             f"Parsed CLI config options (main):\n{str(parsed_main)}\n\n"
             f"Parsed CLI config options (modules):\n{str(parsed_modules)}",
         )
@@ -206,7 +210,7 @@ class ConfigLoader(Loggable):
 
         else:
 
-            self.logger.warning(
+            LOG.warning(
                 f"Specified language '{flag_value}' is not a valid "
                 f"language key. Please use a key in the following syntax: "
                 f"<language>[-<country>] (e.g.: en-GB, en_US, de-DE)",
@@ -520,7 +524,7 @@ class ConfigLoader(Loggable):
             )
 
         except ConfigOptionNotFoundError:
-            self.logger.info(
+            LOG.info(
                 f"Config entry '{key}' for module '{module.display_name}' not found. "
                 f"Using default value '{str(default_value)}' instead...",
             )
@@ -528,7 +532,7 @@ class ConfigLoader(Loggable):
             return default_value
 
         except ConfigOptionVerificationError as e:
-            self.logger.warning(
+            LOG.warning(
                 f"Config entry invalid. Using default value '{str(default_value)}' "
                 f"instead. Details: {str(e)}",
             )

@@ -2,6 +2,7 @@
 working with."""
 from __future__ import annotations
 
+import logging
 import os
 import re
 import sys
@@ -22,11 +23,12 @@ from latexbuddy.tools import execute
 from latexbuddy.tools import find_executable
 from latexbuddy.tools import get_line_offsets
 from latexbuddy.tools import is_binary
-# from latexbuddy.config_loader import ConfigLoader
 
 
 # regex to parse out error location from tex2txt output
 location_re = re.compile(r"line (\d+), column (\d+)")
+
+LOG = logging.getLogger(__name__)
 
 
 class TexFile(Loggable):
@@ -160,7 +162,7 @@ class TexFile(Loggable):
         try:
             find_executable("latex")
         except FileNotFoundError:
-            self.logger.error(
+            LOG.error(
                 not_found("pdflatex", "LaTeX (e.g., TeXLive Core)"),
             )
             return None, None
@@ -177,9 +179,9 @@ class TexFile(Loggable):
         try:
             os.mkdir(html_directory)
         except FileExistsError:
-            self.logger.debug(f"Directory {html_directory} already exists.")
+            LOG.debug(f"Directory {html_directory} already exists.")
         except Exception as exc:
-            self.logger.error(
+            LOG.error(
                 texfile_error(
                     f"{exc} occurred while creating {html_directory}.",
                 ),
@@ -190,9 +192,9 @@ class TexFile(Loggable):
         try:
             os.mkdir(compile_directory)
         except FileExistsError:
-            self.logger.debug(f"Directory {compile_directory} already exists.")
+            LOG.debug(f"Directory {compile_directory} already exists.")
         except Exception as exc:
-            self.logger.error(
+            LOG.error(
                 texfile_error(
                     f"{exc} occurred while creating {compile_directory}.",
                 ),
@@ -205,11 +207,11 @@ class TexFile(Loggable):
         try:
             os.mkdir(str(compilation_path))
         except FileExistsError:
-            self.logger.debug(
+            LOG.debug(
                 f"Directory {str(compilation_path)} already exists.",
             )
         except Exception as exc:
-            self.logger.error(
+            LOG.error(
                 texfile_error(
                     f"{exc} occurred while creating {str(compilation_path)}.",
                 ),
@@ -217,10 +219,10 @@ class TexFile(Loggable):
 
         tex_mf = self.__create_tex_mf(compilation_path)
 
-        self.logger.debug(
+        LOG.debug(
             f"TEXFILE: {str(self.tex_file)}, exists: {self.tex_file.exists()}",
         )
-        self.logger.debug(
+        LOG.debug(
             f"PATH: {str(compilation_path)}, exists: {compilation_path.exists()}",
         )
 
@@ -240,8 +242,8 @@ class TexFile(Loggable):
         log = compilation_path / f"{self.tex_file.stem}.log"
         pdf = compilation_path / \
             f"{self.tex_file.stem}.pdf" if compile_pdf else None
-        self.logger.debug(f"LOG: {str(log)}, isFile: {log.is_file()}")
-        self.logger.debug(f"PDF: {str(pdf)}, isFile: {pdf.is_file()}")
+        LOG.debug(f"LOG: {str(log)}, isFile: {log.is_file()}")
+        LOG.debug(f"PDF: {str(pdf)}, isFile: {pdf.is_file()}")
         return log, pdf
 
     @staticmethod

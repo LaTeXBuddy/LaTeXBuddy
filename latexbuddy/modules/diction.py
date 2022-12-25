@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import os
 from pathlib import Path
 from typing import AnyStr
@@ -15,6 +16,8 @@ from latexbuddy.problem import Problem
 from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
 
+LOG = logging.getLogger(__name__)
+
 
 class Diction(Module):
 
@@ -26,7 +29,7 @@ class Diction(Module):
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
 
         # check, if diction is installed
-        tools.find_executable("diction", "Diction", self.logger)
+        tools.find_executable("diction", "Diction", LOG)
 
         self.language = config.get_config_option_or_default(
             LatexBuddy,

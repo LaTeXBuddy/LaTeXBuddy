@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import re
 from pathlib import Path
 from tempfile import mkstemp
@@ -11,6 +12,7 @@ from latexbuddy.modules import Module
 from latexbuddy.problem import Problem
 from latexbuddy.texfile import TexFile
 
+LOG = logging.getLogger(__name__)
 
 line_re = re.compile(
     r"(?P<severity>Warning|Error)\s(?P<file_path>.*)?\s?(?P<line_no>\d+):",
@@ -37,7 +39,7 @@ class LogFilter(Module):
         try:
             tools.find_executable("awk")
         except FileNotFoundError:
-            self.logger.error(not_found("awk", "AWK"))
+            LOG.error(not_found("awk", "AWK"))
 
         log_path = file.log_file
         if log_path is None:

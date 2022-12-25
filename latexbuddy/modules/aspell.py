@@ -1,6 +1,7 @@
 """This module defines the connection between LaTeXBuddy and GNU Aspell."""
 from __future__ import annotations
 
+import logging
 from typing import AnyStr
 
 import latexbuddy.tools as tools
@@ -10,6 +11,8 @@ from latexbuddy.modules import Module
 from latexbuddy.problem import Problem
 from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
+
+LOG = logging.getLogger(__name__)
 
 
 class Aspell(Module):
@@ -25,7 +28,7 @@ class Aspell(Module):
         :param file: LaTeX file to be checked (with built-in detex option)
         """
 
-        tools.find_executable("aspell", "GNU Aspell", self.logger)
+        tools.find_executable("aspell", "GNU Aspell", LOG)
 
         supported_languages = self.find_languages()
 

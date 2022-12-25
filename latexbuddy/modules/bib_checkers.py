@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 import time
 from difflib import SequenceMatcher
@@ -18,7 +19,7 @@ from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
 
 
-# TODO: logger
+LOG = logging.getLogger(__name__)
 
 
 def get_bibfile(file: TexFile) -> Path | None:
@@ -102,7 +103,7 @@ class NewerPublications(Module):
 
         # time keeping
         self.time += float(ret["time"]["text"])
-        self.logger.debug(ret["time"]["text"])
+        LOG.debug(ret["time"]["text"])
 
         try:
             # TODO: handle multiple newer publications found
@@ -157,11 +158,11 @@ class NewerPublications(Module):
             p.map(self.check_for_new, used_pubs)
         """
 
-        self.logger.debug(
+        LOG.debug(
             f"\n\ndblp requests took {round(time.time() - a, 3)} seconds",
         )
-        self.logger.debug(self.time)
-        self.logger.debug(f'{len(used_pubs)} entries found in "{bib_file}"\n')
+        LOG.debug(self.time)
+        LOG.debug(f'{len(used_pubs)} entries found in "{bib_file}"\n')
 
         output_format = config.get_config_option(LatexBuddy, "format")
         html_formats = {"html", "HTML"}
@@ -227,7 +228,7 @@ class BibtexDuplicates(Module):
             ).ratio()
         ratio = total_ratio / len(same_keys)
         if ratio > 0.85:
-            self.logger.debug(
+            LOG.debug(
                 f"------------------\n{ratio}\n{entry_1}\n{entry_2}\n------------------",
             )
             self.found_duplicates.append(ids)

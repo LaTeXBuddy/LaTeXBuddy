@@ -1,6 +1,7 @@
 """This module contains various utility tools."""
 from __future__ import annotations
 
+import logging
 import os
 import re
 import signal
@@ -13,18 +14,10 @@ from pathlib import Path
 from typing import Callable
 
 from latexbuddy.exceptions import ExecutableNotFoundError
-from latexbuddy.log import Loggable
 from latexbuddy.messages import not_found
 from latexbuddy.messages import path_not_found
-from latexbuddy.problem import Problem
-from latexbuddy.problem import ProblemSeverity
 
-
-class ToolLogger(Loggable):
-    pass
-
-
-logger = ToolLogger().logger
+LOG = logging.getLogger(__name__)
 
 
 inc_re = re.compile(r"\\include{(?P<file_name>.*)}")
@@ -43,7 +36,7 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
 
     command = get_command_string(cmd)
 
-    logger.debug(f"Executing '{command}'")
+    LOG.debug(f"Executing '{command}'")
 
     error_list = subprocess.Popen(
         [command],
@@ -63,7 +56,7 @@ def execute_background(*cmd: str) -> subprocess.Popen:
     """
     command = get_command_string(cmd)
 
-    logger.debug(f"Executing '{command}' in the background")
+    LOG.debug(f"Executing '{command}' in the background")
 
     process = subprocess.Popen(
         [command],
@@ -94,7 +87,7 @@ def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
     """
     command = get_command_string(cmd)
 
-    logger.debug(f"Executing '{command}' (ignoring errors)")
+    LOG.debug(f"Executing '{command}' (ignoring errors)")
 
     error_list = subprocess.Popen(
         [command],
@@ -121,7 +114,7 @@ def get_command_string(cmd: tuple[str]) -> str:
 def find_executable(
     name: str,
     to_install: str | None = None,
-    err_logger: Logger = logger,
+    err_logger: Logger = LOG,
     log_errors: bool = True,
 ) -> str:
     """Finds path to an executable. If the executable can not be located, an
@@ -250,7 +243,7 @@ def execute_no_exceptions(
         function_call()
     except Exception as e:
 
-        logger.error(
+        LOG.error(
             f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}",
         )
         if traceback_log_level is not None:
@@ -258,16 +251,16 @@ def execute_no_exceptions(
             stack_trace = traceback.format_exc()
 
             if traceback_log_level == "DEBUG":
-                logger.debug(stack_trace)
+                LOG.debug(stack_trace)
             elif traceback_log_level == "INFO":
-                logger.info(stack_trace)
+                LOG.info(stack_trace)
             elif traceback_log_level == "WARNING":
-                logger.warning(stack_trace)
+                LOG.warning(stack_trace)
             elif traceback_log_level == "ERROR":
-                logger.error(stack_trace)
+                LOG.error(stack_trace)
             else:
                 # use level DEBUG as default, in case of invalid value
-                logger.debug(stack_trace)
+                LOG.debug(stack_trace)
 
 
 def get_app_dir() -> Path:
@@ -331,7 +324,7 @@ def get_all_paths_in_document(file_path: Path) -> list[Path]:
         try:
             lines = unchecked_file.read_text().splitlines(keepends=False)
         except FileNotFoundError:
-            logger.error(
+            LOG.error(
                 path_not_found(
                     "the checking of imports", unchecked_file,
                 ),
@@ -339,7 +332,7 @@ def get_all_paths_in_document(file_path: Path) -> list[Path]:
             continue
         except Exception as e:  # If the file cannot be found it is already removed
             error_message = "Error while searching for files"
-            logger.error(
+            LOG.error(
                 f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}",
             )
             continue
@@ -447,7 +440,7 @@ def get_abs_path(path) -> Path:
         return Path(path)
     p = Path(str(os.getcwd()) + "/" + str(path))
     if not p.is_file() or path[-4:] != ".tex":
-        logger.error(f"File {p} does not exist.")
+        LOG.error(f"File {p} does not exist.")
     return p
 
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 import proselint
 
 from latexbuddy.buddy import LatexBuddy
@@ -8,6 +10,8 @@ from latexbuddy.modules import Module
 from latexbuddy.problem import Problem
 from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
+
+LOG = logging.getLogger(__name__)
 
 
 class ProseLint(Module):
@@ -21,7 +25,7 @@ class ProseLint(Module):
         )
 
         if lang != "en":
-            self.logger.info(
+            LOG.info(
                 "Proselint only supports documents written in English.",
             )
             return []

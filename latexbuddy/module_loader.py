@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib
 import inspect
+import logging
 import sys
 from abc import ABC
 from abc import abstractmethod
@@ -12,6 +13,9 @@ import latexbuddy.tools as tools
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.log import Loggable
 from latexbuddy.modules import Module
+
+
+LOG = logging.getLogger(__name__)
 
 
 class ModuleProvider(ABC):
@@ -108,7 +112,7 @@ class ModuleLoader(ModuleProvider, Loggable):
 
                 module_path = str(py_file.stem)
 
-                self.logger.debug(
+                LOG.debug(
                     f"Attempting to load module from '{module_path}'",
                 )
                 module = importlib.import_module(module_path)
@@ -130,19 +134,19 @@ class ModuleLoader(ModuleProvider, Loggable):
         """
 
         if not self.directory.is_dir():
-            self.logger.warning(
+            LOG.warning(
                 f"Specified path '{str(self.directory.absolute())}' is not a directory."
                 f" No modules could be loaded.",
             )
             return []
 
-        self.logger.debug(
+        LOG.debug(
             f"Searching for .py-files in directory '{str(self.directory.absolute())}'",
         )
 
         files = sorted(self.directory.rglob("*.py"))
 
-        self.logger.debug(
+        LOG.debug(
             f"Found the following .py-files in directory "
             f"'{str(self.directory.absolute())}': {str(files)}",
         )

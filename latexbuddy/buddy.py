@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import multiprocessing as mp
 import os
 import re
@@ -22,6 +23,8 @@ from latexbuddy.problem import set_language
 from latexbuddy.texfile import TexFile
 from latexbuddy.tools import classproperty
 
+
+LOG = logging.getLogger(__name__)
 
 equation_re = re.compile(r"^([A-Z])-\1-\1$")
 
@@ -97,7 +100,7 @@ class LatexBuddy(MainModule):
         )
 
         if not LatexBuddy.instance.output_dir.is_dir():
-            LatexBuddy.instance.logger.warning(
+            LOG.warning(
                 f"'{str(LatexBuddy.instance.output_dir)}' is not a directory. "
                 f"Current directory will be used instead.",
             )
@@ -149,7 +152,7 @@ class LatexBuddy(MainModule):
     def check_whitelist():
         """Removes errors that are whitelisted."""
 
-        LatexBuddy.instance.logger.debug("Beginning whitelist-check...")
+        LOG.debug("Beginning whitelist-check...")
         start_time = time.perf_counter()
 
         if not (
@@ -167,7 +170,7 @@ class LatexBuddy(MainModule):
             if LatexBuddy.instance.errors[uid].key in whitelist_entries:
                 del LatexBuddy.instance.errors[uid]
 
-        LatexBuddy.instance.logger.debug(
+        LOG.debug(
             f"Finished whitelist-check in {round(time.perf_counter() - start_time, 2)} "
             f"seconds",
         )
@@ -183,7 +186,7 @@ class LatexBuddy(MainModule):
         """
 
         if uid not in LatexBuddy.instance.errors:
-            LatexBuddy.instance.logger.error(
+            LOG.error(
                 f"UID not found: {uid}. "
                 "Specified problem will not be added to whitelist.",
             )
@@ -218,14 +221,14 @@ class LatexBuddy(MainModule):
             nonlocal result
 
             start_time = time.perf_counter()
-            module.logger.debug(f"{module.display_name} started checks")
+            LOG.debug(f"{module.display_name} started checks")
 
             result = module.run_checks(
                 LatexBuddy.instance.cfg,
                 LatexBuddy.instance.tex_file,
             )
 
-            module.logger.debug(
+            LOG.debug(
                 f"{module.display_name} finished after "
                 f"{round(time.perf_counter() - start_time, 2)} seconds",
             )
@@ -262,11 +265,11 @@ class LatexBuddy(MainModule):
             LatexBuddy.instance.cfg,
         )
 
-        LatexBuddy.instance.logger.debug(
+        LOG.debug(
             f"Using multiprocessing pool with {os.cpu_count()} "
             f"threads/processes for checks.",
         )
-        LatexBuddy.instance.logger.debug(
+        LOG.debug(
             f"Executing the following modules in parallel: "
             f"{[module.display_name for module in modules]}",
         )
@@ -301,7 +304,7 @@ class LatexBuddy(MainModule):
         with json_output_path.open("w") as file:
             json.dump(list_of_problems, file, indent=4, cls=ProblemJSONEncoder)
 
-        LatexBuddy.instance.logger.info(
+        LOG.info(
             f"Output saved to {json_output_path.resolve()}",
         )
 
@@ -331,7 +334,7 @@ class LatexBuddy(MainModule):
             ),
         )
 
-        LatexBuddy.instance.logger.info(
+        LOG.info(
             f"Output saved to {html_output_path.resolve()}",
         )
 
@@ -360,7 +363,7 @@ class LatexBuddy(MainModule):
             ),
         )
 
-        LatexBuddy.instance.logger.info(
+        LOG.info(
             f"Output saved to {html_output_path.resolve()}",
         )
 

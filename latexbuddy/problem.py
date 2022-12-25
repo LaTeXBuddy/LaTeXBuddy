@@ -5,6 +5,7 @@ types, however LaTeXBuddy will most probably not display extra metadata.
 """
 from __future__ import annotations
 
+import logging
 import time
 from enum import Enum
 from functools import total_ordering
@@ -13,8 +14,8 @@ from pathlib import Path
 from typing import Any
 
 from latexbuddy.log import Loggable
-# from latexbuddy.modules import NamedModule
 
+LOG = logging.getLogger(__name__)
 
 language = None  # static variable used for a uniform key generation
 
@@ -137,7 +138,7 @@ class Problem(Loggable):
             self.checker = checker.display_name
 
         if position is not None and len(text) < 1:
-            self.logger.warning(
+            LOG.warning(
                 f"A Problem created by {self.checker} has a non-None position, but "
                 f"does not have a problematic text with length > 0. It will be "
                 f"converted to a general problem without a position...",
