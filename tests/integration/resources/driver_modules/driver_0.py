@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem

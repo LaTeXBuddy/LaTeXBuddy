@@ -45,6 +45,12 @@ Preprocessing
 .. automodule:: latexbuddy.preprocessor
    :members:
 
+Whitelist
+---------
+
+.. automodule:: latexbuddy.whitelist
+   :members:
+
 Utilities
 ---------
 

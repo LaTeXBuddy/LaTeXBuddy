@@ -5,6 +5,17 @@ All notable changes to LaTeXBuddy will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### 🔥 BREAKING CHANGES
+
+-   CLI got reamped and simplified (#112, !183)
+    -   **removed** option `--flask` ⇒ use executable `latexbuddy-server` instead
+    -   **removed** options `--wl_add_keys` and `--wl_from_wordlist` ⇒ use
+        executable `latexbuddy-whitelist` instead
+        -   whitelist operations got moved to the new `whitelist` module
+    -   removed the big mutually exclusive group, which should affect usage
+
 ## [0.4.2] - 25 Dec 2022 :christmas_tree:
 
 ### Fixed

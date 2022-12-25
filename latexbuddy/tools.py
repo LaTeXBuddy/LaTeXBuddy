@@ -7,7 +7,6 @@ import re
 import signal
 import subprocess
 import traceback
-from argparse import Namespace
 from logging import Logger
 from pathlib import Path
 from typing import Callable
@@ -357,40 +356,6 @@ def texify_path(path: str) -> Path:
     return Path(path)
 
 
-def perform_whitelist_operations(args: Namespace):
-    """Performs whitelist operations.
-
-    :param args: the args
-    """
-    wl_file = args.whitelist if args.whitelist else Path("whitelist")
-
-    if args.wl_add_keys:
-        add_whitelist_console(wl_file, args.wl_add_keys)
-
-    if args.wl_from_wordlist:
-        add_whitelist_from_file(
-            wl_file,
-            Path(args.wl_from_wordlist[0]),
-            args.wl_from_wordlist[1],
-        )
-
-
-def add_whitelist_console(whitelist_file, to_add):
-    """Adds a list of keys to the Whitelist. Keys should be valid keys, ideally
-    copied from LaTeXBuddy HTML Output.
-
-    :param whitelist_file: Path to whitelist file
-    :param to_add: list of keys
-    """
-    whitelist_entries = whitelist_file.read_text().splitlines()
-    with whitelist_file.open("a+") as file:
-        for key in to_add:
-            if key not in whitelist_entries:
-                whitelist_entries.append(key)
-                file.write(key)
-                file.write("\n")
-
-
 def get_abs_path(path) -> Path:
     """Gets absolute path of a string.
 
@@ -404,29 +369,6 @@ def get_abs_path(path) -> Path:
     if not p.is_file() or path[-4:] != ".tex":
         LOG.error(f"File {p} does not exist.")
     return p
-
-
-def add_whitelist_from_file(whitelist_file, file_to_parse, lang):
-    """Takes in a list of words and creates their respective keys, then adds
-    them to whitelist. Words in the file_to_parse should all be from the same
-    language. Each line represents a single Word.
-
-    :param whitelist_file: Path to whitelist file
-    :param file_to_parse: Path to wordlist
-    :param lang: language of the words in the wordlist
-    """
-    lines = file_to_parse.read_text().splitlines(keepends=False)
-    # TODO check if whitelist file and file to parse is path
-    whitelist_entries = whitelist_file.read_text().splitlines()
-    with whitelist_file.open("a+") as file:
-        for line in lines:
-            if line == "":
-                continue
-            key = lang + "_spelling_" + line
-            if key not in whitelist_entries:
-                whitelist_entries.append(key)
-                file.write(key)
-                file.write("\n")
 
 
 class classproperty(property):
