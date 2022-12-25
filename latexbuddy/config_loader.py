@@ -1,6 +1,4 @@
 """This module describes the LaTeXBuddy config loader and its properties."""
-from __future__ import annotations
-
 import importlib.util as importutil
 import re
 from argparse import Namespace
@@ -8,7 +6,13 @@ from pathlib import Path
 from typing import Any
 from typing import AnyStr
 from typing import Callable
-from typing import Collection
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Set
+from typing import Tuple
+from typing import Type
+from typing import Union
 
 from pydantic import BaseModel
 from pydantic import ValidationError
@@ -32,17 +36,17 @@ class ConfigLoader(Loggable):
         r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?",
     )
 
-    def __init__(self, cli_arguments: Namespace | None = None):
+    def __init__(self, cli_arguments: Optional[Namespace] = None):
         """Creates a ConfigLoader module.
 
         :param cli_arguments: The commandline arguments specified in the LaTeXBuddy call
         """
 
-        self.main_configurations: dict[str, Any] = {}
-        self.module_configurations: dict[str, dict[str, Any]] = {}
+        self.main_configurations: Dict[str, Any] = {}
+        self.module_configurations: Dict[str, Dict[str, Any]] = {}
 
-        self.main_flags: dict[str, Any] = {}
-        self.module_flags: dict[str, dict[str, Any]] = {}
+        self.main_flags: Dict[str, Any] = {}
+        self.module_flags: Dict[str, Dict[str, Any]] = {}
 
         if cli_arguments is None:
             self.logger.debug(
@@ -69,7 +73,7 @@ class ConfigLoader(Loggable):
     def __parse_flags(
         self,
         args: Namespace,
-    ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+    ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
         """This private helper-function parses commandline arguments into two
         dictionaries: one for main-instance configurations and one for module
         configurations.
@@ -81,7 +85,8 @@ class ConfigLoader(Loggable):
         """
 
         args_dict = {
-            key: value for key, value in vars(args).items() if value is not None
+            key: value for key, value in vars(args).items() if
+            value is not None
         }
 
         parsed_main, parsed_modules = self.__parse_args_dict(args_dict)
@@ -95,8 +100,8 @@ class ConfigLoader(Loggable):
 
     def __parse_args_dict(
         self,
-        args_dict: dict[str, Any],
-    ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+        args_dict: Dict[str, Any],
+    ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
         """This private helper function parses the preprocessed args_dict
         (without None-elements).
 
@@ -107,11 +112,11 @@ class ConfigLoader(Loggable):
 
         # mutual exclusion of enable_modules and disable_modules
         # is guaranteed by argparse library
-        flag_function_map: dict[
+        flag_function_map: Dict[
             str,
             Callable[
-                [Any, dict[str, Any], dict[str, dict[str, Any]]],
-                tuple[dict[str, Any], dict[str, dict[str, Any]]],
+                [Any, Dict[str, Any], Dict[str, Dict[str, Any]]],
+                Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]],
             ],
         ] = {
             "enable_modules": self.__parse_flag_enable_modules,
@@ -137,9 +142,9 @@ class ConfigLoader(Loggable):
     def __parse_flag_enable_modules(
         self,
         flag_value: Any,
-        parsed_main: dict[str, Any],
-        parsed_modules: dict[str, dict[str, Any]],
-    ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+        parsed_main: Dict[str, Any],
+        parsed_modules: Dict[str, Dict[str, Any]],
+    ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
         """This private helper-function parses the CLI flag '--
         enable_modules'."""
 
@@ -162,9 +167,9 @@ class ConfigLoader(Loggable):
     def __parse_flag_disable_modules(
         self,
         flag_value: Any,
-        parsed_main: dict[str, Any],
-        parsed_modules: dict[str, dict[str, Any]],
-    ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+        parsed_main: Dict[str, Any],
+        parsed_modules: Dict[str, Dict[str, Any]],
+    ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
         """This private helper-function parses the CLI flag '--
         disable_modules'."""
         parsed_main["enable-modules-by-default"] = True
@@ -186,9 +191,9 @@ class ConfigLoader(Loggable):
     def __parse_flag_language(
         self,
         flag_value: Any,
-        parsed_main: dict[str, Any],
-        parsed_modules: dict[str, dict[str, Any]],
-    ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+        parsed_main: Dict[str, Any],
+        parsed_modules: Dict[str, Dict[str, Any]],
+    ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
         """This private helper-function parses the CLI flag '--language'."""
         language_match = self._REGEX_LANGUAGE_FLAG.fullmatch(flag_value)
 
@@ -219,7 +224,8 @@ class ConfigLoader(Loggable):
 
         def lambda_function() -> None:
             spec = importutil.spec_from_file_location(
-                "config", config_file_path,
+                "config",
+                config_file_path,
             )
             config = importutil.module_from_spec(spec)
             spec.loader.exec_module(config)
@@ -234,12 +240,14 @@ class ConfigLoader(Loggable):
 
     @staticmethod
     def __get_option(
-        config_dict: dict,
+        config_dict: Dict,
         module,  # : Optional[Union[Type[NamedModule], NamedModule]],
         key: str,
-        verify_type: type = Any,
-        verify_regex: str | None = None,
-        verify_choices: None | Collection[Any] = None,
+        verify_type: Type = Any,
+        verify_regex: Optional[str] = None,
+        verify_choices: Optional[
+            Union[List[Any], Tuple[Any], Set[Any]]
+        ] = None,
         error_indicator: str = "config",
     ) -> Any:
         """This private helper-function searches for a config entry in the
@@ -290,7 +298,9 @@ class ConfigLoader(Loggable):
 
             module_name = module.display_name
 
-            if module_name not in config_dict or key not in config_dict[module_name]:
+            if module_name not in config_dict or key not in config_dict[
+                    module_name
+            ]:
                 raise ConfigOptionNotFoundError(
                     f"Module: {module_name}, key: {key} ({error_indicator})",
                 )
@@ -308,7 +318,12 @@ class ConfigLoader(Loggable):
         return entry
 
     @staticmethod
-    def __verify_type(entry: Any, verify_type: type, key: str, module_name: str):
+    def __verify_type(
+        entry: Any,
+        verify_type: Type,
+        key: str,
+        module_name: str,
+    ):
         # TODO: Documentation
 
         if verify_type is Any:
@@ -329,7 +344,7 @@ class ConfigLoader(Loggable):
     @staticmethod
     def __verify_regex(
         entry: Any,
-        verify_regex: str | None,
+        verify_regex: Optional[str],
         key: str,
         module_name: str,
     ):
@@ -350,7 +365,7 @@ class ConfigLoader(Loggable):
     @staticmethod
     def __verify_choices(
         entry: Any,
-        verify_choices: list[Any] | tuple[Any] | set[Any] | None,
+        verify_choices: Optional[Union[List[Any], Tuple[Any], Set[Any]]],
         key: str,
         module_name: str,
     ):
@@ -372,9 +387,11 @@ class ConfigLoader(Loggable):
         self,
         module,  # : Optional[Union[Type[NamedModule], NamedModule]],
         key: str,
-        verify_type: type = Any,
-        verify_regex: str | None = None,
-        verify_choices: None | Collection[Any] = None,
+        verify_type: Type = Any,
+        verify_regex: Optional[str] = None,
+        verify_choices: Optional[
+            Union[List[Any], Tuple[Any], Set[Any]]
+        ] = None,
     ) -> Any:
         """This method fetches the value of the config entry with the specified
         key for the specified tool or raises a ConfigOptionNotFoundError, if
@@ -464,9 +481,11 @@ class ConfigLoader(Loggable):
         module,  # : Optional[Union[Type[NamedModule], NamedModule]],
         key: str,
         default_value: Any,
-        verify_type: type = Any,
-        verify_regex: str | None = None,
-        verify_choices: None | Collection[Any] = None,
+        verify_type: Type = Any,
+        verify_regex: Optional[str] = None,
+        verify_choices: Optional[
+            Union[List[Any], Tuple[Any], Set[Any]]
+        ] = None,
     ) -> Any:
         """This method fetches the value of the config entry with the specified
         key for the specified tool or returns the specified default value, if

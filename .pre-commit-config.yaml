@@ -38,6 +38,10 @@ repos:
     hooks:
       - id: reorder-python-imports
         args: [--py37-plus, --add-import, "from __future__ import annotations"]
+        exclude: ^latexbuddy/config_loader.py$
+      - id: reorder-python-imports
+        args: [--py37-plus]
+        files: ^latexbuddy/config_loader.py$
   - repo: https://github.com/asottile/add-trailing-comma
     rev: v2.3.0
     hooks:
