@@ -82,13 +82,6 @@ def _get_parser() -> argparse.ArgumentParser:
         "to the whitelist as spelling errors to be ignored by LaTeXBuddy.",
     )
 
-    mutex_group.add_argument(
-        "--flask",
-        action="store_true",
-        default=False,
-        help="This option starts a local webserver to check your documents with a GUI.",
-    )
-
     # TODO: wait for argparse to support nesting of groups in order to make the whole
     #  buddy_group mutually exclusive to -V, -ak and -awl
     buddy_group = mutex_group.add_argument_group("buddy arguments")
@@ -162,20 +155,12 @@ def main(args: Sequence[str] | None = None) -> int:
         perform_whitelist_operations(parsed_args)
         return 0
 
-    if parsed_args.flask:
-        __execute_flask_startup(parsed_args)
-        return 0
-
     __execute_latexbuddy_checks(parsed_args)
 
     LOG.debug(
         f"Execution finished in {round(perf_counter() - start, 3)} seconds",
     )
     return 0
-
-
-def __execute_flask_startup(args: argparse.Namespace) -> None:
-    flask_app.run_server()
 
 
 def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:

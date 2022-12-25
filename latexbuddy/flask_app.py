@@ -336,3 +336,7 @@ def get_whitelist_path(whitelist_id: str) -> str | None:
         return None
 
     return os.path.join(app.config["WHITELIST_FOLDER"], whitelist_id)
+
+
+if __name__ == "__main__":
+    run_server()
