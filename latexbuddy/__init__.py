@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging.handlers
-from pkgutil import extend_path
 
 import latexbuddy.tools
 from latexbuddy import colour
@@ -10,7 +9,6 @@ from latexbuddy.logging_formatter import ConsoleFormatter
 # package metadata
 __app_name__ = "LaTeXBuddy"  # proper name
 __name__ = "latexbuddy"  # "unixified" name
-__path__ = extend_path(__path__, __name__)
 __version__ = "0.4.2"
 
 

@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         -   whitelist operations got moved to the new `whitelist` module
     -   removed the big mutually exclusive group, which should affect usage
 
+### Changed
+
+-   `extend_path()` call was removed, making LaTeXBuddy not a namespace any more
+
 ## [0.4.2] - 25 Dec 2022 :christmas_tree:
 
 ### Fixed
