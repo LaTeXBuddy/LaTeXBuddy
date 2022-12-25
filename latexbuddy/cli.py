@@ -9,20 +9,20 @@ from pathlib import Path
 from time import perf_counter
 from typing import AnyStr
 
-from colorama import Fore
-
+import latexbuddy
 from latexbuddy import __app_name__
-from latexbuddy import __logger as root_logger
 from latexbuddy import __name__ as name
 from latexbuddy import __version__
+from latexbuddy import colour
 from latexbuddy import flask_app
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.log import __setup_root_logger
 from latexbuddy.module_loader import ModuleLoader
 from latexbuddy.tools import get_abs_path
 from latexbuddy.tools import get_all_paths_in_document
 from latexbuddy.tools import perform_whitelist_operations
+
+LOG = logging.getLogger(__name__)
 
 
 def _get_parser() -> argparse.ArgumentParser:
@@ -89,8 +89,8 @@ def _get_parser() -> argparse.ArgumentParser:
     buddy_group.add_argument(
         "--verbose",
         "-v",
-        action="store_true",
-        default=False,
+        action="count",
+        default=0,
         help="Display debug output",
     )
     buddy_group.add_argument(
@@ -147,10 +147,15 @@ def main():
 
     args = _get_parser().parse_args()
 
-    logger = __setup_logger(args)
+    verbosity = args.verbose
+    if os.environ.get("LATEXBUDDY_DEBUG"):
+        verbosity = 2
+    latexbuddy.configure_logging(
+        verbosity,
+    )
 
-    print(f"{Fore.CYAN}{__app_name__}{Fore.RESET} v{__version__}")
-    logger.debug(f"Parsed CLI args: {str(args)}")
+    print(f"{colour.CYAN}{__app_name__}{colour.RESET_ALL} v{__version__}")
+    LOG.debug(f"Parsed CLI args: {str(args)}")
 
     if args.wl_add_keys or args.wl_from_wordlist:
         perform_whitelist_operations(args)
@@ -162,16 +167,7 @@ def main():
 
     __execute_latexbuddy_checks(args)
 
-    logger.debug(f"Execution finished in {round(perf_counter() - start, 2)}s")
-
-
-def __setup_logger(args: argparse.Namespace) -> logging.Logger:
-    display_debug = args.verbose or os.environ.get("LATEXBUDDY_DEBUG", False)
-
-    __setup_root_logger(
-        root_logger, logging.DEBUG if display_debug else logging.INFO,
-    )
-    return root_logger.getChild("cli")
+    LOG.debug(f"Execution finished in {round(perf_counter() - start, 2)}s")
 
 
 def __execute_flask_startup(args: argparse.Namespace) -> None:

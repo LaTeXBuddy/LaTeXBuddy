@@ -1,14 +1,16 @@
 from __future__ import annotations
 
+import logging
 import re
 from abc import ABC
 from abc import abstractmethod
 from typing import Callable
 
-from latexbuddy.log import Loggable
 from latexbuddy.problem import Problem
 from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
+
+LOG = logging.getLogger(__name__)
 
 
 # forward-declare
@@ -222,7 +224,7 @@ class WhitelistKeyProblemFilter(ProblemFilter):
         return type(other) == WhitelistKeyProblemFilter and other.wl_key == self.wl_key
 
 
-class Preprocessor(Loggable):
+class Preprocessor:
     """This class represents the LaTeXBuddy in-file preprocessor.
 
     the Preprocessor is capable of parsing buddy commands disguised as
@@ -329,7 +331,7 @@ class Preprocessor(Loggable):
             if match is not None:
                 return match
 
-        self.logger.warning(
+        LOG.warning(
             f"Invalid Syntax: Could not parse preprocessing command "
             f"in line {line_num}: \n{line}",
         )
@@ -350,7 +352,7 @@ class Preprocessor(Loggable):
 
         match = Preprocessor.__RE_IGNORE_NEXT_ONE_LINE.fullmatc(line)
         if match is not None:
-            self.logger.debug(
+            LOG.debug(
                 f"Created LineProblemFilter from line {line_num + 1} to {line_num + 1}",
             )
             return [LineProblemFilter(line_num + 1, line_num + 1)]
@@ -375,7 +377,7 @@ class Preprocessor(Loggable):
         match = Preprocessor.__RE_IGNORE_NEXT_N_LINES.fullmatch(line)
         if match is not None:
             n = int(match.group(1))
-            self.logger.debug(
+            LOG.debug(
                 f"Created LineProblemFilter from line {line_num + 1} to {line_num + n}",
             )
             return [LineProblemFilter(line_num + 1, line_num + n)]
@@ -403,12 +405,12 @@ class Preprocessor(Loggable):
             )
 
             if open_ended_filter is not None:
-                self.logger.info(
+                LOG.info(
                     f"Ignored duplicate command 'begin-ignore' in line {line_num}",
                 )
                 return []
             else:
-                self.logger.debug(
+                LOG.debug(
                     f"Created open-ended LineProblemFilter "
                     f"beginning in line {line_num + 1}",
                 )
@@ -443,12 +445,12 @@ class Preprocessor(Loggable):
                 )
 
                 if open_ended_filter is not None:
-                    self.logger.info(
+                    LOG.info(
                         f"Ignored duplicate command 'begin-ignore' "
                         f"for module '{module}' in line {line_num}",
                     )
                 else:
-                    self.logger.debug(
+                    LOG.debug(
                         f"Created open-ended ModuleProblemFilter "
                         f"for module '{module}' beginning in line {line_num + 1}",
                     )
@@ -488,12 +490,12 @@ class Preprocessor(Loggable):
                     )
 
                     if open_ended_filter is not None:
-                        self.logger.info(
+                        LOG.info(
                             f"Ignored duplicate command 'begin-ignore' "
                             f"for severity '{severity}' in line {line_num}",
                         )
                     else:
-                        self.logger.debug(
+                        LOG.debug(
                             f"Created open-ended ModuleProblemFilter for severity "
                             f"'{str(enum_severity)}' beginning in line {line_num + 1}",
                         )
@@ -501,7 +503,7 @@ class Preprocessor(Loggable):
                             SeverityProblemFilter(enum_severity, line_num + 1),
                         )
                 except KeyError:
-                    self.logger.warning(
+                    LOG.warning(
                         f"Invalid syntax: Unknown ProblemSeverity '{severity}' "
                         f"in line {line_num}",
                     )
@@ -537,12 +539,12 @@ class Preprocessor(Loggable):
                 )
 
                 if open_ended_filter is not None:
-                    self.logger.info(
+                    LOG.info(
                         f"Ignored duplicate command 'begin-ignore' "
                         f"for whitelist-key '{key}' in line {line_num}",
                     )
                 else:
-                    self.logger.debug(
+                    LOG.debug(
                         f"Created open-ended WhitelistKeyProblemFilter "
                         f"for whitelist-key '{key}' beginning in line {line_num + 1}",
                     )
@@ -575,11 +577,11 @@ class Preprocessor(Loggable):
             )
 
             if open_ended_filter is None:
-                self.logger.info(
+                LOG.info(
                     f"Ignored duplicate command 'end-ignore' in line {line_num}",
                 )
             else:
-                self.logger.debug(
+                LOG.debug(
                     f"Ended existing open-ended LineProblemFilter in line {line_num}",
                 )
                 open_ended_filter.end(line_num)
@@ -612,12 +614,12 @@ class Preprocessor(Loggable):
                 )
 
                 if open_ended_filter is None:
-                    self.logger.info(
+                    LOG.info(
                         f"Ignored duplicate command 'end-ignore' for module '{module}' "
                         f"in line {line_num}",
                     )
                 else:
-                    self.logger.debug(
+                    LOG.debug(
                         f"Ended existing open-ended ModuleProblemFilter "
                         f"for module '{module}' in line {line_num + 1}",
                     )
@@ -654,18 +656,18 @@ class Preprocessor(Loggable):
                     )
 
                     if open_ended_filter is None:
-                        self.logger.info(
+                        LOG.info(
                             f"Ignored duplicate command 'end-ignore' "
                             f"for severity '{severity}' in line {line_num}",
                         )
                     else:
-                        self.logger.debug(
+                        LOG.debug(
                             f"Ended existing open-ended SeverityProblemFilter for "
                             f"severity '{str(enum_severity)}' in line {line_num + 1}",
                         )
                         open_ended_filter.end(line_num)
                 except KeyError:
-                    self.logger.warning(
+                    LOG.warning(
                         f"Invalid syntax: Unknown ProblemSeverity '{severity}' "
                         f"in line {line_num}",
                     )
@@ -698,12 +700,12 @@ class Preprocessor(Loggable):
                 )
 
                 if open_ended_filter is None:
-                    self.logger.info(
+                    LOG.info(
                         f"Ignored duplicate command 'end-ignore' "
                         f"for whitelist-key '{key}' in line {line_num}",
                     )
                 else:
-                    self.logger.debug(
+                    LOG.debug(
                         f"Ended existing open-ended WhitelistKeyProblemFilter "
                         f"for whitelist-key '{key}' in line {line_num + 1}",
                     )

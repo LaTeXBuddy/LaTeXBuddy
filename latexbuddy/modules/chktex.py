@@ -4,12 +4,16 @@ ChkTeX Documentation: https://www.nongnu.org/chktex/ChkTeX.pdf
 """
 from __future__ import annotations
 
+import logging
+
 import latexbuddy.tools as tools
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem
 from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
+
+LOG = logging.getLogger(__name__)
 
 
 class Chktex(Module):
@@ -27,7 +31,7 @@ class Chktex(Module):
         :param file: LaTeX file to be checked (with built-in detex option)
         """
 
-        tools.find_executable("chktex", "ChkTeX", self.logger)
+        tools.find_executable("chktex", "ChkTeX", LOG)
 
         format_str = (
             self.DELIMITER.join(

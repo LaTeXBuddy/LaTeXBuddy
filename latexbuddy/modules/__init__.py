@@ -5,13 +5,12 @@ from __future__ import annotations
 from abc import abstractmethod
 
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.log import Loggable
 from latexbuddy.problem import Problem
 from latexbuddy.texfile import TexFile
 from latexbuddy.tools import classproperty
 
 
-class NamedModule(Loggable):
+class NamedModule:
     """Interface class adding the ability to provide a display name to any
     module instance."""
 

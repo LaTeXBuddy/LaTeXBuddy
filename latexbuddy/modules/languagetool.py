@@ -2,13 +2,13 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 import socket
 import time
 from contextlib import closing
 from enum import Enum
 from json import JSONDecodeError
-from logging import Logger
 from typing import AnyStr
 from typing import List
 
@@ -22,6 +22,8 @@ from latexbuddy.modules import Module
 from latexbuddy.problem import Problem
 from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
+
+LOG = logging.getLogger(__name__)
 
 
 class Mode(Enum):
@@ -82,7 +84,7 @@ class LanguageTool(Module):
             self.mode = Mode.COMMANDLINE
 
         if self.mode == Mode.LOCAL_SERVER:
-            self.local_server = LanguageToolLocalServer(self.logger)
+            self.local_server = LanguageToolLocalServer()
             self.local_server.start_local_server()
 
         elif self.mode == Mode.REMOTE_SERVER:
@@ -183,14 +185,14 @@ class LanguageTool(Module):
         commandline."""
 
         tools.find_executable(
-            "java", "JRE (Java Runtime Environment)", self.logger,
+            "java", "JRE (Java Runtime Environment)", LOG,
         )
 
         try:
             result = tools.find_executable(
                 "languagetool",
                 "LanguageTool (CLI)",
-                self.logger,
+                LOG,
                 log_errors=False,
             )
             executable_source = "native"
@@ -200,7 +202,7 @@ class LanguageTool(Module):
             result = tools.find_executable(
                 "languagetool-commandline.jar",
                 "LanguageTool (CLI)",
-                self.logger,
+                LOG,
             )
             executable_source = "java"
 
@@ -322,7 +324,7 @@ class LanguageTool(Module):
         try:
             return response.json()
         except JSONDecodeError:
-            self.logger.error(
+            LOG.error(
                 f"Could not decode the following POST response in JSON format: "
                 f"{response.text}",
             )
@@ -455,13 +457,11 @@ class LanguageToolLocalServer:
     __SERVER_REQUEST_TIMEOUT = 1  # in seconds
     __SERVER_MAX_ATTEMPTS = 20
 
-    def __init__(self, logger: Logger):
+    def __init__(self):
         self.lt_path = None
         self.lt_server_command = None
         self.server_process = None
         self.port = None
-
-        self.logger = logger
 
     def __del__(self):
         self.stop_local_server()
@@ -473,14 +473,14 @@ class LanguageToolLocalServer:
         """
 
         tools.find_executable(
-            "java", "JRE (Java Runtime Environment)", self.logger,
+            "java", "JRE (Java Runtime Environment)", LOG,
         )
 
         try:
             result = tools.find_executable(
                 "languagetool-server",
                 "LanguageTool (local server)",
-                self.logger,
+                LOG,
                 log_errors=False,
             )
             executable_source = "native"
@@ -490,7 +490,7 @@ class LanguageToolLocalServer:
             result = tools.find_executable(
                 "languagetool-server.jar",
                 "LanguageTool (local server)",
-                self.logger,
+                LOG,
             )
             executable_source = "java"
 
