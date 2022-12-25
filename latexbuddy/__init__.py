@@ -45,8 +45,9 @@ def configure_logging(verbosity: int = 0, enable_colour: bool = True) -> None:
         raise ValueError("verbosity level cannot be negative")
     verbosity = min(verbosity, max(_VERBOSITY_TO_LOG_LEVEL))
 
+    latexbuddy.tools.dirs.user_log_path.mkdir(parents=True, exist_ok=True)
     file_handler = logging.handlers.RotatingFileHandler(
-        latexbuddy.tools.get_app_dir() / "debug.log",
+        latexbuddy.tools.dirs.user_log_path / "debug.log",
         maxBytes=2_097_152,  # 2 Mebibytes
         backupCount=4,
     )
