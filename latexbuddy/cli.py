@@ -57,34 +57,28 @@ def _get_parser() -> argparse.ArgumentParser:
         help="Directory, in which to put the output file.",
     )
 
-    mutex_group = parser.add_mutually_exclusive_group()
-
-    # TODO: wait for argparse to support nesting of groups in order to make the whole
-    #  buddy_group mutually exclusive to -V, -ak and -awl
-    buddy_group = mutex_group.add_argument_group("buddy arguments")
-
     # nargs="+" marks the beginning of a list
-    buddy_group.add_argument(
+    parser.add_argument(
         "file",
         nargs="+",
         type=Path,
         help="File(s) that will be processed.",
     )
-    buddy_group.add_argument(
+    parser.add_argument(
         "--language",
         "-l",
         type=str,
         default=None,
         help="Target language of the file.",
     )
-    buddy_group.add_argument(
+    parser.add_argument(
         "--whitelist",
         "-w",
         type=str,
         default=None,
         help="Location of the whitelist file.",
     )
-    buddy_group.add_argument(
+    parser.add_argument(
         "--format",
         "-f",
         type=str,
@@ -93,7 +87,7 @@ def _get_parser() -> argparse.ArgumentParser:
         help="Format of the output file (either HTML or JSON).",
     )
 
-    module_selection = buddy_group.add_mutually_exclusive_group()
+    module_selection = parser.add_mutually_exclusive_group()
     module_selection.add_argument(
         "--enable-modules",
         type=str,
