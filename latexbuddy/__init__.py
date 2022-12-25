@@ -53,7 +53,7 @@ def configure_logging(verbosity: int = 0, enable_colour: bool = True) -> None:
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(
         logging.Formatter(
-            "%(name)-30s %(relativeCreated)6d %(levelname)-8s %(message)s",
+            "%(asctime)s %(name)-30s %(levelname)-8s %(message)s",
         ),
     )
 
