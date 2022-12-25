@@ -364,14 +364,14 @@ def perform_whitelist_operations(args: Namespace):
     """
     wl_file = args.whitelist if args.whitelist else Path("whitelist")
 
-    if args.wl_add_keys:
-        add_whitelist_console(wl_file, args.wl_add_keys)
+    if args.add_to_whitelist:
+        add_whitelist_console(wl_file, args.add_to_whitelist)
 
-    if args.wl_from_wordlist:
+    if args.whitelist_from_wordlist:
         add_whitelist_from_file(
             wl_file,
-            Path(args.wl_from_wordlist[0]),
-            args.wl_from_wordlist[1],
+            Path(args.whitelist_from_wordlist[0]),
+            args.whitelist_from_wordlist[1],
         )
 
 

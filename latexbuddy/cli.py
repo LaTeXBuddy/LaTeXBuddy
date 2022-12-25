@@ -63,8 +63,8 @@ def _get_parser() -> argparse.ArgumentParser:
     mutex_group = parser.add_mutually_exclusive_group()
 
     mutex_group.add_argument(
-        "--wl_add_keys",
-        "-ak",
+        "--add-to-whitelist",
+        "-W",
         nargs="+",
         metavar="KEY",
         default=None,
@@ -72,15 +72,14 @@ def _get_parser() -> argparse.ArgumentParser:
         " the keys are copied from LaTeXBuddy HTML Output",
     )
     mutex_group.add_argument(
-        "--wl_from_wordlist",
-        "-awl",
+        "--whitelist-from-wordlist",
+        "-L",
         metavar=("WORD_LIST", "LANGUAGE"),
         nargs=2,
         default=None,
         help="First argument is a file containing a single word per line, "
-        "second argument is the language of the words."
-        " The words get parsed to keys and the keys get added to the whitelist as "
-        "spelling errors that will be ignored by LaTeXBuddy",
+        "second argument is the language of the words. The words get added "
+        "to the whitelist as spelling errors to be ignored by LaTeXBuddy.",
     )
 
     mutex_group.add_argument(
@@ -159,7 +158,7 @@ def main(args: Sequence[str] | None = None) -> int:
     print(f"{colour.CYAN}{__app_name__}{colour.RESET_ALL} v{__version__}")
     LOG.debug(f"Parsed CLI args: {str(parsed_args)}")
 
-    if parsed_args.wl_add_keys or parsed_args.wl_from_wordlist:
+    if parsed_args.add_to_whitelist or parsed_args.whitelist_from_wordlist:
         perform_whitelist_operations(parsed_args)
         return 0
 
