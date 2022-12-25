@@ -6,7 +6,6 @@ from abc import ABC
 from abc import abstractmethod
 from typing import Callable
 
-from latexbuddy.log import Loggable
 from latexbuddy.problem import Problem
 from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
@@ -225,7 +224,7 @@ class WhitelistKeyProblemFilter(ProblemFilter):
         return type(other) == WhitelistKeyProblemFilter and other.wl_key == self.wl_key
 
 
-class Preprocessor(Loggable):
+class Preprocessor:
     """This class represents the LaTeXBuddy in-file preprocessor.
 
     the Preprocessor is capable of parsing buddy commands disguised as

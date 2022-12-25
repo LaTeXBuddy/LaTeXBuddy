@@ -21,13 +21,12 @@ from pydantic import ValidationError
 import latexbuddy.tools as tools
 from latexbuddy.exceptions import ConfigOptionNotFoundError
 from latexbuddy.exceptions import ConfigOptionVerificationError
-from latexbuddy.log import Loggable
 
 
 LOG = logging.getLogger(__name__)
 
 
-class ConfigLoader(Loggable):
+class ConfigLoader:
     """Describes a ConfigLoader object.
 
     The ConfigLoader processes LaTeXBuddy's cli arguments and loads the

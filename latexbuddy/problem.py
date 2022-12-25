@@ -13,7 +13,6 @@ from json import JSONEncoder
 from pathlib import Path
 from typing import Any
 
-from latexbuddy.log import Loggable
 
 LOG = logging.getLogger(__name__)
 
@@ -66,7 +65,7 @@ def set_language(lang):
     language = lang
 
 
-class Problem(Loggable):
+class Problem:
     """Describes a Problem object.
 
     A Problem object contains information about a problem detected by a

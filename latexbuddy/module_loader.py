@@ -11,7 +11,6 @@ from types import ModuleType
 
 import latexbuddy.tools as tools
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.log import Loggable
 from latexbuddy.modules import Module
 
 
@@ -36,7 +35,7 @@ class ModuleProvider(ABC):
         """
 
 
-class ModuleLoader(ModuleProvider, Loggable):
+class ModuleLoader(ModuleProvider):
     """This class encapsulates all features necessary to load LaTeXBuddy
     modules from a specified directory."""
 

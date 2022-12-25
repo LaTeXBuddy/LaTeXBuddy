@@ -15,7 +15,6 @@ from yalafi.tex2txt import Options
 from yalafi.tex2txt import tex2txt
 from yalafi.tex2txt import translate_numbers
 
-from latexbuddy.log import Loggable
 from latexbuddy.messages import not_found
 from latexbuddy.messages import texfile_error
 from latexbuddy.tools import absolute_to_linecol
@@ -31,7 +30,7 @@ location_re = re.compile(r"line (\d+), column (\d+)")
 LOG = logging.getLogger(__name__)
 
 
-class TexFile(Loggable):
+class TexFile:
     """A simple TeX file.
 
     This class reads the file, detects its encoding and saves it as text
