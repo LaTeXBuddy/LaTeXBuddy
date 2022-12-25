@@ -11,7 +11,7 @@ from latexbuddy.logging_formatter import ConsoleFormatter
 __app_name__ = "LaTeXBuddy"  # proper name
 __name__ = "latexbuddy"  # "unixified" name
 __path__ = extend_path(__path__, __name__)
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 
 
 # by default, don't add any handler

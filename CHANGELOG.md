@@ -5,7 +5,7 @@ All notable changes to LaTeXBuddy will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.2] - 25 Dec 2022 :christmas_tree:
 
 ### Fixed
 
@@ -175,7 +175,8 @@ This is the first (pre-)release of LaTeXBuddy.
 -   draft of the abstract module API (!22)
 -   logo (!38)
 
-[unreleased]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.4.1...master
+[unreleased]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.4.2...master
+[0.4.2]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.4.1...v0.4.2
 [0.4.1]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.4.0...v0.4.1
 [0.4.0]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.3.0...v0.4.0
 [0.3.0]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/compare/v0.2.0...v0.3.0
