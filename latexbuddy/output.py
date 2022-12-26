@@ -94,14 +94,15 @@ def render_general_html(
 
     highlighted_tex = highlight(file_text, problem_values)
 
-    if not Path(pdf_path).exists():
-        pdf_path = None
-    else:
+    final_pdf_path: str | None = pdf_path
+    if Path(pdf_path).exists():
         # TODO: temporary fix, might cause issues if another "compiled"
         #  directory is in pdf_path
         cut_path = pdf_path.find("compiled")
         if -1 < cut_path:
-            pdf_path = pdf_path[pdf_path.find("compiled"):]
+            final_pdf_path = pdf_path[pdf_path.find("compiled"):]
+    else:
+        final_pdf_path = None
 
     #  list of lines
     highlighted_tex = highlighted_tex.split("\n")
@@ -117,7 +118,7 @@ def render_general_html(
         problems=problem_values,
         general_problems=general_problems,
         paths=path_list,
-        pdf_path=pdf_path,
+        pdf_path=final_pdf_path,
     )
 
 
@@ -178,7 +179,14 @@ class Interval:
 
         self._problems = problems
 
-        self._start = start if start else problems[0].position[1]
+        if not start:
+            for problem in self._problems:
+                if problem.position is not None:
+                    self._start = problem.position[1]
+                    break
+            else:
+                self._start = 0
+
         self._end = end if end else self.start + problems[0].length
 
         if self.end < self.start:
@@ -186,7 +194,7 @@ class Interval:
             raise ValueError(_msg)
 
     @property
-    def problems(self):
+    def problems(self) -> list[Problem]:
         return self._problems
 
     @property

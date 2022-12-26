@@ -16,8 +16,8 @@ LOG = logging.getLogger(__name__)
 
 
 class Aspell(Module):
-    def __init__(self):
-        self.language = None
+    def __init__(self) -> None:
+        self.language: str | None = None
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         """Runs the Aspell checks on a file and returns the results as a list.
@@ -38,22 +38,21 @@ class Aspell(Module):
             LatexBuddy,
             "language",
             "en",
-            verify_type=AnyStr,
+            verify_type=AnyStr,  # type: ignore
             verify_choices=supported_languages,
         )
 
-        language_country = config.get_config_option_or_default(
+        language_country: str = config.get_config_option_or_default(
             LatexBuddy,
             "language_country",
             None,
-            verify_type=AnyStr,
+            verify_type=AnyStr,  # type: ignore
         )
 
-        if (
-            language_country is not None
-            and self.language + "-" + language_country in supported_languages
-        ):
-            self.language = self.language + "-" + language_country
+        if language_country is not None:
+            language_code = f"{self.language}-{language_country}"
+            if language_code in supported_languages:
+                self.language = language_code
 
         error_list = []
         counter = 1  # counts the lines

@@ -39,10 +39,10 @@ class LatexBuddy(MainModule):
 
     __current_instance = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
-        self.errors = {}  # all current errors
+        self.errors: dict[str, Problem] = {}  # all current errors
         self.cfg: ConfigLoader = ConfigLoader()  # configuration
         # in-file preprocessing
         self.preprocessor: Preprocessor | None = None
@@ -58,7 +58,7 @@ class LatexBuddy(MainModule):
         self.compile_tex: bool
 
     @classproperty
-    def instance(cls):  # noqa N805
+    def instance(cls) -> LatexBuddy:  # noqa N805
         if cls.__current_instance is None:
             cls.__current_instance = LatexBuddy()
         return cls.__current_instance
@@ -71,7 +71,7 @@ class LatexBuddy(MainModule):
         path_list: list[Path],
         *,
         compile_tex: bool,
-    ):
+    ) -> None:
         """Initializes the LaTeXBuddy instance.
 
         :param config_loader: ConfigLoader object to manage config options
@@ -100,7 +100,7 @@ class LatexBuddy(MainModule):
                 LatexBuddy,
                 "output",
                 "./latexbuddy_html/",
-                verify_type=AnyStr,
+                verify_type=AnyStr,  # type: ignore
             ),
         )
 
@@ -116,7 +116,7 @@ class LatexBuddy(MainModule):
                 LatexBuddy,
                 "format",
                 "HTML",
-                verify_type=AnyStr,
+                verify_type=AnyStr,  # type: ignore
                 verify_choices=[
                     "HTML",
                     "html",
@@ -134,12 +134,12 @@ class LatexBuddy(MainModule):
                 LatexBuddy,
                 "whitelist",
                 "whitelist",
-                verify_type=AnyStr,
+                verify_type=AnyStr,  # type: ignore
             ),
         )
 
     @staticmethod
-    def add_error(problem: Problem):
+    def add_error(problem: Problem) -> None:
         """Adds the error to the errors dictionary.
 
         UID is used as key, the error object is used as value.
@@ -158,7 +158,7 @@ class LatexBuddy(MainModule):
         LatexBuddy.instance.errors[problem.uid] = problem
 
     @staticmethod
-    def check_whitelist():
+    def check_whitelist() -> None:
         """Removes errors that are whitelisted."""
 
         LOG.debug("Beginning whitelist-check...")
@@ -186,7 +186,7 @@ class LatexBuddy(MainModule):
         )
 
     @staticmethod
-    def add_to_whitelist(uid):
+    def add_to_whitelist(uid: str) -> None:
         """Adds the error identified by the given UID to the whitelist.
 
         Afterwards this method deletes all other errors that are
@@ -253,7 +253,7 @@ class LatexBuddy(MainModule):
         return result
 
     @staticmethod
-    def run_tools():
+    def run_tools() -> None:
         """Runs all modules in the LaTeXBuddy toolchain in parallel."""
 
         language = LatexBuddy.instance.cfg.get_config_option_or_default(
@@ -293,7 +293,7 @@ class LatexBuddy(MainModule):
                 LatexBuddy.instance.add_error(problem)
 
     @staticmethod
-    def output_json():
+    def output_json() -> None:
         """Writes all the current problem objects to the output file."""
 
         list_of_problems = []
@@ -313,7 +313,7 @@ class LatexBuddy(MainModule):
         )
 
     @staticmethod
-    def output_html():
+    def output_html() -> None:
         """Renders all current problem objects as HTML and writes the file."""
 
         # importing this here to avoid circular import error
@@ -345,7 +345,7 @@ class LatexBuddy(MainModule):
         )
 
     @staticmethod
-    def output_flask_html():
+    def output_flask_html() -> None:
         # importing this here to avoid circular import error
         from latexbuddy.output import render_flask_html
 
@@ -375,7 +375,7 @@ class LatexBuddy(MainModule):
         )
 
     @staticmethod
-    def output_file():
+    def output_file() -> None:
         """Writes all current problems to the specified output file."""
 
         if LatexBuddy.instance.output_format == "JSON":

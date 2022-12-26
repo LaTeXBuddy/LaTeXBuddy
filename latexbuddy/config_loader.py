@@ -1,5 +1,5 @@
 """This module describes the LaTeXBuddy config loader and its properties."""
-import importlib.util as importutil
+import importlib.util
 import logging
 import re
 from argparse import Namespace
@@ -13,6 +13,7 @@ from typing import Optional
 from typing import Set
 from typing import Tuple
 from typing import Type
+from typing import TYPE_CHECKING
 from typing import Union
 
 from pydantic import BaseModel
@@ -22,6 +23,8 @@ import latexbuddy.tools
 from latexbuddy.exceptions import ConfigOptionNotFoundError
 from latexbuddy.exceptions import ConfigOptionVerificationError
 
+if TYPE_CHECKING:
+    from latexbuddy.modules import NamedModule
 
 LOG = logging.getLogger(__name__)
 
@@ -115,8 +118,8 @@ class ConfigLoader:
 
         :param args_dict: preprocessed dictionary to be parsed
         """
-        parsed_main = {}
-        parsed_modules = {}
+        parsed_main: dict[str, Any] = {}
+        parsed_modules: dict[str, dict[str, Any]] = {}
 
         # mutual exclusion of enable_modules and disable_modules
         # is guaranteed by argparse library
@@ -232,11 +235,15 @@ class ConfigLoader:
         """
 
         def lambda_function() -> None:
-            spec = importutil.spec_from_file_location(
+            spec = importlib.util.spec_from_file_location(
                 "config",
                 config_file_path,
             )
-            config = importutil.module_from_spec(spec)
+            if spec is None or spec.loader is None:
+                _msg = f"{str(config_file_path)}: " \
+                       f"Import error: Couldn't find a suitable file loader"
+                raise ValueError(_msg)
+            config = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(config)
 
             self.main_configurations = config.main
@@ -250,10 +257,10 @@ class ConfigLoader:
 
     @staticmethod
     def __get_option(
-        config_dict: Dict,
-        module,  # : Optional[Union[Type[NamedModule], NamedModule]],
+        config_dict: Dict[str, Any],
+        module: "Optional[Union[Type[NamedModule], NamedModule]]",
         key: str,
-        verify_type: Type = Any,
+        verify_type: Type = Any,  # type: ignore
         verify_regex: Optional[str] = None,
         verify_choices: Optional[
             Union[List[Any], Tuple[Any], Set[Any]]
@@ -326,7 +333,7 @@ class ConfigLoader:
 
         # assert that entry type is a string, if regex check is applied
         if verify_regex is not None:
-            verify_type = AnyStr
+            verify_type = AnyStr  # type: ignore
 
         ConfigLoader.__verify_type(entry, verify_type, key, module_name)
         ConfigLoader.__verify_regex(entry, verify_regex, key, module_name)
@@ -337,17 +344,17 @@ class ConfigLoader:
     @staticmethod
     def __verify_type(
         entry: Any,
-        verify_type: Type,
+        verify_type: Type,  # type: ignore
         key: str,
         module_name: str,
-    ):
+    ) -> None:
         # TODO: Documentation
 
         if verify_type is Any:
             return
 
         class TypeVerifier(BaseModel):
-            cfg_entry: verify_type
+            cfg_entry: verify_type  # type: ignore
 
         try:
             TypeVerifier(cfg_entry=entry)
@@ -362,7 +369,7 @@ class ConfigLoader:
         verify_regex: Optional[str],
         key: str,
         module_name: str,
-    ):
+    ) -> None:
         # TODO: Documentation
 
         if verify_regex is None:
@@ -385,7 +392,7 @@ class ConfigLoader:
         verify_choices: Optional[Union[List[Any], Tuple[Any], Set[Any]]],
         key: str,
         module_name: str,
-    ):
+    ) -> None:
         # TODO: Documentation
 
         if verify_choices is None:
@@ -403,9 +410,9 @@ class ConfigLoader:
     #  modules.__init__.py when importing NamedModule
     def get_config_option(
         self,
-        module,  # : Optional[Union[Type[NamedModule], NamedModule]],
+        module: "Optional[Union[Type[NamedModule], NamedModule]]",
         key: str,
-        verify_type: Type = Any,
+        verify_type: Type = Any,  # type: ignore
         verify_regex: Optional[str] = None,
         verify_choices: Optional[
             Union[List[Any], Tuple[Any], Set[Any]]
@@ -499,10 +506,10 @@ class ConfigLoader:
     #  modules.__init__.py when importing NamedModule
     def get_config_option_or_default(
         self,
-        module,  # : Optional[Union[Type[NamedModule], NamedModule]],
+        module: "Optional[Union[Type[NamedModule], NamedModule]]",
         key: str,
         default_value: Any,
-        verify_type: Type = Any,
+        verify_type: Type = Any,  # type: ignore
         verify_regex: Optional[str] = None,
         verify_choices: Optional[
             Union[List[Any], Tuple[Any], Set[Any]]
@@ -547,7 +554,7 @@ class ConfigLoader:
 
         except ConfigOptionNotFoundError:
             LOG.info(
-                f"Config entry '{key}' "
+                f"Config entry '{key}' "  # type: ignore
                 f"for module '{module.display_name}' not found. "
                 f"Using default value '{str(default_value)}' instead...",
             )

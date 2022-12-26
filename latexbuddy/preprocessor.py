@@ -261,7 +261,7 @@ class Preprocessor:
         r"%\s?buddy end-ignore (whitelist-keys?)((?: \S+)+)",
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializes a new Preprocessor instance with an empty list of
         filters."""
 
@@ -348,7 +348,7 @@ class Preprocessor:
         :return: LineProblemFilter as a list, None if regex not matching
         """
 
-        match = Preprocessor.__RE_IGNORE_NEXT_ONE_LINE.fullmatc(line)
+        match = Preprocessor.__RE_IGNORE_NEXT_ONE_LINE.fullmatch(line)
         if match is not None:
             LOG.debug(
                 f"Created LineProblemFilter "
@@ -442,7 +442,7 @@ class Preprocessor:
         if match is not None:
             modules = match.group(1).strip().split(" ")
 
-            filters = []
+            filters: list[ProblemFilter] = []
             for module in modules:
 
                 open_ended_filter = self.__get_open_ended_filter(
@@ -485,7 +485,7 @@ class Preprocessor:
         if match is not None:
             severities = match.group(1).strip().split(" ")
 
-            filters = []
+            filters: list[ProblemFilter] = []
             for severity in severities:
 
                 try:
@@ -540,7 +540,7 @@ class Preprocessor:
         if match is not None:
             keys = match.group(1).strip().split(" ")
 
-            filters = []
+            filters: list[ProblemFilter] = []
             for key in keys:
 
                 open_ended_filter = self.__get_open_ended_filter(

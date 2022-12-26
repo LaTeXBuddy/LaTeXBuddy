@@ -18,7 +18,6 @@ from latexbuddy import colour
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.module_loader import ModuleLoader
-from latexbuddy.tools import get_abs_path
 from latexbuddy.tools import get_all_paths_in_document
 
 LOG = logging.getLogger(__name__)
@@ -146,15 +145,15 @@ def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
                 LatexBuddy,
                 "module_dir",
                 "latexbuddy/modules/",
-                verify_type=AnyStr,
+                verify_type=AnyStr,  # type: ignore
             ),
         ),
     )
 
-    for p in args.file:  # args.file is a list
-        p = get_abs_path(p)
+    for file in args.file:  # args.file is a list
+        file_path = Path(file).absolute()
         first_path = True
-        paths = get_all_paths_in_document(Path(p))
+        paths = get_all_paths_in_document(file_path)
 
         for path in paths:
 

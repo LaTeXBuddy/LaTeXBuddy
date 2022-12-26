@@ -20,7 +20,8 @@ if typing.TYPE_CHECKING:
 
 LOG = logging.getLogger(__name__)
 
-language = None  # static variable used for a uniform key generation
+# static variable used for a uniform key generation
+language: str | None = None
 
 
 @total_ordering
@@ -52,24 +53,26 @@ class ProblemSeverity(Enum):
     WARNING = 2
     ERROR = 3
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name.lower()
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, ProblemSeverity):
+            return NotImplemented
         return self.value == other.value
 
-    def __lt__(self, other):
-        # TODO: do we actually need this check?
-        if self.__class__ is other.__class__:
-            return self.value < other.value
-        return False
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, ProblemSeverity):
+            return NotImplemented
+        return self.value < other.value
 
 
-def set_language(lang):
+def set_language(lang: str | None) -> None:
     """Sets the static variable language used for key generation.
 
     :param lang: global language that the modules currently work with
     """
+    # FIXME: don't use global variables
     global language
     language = lang
 
@@ -176,7 +179,7 @@ class Problem:
 
         self.__cut_suggestions(10)
 
-    def __cut_suggestions(self, n):
+    def __cut_suggestions(self, n: int) -> None:
         """Cuts the suggestions list down to the first n elements if there are
         more.
 
@@ -185,7 +188,7 @@ class Problem:
         if len(self.suggestions) > n:
             self.suggestions = self.suggestions[:n]
 
-    def __generate_key(self, key) -> str:
+    def __generate_key(self, key: str | None) -> str:
         """Generates a key for the problem based on language and the given key.
 
         Major difference for this method is if the module that created
@@ -257,7 +260,7 @@ class Problem:
 class ProblemJSONEncoder(JSONEncoder):
     """Provides JSON serializability for class Problem."""
 
-    def default(self, obj: typing.Any):
+    def default(self, obj: typing.Any) -> dict[str, typing.Any]:
         if not isinstance(obj, Problem):
             return JSONEncoder.default(self, obj)
 

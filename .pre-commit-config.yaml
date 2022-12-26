@@ -73,6 +73,16 @@ repos:
     rev: "v0.991"
     hooks:
       - id: mypy
+        args:
+          - --ignore-missing-imports
+          - --no-warn-unused-ignores
+          - --allow-redefinition
+          - --check-untyped-defs
+          - --disallow-any-generics
+          - --disallow-incomplete-defs
+          - --disallow-untyped-defs
+          - --warn-redundant-casts
         additional_dependencies:
+          - types-chardet
           - types-colorama
           - types-requests

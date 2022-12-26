@@ -10,7 +10,7 @@ from pathlib import Path
 from tempfile import mkstemp
 
 from chardet import detect
-from yalafi.tex2txt import Options
+from yalafi.tex2txt import Options  # type: ignore
 from yalafi.tex2txt import tex2txt
 from yalafi.tex2txt import translate_numbers
 
@@ -67,12 +67,17 @@ class TexFile:
         else:
             self.log_file, self.pdf_file = (None, None)
 
-    def __detex(self):
+    def __detex(self) -> tuple[
+        str, list[int],
+        list[tuple[tuple[int, int] | None, str]],
+    ]:
         opts = Options()  # use default options
 
         detex_stderr = StringIO()
         sys.stderr = detex_stderr  # temporary redirect stderr
 
+        plain: str
+        charmap: list[int]
         plain, charmap = tex2txt(self.tex, opts)
 
         sys.stderr = sys.__stderr__  # restore original stderr
@@ -123,15 +128,20 @@ class TexFile:
         self,
         line: int,
         col: int,
-    ) -> tuple[int, int] | None:
+    ) -> tuple[int, int]:
         offsets = get_line_offsets(self.plain)
         aux = translate_numbers(
-            self.tex, self.plain,
-            self._charmap, offsets, line, col,
+            self.tex,
+            self.plain,
+            self._charmap,
+            offsets,
+            line,
+            col,
         )
 
         if aux is None:
-            return None
+            _msg = f"Can't translate position {line}:{col}."
+            raise ValueError
 
         return aux.lin, aux.col
 
@@ -142,7 +152,8 @@ class TexFile:
         return self.tex_file == other.tex_file
 
     def __repr__(self) -> str:
-        return f"{self.__name__}(file={str(self.tex_file.resolve())})"
+        return f"{self.__class__.__name__}(" \
+               f"file={str(self.tex_file.resolve())})"
 
     def __str__(self) -> str:
         return str(self.tex_file)

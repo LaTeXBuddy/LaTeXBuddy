@@ -15,9 +15,9 @@ class NamedModule:
     module instance."""
 
     @classproperty
-    def display_name(cls) -> str:  # noqa N805
+    def display_name(cls) -> str:  # noqa
         """Returns the canonical display name of the module."""
-        return cls.__name__
+        return cls.__name__  # type: ignore
 
 
 class MainModule(NamedModule):
@@ -28,7 +28,7 @@ class Module(NamedModule):
     """Abstract class that defines a simple LaTeXBuddy module."""
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self) -> None:
         """Creates and initializes a new instance of this module."""
 
     @abstractmethod

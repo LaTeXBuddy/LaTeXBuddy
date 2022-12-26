@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
-import proselint
+from proselint.tools import lint
 
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
@@ -15,7 +16,7 @@ LOG = logging.getLogger(__name__)
 
 
 class ProseLint(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         self.problem_type = "grammar"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
@@ -29,11 +30,15 @@ class ProseLint(Module):
             )
             return []
 
-        suggestions = proselint.tools.lint(file.plain)
+        suggestions = lint(file.plain)
 
         return self.format_errors(suggestions, file)
 
-    def format_errors(self, suggestions: list, file: TexFile):
+    def format_errors(
+        self,
+        suggestions: list[tuple[str, str, int, int, int, int, int, str, Any]],
+        file: TexFile,
+    ) -> list[Problem]:
         problems = []
         for suggestion in suggestions:
             p_type = suggestion[0]
@@ -72,6 +77,6 @@ class ProseLint(Module):
         return problems
 
     @staticmethod
-    def get_text(start_char: int, length: int, file: TexFile):
+    def get_text(start_char: int, length: int, file: TexFile) -> str:
         text = file.plain
         return text[start_char: start_char + length]

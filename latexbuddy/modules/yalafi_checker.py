@@ -8,7 +8,7 @@ from latexbuddy.texfile import TexFile
 
 
 class YaLafi(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:

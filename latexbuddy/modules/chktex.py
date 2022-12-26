@@ -17,7 +17,7 @@ LOG = logging.getLogger(__name__)
 
 
 class Chktex(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         self.DELIMITER = ":::"
         self.problem_type = "latex"
 
@@ -77,8 +77,8 @@ class Chktex(Module):
             # length = int(out_split[3])  # noqa not used for now
             internal_id = out_split[4]
             text = out_split[5]
-            description = out_split[6] if len(out_split[6]) > 0 else None
-            position = (row, col)
+            description = out_split[6] if len(out_split[6]) > 0 else ""
+            position: tuple[int, int] | None = (row, col)
             key = self.display_name + key_delimiter + str(internal_id)
 
             # convert problems with text-length of zero to general problems

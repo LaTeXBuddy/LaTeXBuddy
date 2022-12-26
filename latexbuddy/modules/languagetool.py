@@ -9,8 +9,10 @@ import time
 from contextlib import closing
 from enum import Enum
 from json import JSONDecodeError
+from typing import Any
 from typing import AnyStr
 from typing import List
+from typing import TYPE_CHECKING
 
 import requests
 
@@ -22,6 +24,9 @@ from latexbuddy.modules import Module
 from latexbuddy.problem import Problem
 from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
+
+if TYPE_CHECKING:
+    from subprocess import Popen
 
 LOG = logging.getLogger(__name__)
 
@@ -45,19 +50,15 @@ class LanguageTool(Module):
         r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?",
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Creates a LanguageTool checking module."""
 
-        self.mode = None
         self.language = None
 
-        self.disabled_rules = None
-        self.disabled_categories = None
+        self.disabled_rules = ""
+        self.disabled_categories = ""
 
-        self.local_server = None
-        self.remote_url = None
         self.remote_url_languages = None
-        self.lt_console_command = None
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         """Runs the LanguageTool checks on a file and returns the results as a
@@ -76,7 +77,7 @@ class LanguageTool(Module):
             LanguageTool,
             "mode",
             "COMMANDLINE",
-            verify_type=AnyStr,
+            verify_type=AnyStr,  # type: ignore
             verify_choices=[e.value for e in Mode],
         )
 
@@ -94,7 +95,7 @@ class LanguageTool(Module):
             self.remote_url = config.get_config_option(
                 LanguageTool,
                 "remote_url_check",
-                verify_type=AnyStr,
+                verify_type=AnyStr,  # type: ignore
                 verify_regex="http(s?)://(\\S*)",
             )
 
@@ -102,7 +103,7 @@ class LanguageTool(Module):
                 LanguageTool,
                 "remote_url_languages",
                 None,
-                verify_type=AnyStr,
+                verify_type=AnyStr,  # type: ignore
                 verify_regex="http(s?)://(\\S*)",
             )
 
@@ -115,7 +116,7 @@ class LanguageTool(Module):
             LatexBuddy,
             "language",
             None,
-            verify_type=AnyStr,
+            verify_type=AnyStr,  # type: ignore
             verify_choices=supported_languages,
         )
 
@@ -123,7 +124,7 @@ class LanguageTool(Module):
             LatexBuddy,
             "language_country",
             None,
-            verify_type=AnyStr,
+            verify_type=AnyStr,  # type: ignore
         )
 
         if (
@@ -265,19 +266,13 @@ class LanguageTool(Module):
             ),
         )
 
-        if self.disabled_rules == "":
-            self.disabled_rules = None
-
-        if self.disabled_categories == "":
-            self.disabled_categories = None
-
     def check_tex(self, file: TexFile) -> list[Problem]:
         """Runs the LanguageTool checks on a file.
 
         :param file: the file to run checks on
         """
 
-        raw_problems = None
+        raw_problems: dict[str, Any] = {}
 
         if self.mode == Mode.LOCAL_SERVER:
             raw_problems = self.lt_post_request(
@@ -293,16 +288,17 @@ class LanguageTool(Module):
 
         return self.format_errors(raw_problems, file)
 
-    def lt_post_request(self, file: TexFile, server_url: str) -> dict | None:
+    def lt_post_request(
+        self,
+        file: TexFile,
+        server_url: str,
+    ) -> dict[str, Any]:
         """Send a POST request to the LanguageTool server to check the text.
 
         :param file: TexFile object representing the file to be checked
         :param server_url: URL of the LanguageTool server
         :return: server's response
         """
-        if file is None:
-            return None
-
         request_data = {
             "text": file.plain,
         }
@@ -327,7 +323,7 @@ class LanguageTool(Module):
                 f"Could not decode the following POST response in JSON format:"
                 f" {response.text}",
             )
-            return None
+            return {}
 
     def lt_languages_get_request(self, server_url: str) -> list[str]:
         """Sends a GET request to the specified URL in order to retrieve a JSON
@@ -346,15 +342,12 @@ class LanguageTool(Module):
 
         return supported_languages
 
-    def execute_commandline_request(self, file: TexFile) -> dict | None:
+    def execute_commandline_request(self, file: TexFile) -> dict[str, Any]:
         """Execute the LanguageTool command line app to check the text.
 
         :param file: TexFile object representing the file to be checked
         :return: app's response
         """
-
-        if file is None:
-            return None
 
         self.find_languagetool_command()
 
@@ -371,12 +364,15 @@ class LanguageTool(Module):
         try:
             json_output = json.loads(output)
         except json.decoder.JSONDecodeError:
-            json_output = json.loads("{}")
+            json_output = {}
 
         return json_output
 
     @staticmethod
-    def format_errors(raw_problems: dict, file: TexFile) -> list[Problem]:
+    def format_errors(
+        raw_problems: dict[str, Any],
+        file: TexFile,
+    ) -> list[Problem]:
         """Parses LanguageTool errors and converts them to LaTeXBuddy Error
         objects.
 
@@ -384,7 +380,7 @@ class LanguageTool(Module):
         :param file: TexFile object representing the file to be checked
         """
 
-        problems = []
+        problems: list[Problem] = []
 
         if raw_problems is None or len(raw_problems) == 0:
             return problems
@@ -429,7 +425,7 @@ class LanguageTool(Module):
 
     @staticmethod
     def parse_error_replacements(
-        json_replacements: list[dict],
+        json_replacements: list[dict[str, Any]],
         max_elements: int = 5,
     ) -> list[str]:
         """Converts LanguageTool's replacements to LaTeXBuddy suggestions list.
@@ -458,13 +454,11 @@ class LanguageToolLocalServer:
     __SERVER_REQUEST_TIMEOUT = 1  # in seconds
     __SERVER_MAX_ATTEMPTS = 20
 
-    def __init__(self):
-        self.lt_path = None
-        self.lt_server_command = None
-        self.server_process = None
-        self.port = None
+    def __init__(self) -> None:
+        self.port = self.__DEFAULT_PORT
+        self.server_process: Popen[bytes] | None = None
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.stop_local_server()
 
     def get_server_run_command(self) -> None:
@@ -571,7 +565,7 @@ class LanguageToolLocalServer:
         self.server_process = None
 
     @staticmethod
-    def find_free_port(port: int = None) -> int:
+    def find_free_port(port: int | None = None) -> int:
         """Tries to find a free port for the LanguageTool server.
 
         :param port: port to check first

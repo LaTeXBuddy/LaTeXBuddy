@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 import datetime
+import hashlib
+import logging
 import os
 import re
 import tempfile
+import typing
 import zipfile
 from pathlib import Path
 from pathlib import PurePath
 
+import flask
 from flask import abort
 from flask import Flask
 from flask import redirect
@@ -22,9 +26,14 @@ from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.module_loader import ModuleLoader
 
+if typing.TYPE_CHECKING:
+    from werkzeug.datastructures import FileStorage
+    from werkzeug.wrappers.response import Response
+
 
 app = Flask(name)
 env = Environment(loader=PackageLoader("latexbuddy"))
+LOG = logging.getLogger(__name__)
 
 ALLOWED_EXTENSIONS = [
     "txt",
@@ -100,7 +109,17 @@ class FlaskConfigLoader(ConfigLoader):
             self.main_flags["whitelist"] = get_whitelist_path(whitelist_id)
 
 
-def run_server():
+def _get_filename(file: FileStorage) -> str:
+    if file.filename is None:
+        return hashlib.blake2b(
+            file.stream.read(1024),
+            digest_size=8,
+        ).hexdigest()
+
+    return file.filename
+
+
+def run_server() -> None:
     upload_folder = tempfile.TemporaryDirectory()
     app.config["UPLOAD_FOLDER"] = upload_folder.name
 
@@ -123,14 +142,14 @@ def run_server():
 
 
 @app.route("/")
-def index():
+def index() -> str:
     return env.get_template("flask_index.html").render(
         whitelist_ids=get_available_whitelist_ids(),
     )
 
 
 @app.route("/check", methods=["GET", "POST"])
-def document_check():
+def document_check() -> Response:
     if request.method != "POST":
         return redirect("/")
 
@@ -140,17 +159,18 @@ def document_check():
         return redirect("/")
 
     date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    result_id = f"{date}_{files[0].filename.replace('.', '_')}"
+    result_id = f"{date}_{_get_filename(files[0]).replace('.', '_')}"
     result_path = os.path.join(app.config["RESULTS_FOLDER"], result_id)
 
     saved_tex_files = []
 
     for file in files:
+        file_name = _get_filename(file)
 
-        if not allowed_file(file.filename):
+        if not allowed_file(file_name):
             continue
 
-        filename = secure_filename(file.filename)
+        filename = secure_filename(file_name)
         target_dir_path = os.path.join(app.config["UPLOAD_FOLDER"], result_id)
         Path(target_dir_path).mkdir()
 
@@ -164,16 +184,15 @@ def document_check():
         tex_files = list(Path(target_dir_path).rglob("*.tex"))
         saved_tex_files.extend(tex_files)
 
-    for file in saved_tex_files:
-
+    for tex_file in saved_tex_files:
         # TODO: compile PDF only in main document
-        run_buddy(file, Path(result_path), saved_tex_files)
+        run_buddy(tex_file, Path(result_path), saved_tex_files)
 
     return redirect(f"/result/{result_id}")
 
 
 @app.route("/result/<result_id>")
-def check_result(result_id):
+def check_result(result_id: str) -> Response:
     result_path = Path(
         os.path.join(app.config["RESULTS_FOLDER"], secure_filename(result_id)),
     )
@@ -190,7 +209,10 @@ def check_result(result_id):
 
 
 @app.route("/result/<result_id>/<file_name>")
-def display_result(result_id, file_name):
+def display_result(
+    result_id: str,
+    file_name: str,
+) -> Response:
     result_path = Path(
         os.path.join(app.config["RESULTS_FOLDER"], secure_filename(result_id)),
     )
@@ -205,11 +227,15 @@ def display_result(result_id, file_name):
     )
 
     with open(file_path) as f:
-        return f.read()
+        return flask.Response(f.read())
 
 
 @app.route("/result/<result_id_0>/compiled/<result_id_1>/<pdf_name>")
-def compiled_pdf(result_id_0, result_id_1, pdf_name):
+def compiled_pdf(
+    result_id_0: str,
+    result_id_1: str,
+    pdf_name: str,
+) -> Response:
     result_id = result_id_0
     if result_id_0 != result_id_1:
         abort(404)
@@ -228,7 +254,7 @@ def compiled_pdf(result_id_0, result_id_1, pdf_name):
 
 
 @app.route("/whitelist-api/upload", methods=["GET", "POST"])
-def upload_whitelist():
+def upload_whitelist() -> Response:
     if request.method != "POST":
         return redirect("/")
 
@@ -240,12 +266,13 @@ def upload_whitelist():
     date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     for wl_file in files:
+        file_name = _get_filename(wl_file)
 
-        if not allowed_whitelist_file(wl_file.filename):
+        if not allowed_whitelist_file(file_name):
             continue
 
-        filename = f"{date}_{secure_filename(wl_file.filename)}"
-        target_path = os.path.join(app.config["WHITELIST_FOLDER"], filename)
+        file_name = f"{date}_{secure_filename(file_name)}"
+        target_path = os.path.join(app.config["WHITELIST_FOLDER"], file_name)
 
         wl_file.save(target_path)
 
@@ -260,7 +287,11 @@ def allowed_whitelist_file(filename: str) -> bool:
     return len(PurePath(filename).suffixes) == 0
 
 
-def run_buddy(file_path: Path, output_dir: Path, path_list: list[Path]):
+def run_buddy(
+    file_path: Path,
+    output_dir: Path,
+    path_list: list[Path],
+) -> None:
     if not output_dir.exists():
         output_dir.mkdir()
 

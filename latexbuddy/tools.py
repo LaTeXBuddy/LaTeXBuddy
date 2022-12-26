@@ -9,6 +9,8 @@ import subprocess
 import traceback
 from logging import Logger
 from pathlib import Path
+from typing import Any
+from typing import AnyStr
 from typing import Callable
 
 from platformdirs import PlatformDirs
@@ -52,7 +54,7 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
     return out.decode(encoding)
 
 
-def execute_background(*cmd: str) -> subprocess.Popen:
+def execute_background(*cmd: str) -> subprocess.Popen[bytes]:
     """Executes a terminal command in background.
 
     :param cmd: command name and arguments
@@ -71,7 +73,7 @@ def execute_background(*cmd: str) -> subprocess.Popen:
     )
 
 
-def kill_background_process(process: subprocess.Popen):
+def kill_background_process(process: subprocess.Popen[AnyStr]) -> None:
     """Kills previously opened background process.
 
     For example, it can accept the return value of
@@ -103,7 +105,7 @@ def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
     return out.decode(encoding)
 
 
-def get_command_string(cmd: tuple[str]) -> str:
+def get_command_string(cmd: tuple[str, ...]) -> str:
     """Constructs a command string from a tuple of arguments.
 
     :param cmd: tuple of command line arguments
@@ -289,8 +291,8 @@ def get_all_paths_in_document(file_path: Path) -> list[Path]:
     :param file_path:a string, containing file path
     :return: the files to check
     """
-    unchecked_files = []
-    checked_files = []
+    unchecked_files: list[Path] = []
+    checked_files: list[Path] = []
     unchecked_files.append(file_path)
     root_dir = str(file_path.parent)
 
@@ -376,24 +378,12 @@ def texify_path(path: str) -> Path:
     return Path(path)
 
 
-def get_abs_path(path) -> Path:
-    """Gets absolute path of a string.
-
-    :param path: the path
-    :return: the absolute path
-    """
-    path = str(path)
-    if path[:2] == "~/" or path[0] == "/":
-        return Path(path)
-    p = Path(str(os.getcwd()) + "/" + str(path))
-    if not p.is_file() or path[-4:] != ".tex":
-        LOG.error(f"File {p} does not exist.")
-    return p
-
-
 class classproperty(property):  # noqa N801
     """Provides a way to implement a python property with class-level
     accessibility."""
 
-    def __get__(self, cls, owner):
+    def __get__(self, obj: Any, owner: type | None = None) -> Any:
+        if not self.fget:
+            _msg = "classproperty doesn't work without a getter"
+            raise ValueError(_msg)
         return classmethod(self.fget).__get__(None, owner)()

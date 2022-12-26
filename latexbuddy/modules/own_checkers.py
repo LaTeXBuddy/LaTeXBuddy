@@ -12,7 +12,7 @@ from latexbuddy.texfile import TexFile
 
 
 class UnreferencedFigures(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         self.p_type = "0"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
@@ -71,7 +71,7 @@ class UnreferencedFigures(Module):
 
 
 class SiUnitx(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
@@ -100,7 +100,7 @@ class SiUnitx(Module):
         all_numbers = re.finditer("[0-9]+", text)
         threshold = 3
 
-        def filter_big_numbers(n: re.Match):
+        def filter_big_numbers(n: re.Match[str]) -> bool:
             return len(n.group(0)) > threshold
 
         numbers = list(filter(filter_big_numbers, all_numbers))
@@ -237,7 +237,7 @@ class SiUnitx(Module):
 
 
 class EmptySections(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
@@ -272,7 +272,7 @@ class EmptySections(Module):
 
 
 class URLCheck(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         self.category = "latex"
         self.severity = ProblemSeverity.INFO
 
@@ -335,7 +335,7 @@ class CheckFigureResolution(Module):
         ".jp2",
     ]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.p_type = "0"
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
@@ -349,7 +349,7 @@ class CheckFigureResolution(Module):
         """
         search_root = os.path.dirname(file.tex_file)
         problems = []
-        figures = []
+        figures: list[str] = []
 
         for root, _dirs, files in os.walk(search_root):
             root_name = os.path.basename(root)
@@ -382,7 +382,7 @@ class CheckFigureResolution(Module):
 
 
 class NativeUseOfRef(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
 

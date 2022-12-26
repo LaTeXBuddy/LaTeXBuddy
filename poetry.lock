@@ -1148,6 +1148,18 @@ files = [
 ]
 
 [[package]]
+name = "types-chardet"
+version = "5.0.4.1"
+description = "Typing stubs for chardet"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-chardet-5.0.4.1.tar.gz", hash = "sha256:cb04c8ea105220bf44c1c93f227e09117bbb07aa56d743be2972330fd06751de"},
+    {file = "types_chardet-5.0.4.1-py3-none-any.whl", hash = "sha256:651e4b1c593683960fcd0ee5353b37e7d8d3eecebed72277c1ff9b373f86cdaf"},
+]
+
+[[package]]
 name = "types-colorama"
 version = "0.4.15.4"
 description = "Typing stubs for colorama"
@@ -1276,4 +1288,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7.15"
-content-hash = "7d8ddd30baea642fd57df6d6d0da0a48b08a93a1845ea24ac9acf344f0ede2b0"
+content-hash = "b85fe03f4d7c70b30ee69a0969771cb4267d77ff2237e630451a5823a1703005"

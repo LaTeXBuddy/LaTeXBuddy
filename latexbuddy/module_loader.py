@@ -8,6 +8,7 @@ from abc import ABC
 from abc import abstractmethod
 from pathlib import Path
 from types import ModuleType
+from typing import Callable
 
 import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
@@ -105,7 +106,7 @@ class ModuleLoader(ModuleProvider):
 
         loaded_modules = []
 
-        def make_lambda(file):
+        def make_lambda(file: Path) -> Callable[[], None]:
             def lambda_function() -> None:
                 module_path = str(file.stem)
 

@@ -25,7 +25,7 @@ class LogFilter(Module):
     Using TexFilt: https://www.ctan.org/tex-archive/support/texfilt
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializes the LogFilter."""
         self.texfilt_path = Path("latexbuddy/modules/texfilt.awk")
 
