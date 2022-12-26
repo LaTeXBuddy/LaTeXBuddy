@@ -20,6 +20,7 @@ Python-based, so that implementing new functionality becomes a breeze!
 ----
 
 .. toctree::
+   :caption: About
    :hidden:
 
    about/changelog.md
@@ -64,3 +65,10 @@ Developer's guide
    :maxdepth: 2
 
    developer/environment.md
+
+.. toctree::
+   :caption: Appendix
+   :titlesonly:
+   :hidden:
+
+   COPYING.md

@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 -   `extend_path()` call was removed, making LaTeXBuddy not a namespace any more
+-   LaTeXBuddy is now open-source under the terms of GPL-3.0-or-later (#105, !175)
 
 ## [0.4.2] - 25 Dec 2022 :christmas_tree:
 
