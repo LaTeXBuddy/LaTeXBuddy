@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Sequence
 
 
-def add_to_whitelist(whitelist: Path, keys: list[str]):
+def add_to_whitelist(whitelist: Path, keys: list[str]) -> None:
     """Adds a list of keys to the whitelist.
 
     Keys should be valid keys, ideally copied from LaTeXBuddy HTML
@@ -25,7 +25,7 @@ def add_to_whitelist(whitelist: Path, keys: list[str]):
 
 def fill_whitelist_from_wordlist(
     whitelist: Path, wordlist: Path, language: str,
-):
+) -> None:
     """Adds keys to the whitelist based on a list of words.
 
     Words in the wordlist should all be from the same language. Each
@@ -64,7 +64,7 @@ def _get_parser() -> argparse.ArgumentParser:
         default="./whitelist",
         help="Location of the whitelist file.",
     )
-    subparsers = parser.add_subparsers(help='available operations')
+    subparsers = parser.add_subparsers(help="available operations")
 
     add_parser = subparsers.add_parser(
         "add",
@@ -100,21 +100,21 @@ def _get_parser() -> argparse.ArgumentParser:
 
 def main(args: Sequence[str] | None = None) -> int:
     args = args if args is not None else sys.argv[1:]
-    args = _get_parser().parse_args(args)
+    parsed_args = _get_parser().parse_args(args)
 
-    if "keys" in args:
-        add_to_whitelist(args.whitelist, args.keys)
+    if "keys" in parsed_args:
+        add_to_whitelist(parsed_args.whitelist, parsed_args.keys)
         return 0
 
-    if "wordlist" in args and "language" in args:
+    if "wordlist" in parsed_args and "language" in parsed_args:
         fill_whitelist_from_wordlist(
-            args.whitelist,
-            args.wordlist,
-            args.language,
+            parsed_args.whitelist,
+            parsed_args.wordlist,
+            parsed_args.language,
         )
 
     return 2
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())

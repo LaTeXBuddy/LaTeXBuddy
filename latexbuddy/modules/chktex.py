@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import logging
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem
@@ -17,7 +17,7 @@ LOG = logging.getLogger(__name__)
 
 
 class Chktex(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         self.DELIMITER = ":::"
         self.problem_type = "latex"
 
@@ -27,11 +27,13 @@ class Chktex(Module):
 
         Requires chktex to be installed separately
 
-        :param config: the configuration options of the calling LaTeXBuddy instance
-        :param file: LaTeX file to be checked (with built-in detex option)
+        :param config: the configuration options of the calling
+                       LaTeXBuddy instance
+        :param file: LaTeX file to be checked (with built-in detex
+                     option)
         """
 
-        tools.find_executable("chktex", "ChkTeX", LOG)
+        latexbuddy.tools.find_executable("chktex", "ChkTeX", LOG)
 
         format_str = (
             self.DELIMITER.join(
@@ -41,7 +43,7 @@ class Chktex(Module):
         )
 
         file_path = str(file.tex_file)
-        command_output = tools.execute(
+        command_output = latexbuddy.tools.execute(
             "chktex",
             "-f",
             f"'{format_str}'",
@@ -50,9 +52,7 @@ class Chktex(Module):
         )
         out_split = command_output.split("\n")
 
-        result = self.format_problems(out_split, file)
-
-        return result
+        return self.format_problems(out_split, file)
 
     def format_problems(self, out: list[str], file: TexFile) -> list[Problem]:
         """Converts the output of chktex to a list of Problems.
@@ -74,11 +74,11 @@ class Chktex(Module):
             )
             row = int(out_split[1])
             col = int(out_split[2])
-            length = int(out_split[3])  # not used for now
+            # length = int(out_split[3])  # noqa not used for now
             internal_id = out_split[4]
             text = out_split[5]
-            description = out_split[6] if len(out_split[6]) > 0 else None
-            position = (row, col)
+            description = out_split[6] if len(out_split[6]) > 0 else ""
+            position: tuple[int, int] | None = (row, col)
             key = self.display_name + key_delimiter + str(internal_id)
 
             # convert problems with text-length of zero to general problems

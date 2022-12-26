@@ -3,7 +3,6 @@ working with."""
 from __future__ import annotations
 
 import logging
-import os
 import re
 import sys
 from io import StringIO
@@ -11,12 +10,11 @@ from pathlib import Path
 from tempfile import mkstemp
 
 from chardet import detect
-from yalafi.tex2txt import Options
+from yalafi.tex2txt import Options  # type: ignore
 from yalafi.tex2txt import tex2txt
 from yalafi.tex2txt import translate_numbers
 
 from latexbuddy.messages import not_found
-from latexbuddy.messages import texfile_error
 from latexbuddy.tools import absolute_to_linecol
 from latexbuddy.tools import execute
 from latexbuddy.tools import find_executable
@@ -37,11 +35,8 @@ class TexFile:
     for future editing.
     """
 
-    def __init__(self, file: Path, compile_tex: bool):
+    def __init__(self, file: Path, *, compile_tex: bool):
         """Creates a new file instance.
-
-        By default, the file is being read, but not detexed. The file can be detexed at
-        any point using `detex()` method.
 
         :param file: Path object of the file to be loaded
         :param compile_tex: Bool if the tex should be compiled
@@ -64,21 +59,25 @@ class TexFile:
         self.plain_file.write_text(self.plain)
 
         self.is_faulty = is_binary(tex_bytes) or len(self._parse_problems) > 0
-        # compile_pdf = cfg.get_config_option_or_default(
-        #     "buddy", "pdf", True, verify_type=bool
-        # )
         compile_pdf = True
         if compile_tex:
-            self.log_file, self.pdf_file = self.__compile_tex(compile_pdf)
+            self.log_file, self.pdf_file = self.__compile_tex(
+                compile_pdf=compile_pdf,
+            )
         else:
             self.log_file, self.pdf_file = (None, None)
 
-    def __detex(self):
+    def __detex(self) -> tuple[
+        str, list[int],
+        list[tuple[tuple[int, int] | None, str]],
+    ]:
         opts = Options()  # use default options
 
         detex_stderr = StringIO()
         sys.stderr = detex_stderr  # temporary redirect stderr
 
+        plain: str
+        charmap: list[int]
         plain, charmap = tex2txt(self.tex, opts)
 
         sys.stderr = sys.__stderr__  # restore original stderr
@@ -129,15 +128,20 @@ class TexFile:
         self,
         line: int,
         col: int,
-    ) -> tuple[int, int] | None:
+    ) -> tuple[int, int]:
         offsets = get_line_offsets(self.plain)
         aux = translate_numbers(
-            self.tex, self.plain,
-            self._charmap, offsets, line, col,
+            self.tex,
+            self.plain,
+            self._charmap,
+            offsets,
+            line,
+            col,
         )
 
         if aux is None:
-            return None
+            _msg = f"Can't translate position {line}:{col}."
+            raise ValueError
 
         return aux.lin, aux.col
 
@@ -148,13 +152,17 @@ class TexFile:
         return self.tex_file == other.tex_file
 
     def __repr__(self) -> str:
-        return f"{self.__name__}(file={str(self.tex_file.resolve())})"
+        return f"{self.__class__.__name__}(" \
+               f"file={str(self.tex_file.resolve())})"
 
     def __str__(self) -> str:
         return str(self.tex_file)
 
-    def __compile_tex(self, compile_pdf: bool) -> tuple[Path | None, Path | None]:
-
+    def __compile_tex(
+        self,
+        *,
+        compile_pdf: bool,
+    ) -> tuple[Path | None, Path | None]:
         from latexbuddy.buddy import LatexBuddy
 
         compiler = "latex"
@@ -172,77 +180,42 @@ class TexFile:
         html_directory = LatexBuddy.instance.cfg.get_config_option_or_default(
             LatexBuddy,
             "output",
-            os.getcwd() + "/latexbuddy_html/",
+            "./latexbuddy_html/",
         )
+        html_path = Path(html_directory)
 
-        try:
-            os.mkdir(html_directory)
-        except FileExistsError:
-            LOG.debug(f"Directory {html_directory} already exists.")
-        except Exception as exc:
-            LOG.error(
-                texfile_error(
-                    f"{exc} occurred while creating {html_directory}.",
-                ),
-            )
+        results_dir = html_path / "compiled" / str(self.tex_file.parent.name)
+        results_dir.mkdir(parents=True, exist_ok=True)
 
-        compile_directory = html_directory + "/compiled"
-
-        try:
-            os.mkdir(compile_directory)
-        except FileExistsError:
-            LOG.debug(f"Directory {compile_directory} already exists.")
-        except Exception as exc:
-            LOG.error(
-                texfile_error(
-                    f"{exc} occurred while creating {compile_directory}.",
-                ),
-            )
-
-        compilation_path = Path(
-            compile_directory + "/" + str(self.tex_file.parent.name),
-        )
-
-        try:
-            os.mkdir(str(compilation_path))
-        except FileExistsError:
-            LOG.debug(
-                f"Directory {str(compilation_path)} already exists.",
-            )
-        except Exception as exc:
-            LOG.error(
-                texfile_error(
-                    f"{exc} occurred while creating {str(compilation_path)}.",
-                ),
-            )
-
-        tex_mf = self.__create_tex_mf(compilation_path)
+        tex_mf = self.__create_tex_mf(results_dir)
 
         LOG.debug(
-            f"TEXFILE: {str(self.tex_file)}, exists: {self.tex_file.exists()}",
+            f"TEXFILE: {str(self.tex_file)},"
+            f"exists: {self.tex_file.exists()}",
         )
         LOG.debug(
-            f"PATH: {str(compilation_path)}, exists: {compilation_path.exists()}",
+            f"PATH: {str(results_dir)}, "
+            f"exists: {results_dir.exists()}",
         )
 
-        print(self.tex_file.name)
-        print(self.tex_file.parent)
         execute(
             f'TEXMFCNF="{tex_mf}";',
             "cd",
             f"{str(self.tex_file.parent)};",
             compiler,
             "-interaction=nonstopmode",
-            f"-output-directory='{str(compilation_path)}'",
+            f"-output-directory='{str(results_dir)}'",
             "-8bit",
             str(self.tex_file.name),
         )
 
-        log = compilation_path / f"{self.tex_file.stem}.log"
-        pdf = compilation_path / \
-            f"{self.tex_file.stem}.pdf" if compile_pdf else None
+        log = results_dir / f"{self.tex_file.stem}.log"
         LOG.debug(f"LOG: {str(log)}, isFile: {log.is_file()}")
-        LOG.debug(f"PDF: {str(pdf)}, isFile: {pdf.is_file()}")
+
+        pdf = None
+        if compile_pdf:
+            pdf = results_dir / f"{self.tex_file.stem}.pdf"
+            LOG.debug(f"PDF: {str(pdf)}, isFile: {pdf.is_file()}")
         return log, pdf
 
     @staticmethod

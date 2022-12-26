@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from typing import AnyStr
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
@@ -16,19 +16,21 @@ LOG = logging.getLogger(__name__)
 
 
 class Aspell(Module):
-    def __init__(self):
-        self.language = None
+    def __init__(self) -> None:
+        self.language: str | None = None
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         """Runs the Aspell checks on a file and returns the results as a list.
 
         Requires Aspell to be set up.
 
-        :param config: the configuration options of the calling LaTeXBuddy instance
-        :param file: LaTeX file to be checked (with built-in detex option)
+        :param config: the configuration options of the calling
+                       LaTeXBuddy instance
+        :param file: LaTeX file to be checked (with built-in detex
+                     option)
         """
 
-        tools.find_executable("aspell", "GNU Aspell", LOG)
+        latexbuddy.tools.find_executable("aspell", "GNU Aspell", LOG)
 
         supported_languages = self.find_languages()
 
@@ -36,22 +38,21 @@ class Aspell(Module):
             LatexBuddy,
             "language",
             "en",
-            verify_type=AnyStr,
+            verify_type=AnyStr,  # type: ignore
             verify_choices=supported_languages,
         )
 
-        language_country = config.get_config_option_or_default(
+        language_country: str = config.get_config_option_or_default(
             LatexBuddy,
             "language_country",
             None,
-            verify_type=AnyStr,
+            verify_type=AnyStr,  # type: ignore
         )
 
-        if (
-            language_country is not None
-            and self.language + "-" + language_country in supported_languages
-        ):
-            self.language = self.language + "-" + language_country
+        if language_country is not None:
+            language_code = f"{self.language}-{language_country}"
+            if language_code in supported_languages:
+                self.language = language_code
 
         error_list = []
         counter = 1  # counts the lines
@@ -61,7 +62,7 @@ class Aspell(Module):
         for line in lines:  # check every line
             if len(line) > 0:
                 escaped_line = line.replace("'", "\\'")
-                output = tools.execute(
+                output = latexbuddy.tools.execute(
                     f"echo '{escaped_line}' | aspell -a -l {self.language}",
                 )
                 # the first line specifies aspell version
@@ -70,20 +71,23 @@ class Aspell(Module):
                     out.pop()  # remove last element
                 error_list.extend(self.format_errors(out, counter, file))
 
-            counter += 1  # if there is an empty line, just increase the counter
+            # if there is an empty line, just increase the counter
+            counter += 1
 
         return error_list
 
     @staticmethod
     def find_languages() -> list[str]:
         """Returns all languages supported by the current aspell installation.
-        Omits specific language variations like 'en-variant_0'.
+        Omits specific language variations like 'en- variant_0'.
 
         :return: list of supported languages in str format
         """
         return [
             lang
-            for lang in tools.execute("aspell", "dump dicts").splitlines()
+            for lang in latexbuddy.tools.execute(
+                "aspell", "dump dicts",
+            ).splitlines()
             if "-" not in lang
         ]
 

@@ -36,6 +36,11 @@ platformdirs = "^2.6.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
+ruff = "^0.0.193"
+mypy = "^0.991"
+types-colorama = "^0.4.15.4"
+types-requests = "^2.28.11.7"
+types-chardet = "^5.0.4.1"
 
 
 [tool.poetry.group.docs.dependencies]
@@ -58,3 +63,47 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.autopep8]
 ignore = ["W503"]
+
+[tool.mypy]
+allow_redefinition = true
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.ruff]
+line-length = 79
+target-version = "py37"
+
+select = [
+    "F",  # pyflakes
+    "E", "W",  # pycodestyle
+    "C90",  # mccabe
+    # TODO: complete docs in a separate issue
+#    "D1", "D3",  # pydocstyle
+    "N",  # pep8-naming
+    "S",  # bandit
+    "BLE",  # flake8-blind-except
+    "FBT",  # flake8-boolean-trap
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "EM",  # flake8-errmsg
+    "ICN",  # flake8-import-conventions
+    "T20",  # flake8-print
+    "Q",  # flake8-quotes
+    "RET",  # flake8-return
+    "SIM",  # flake8-simplify
+    "ERA",  # eradicate
+    "PLC", "PLE", "PLR", "PLW",  # pylint
+]
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.ruff.flake8-import-conventions.aliases]
+multiprocessing = "mp"
+
+[tool.ruff.flake8-quotes]
+inline-quotes = "double"

@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 from tempfile import mkstemp
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
@@ -25,7 +25,7 @@ class LogFilter(Module):
     Using TexFilt: https://www.ctan.org/tex-archive/support/texfilt
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializes the LogFilter."""
         self.texfilt_path = Path("latexbuddy/modules/texfilt.awk")
 
@@ -37,7 +37,7 @@ class LogFilter(Module):
         :return: a list of problems
         """
         try:
-            tools.find_executable("awk")
+            latexbuddy.tools.find_executable("awk")
         except FileNotFoundError:
             LOG.error(not_found("awk", "AWK"))
 
@@ -49,7 +49,7 @@ class LogFilter(Module):
             prefix="latexbuddy",
             suffix="raw_log_errors",
         )
-        tools.execute(
+        latexbuddy.tools.execute(
             "awk",
             "-f",
             str(self.texfilt_path),
@@ -59,7 +59,11 @@ class LogFilter(Module):
         raw_problems_path = Path(raw_problems_path)
         return self.format_problems(raw_problems_path, file)
 
-    def format_problems(self, raw_problems_path: Path, file: TexFile) -> list[Problem]:
+    def format_problems(
+        self,
+        raw_problems_path: Path,
+        file: TexFile,
+    ) -> list[Problem]:
         """Formats the output to a List of Problems.
 
         :param raw_problems_path: Path to TexFilt output
@@ -76,7 +80,8 @@ class LogFilter(Module):
                 continue
             severity = match.group("severity").upper()
             file_path = file.tex_file
-            # position = (int(match.group("line_no")), 1)   # Does not work yet
+            # Does not work yet
+            # position = (int(match.group("line_no")), 1)  # noqa
 
             # TODO: refactor this
             split_match = problem_line.split(f"{match.group()}")

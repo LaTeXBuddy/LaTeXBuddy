@@ -38,19 +38,17 @@ def get_bibfile(file: TexFile) -> Path | None:
     m = re.search(pattern, tex)
 
     if m is None:  # TODO: maybe log this
-        # raise ValueError("No valid bibliography found in the .tex at {path}")
         return None
 
-    path = str(path)[: -len(path.parts[-1])]  # remove filename
-    bib_path = Path(path + m.group(1) + ".bib")
-
+    bib_path = path.parent / f"{m.group(1)}.bib"
     if not bib_path.exists():
-        raise FileNotFoundError(f"No bibliography found at {bib_path}")
+        _msg = f"No bibliography found at {bib_path}"
+        raise FileNotFoundError(_msg)
 
     return bib_path  # assuming theres only one bibtex file
 
 
-def parse_bibfile(bibfile: Path) -> (str, str, str):
+def parse_bibfile(bibfile: Path) -> list[tuple[str, str, str]]:
     """Parses the given BibTeX file to extract the publications.
 
     :param bibfile: Path object of the BibTeX file to be parsed
@@ -59,24 +57,29 @@ def parse_bibfile(bibfile: Path) -> (str, str, str):
     with bibfile.open() as bibtex_file:
         try:
             bib_database = bibtexparser.load(bibtex_file)
-            entries = bib_database.entries
-        # catch error that is raised if the bibtex file is not correctly formatted
-        except UndefinedString as e:
-            raise ValueError(
-                f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}',
+            entries: list[dict[str, str]] = bib_database.entries
+        # catch error that is raised if the bibtex file is not correctly
+        # formatted
+        except UndefinedString as exc:
+            _msg = (
+                f"{str(bibfile)}:"
+                f"Could not parse BibTeX file: "
+                f"Invalid format: {str(exc)}",
             )
+            raise ValueError(_msg) from exc
 
     results = []
     for entry in entries:
         try:
             """if (entry["ENTRYTYPE"] == "inproceedings"):"""
-            t = entry["title"]
-            # remove parenthesis from start/end of title for better comparison later on
-            while t[0] == "{" or t[0] == "(":
-                t = t[1:]
-            while t[-1] == "}" or t[-1] == ")":
-                t = t[:-1]
-            results.append((t, entry["year"], entry["ID"]))
+            title: str = entry["title"]
+            # remove parenthesis from start/end of title for better comparison
+            # later on
+            while title[0] == "{" or title[0] == "(":
+                title = title[1:]
+            while title[-1] == "}" or title[-1] == ")":
+                title = title[:-1]
+            results.append((title, entry["year"], entry["ID"]))
         except KeyError:
             pass
 
@@ -84,26 +87,29 @@ def parse_bibfile(bibfile: Path) -> (str, str, str):
 
 
 class NewerPublications(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
-        self.time = 0
-        self.found_pubs = []
+        self.found_pubs: list[tuple[str, str, str, tuple[str, str, str]]] = []
         self.debug = False
 
-    def check_for_new(self, publication: (str, str), s) -> (str, str, str, (str, str)):
+    def check_for_new(
+        self,
+        publication: tuple[str, str, str],
+        session: requests.Session,
+    ) -> None:
         # send requests
-        # ex: https://dblp.org/search/publ/api?format=json&q=In%20Search%20of%20an%20Understandable%20Consensus%20Algorithm
+        # Example:
+        # https://dblp.org/search/publ/api?format=json&q=In%20Search%20of%20an%20Understandable%20Consensus%20Algorithm
 
         c_returns = 4  # number of max returns from the request
-        x = s.get(
-            f"https://dblp.org/search/publ/api?format=json&h={c_returns}&q={publication[0]}",
+        x = session.get(
+            f"https://dblp.org/search/publ/api"
+            f"?format=json"
+            f"&h={c_returns}"
+            f"&q={publication[0]}",
         )
         ret = json.loads(x.text)["result"]
-
-        # time keeping
-        self.time += float(ret["time"]["text"])
-        LOG.debug(ret["time"]["text"])
 
         try:
             # TODO: handle multiple newer publications found
@@ -113,7 +119,8 @@ class NewerPublications(Module):
                     continue
 
                 title = hit["info"]["title"]
-                if title[-1] == ".":  # remove . at the end, dblp adds it sometimes
+                # remove period at the end, dblp adds it sometimes
+                if title[-1] == ".":
                     title = title[:-1]
 
                 # Check if the title is somewhat similar to the one from BibTeX
@@ -147,21 +154,16 @@ class NewerPublications(Module):
 
         used_pubs = parse_bibfile(bib_file)
 
-        a = time.time()
+        start = time.perf_counter()
 
         s = requests.session()
         for pub in used_pubs:
             self.check_for_new(pub, s)
 
-        """
-        with ThreadPool(4) as p:
-            p.map(self.check_for_new, used_pubs)
-        """
-
         LOG.debug(
-            f"\n\ndblp requests took {round(time.time() - a, 3)} seconds",
+            f"dblp requests took "
+            f"{round(time.perf_counter() - start, 3)} seconds",
         )
-        LOG.debug(self.time)
         LOG.debug(f'{len(used_pubs)} entries found in "{bib_file}"\n')
 
         output_format = config.get_config_option(LatexBuddy, "format")
@@ -169,17 +171,19 @@ class NewerPublications(Module):
         problem_text = "BibTeX outdated: "
         problems = []
 
-        for pub in self.found_pubs:
-            bibtex_id = pub[3][2]
-            if output_format in html_formats:  # HTML tags if output to HTML page
+        for found_pub in self.found_pubs:
+            bibtex_id = found_pub[2]
+            # HTML tags if output to HTML page
+            if output_format in html_formats:
                 suggestion = (
-                    f'Potential newer version "<i>{pub[0]}</i>" from '
-                    f'<b>{pub[1]}</b> at <a href="{pub[2]}"'
-                    f'target="_blank">{pub[2]}</a>'
+                    f'Potential newer version "<i>{found_pub[0]}</i>" from '
+                    f'<b>{found_pub[1]}</b> at <a href="{found_pub[2]}"'
+                    f'target="_blank">{found_pub[2]}</a>'
                 )
             else:
                 suggestion = (
-                    f'Potential newer version "{pub[0]}" from {pub[1]} at {pub[2]}'
+                    f'Potential newer version "{found_pub[0]}" '
+                    f"from {found_pub[1]} at {found_pub[2]}"
                 )
             problems.append(
                 Problem(
@@ -198,10 +202,10 @@ class NewerPublications(Module):
 
 
 class BibtexDuplicates(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
-        self.found_duplicates = []
+        self.found_duplicates: list[tuple[str, str]] = []
         self.debug = False
 
     def clean_str(self, to_clean: str) -> str:
@@ -215,11 +219,15 @@ class BibtexDuplicates(Module):
             return ""
         return to_clean.upper()
 
-    def compare_entries(self, entry_1, entry_2) -> None:
+    def compare_entries(
+        self,
+        entry_1: dict[str, str],
+        entry_2: dict[str, str],
+    ) -> None:
         ids = (entry_1["ID"], entry_2["ID"])
         same_keys = set(entry_1.keys()).intersection(set(entry_2.keys()))
         same_keys.remove("ID")
-        total_ratio = 0
+        total_ratio: float = 0
         for key in same_keys:
             total_ratio += SequenceMatcher(
                 None,
@@ -229,12 +237,12 @@ class BibtexDuplicates(Module):
         ratio = total_ratio / len(same_keys)
         if ratio > 0.85:
             LOG.debug(
-                f"------------------\n{ratio}\n{entry_1}\n{entry_2}\n------------------",
+                f"{entry_1} is probably a duplicate of {entry_2}. "
+                f"Similarity ratio: {ratio}",
             )
             self.found_duplicates.append(ids)
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
-
         bib_file = get_bibfile(file)
 
         if bib_file is None:
@@ -244,12 +252,14 @@ class BibtexDuplicates(Module):
         with bib_file.open() as bibtex_file:
             try:
                 bib_database = bibtexparser.load(bibtex_file)
-                entries = bib_database.entries
-            # catch error that is raised if the bibtex file is not correctly formatted
-            except UndefinedString as e:
-                raise ValueError(
-                    f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}',
-                )
+                entries: list[dict[str, str]] = bib_database.entries
+            # catch error that is raised if the bibtex file is not correctly
+            # formatted
+            except UndefinedString as exc:
+                _msg = f"{str(bib_file)}:" \
+                       f"Could not parse BibTeX file: " \
+                       f"Invalid format: {str(exc)}"
+                raise ValueError(_msg) from exc
 
         for i in range(len(entries)):
             for j in range(i + 1, len(entries)):

@@ -1,4 +1,4 @@
-"""This module describes the main LaTeXBuddy instance class."""
+"""Contains the main LaTeXBuddy instance class."""
 from __future__ import annotations
 
 import json
@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 from typing import AnyStr
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
 from latexbuddy.module_loader import ModuleProvider
@@ -39,10 +39,10 @@ class LatexBuddy(MainModule):
 
     __current_instance = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
-        self.errors = {}  # all current errors
+        self.errors: dict[str, Problem] = {}  # all current errors
         self.cfg: ConfigLoader = ConfigLoader()  # configuration
         # in-file preprocessing
         self.preprocessor: Preprocessor | None = None
@@ -58,7 +58,7 @@ class LatexBuddy(MainModule):
         self.compile_tex: bool
 
     @classproperty
-    def instance(cls):
+    def instance(cls) -> LatexBuddy:  # noqa N805
         if cls.__current_instance is None:
             cls.__current_instance = LatexBuddy()
         return cls.__current_instance
@@ -69,13 +69,15 @@ class LatexBuddy(MainModule):
         module_provider: ModuleProvider,
         file_to_check: Path,
         path_list: list[Path],
+        *,
         compile_tex: bool,
-    ):
+    ) -> None:
         """Initializes the LaTeXBuddy instance.
 
         :param config_loader: ConfigLoader object to manage config options
-        :param module_provider: ModuleProvider instance as a source of Module instances
-                                for running checks on the specified file
+        :param module_provider: ModuleProvider instance as a source of
+                                Module instances for running checks on
+                                the specified file
         :param file_to_check: file that will be checked
         :param path_list: a list of the paths for the html output
         :param compile_tex: boolean if the tex file should be compiled
@@ -86,7 +88,10 @@ class LatexBuddy(MainModule):
         LatexBuddy.instance.preprocessor = None
         LatexBuddy.instance.module_provider = module_provider
         LatexBuddy.instance.file_to_check = file_to_check
-        LatexBuddy.instance.tex_file = TexFile(file_to_check, compile_tex)
+        LatexBuddy.instance.tex_file = TexFile(
+            file_to_check,
+            compile_tex=compile_tex,
+        )
         LatexBuddy.instance.path_list = path_list
 
         # file where the error should be saved
@@ -95,7 +100,7 @@ class LatexBuddy(MainModule):
                 LatexBuddy,
                 "output",
                 "./latexbuddy_html/",
-                verify_type=AnyStr,
+                verify_type=AnyStr,  # type: ignore
             ),
         )
 
@@ -111,7 +116,7 @@ class LatexBuddy(MainModule):
                 LatexBuddy,
                 "format",
                 "HTML",
-                verify_type=AnyStr,
+                verify_type=AnyStr,  # type: ignore
                 verify_choices=[
                     "HTML",
                     "html",
@@ -129,12 +134,12 @@ class LatexBuddy(MainModule):
                 LatexBuddy,
                 "whitelist",
                 "whitelist",
-                verify_type=AnyStr,
+                verify_type=AnyStr,  # type: ignore
             ),
         )
 
     @staticmethod
-    def add_error(problem: Problem):
+    def add_error(problem: Problem) -> None:
         """Adds the error to the errors dictionary.
 
         UID is used as key, the error object is used as value.
@@ -142,14 +147,18 @@ class LatexBuddy(MainModule):
         :param problem: problem to add to the dictionary
         """
 
-        if (
-            LatexBuddy.instance.preprocessor is None
-            or LatexBuddy.instance.preprocessor.matches_preprocessor_filter(problem)
-        ) and not equation_re.match(problem.text):
-            LatexBuddy.instance.errors[problem.uid] = problem
+        pp = LatexBuddy.instance.preprocessor
+        if pp is not None:
+            if not pp.matches_preprocessor_filter(problem):
+                return
+
+        if equation_re.match(problem.text):
+            return
+
+        LatexBuddy.instance.errors[problem.uid] = problem
 
     @staticmethod
-    def check_whitelist():
+    def check_whitelist() -> None:
         """Removes errors that are whitelisted."""
 
         LOG.debug("Beginning whitelist-check...")
@@ -161,7 +170,8 @@ class LatexBuddy(MainModule):
         ):
             return  # if no whitelist yet, don't have to check
 
-        whitelist_entries = LatexBuddy.instance.whitelist_file.read_text().splitlines()
+        whitelist_entries = LatexBuddy.instance.whitelist_file\
+            .read_text().splitlines()
         # TODO: Ignore emtpy strings in here
 
         # need to copy here or we get an error deleting
@@ -171,16 +181,16 @@ class LatexBuddy(MainModule):
                 del LatexBuddy.instance.errors[uid]
 
         LOG.debug(
-            f"Finished whitelist-check in {round(time.perf_counter() - start_time, 2)} "
-            f"seconds",
+            f"Finished whitelist-check in "
+            f"{round(time.perf_counter() - start_time, 2)} seconds",
         )
 
     @staticmethod
-    def add_to_whitelist(uid):
+    def add_to_whitelist(uid: str) -> None:
         """Adds the error identified by the given UID to the whitelist.
 
-        Afterwards this method deletes all other errors that are the same as the one
-        just whitelisted.
+        Afterwards this method deletes all other errors that are
+        the same as the one just whitelisted.
 
         :param uid: the UID of the error to be deleted
         """
@@ -201,7 +211,8 @@ class LatexBuddy(MainModule):
         added_key = LatexBuddy.instance.errors[uid].key
         del LatexBuddy.instance.errors[uid]
 
-        # check if there are other errors equal to the one just added to the whitelist
+        # check if there are other errors equal to the one just added
+        # to the whitelist
         uids = list(LatexBuddy.instance.errors.keys())
         for curr_uid in uids:
             if LatexBuddy.instance.errors[curr_uid].key == added_key:
@@ -233,7 +244,7 @@ class LatexBuddy(MainModule):
                 f"{round(time.perf_counter() - start_time, 2)} seconds",
             )
 
-        tools.execute_no_exceptions(
+        latexbuddy.tools.execute_no_exceptions(
             lambda_function,
             error_occurred_in_module(module.display_name),
             "DEBUG",
@@ -242,7 +253,7 @@ class LatexBuddy(MainModule):
         return result
 
     @staticmethod
-    def run_tools():
+    def run_tools() -> None:
         """Runs all modules in the LaTeXBuddy toolchain in parallel."""
 
         language = LatexBuddy.instance.cfg.get_config_option_or_default(
@@ -281,20 +292,13 @@ class LatexBuddy(MainModule):
             for problem in problems:
                 LatexBuddy.instance.add_error(problem)
 
-        # FOR TESTING ONLY
-        # LatexBuddy.instance.check_whitelist()
-        # keys = list(LatexBuddy.instance.errors.keys())
-        # for key in keys:
-        #     LatexBuddy.instance.add_to_whitelist(key)
-        #     return
-
     @staticmethod
-    def output_json():
+    def output_json() -> None:
         """Writes all the current problem objects to the output file."""
 
         list_of_problems = []
 
-        for problem_uid in LatexBuddy.instance.errors.keys():
+        for problem_uid in LatexBuddy.instance.errors:
             list_of_problems.append(LatexBuddy.instance.errors[problem_uid])
 
         json_output_path = Path(
@@ -309,7 +313,7 @@ class LatexBuddy(MainModule):
         )
 
     @staticmethod
-    def output_html():
+    def output_html() -> None:
         """Renders all current problem objects as HTML and writes the file."""
 
         # importing this here to avoid circular import error
@@ -328,9 +332,11 @@ class LatexBuddy(MainModule):
                 LatexBuddy.instance.tex_file.tex,
                 LatexBuddy.instance.errors,
                 LatexBuddy.instance.path_list,
+                # TODO: this should be the path (str) where the PDF file
+                #  is located
                 str(
                     LatexBuddy.instance.tex_file.pdf_file,
-                ),  # TODO: this should be the path (str) where the pdf file is located
+                ),
             ),
         )
 
@@ -339,8 +345,7 @@ class LatexBuddy(MainModule):
         )
 
     @staticmethod
-    def output_flask_html():
-
+    def output_flask_html() -> None:
         # importing this here to avoid circular import error
         from latexbuddy.output import render_flask_html
 
@@ -357,9 +362,11 @@ class LatexBuddy(MainModule):
                 LatexBuddy.instance.tex_file.tex,
                 LatexBuddy.instance.errors,
                 LatexBuddy.instance.path_list,
+                # TODO: this should be the path (str) where the PDF file
+                #  is located
                 str(
                     LatexBuddy.instance.tex_file.pdf_file,
-                ),  # TODO: this should be the path (str) where the pdf file is located
+                ),
             ),
         )
 
@@ -368,7 +375,7 @@ class LatexBuddy(MainModule):
         )
 
     @staticmethod
-    def output_file():
+    def output_file() -> None:
         """Writes all current problems to the specified output file."""
 
         if LatexBuddy.instance.output_format == "JSON":

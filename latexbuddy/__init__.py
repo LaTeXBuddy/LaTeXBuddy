@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging.handlers
 
 import latexbuddy.tools
-from latexbuddy import colour
 from latexbuddy.logging_formatter import ConsoleFormatter
 
 # package metadata
@@ -24,7 +23,11 @@ _VERBOSITY_TO_LOG_LEVEL = {
 }
 
 
-def configure_logging(verbosity: int = 0, enable_colour: bool = True) -> None:
+def configure_logging(
+    verbosity: int = 0,
+    *,
+    enable_colour: bool = True,
+) -> None:
     """Configures :py:mod:`logging`.
 
     This method adds the correct :py:class:`logging.Handler`s and
@@ -40,7 +43,8 @@ def configure_logging(verbosity: int = 0, enable_colour: bool = True) -> None:
     :param enable_colour: whether to make the output coloured
     """
     if verbosity < 0:
-        raise ValueError("verbosity level cannot be negative")
+        _msg = "Verbosity level cannot be negative"
+        raise ValueError(_msg)
     verbosity = min(verbosity, max(_VERBOSITY_TO_LOG_LEVEL))
 
     latexbuddy.tools.dirs.user_log_path.mkdir(parents=True, exist_ok=True)

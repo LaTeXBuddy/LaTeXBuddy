@@ -21,7 +21,7 @@ class ConsoleFormatter(logging.Formatter):
     colour, ans the message itself.
     """
 
-    def __init__(self, enable_colour: bool = True) -> None:
+    def __init__(self, *, enable_colour: bool = True) -> None:
         super().__init__("%(message)s")
         self.colour: bool = enable_colour
 

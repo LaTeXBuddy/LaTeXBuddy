@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
-import proselint
+from proselint.tools import lint
 
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
@@ -15,11 +16,10 @@ LOG = logging.getLogger(__name__)
 
 
 class ProseLint(Module):
-    def __init__(self):
+    def __init__(self) -> None:
         self.problem_type = "grammar"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
-
         lang = config.get_config_option_or_default(
             LatexBuddy, "language", None,
         )
@@ -30,18 +30,20 @@ class ProseLint(Module):
             )
             return []
 
-        suggestions = proselint.tools.lint(file.plain)
+        suggestions = lint(file.plain)
 
-        result = self.format_errors(suggestions, file)
+        return self.format_errors(suggestions, file)
 
-        return result
-
-    def format_errors(self, suggestions: list, file: TexFile):
+    def format_errors(
+        self,
+        suggestions: list[tuple[str, str, int, int, int, int, int, str, Any]],
+        file: TexFile,
+    ) -> list[Problem]:
         problems = []
         for suggestion in suggestions:
             p_type = suggestion[0]
             description = suggestion[1]
-            # line, col = (suggestion[2] + 1, suggestion[3] + 1)
+            # line, col = (suggestion[2] + 1, suggestion[3] + 1)  # noqa
             start_char = suggestion[4] - 1
             position = file.get_position_in_tex(start_char)
             length = suggestion[6]
@@ -75,6 +77,6 @@ class ProseLint(Module):
         return problems
 
     @staticmethod
-    def get_text(start_char: int, length: int, file: TexFile):
+    def get_text(start_char: int, length: int, file: TexFile) -> str:
         text = file.plain
         return text[start_char: start_char + length]

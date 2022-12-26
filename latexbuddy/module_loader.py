@@ -8,8 +8,9 @@ from abc import ABC
 from abc import abstractmethod
 from pathlib import Path
 from types import ModuleType
+from typing import Callable
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 
@@ -30,8 +31,9 @@ class ModuleProvider(ABC):
 
         :param cfg: ConfigLoader instance containing config options for
                     enabled/disabled tools
-        :return: a list of instances of classes implementing the Module API which have
-                 been enabled in the specified configuration context
+        :return: a list of instances of classes implementing the Module
+                 API which have been enabled in the specified
+                 configuration context
         """
 
 
@@ -47,13 +49,12 @@ class ModuleLoader(ModuleProvider):
         self.directory = directory
 
     def load_selected_modules(self, cfg: ConfigLoader) -> list[Module]:
-
         # importing this here to avoid circular import error
         from latexbuddy.buddy import LatexBuddy
 
         modules = self.load_modules()
 
-        selected = [
+        return [
             module
             for module in modules
             if cfg.get_config_option_or_default(
@@ -62,12 +63,10 @@ class ModuleLoader(ModuleProvider):
                 cfg.get_config_option_or_default(
                     LatexBuddy,
                     "enable-modules-by-default",
-                    True,
+                    default_value=True,
                 ),
             )
         ]
-
-        return selected
 
     def load_modules(self) -> list[Module]:
         """This method loads every module that is found in the ModuleLoader's
@@ -84,8 +83,10 @@ class ModuleLoader(ModuleProvider):
 
             classes = [
                 cls_obj
-                for cls_name, cls_obj in inspect.getmembers(module, inspect.isclass)
-                if cls_obj.__module__ == module.__name__ and Module in cls_obj.mro()
+                for cls_name, cls_obj
+                in inspect.getmembers(module, inspect.isclass)
+                if cls_obj.__module__ == module.__name__
+                and Module in cls_obj.mro()
             ]
 
             for class_obj in classes:
@@ -105,11 +106,9 @@ class ModuleLoader(ModuleProvider):
 
         loaded_modules = []
 
-        for py_file in py_files:
-
+        def make_lambda(file: Path) -> Callable[[], None]:
             def lambda_function() -> None:
-
-                module_path = str(py_file.stem)
+                module_path = str(file.stem)
 
                 LOG.debug(
                     f"Attempting to load module from '{module_path}'",
@@ -117,10 +116,13 @@ class ModuleLoader(ModuleProvider):
                 module = importlib.import_module(module_path)
 
                 loaded_modules.append(module)
+            return lambda_function
 
-            tools.execute_no_exceptions(
-                lambda_function,
-                f"An error occurred while loading module file at {str(py_file)}",
+        for py_file in py_files:
+            latexbuddy.tools.execute_no_exceptions(
+                make_lambda(py_file),
+                f"An error occurred while loading module file at "
+                f"{str(py_file)}",
             )
 
         return loaded_modules
@@ -129,18 +131,20 @@ class ModuleLoader(ModuleProvider):
         """This method finds all .py files within the ModuleLoader's directory
         or any subdirectories and returns a list of their paths.
 
-        :return: a list of all .py files in the ModuleLoader's directory (or subfolders)
+        :return: a list of all Python files in the ModuleLoader's
+                 directory (or subfolders)
         """
 
         if not self.directory.is_dir():
             LOG.warning(
-                f"Specified path '{str(self.directory.absolute())}' is not a directory."
-                f" No modules could be loaded.",
+                f"{str(self.directory.absolute())} is not a directory. "
+                f"No modules could be loaded.",
             )
             return []
 
         LOG.debug(
-            f"Searching for .py-files in directory '{str(self.directory.absolute())}'",
+            f"Searching for Python files inside "
+            f"'{str(self.directory.absolute())}'",
         )
 
         files = sorted(self.directory.rglob("*.py"))
