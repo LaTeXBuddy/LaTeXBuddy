@@ -309,10 +309,16 @@ def get_all_paths_in_document(file_path: Path) -> list[Path]:
     unchecked_files: list[Path] = []
     checked_files: list[Path] = []
     unchecked_files.append(file_path)
-    root_dir = str(file_path.parent)
 
     while len(unchecked_files) > 0:
-        unchecked_file = convert_file_to_absolute(unchecked_files, root_dir)
+        unchecked_file = unchecked_files.pop(0)
+        if not (
+            unchecked_file.is_absolute()
+            or str(unchecked_file).startswith("~")
+        ):
+            unchecked_file = file_path.parent / unchecked_file.name
+        unchecked_file = texify_path(str(unchecked_file))
+
         try:
             lines = unchecked_file.read_text().splitlines(keepends=False)
         except FileNotFoundError:
@@ -337,22 +343,6 @@ def get_all_paths_in_document(file_path: Path) -> list[Path]:
         checked_files.append(unchecked_file)
 
     return checked_files
-
-
-def convert_file_to_absolute(
-    unchecked_files: list[Path],
-    root_dir: str,
-) -> Path:
-    """Converts a relative path to an absolute if needed.
-
-    :param unchecked_files: the list of unchecked_files
-    :param root_dir: the root directory
-    :return: the absolute path
-    """
-    unchecked_file = unchecked_files.pop(0)
-    if not (str(unchecked_file)[:2] == "~/" or str(unchecked_file)[0] == "/"):
-        unchecked_file = Path(root_dir + "/" + str(unchecked_file))
-    return texify_path(str(unchecked_file))
 
 
 def match_lines(
