@@ -1,4 +1,4 @@
-# LaTeXBuddy - a LaTeX checking tool
+# LaTeXBuddy ChkTeX checker
 # Copyright (C) 2021-2022  LaTeXBuddy
 #
 # This program is free software: you can redistribute it and/or modify
