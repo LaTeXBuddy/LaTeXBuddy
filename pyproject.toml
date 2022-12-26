@@ -64,5 +64,34 @@ ignore = ["W503"]
 line-length = 79
 target-version = "py37"
 
+select = [
+    "F",  # pyflakes
+    "E", "W",  # pycodestyle
+    "C90",  # mccabe
+    # TODO: complete docs in a separate issue
+#    "D1", "D3",  # pydocstyle
+    "N",  # pep8-naming
+    "S",  # bandit
+    "BLE",  # flake8-blind-except
+    "FBT",  # flake8-boolean-trap
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "EM",  # flake8-errmsg
+    "ICN",  # flake8-import-conventions
+    "T20",  # flake8-print
+    "Q",  # flake8-quotes
+    "RET",  # flake8-return
+    "SIM",  # flake8-simplify
+    "ERA",  # eradicate
+    "PLC", "PLE", "PLR", "PLW",  # pylint
+]
+
+[tool.ruff.mccabe]
+# TODO: eventually reduce back to 10
+max-complexity = 15
+
 [tool.ruff.flake8-import-conventions.aliases]
 multiprocessing = "mp"
+
+[tool.ruff.flake8-quotes]
+inline-quotes = "double"
