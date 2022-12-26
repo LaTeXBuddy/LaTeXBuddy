@@ -69,6 +69,7 @@ repos:
       - id: ruff
         # Respect `exclude` and `extend-exclude` settings.
         args: ["--force-exclude"]
+        files: ^latexbuddy/
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: "v0.991"
     hooks:
@@ -86,3 +87,4 @@ repos:
           - types-chardet
           - types-colorama
           - types-requests
+        files: ^latexbuddy/
