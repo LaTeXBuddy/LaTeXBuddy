@@ -317,7 +317,11 @@ def get_all_paths_in_document(file_path: Path) -> list[Path]:
             or str(unchecked_file).startswith("~")
         ):
             unchecked_file = file_path.parent / unchecked_file.name
-        unchecked_file = texify_path(str(unchecked_file))
+
+        if unchecked_file.suffix != ".tex":
+            with_tex = Path(f"{unchecked_file}.tex")
+            if with_tex.exists():
+                unchecked_file = with_tex
 
         try:
             lines = unchecked_file.read_text().splitlines(keepends=False)
@@ -369,18 +373,6 @@ def match_lines(
             if match not in unchecked_files and match not in checked_files:
                 unchecked_files.append(match)
     return unchecked_files
-
-
-def texify_path(path: str) -> Path:
-    """Adds .tex to a file path if needed.
-
-    :param path: the path
-    :return: the texified path
-    """
-    if not path.endswith(".tex"):
-        if Path(path + ".tex").exists():
-            return Path(path + ".tex")
-    return Path(path)
 
 
 class classproperty(property):  # noqa N801
