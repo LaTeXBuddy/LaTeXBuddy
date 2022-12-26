@@ -87,8 +87,7 @@ select = [
 ]
 
 [tool.ruff.mccabe]
-# TODO: eventually reduce back to 10
-max-complexity = 15
+max-complexity = 10
 
 [tool.ruff.flake8-import-conventions.aliases]
 multiprocessing = "mp"
