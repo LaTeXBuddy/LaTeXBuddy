@@ -56,7 +56,7 @@ def config_file(tmp_path: Path, resources_dir: Path) -> Path:
     config_file.write_text(
         _CONFIG_FILE_CONTENTS.replace(
             "<DRIVERS>",
-            str((resources_dir / "driver_modules").absolute()),
+            str((resources_dir / "driver_modules").resolve()),
         ),
     )
     return config_file
@@ -84,12 +84,12 @@ def test_running_cli(
     """
     args = [
         "--config",
-        str(config_file.absolute()),
+        str(config_file.resolve()),
         "--whitelist",
-        str(empty_whitelist_file.absolute()),
+        str(empty_whitelist_file.resolve()),
         "--output",
-        str(output_dir.absolute()),
-        str(document.absolute()),
+        str(output_dir.resolve()),
+        str(document.resolve()),
     ]
 
     return_code = latexbuddy.cli.main(args)

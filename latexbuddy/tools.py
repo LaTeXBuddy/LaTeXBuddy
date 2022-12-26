@@ -309,10 +309,20 @@ def get_all_paths_in_document(file_path: Path) -> list[Path]:
     unchecked_files: list[Path] = []
     checked_files: list[Path] = []
     unchecked_files.append(file_path)
-    root_dir = str(file_path.parent)
 
     while len(unchecked_files) > 0:
-        unchecked_file = convert_file_to_absolute(unchecked_files, root_dir)
+        unchecked_file = unchecked_files.pop(0)
+        if not (
+            unchecked_file.is_absolute()
+            or str(unchecked_file).startswith("~")
+        ):
+            unchecked_file = file_path.parent / unchecked_file.name
+
+        if unchecked_file.suffix != ".tex":
+            with_tex = Path(f"{unchecked_file}.tex")
+            if with_tex.exists():
+                unchecked_file = with_tex
+
         try:
             lines = unchecked_file.read_text().splitlines(keepends=False)
         except FileNotFoundError:
@@ -339,22 +349,6 @@ def get_all_paths_in_document(file_path: Path) -> list[Path]:
     return checked_files
 
 
-def convert_file_to_absolute(
-    unchecked_files: list[Path],
-    root_dir: str,
-) -> Path:
-    """Converts a relative path to an absolute if needed.
-
-    :param unchecked_files: the list of unchecked_files
-    :param root_dir: the root directory
-    :return: the absolute path
-    """
-    unchecked_file = unchecked_files.pop(0)
-    if not (str(unchecked_file)[:2] == "~/" or str(unchecked_file)[0] == "/"):
-        unchecked_file = Path(root_dir + "/" + str(unchecked_file))
-    return texify_path(str(unchecked_file))
-
-
 def match_lines(
     lines: list[str],
     unchecked_files: list[Path],
@@ -363,8 +357,8 @@ def match_lines(
     """Matches the lines with the given regexes.
 
     :param lines: the lines
-    :unchecked_files: the unchecked_files
-    :checked_files: the checked_files
+    :param unchecked_files: the unchecked_files
+    :param checked_files: the checked_files
     :return: the unchecked_files
     """
     for line in lines:
@@ -379,18 +373,6 @@ def match_lines(
             if match not in unchecked_files and match not in checked_files:
                 unchecked_files.append(match)
     return unchecked_files
-
-
-def texify_path(path: str) -> Path:
-    """Adds .tex to a file path if needed.
-
-    :param path: the path
-    :return: the texified path
-    """
-    if not path.endswith(".tex"):
-        if Path(path + ".tex").exists():
-            return Path(path + ".tex")
-    return Path(path)
 
 
 class classproperty(property):  # noqa N801
