@@ -18,8 +18,8 @@ def not_found(executable: str, to_install: str) -> str:
 
 def error_occurred_in_module(module_name: str) -> str:
     return (
-        f"An error occurred while executing checks for module '{module_name}' "
-        f"resulting in the module stopping execution and not providing any results"
+        f"An error occurred while executing checks for module '{module_name}'."
+        f" Executions was stopped, no results generated."
     )
 
 

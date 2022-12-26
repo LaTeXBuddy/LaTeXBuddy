@@ -1,17 +1,21 @@
 """This module describes the LaTeXBuddy Problem class and its properties.
 
-*Problems* are found by *Checkers*. *Checkers* are free to implement their own Problem
-types, however LaTeXBuddy will most probably not display extra metadata.
+*Problems* are found by *Checkers*. *Checkers* are free to implement their own
+:class:`~latexbuddy.problem.Problem` types, however, LaTeXBuddy will most
+surely not display extra metadata.
 """
 from __future__ import annotations
 
 import logging
 import time
+import typing
 from enum import Enum
 from functools import total_ordering
 from json import JSONEncoder
 from pathlib import Path
-from typing import Any
+
+if typing.TYPE_CHECKING:
+    from latexbuddy.modules import NamedModule
 
 
 LOG = logging.getLogger(__name__)
@@ -23,21 +27,24 @@ language = None  # static variable used for a uniform key generation
 class ProblemSeverity(Enum):
     """Defines possible problem severity grades.
 
-    Problem severity is usually preset by the checkers themselves. However, a user
-    should be able to redefine the severity of a specific problem, using either
-    category, key, or p_type.
+    Problem severity is usually preset by the checkers themselves.
+    However, a user should be able to redefine the severity of a
+    specific problem, using either ``category``, ``key``, or
+    ``p_type``.
 
-    * "none" problems are not being highlighted, but are still being output.
-    * "info" problems are highlighted with light blue colour. These are suggestions;
-      problems, that aren't criticising the text.
+    * ``"none"`` problems are not being highlighted, but are still
+      being output.
+    * ``"info"`` problems are highlighted with light blue colour. These
+      are suggestions; problems, that aren't criticising the text.
       Example: suggestion to use "lots" instead of "a lot"
-    * "warning" problems are highlighted with orange colour. These are warnings about
-      problematic areas in documents. The files compile and work as expected, but some
-      behaviour may be unacceptable.
+    * ``"warning"`` problems are highlighted with orange colour. These
+      are warnings about problematic areas in documents. The files
+      compile and work as expected, but some behaviour may be
+      unacceptable.
       Example: warning about using "$$" in LaTeX
-    * "error" problems are highlighted with red colour. These are errors, that prevent
-      the documents to compile correctly.
-      Example: not closed environment, or wrong LaTeX syntax
+    * ``"error"`` problems are highlighted with red colour. These are
+      errors, that prevent the documents to compile correctly.
+      Example: not closed environment, or plain wrong LaTeX syntax
     """
 
     NONE = 0
@@ -73,13 +80,11 @@ class Problem:
     word.
     """
 
-    # TODO: resolve circular import error with modules.__init__.py in order to have
-    #       type hints for attribute 'checker'
     def __init__(
         self,
         position: tuple[int, int] | None,
         text: str,
-        checker,  # : Union[Type[NamedModule], NamedModule],
+        checker: type[NamedModule] | NamedModule,
         file: Path,
         severity: ProblemSeverity = ProblemSeverity.WARNING,
         p_type: str | None = None,
@@ -90,27 +95,32 @@ class Problem:
         suggestions: list[str] | None = None,
         key: str | None = None,
     ):
-        """
+        """Initializes a Problem object.
 
-        :param position: position of the problem in the source file, encoded as
-                         `(line, column)`.
-        :param length: the length of the problematic text.
-        :param text: problematic text.
-        :param checker: type or instance of the tool that discovered the problem.
-        :param p_type: ID of the problem type, used inside the respective checker.
-        :param file: **[DEPRECATED]** path to the file where the problem was found
-        :param severity: severity of the problem.
-        :param category: category of the problem, for example "grammar".
-        :param description: description of the problem.
-        :param context: optional context of the problem, that is, text that comes before
-                        and after the problematic text.
-        :param suggestions: list of suggestions, that is, possible replacements for
-                            problematic text.
-        :param key: semi-unique string, which can be used to compare two problems. Will
-                    be used for entries in the whitelist
-
+        :param position: position of the problem in the source file,
+                         encoded as ``(line, column)``
+        :param length: the length of the problematic text
+        :param text: problematic text
+        :param checker: type or instance of the tool that discovered
+                        the problem
+        :param p_type: ID of the problem type, used inside the
+                       respective checker
+        :param file: **[DEPRECATED]** path to the file where the
+                     problem was found
+        :param severity: severity of the problem
+        :param category: category of the problem, for example "grammar"
+        :param description: description of the problem
+        :param context: optional context of the problem, that is, text
+                        that comes before and after the problematic
+                        text
+        :param suggestions: list of suggestions, that is, possible
+                            replacements for problematic text
+        :param key: semi-unique string, which can be used to compare
+                    two problems. Will be used for entries in the
+                    whitelist
         """
-        # TODO: maybe move the defaults to the params, or was there a specific reason?
+        # TODO: maybe move the defaults to the params, or was there a specific
+        #  reason?
 
         # importing these here to avoid circular import error
         from latexbuddy.buddy import LatexBuddy
@@ -138,9 +148,9 @@ class Problem:
 
         if position is not None and len(text) < 1:
             LOG.warning(
-                f"A Problem created by {self.checker} has a non-None position, but "
-                f"does not have a problematic text with length > 0. It will be "
-                f"converted to a general problem without a position...",
+                f"A problem reported by {self.checker} includes position "
+                f"data, but does not specify the problematic code. It will be "
+                f"displayed as a general problem without a position.",
             )
             self.position = None
 
@@ -179,17 +189,21 @@ class Problem:
     def __generate_key(self, key) -> str:
         """Generates a key for the problem based on language and the given key.
 
-        Major difference for this method is if the module that created this problem
-        instance has supplied a key or not.
+        Major difference for this method is if the module that created
+        this problem instance has supplied a key or not.
 
-        :param key: key generated and given by the checker module, None if not supplied
+        :param key: key generated and given by the checker module,
+                    ``None`` if not supplied
         :return: final generated key
         """
         if key is None:
-            # TODO: maybe remove automatic key generation altogether and default to None
+            # TODO: maybe remove automatic key generation altogether and
+            #  default to `None`
             space = " "
             minus = "-"
-            key = f"{self.checker}_{self.p_type}_{self.text.replace(space, minus)}"
+            key = f"{self.checker}_" \
+                  f"{self.p_type}_" \
+                  f"{self.text.replace(space, minus)}"
 
         # add language to the key if its a spelling or grammar error
         if language is not None and (
@@ -244,9 +258,8 @@ class Problem:
 class ProblemJSONEncoder(JSONEncoder):
     """Provides JSON serializability for class Problem."""
 
-    def default(self, obj: Any):
-
-        if type(obj) == Problem:
+    def default(self, obj: typing.Any):
+        if isinstance(obj, Problem):
 
             return {
                 "position": obj.position,

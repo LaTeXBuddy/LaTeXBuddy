@@ -24,8 +24,10 @@ class Aspell(Module):
 
         Requires Aspell to be set up.
 
-        :param config: the configuration options of the calling LaTeXBuddy instance
-        :param file: LaTeX file to be checked (with built-in detex option)
+        :param config: the configuration options of the calling
+                       LaTeXBuddy instance
+        :param file: LaTeX file to be checked (with built-in detex
+                     option)
         """
 
         tools.find_executable("aspell", "GNU Aspell", LOG)
@@ -70,14 +72,15 @@ class Aspell(Module):
                     out.pop()  # remove last element
                 error_list.extend(self.format_errors(out, counter, file))
 
-            counter += 1  # if there is an empty line, just increase the counter
+            # if there is an empty line, just increase the counter
+            counter += 1
 
         return error_list
 
     @staticmethod
     def find_languages() -> list[str]:
         """Returns all languages supported by the current aspell installation.
-        Omits specific language variations like 'en-variant_0'.
+        Omits specific language variations like 'en- variant_0'.
 
         :return: list of supported languages in str format
         """

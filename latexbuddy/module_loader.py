@@ -30,8 +30,9 @@ class ModuleProvider(ABC):
 
         :param cfg: ConfigLoader instance containing config options for
                     enabled/disabled tools
-        :return: a list of instances of classes implementing the Module API which have
-                 been enabled in the specified configuration context
+        :return: a list of instances of classes implementing the Module
+                 API which have been enabled in the specified
+                 configuration context
         """
 
 
@@ -47,7 +48,6 @@ class ModuleLoader(ModuleProvider):
         self.directory = directory
 
     def load_selected_modules(self, cfg: ConfigLoader) -> list[Module]:
-
         # importing this here to avoid circular import error
         from latexbuddy.buddy import LatexBuddy
 
@@ -84,8 +84,10 @@ class ModuleLoader(ModuleProvider):
 
             classes = [
                 cls_obj
-                for cls_name, cls_obj in inspect.getmembers(module, inspect.isclass)
-                if cls_obj.__module__ == module.__name__ and Module in cls_obj.mro()
+                for cls_name, cls_obj
+                in inspect.getmembers(module, inspect.isclass)
+                if cls_obj.__module__ == module.__name__
+                and Module in cls_obj.mro()
             ]
 
             for class_obj in classes:
@@ -108,7 +110,6 @@ class ModuleLoader(ModuleProvider):
         for py_file in py_files:
 
             def lambda_function() -> None:
-
                 module_path = str(py_file.stem)
 
                 LOG.debug(
@@ -120,7 +121,8 @@ class ModuleLoader(ModuleProvider):
 
             tools.execute_no_exceptions(
                 lambda_function,
-                f"An error occurred while loading module file at {str(py_file)}",
+                f"An error occurred while loading module file at "
+                f"{str(py_file)}",
             )
 
         return loaded_modules
@@ -129,18 +131,20 @@ class ModuleLoader(ModuleProvider):
         """This method finds all .py files within the ModuleLoader's directory
         or any subdirectories and returns a list of their paths.
 
-        :return: a list of all .py files in the ModuleLoader's directory (or subfolders)
+        :return: a list of all Python files in the ModuleLoader's
+                 directory (or subfolders)
         """
 
         if not self.directory.is_dir():
             LOG.warning(
-                f"Specified path '{str(self.directory.absolute())}' is not a directory."
-                f" No modules could be loaded.",
+                f"{str(self.directory.absolute())} is not a directory. "
+                f"No modules could be loaded.",
             )
             return []
 
         LOG.debug(
-            f"Searching for .py-files in directory '{str(self.directory.absolute())}'",
+            f"Searching for Python files inside "
+            f"'{str(self.directory.absolute())}'",
         )
 
         files = sorted(self.directory.rglob("*.py"))

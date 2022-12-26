@@ -20,14 +20,12 @@ LOG = logging.getLogger(__name__)
 
 
 class Diction(Module):
-
     __SUPPORTED_LANGUAGES = ["en", "de", "nl"]
 
     def __init__(self):
         self.language = None
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
-
         # check, if diction is installed
         tools.find_executable("diction", "Diction", LOG)
 
@@ -52,7 +50,9 @@ class Diction(Module):
 
         # execute diction and collect output
         errors = tools.execute(
-            f"diction --suggest --language {self.language} {str(cleaned_file)}",
+            f"diction --suggest "
+            f"--language {self.language} "
+            f"{str(cleaned_file)}",
         )
 
         # remove unnecessary information and split lines
@@ -89,7 +89,8 @@ class Diction(Module):
         """Parses diction errors and returns list of Problems.
 
         :param original: lines of file to check as list
-        :param out: line split output of the diction command with empty lines removed
+        :param out: line split output of the diction command with empty
+                    lines removed
         :param file: the file path
         """
         problems = []

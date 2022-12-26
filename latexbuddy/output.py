@@ -8,7 +8,6 @@ from jinja2 import Environment
 from jinja2 import PackageLoader
 from jinja2 import Template
 
-from latexbuddy.buddy import LatexBuddy
 from latexbuddy.problem import Problem
 from latexbuddy.problem import ProblemSeverity
 
@@ -98,8 +97,8 @@ def render_general_html(
     if not Path(pdf_path).exists():
         pdf_path = None
     else:
-        # TODO: temporary fix, might cause issues if another "compiled" directory
-        #  is in pdf_path
+        # TODO: temporary fix, might cause issues if another "compiled"
+        #  directory is in pdf_path
         cut_path = pdf_path.find("compiled")
         if -1 < cut_path:
             pdf_path = pdf_path[pdf_path.find("compiled"):]
@@ -122,7 +121,9 @@ def render_general_html(
     )
 
 
-def sort_problems(problems: dict[str, Problem]) -> tuple[list[Problem], list[Problem]]:
+def sort_problems(
+    problems: dict[str, Problem],
+) -> tuple[list[Problem], list[Problem]]:
     problem_values = sorted(problems.values(), key=problem_key)
     general_problems = [
         problem for problem in problem_values if problem_key(problem) < 0
@@ -156,32 +157,17 @@ def calculate_line_numbers(file_text: str) -> list[str]:
 
 
 class Interval:
-    """forward declaration to enable type-hinting within class."""
+    """This class describes an interval with problems.
 
-    @property
-    def start(self) -> int:
-        return -1
+    An interval is a section of text, defined byt its start and end
+    positions, that contains :class:`~latexbuddy.problem.Problem`
+    objects.
 
-    @property
-    def end(self) -> int:
-        return -1
+    :param problems: list of problems on the interval
+    :param start: start symbol of the interval
+    :param end: end symbol of the interval
+    """
 
-    @property
-    def severity(self) -> int:
-        return -1
-
-    @property
-    def problems(self):
-        return []
-
-    def intersects(self, other):
-        return False
-
-    def perform_intersection(self, other):
-        return None
-
-
-class Interval:
     def __init__(
         self,
         problems: Problem | list[Problem],
@@ -310,16 +296,16 @@ def highlight(tex: str, problems: list[Problem]) -> str:
     return "\n".join(tex_lines) + "\n"
 
 
-def create_empty_line_interval_list(tex_lines: list[str]) -> list[list[Interval]]:
+def create_empty_line_interval_list(lines: list[str]) -> list[list[Interval]]:
     """Creates and returns a list of (empty) lists of Intervals. The outer list
     will contain exactly len(tex_lines) + 1 empty lists.
 
-    :param tex_lines: individual lines of a .tex-file as a list of strings
+    :param lines: individual lines of a .tex-file as a list of strings
     :returns: a list of empty lists that meet the specified dimensions
     """
 
     line_intervals: list[list[Interval]] = []
-    for _ in tex_lines:
+    for _ in lines:
         line_intervals.append([])
 
     # when parsing, yalafi often marks the n+1'th line as erroneous
@@ -350,12 +336,13 @@ def add_basic_problem_intervals(
         if problem.length == 0:
             continue
 
-        # FIXME: split intervals, if they encompass a latex command which has been
-        #  removed in the detex process (issue #58)
+        # FIXME: split intervals, if they encompass a latex command which has
+        #  been removed in the detex process (issue #58)
         line = problem.position[0] - 1
         interval = Interval(problem)
 
-        # move the interval down the lines until their start index is actually included
+        # move the interval down the lines until their start index is actually
+        # included
         while interval.start > len(tex_lines[line]):
             interval = Interval(
                 problem,
@@ -385,10 +372,11 @@ def add_basic_problem_intervals(
 
 
 def resolve_interval_intersections(intervals: list[Interval]) -> None:
-    """Finds any intersecting intervals and replaces them with non-intersecting
-    intervals that may contain more than one problem.
+    """Finds any intersecting intervals and replaces them with non-
+    intersecting intervals that may contain more than one problem.
 
-    :param intervals: list of intervals in one line to be checked for intersections
+    :param intervals: list of intervals in one line to be checked for
+                      intersections
     """
 
     if len(intervals) < 2:
@@ -421,32 +409,41 @@ def resolve_interval_intersections(intervals: list[Interval]) -> None:
 
 
 def mark_intervals_in_tex(
-    tex_lines: list[str],
+    lines: list[str],
     line_intervals: list[list[Interval]],
 ) -> None:
-    """Adds HTML marker-tags (span) for every interval in line_intervals to the
-    respective line in tex_lines and escapes all HTML control characters in
-    tex_lines.
+    """Adds HTML marker-tags for every interval in multiple lines of TeX code.
 
-    :param tex_lines: text lines from the .tex-file
-    :param line_intervals: list of non-intersecting intervals to be marked for every
-                           line in tex_lines
+    For every line in ``lines``, and for every interval in
+    ``line_intervals`` for the respective line, this method wraps it
+    with ``<span>`` tags and returns the resulting line. This method
+    also escapes all HTML control characters included in ``tex_line``.
+
+    It basically calls :func:`.mark_intervals_in_tex_line`, but the
+    lines are modified in-place.
+
+    :param lines: lines from the TeX file
+    :param line_intervals: list of non-intersecting intervals to be
+                           highlighted for every line
     """
 
-    for i in range(len(tex_lines)):
-        tex_lines[i] = mark_intervals_in_tex_line(
-            tex_lines[i], line_intervals[i],
+    for i in range(len(lines)):
+        lines[i] = mark_intervals_in_tex_line(
+            lines[i], line_intervals[i],
         )
 
 
-def mark_intervals_in_tex_line(tex_line: str, intervals: list[Interval]) -> str:
-    """Adds HTML marker-tags (span) for every interval in intervals to the
-    respective tex_line string and returns the resulting line. This method also
-    escapes all HTML control characters included in tex_line.
+def mark_intervals_in_tex_line(line: str, intervals: list[Interval]) -> str:
+    """Adds HTML marker-tags for every interval in a line of TeX code.
 
-    :param tex_line: line from the .tex-file
-    :param intervals: list of non-intersecting intervals to be highlighted in the line
-    :returns: resulting line as a string, containing HTML span tags
+    For every interval in ``intervals``, this method wraps it with
+    ``<span>`` tags and returns the resulting line. This method also
+    escapes all HTML control characters included in ``tex_line``.
+
+    :param line: line from the TeX file
+    :param intervals: list of non-intersecting intervals to be
+                      highlighted in the line
+    :returns: resulting line as a string, containing ``<span>`` tags
     """
 
     offset: int = 0
@@ -456,9 +453,9 @@ def mark_intervals_in_tex_line(tex_line: str, intervals: list[Interval]) -> str:
         start: int = interval.start + offset - 1
         end: int = interval.end + offset - 1
 
-        preface = tex_line[:start]
-        content = tex_line[start:end]
-        appendix = tex_line[end:]
+        preface = line[:start]
+        content = line[start:end]
+        appendix = line[end:]
 
         escaped_content = escape(content)
         escaped_preface = escape(preface) if i == 0 else preface
@@ -466,7 +463,7 @@ def mark_intervals_in_tex_line(tex_line: str, intervals: list[Interval]) -> str:
             if i == len(intervals) - 1 \
             else appendix
 
-        tex_line = (
+        line = (
             f"{escaped_preface}"
             f"{open_tag}{escaped_content}{close_tag}"
             f"{escaped_appendix}"
@@ -477,16 +474,17 @@ def mark_intervals_in_tex_line(tex_line: str, intervals: list[Interval]) -> str:
         offset += len(escaped_content) - len(content)
         offset += len(escaped_appendix) - len(appendix)
 
-    return tex_line
+    return line
 
 
 def generate_wrapper_html_tags(interval: Interval) -> tuple[str, str]:
-    """Generates and returns a pair of HTML span tags to wrap the text in the
-    specified interval.
+    """Generates and returns a pair of HTML ``<span>`` tags to wrap the text in
+    the specified interval.
 
-    :param interval: interval, specifying the position and metadata of the tags
-    :returns: a tuple of two strings, containing an opening and a closing span tag for
-              the specified interval object
+    :param interval: interval, specifying the position and metadata of
+                     the tags
+    :returns: a tuple of two strings, containing an opening and
+              a closing ``<span>`` tag for the specified interval object
     """
 
     # escape HTML control sequences and remove possible invalid linebreaks
@@ -500,6 +498,6 @@ def generate_wrapper_html_tags(interval: Interval) -> tuple[str, str]:
         f"onclick=\"jumpTo('{lid}')\""
         f">"
     )
-    closing_tag = f"</span>"
+    closing_tag = "</span>"
 
     return opening_tag, closing_tag

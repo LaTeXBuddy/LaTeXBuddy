@@ -27,8 +27,10 @@ class Chktex(Module):
 
         Requires chktex to be installed separately
 
-        :param config: the configuration options of the calling LaTeXBuddy instance
-        :param file: LaTeX file to be checked (with built-in detex option)
+        :param config: the configuration options of the calling
+                       LaTeXBuddy instance
+        :param file: LaTeX file to be checked (with built-in detex
+                     option)
         """
 
         tools.find_executable("chktex", "ChkTeX", LOG)
@@ -74,7 +76,7 @@ class Chktex(Module):
             )
             row = int(out_split[1])
             col = int(out_split[2])
-            length = int(out_split[3])  # not used for now
+            # length = int(out_split[3])  # not used for now
             internal_id = out_split[4]
             text = out_split[5]
             description = out_split[6] if len(out_split[6]) > 0 else None

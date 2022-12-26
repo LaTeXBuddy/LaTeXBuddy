@@ -66,8 +66,10 @@ class LanguageTool(Module):
         Requires LanguageTool (server) to be set up.
         Local or global servers can be used.
 
-        :param config: the configuration options of the calling LaTeXBuddy instance
-        :param file: LaTeX file to be checked (with built-in detex option)
+        :param config: the configuration options of the calling
+                       LaTeXBuddy instance
+        :param file: LaTeX file to be checked (with built-in detex
+                     option)
         """
 
         cfg_mode = config.get_config_option_or_default(
@@ -325,8 +327,8 @@ class LanguageTool(Module):
             return response.json()
         except JSONDecodeError:
             LOG.error(
-                f"Could not decode the following POST response in JSON format: "
-                f"{response.text}",
+                f"Could not decode the following POST response in JSON format:"
+                f" {response.text}",
             )
             return None
 
@@ -435,8 +437,10 @@ class LanguageTool(Module):
     ) -> list[str]:
         """Converts LanguageTool's replacements to LaTeXBuddy suggestions list.
 
-        :param json_replacements: list of LT's replacements for a particular word
-        :param max_elements: Caps the number of replacements for the given error
+        :param json_replacements: list of LT's replacements for a
+                                  particular word
+        :param max_elements: max amount of proposed replacements for
+                             the given error
         :return: list of string values of said replacements
         """
         output = []

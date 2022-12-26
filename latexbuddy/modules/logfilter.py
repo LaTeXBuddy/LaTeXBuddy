@@ -59,7 +59,11 @@ class LogFilter(Module):
         raw_problems_path = Path(raw_problems_path)
         return self.format_problems(raw_problems_path, file)
 
-    def format_problems(self, raw_problems_path: Path, file: TexFile) -> list[Problem]:
+    def format_problems(
+        self,
+        raw_problems_path: Path,
+        file: TexFile,
+    ) -> list[Problem]:
         """Formats the output to a List of Problems.
 
         :param raw_problems_path: Path to TexFilt output

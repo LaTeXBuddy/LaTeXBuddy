@@ -75,7 +75,8 @@ def execute_background(*cmd: str) -> subprocess.Popen:
 def kill_background_process(process: subprocess.Popen):
     """Kills previously opened background process.
 
-    For example, it can accept the return value of execute_background() as argument.
+    For example, it can accept the return value of
+    :func:`~latexbuddy.tools.execute_background` as argument.
 
     :param process: subprocess instance of the process
     """
@@ -121,19 +122,25 @@ def find_executable(
     err_logger: Logger = LOG,
     log_errors: bool = True,
 ) -> str:
-    """Finds path to an executable. If the executable can not be located, an
-    error message is logged to the specified logger, otherwise the executable's
-    path is logged as a debug message.
+    """Finds path to an executable.
 
-    This uses 'which', i.e. the executable should at least be in user's $PATH
+    If the executable can not be located, an error message is logged
+    to the specified logger, otherwise the executable's path is logged
+    as a debug message.
+
+    This uses 'which', i.e. the executable should at least be in user's
+    $PATH
 
     :param name: executable name
-    :param to_install: correct name of the program or project which the requested
-                       executable belongs to (used in log messages)
-    :param err_logger: custom logger to be used for logging debug/error messages
-    :param log_errors: specifies whether or not this method should log an error message,
-                       if the executable can not be located; if this is False, a debug
-                       message will be logged instead
+    :param to_install: correct name of the program or project which the
+                       requested executable belongs to (used in log
+                       messages)
+    :param err_logger: custom logger to be used for logging debug/error
+                       messages
+    :param log_errors: specifies whether or not this method should log
+                       an error message, if the executable can not be
+                       located; if this is False, a debug message will
+                       be logged instead
     :return: path to the executable
     :raises FileNotFoundError: if the executable couldn't be found
     """
@@ -144,7 +151,10 @@ def find_executable(
 
         if log_errors:
             err_logger.error(
-                not_found(name, to_install if to_install is not None else name),
+                not_found(
+                    name,
+                    to_install if to_install is not None else name,
+                ),
             )
         else:
             err_logger.debug(
@@ -167,7 +177,10 @@ def find_executable(
 location_re = re.compile(r"line (\d+), column (\d+)")
 
 
-def absolute_to_linecol(text: str, position: int) -> tuple[int, int, list[int]]:
+def absolute_to_linecol(
+    text: str,
+    position: int,
+) -> tuple[int, int, list[int]]:
     """Calculates line and column number for an absolute character position.
 
     :param text: text of file to find line:col position for
@@ -189,14 +202,15 @@ def absolute_to_linecol(text: str, position: int) -> tuple[int, int, list[int]]:
 def get_line_offsets(text: str) -> list[int]:
     """Calculates character offsets for each line in the file.
 
-    Indices correspond to the line numbers, but are 0-based. For example, if first
-    4 lines contain 100 characters (including line breaks), `result[4]` will be 100.
-    `result[0]` = 0.
+    Indices correspond to the line numbers, but are 0-based. For
+    example, if first 4 lines contain 100 characters (including line
+    breaks), `result[4]` will be 100. `result[0]` = 0.
 
     This is a port of YaLaFi's get_line_starts() function.
 
     :param text: contents of file to find offsets for
-    :return: list of line offsets with indices representing 0-based line numbers
+    :return: list of line offsets with indices representing 0-based
+             line numbers
     """
     lines = text.splitlines(keepends=True)
     offset = 0
@@ -212,7 +226,8 @@ def get_line_offsets(text: str) -> list[int]:
 def is_binary(file_bytes: bytes) -> bool:
     """Detects whether the bytes of a file contain binary code or not.
 
-    For correct detection, it is recommended, that at least 1024 bytes were read.
+    For correct detection, it is recommended, that file_bytes is
+    at least 1024 bytes long.
 
     Sources:
       * https://stackoverflow.com/a/7392391/4735420
@@ -233,14 +248,16 @@ def execute_no_exceptions(
 ) -> None:
     """Calls a function and catches any Exception that is raised during this.
 
-    If an Exception is caught, the function is aborted and the error is logged, but as
-    the Exception is caught, the program won't crash.
+    If an Exception is caught, the function is aborted and the error is
+    logged, but as the Exception is caught, the program won't crash.
 
     :param function_call: function to be executed
     :param error_message: custom error message displayed in the console
-    :param traceback_log_level: sets the log_level that is used to log the error
-                                traceback. If it is None, no traceback will be logged.
-                                Valid values are: "DEBUG", "INFO", "WARNING", "ERROR"
+    :param traceback_log_level: sets the log_level that is used to log
+                                the error traceback. If it is None, no
+                                traceback will be logged.
+                                Valid values are: "DEBUG", "INFO",
+                                "WARNING", "ERROR"
     """
 
     try:
@@ -248,7 +265,8 @@ def execute_no_exceptions(
     except Exception as e:
 
         LOG.error(
-            f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}",
+            f"{error_message}:\n{e.__class__.__name__}: "
+            f"{getattr(e, 'message', e)}",
         )
         if traceback_log_level is not None:
 
@@ -291,10 +309,12 @@ def get_all_paths_in_document(file_path: Path) -> list[Path]:
                 ),
             )
             continue
-        except Exception as e:  # If the file cannot be found it is already removed
+        except Exception as e:
+            # If the file cannot be found it is already removed
             error_message = "Error while searching for files"
             LOG.error(
-                f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}",
+                f"{error_message}:\n{e.__class__.__name__}: "
+                f"{getattr(e, 'message', e)}",
             )
             continue
 
@@ -305,7 +325,10 @@ def get_all_paths_in_document(file_path: Path) -> list[Path]:
     return checked_files
 
 
-def convert_file_to_absolute(unchecked_files: list[Path], root_dir: str) -> Path:
+def convert_file_to_absolute(
+    unchecked_files: list[Path],
+    root_dir: str,
+) -> Path:
     """Converts a relative path to an absolute if needed.
 
     :param unchecked_files: the list of unchecked_files

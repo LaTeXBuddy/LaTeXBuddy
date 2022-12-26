@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging.handlers
 
 import latexbuddy.tools
-from latexbuddy import colour
 from latexbuddy.logging_formatter import ConsoleFormatter
 
 # package metadata

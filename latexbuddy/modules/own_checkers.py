@@ -20,8 +20,10 @@ class UnreferencedFigures(Module):
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         """Finds unreferenced figures.
 
-        :param config: the configuration options of the calling LaTeXBuddy instance
-        :param file: LaTeX file to be checked (with built-in detex option)
+        :param config: the configuration options of the calling
+                       LaTeXBuddy instance
+        :param file: LaTeX file to be checked (with built-in detex
+                     option)
         :return: a list of found problems
         """
         tex = file.tex
@@ -113,7 +115,8 @@ class SiUnitx(Module):
                     p_type="num",
                     file=file.tex_file,
                     severity=self.severity,
-                    description=f"For number {number_match.group(0)} \\num from siunitx may be used.",
+                    description=f"For number {number_match.group(0)}, "
+                                f"\\num from siunitx may be used.",
                     key=self.display_name + "_" + number_match.group(0),
                     length=length,
                 ),
@@ -216,7 +219,8 @@ class SiUnitx(Module):
                         p_type="unit",
                         file=file.tex_file,
                         severity=self.severity,
-                        description=f"For unit {unit_match.group(0)} siunitx may be used.",
+                        description=f"For unit {unit_match.group(0)}, "
+                                    f"siunitx may be used.",
                         key=self.display_name + "_" + unit_match.group(0),
                         length=length,
                     ),
@@ -249,7 +253,7 @@ class EmptySections(Module):
                     p_type="0",
                     file=file.tex_file,
                     severity=self.severity,
-                    description=f"Sections may not be empty.",
+                    description="Sections may not be empty.",
                     key=self.display_name + "_" + text,
                     length=length,
                     context=("\\section{", "}"),
@@ -266,8 +270,10 @@ class URLCheck(Module):
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         tex = file.tex
         problems = []
-        # https://stackoverflow.com/questions/6038061/regular-expression-to-find-urls-within-a-string
-        pattern = r"(http|ftp|https)(:\/\/)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
+        # https://stackoverflow.com/q/6038061
+        pattern = r"(http|ftp|https)(:\/\/)" \
+                  r"([\w_-]+(?:(?:\.[\w_-]+)+))" \
+                  r"([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
         urls = re.finditer(pattern, tex)
 
         for url_match in urls:
@@ -287,7 +293,7 @@ class URLCheck(Module):
                     p_type="0",
                     file=file.tex_file,
                     severity=self.severity,
-                    description=f"For URLs use \\url.",
+                    description="For URLs, use \\url.",
                     key=self.display_name + "_" + url_match.group(0),
                     length=length,
                 ),
@@ -296,7 +302,6 @@ class URLCheck(Module):
 
 
 class CheckFigureResolution(Module):
-
     file_endings = [
         ".png",
         ".jpg",
@@ -355,7 +360,8 @@ class CheckFigureResolution(Module):
                         p_type="0",
                         file=file.tex_file,
                         severity=self.severity,
-                        description=f"Figure might have low resolution due to file format {ending}",
+                        description=f"Figure might have low resolution due "
+                                    f"to its file format: {ending}",
                         key=self.display_name + "_" + current_file,
                         length=1,
                     ),
@@ -370,7 +376,8 @@ class NativeUseOfRef(Module):
         self.category = "latex"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
-        description = "Instead of \\ref{} use a more precise command e.g. \\cref{}"
+        description = "Instead of \\ref{} use a more precise command, " \
+                      "for example, \\cref{}"
         tex = file.tex
         problems = []
         ref_pattern = "\\ref{"

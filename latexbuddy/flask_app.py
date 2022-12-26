@@ -6,6 +6,7 @@ import re
 import tempfile
 import zipfile
 from pathlib import Path
+from pathlib import PurePath
 
 from flask import abort
 from flask import Flask
@@ -46,7 +47,6 @@ ALLOWED_EXTENSIONS = [
 
 
 class FlaskConfigLoader(ConfigLoader):
-
     _REGEX_LANGUAGE_FLAG = re.compile(
         r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?",
     )
@@ -65,7 +65,6 @@ class FlaskConfigLoader(ConfigLoader):
             "output": str(output_dir),
             "format": "HTML_FLASK",
             "enable-modules-by-default": True,
-            # "module_dir": "/home/vmuser/PycharmProjects/latexbuddy/latexbuddy/modules/",
             "module_dir": "latexbuddy/modules/",
         }
 
@@ -80,7 +79,8 @@ class FlaskConfigLoader(ConfigLoader):
                 if match.group(2):
                     self.main_flags["language_country"] = match.group(2)
 
-        if module_selector_mode and module_selector_mode in ["blacklist", "whitelist"]:
+        if module_selector_mode \
+                and module_selector_mode in ["blacklist", "whitelist"]:
             self.main_flags["enable-modules-by-default"] = (
                 True if module_selector_mode == "blacklist" else False
             )
@@ -256,11 +256,11 @@ def upload_whitelist():
 
 
 def allowed_file(filename: str) -> bool:
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+    return PurePath(filename).suffix.lower() in ALLOWED_EXTENSIONS
 
 
 def allowed_whitelist_file(filename: str) -> bool:
-    return "." not in filename
+    return len(PurePath(filename).suffixes) == 0
 
 
 def run_buddy(file_path: Path, output_dir: Path, path_list: list[Path]):
@@ -276,10 +276,14 @@ def run_buddy(file_path: Path, output_dir: Path, path_list: list[Path]):
         else None
     )
     module_selection = (
-        request.form["module_selector"] if "module_selector" in request.form else None
+        request.form["module_selector"]
+        if "module_selector" in request.form
+        else None
     )
     whitelist_id = (
-        request.form["whitelist_id"] if "whitelist_id" in request.form else None
+        request.form["whitelist_id"]
+        if "whitelist_id" in request.form
+        else None
     )
 
     config_loader = FlaskConfigLoader(

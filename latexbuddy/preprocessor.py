@@ -13,40 +13,28 @@ from latexbuddy.texfile import TexFile
 LOG = logging.getLogger(__name__)
 
 
-# forward-declare
 class ProblemFilter(ABC):
-    """forward-declaring ProblemFilter because type hints will break
-    otherwise."""
+    """Describes the base class for any problem filter.
 
+    ``ProblemFilter`` provides functionality to define a start and
+    end line and to match a :class:`~latexbuddy.problem.Problem` based
+    on its line position.
 
-class ProblemFilter(ABC):
-    """Describes the base class for any filter for Problem objects.
-    ProblemFilter provides functionality to define a start and end line and to
-    match a problem based on its line position.
+    ``ProblemFilter`` objects can be made "open-ended" by omitting the
+    ``end_line`` parameter. This results in a filter matching any
+    problem located at or below the ``start_line``. Open-ended filters
+    can later be closed by supplying the ``end_line`` via the
+    :meth:`.end` method.
 
-    ProblemFilters can be created open-ended by omitting the end_line parameter
-    resulting in the filter matching any Problem located at or below the start line.
-    Open-ended filters can later be closed by supplying an end line to the end() method.
+    For more diverse filters, ProblemFilter provides the following
+    abstract methods which must be implemented by all subclasses:
+    :meth:`.custom_match` and :meth:`.custom_parameters_equal`.
 
-    For more diverse filters ProblemFilter provides the following abstract methods which
-    must be implemented by all subclasses:
-
-        - custom_match: Matches a problem based on custom parameters. This method is
-                        only called, if a given problem is located within the filter's
-                        line boundaries
-
-        - custom_parameters_equal: determines whether another custom filter is of the
-                                   same type and has all equal custom parameters as the
-                                   current one
+    :param start_line: beginning of the filter's area
+    :param end_line: end of the filter's area (open-ended, if omitted)
     """
 
     def __init__(self, start_line: int, end_line: int | None = None):
-        """Initializes a new ProblemFilter with a start_line and possibly an
-        end_line.
-
-        :param start_line: beginning of the filter's area
-        :param end_line: end of the filter's area (open-ended, if omitted)
-        """
         self.start_line = start_line
         self.end_line = end_line
 
@@ -54,7 +42,8 @@ class ProblemFilter(ABC):
         """Sets the end line of ProblemFilter, if not already done.
 
         :param end_line: line number of the filter's end
-        :return: true if end_line was set; false otherwise
+        :return: ``True`` if ``end_line`` was set before;
+                 ``False`` otherwise
         """
         if self.end_line is None:
             self.end_line = end_line
@@ -80,13 +69,16 @@ class ProblemFilter(ABC):
             return self.start_line <= problem.position[0] <= self.end_line
 
     def match(self, problem: Problem) -> bool:
-        """Determines, whether a given problem is located within the
-        ProblemFilter's line boundaries and matches all custom requirements
-        that the subclass implementation imposes.
+        """Matches custom filter's requirements against a problem.
+
+        This method etermines, whether a given `problem is located
+        within the filter's line boundaries and matches all custom
+        requirements that the subclass implementation imposes.
 
         :param problem: Problem object to examine
-        :return: True, if the problem is located in the area covered by the
-                 ProblemFilter and matches all custom requirements, False otherwise
+        :return: ``True``, if the problem is located in the area
+                 covered by the ProblemFilter and matches all custom
+                 requirements, ``False`` otherwise
         """
 
         return self.__match_line(problem) and self.custom_match(problem)
@@ -97,21 +89,28 @@ class ProblemFilter(ABC):
         subclass implementation.
 
         :param problem: Problem object to be examined
-        :return: True, if the problem matches all custom requirements, False otherwise
+        :return: ``True``, if the problem matches all custom
+                 requirements, ``False`` otherwise
         """
 
     @abstractmethod
     def custom_parameters_equal(self, other: ProblemFilter) -> bool:
-        """Determines, if two custom ProblemFilters are:
+        """Determines, if two custom ``ProblemFilter`` objects are equal.
 
-            - of the same type
-            - equal in terms of their custom parameters
+        Two objects of type :class:`~.ProblemFilter` are considered
+        equal as long as they are:
 
-        This method explicitly DOES NOT CHECK the equality of start_line and end_line!
+        * of the same type
+        * equal in terms of their custom parameters
 
-        :param other: second custom ProblemFilter to be compared with the current one
-        :return: True, if the other custom ProblemFilter is equal to the current one
-                 with respect to its type and custom parameters, False otherwise
+        .. caution::
+           This method does not check the equality of `start_line``
+           and ``end_line``!
+
+        :param other: second custom ProblemFilter to be compared with
+                      the current one
+        :return: ``True``, if the other custom ProblemFilter is equal
+                 to the current one, ``False`` otherwise
         """
 
 
@@ -129,12 +128,10 @@ class LineProblemFilter(ProblemFilter):
         super().__init__(start_line, end_line)
 
     def custom_match(self, problem: Problem) -> bool:
-
         return True
 
     def custom_parameters_equal(self, other: ProblemFilter) -> bool:
-
-        return type(other) == LineProblemFilter
+        return isinstance(other, LineProblemFilter)
 
 
 class ModuleProblemFilter(ProblemFilter):
@@ -159,14 +156,11 @@ class ModuleProblemFilter(ProblemFilter):
         self.module_name = module_name
 
     def custom_match(self, problem: Problem) -> bool:
-
         return problem.checker == self.module_name
 
     def custom_parameters_equal(self, other: ProblemFilter) -> bool:
-
-        return (
-            type(other) == ModuleProblemFilter and other.module_name == self.module_name
-        )
+        return isinstance(other, ModuleProblemFilter) \
+            and other.module_name == self.module_name
 
 
 class SeverityProblemFilter(ProblemFilter):
@@ -191,37 +185,37 @@ class SeverityProblemFilter(ProblemFilter):
         self.severity = severity
 
     def custom_match(self, problem: Problem) -> bool:
-
         return problem.severity == self.severity
 
     def custom_parameters_equal(self, other: ProblemFilter) -> bool:
-
-        return type(other) == SeverityProblemFilter and other.severity == self.severity
+        return isinstance(other, SeverityProblemFilter) \
+            and other.severity == self.severity
 
 
 class WhitelistKeyProblemFilter(ProblemFilter):
-    """WhitelistKeyProblemFilter implementation that filters problems, if they
-    have been created with a specified whitelist key."""
+    """This filter excludes problems, if they have been created with a
+    specified whitelist key.
 
-    def __init__(self, wl_key: str, start_line: int, end_line: int | None = None):
-        """Initializes a new WhitelistKeyProblemFilter with a whitelist key as
-        its custom parameter.
+    :param wl_key: whitelist key of a problem
+    :param start_line: beginning of the filter's area
+    :param end_line: end of the filter's area
+    """
 
-        :param wl_key: whitelist key of a problem
-        :param start_line: beginning of the filter's area
-        :param end_line: end of the filter's area
-        """
-
+    def __init__(
+        self,
+        wl_key: str,
+        start_line: int,
+        end_line: int | None = None,
+    ):
         super().__init__(start_line, end_line)
         self.wl_key = wl_key
 
     def custom_match(self, problem: Problem) -> bool:
-
         return problem.key == self.wl_key
 
     def custom_parameters_equal(self, other: ProblemFilter) -> bool:
-
-        return type(other) == WhitelistKeyProblemFilter and other.wl_key == self.wl_key
+        return isinstance(other, WhitelistKeyProblemFilter) \
+            and other.wl_key == self.wl_key
 
 
 class Preprocessor:
@@ -274,12 +268,16 @@ class Preprocessor:
         self.filters: list[ProblemFilter] = []
 
     def regex_parse_preprocessor_comments(self, file: TexFile) -> None:
-        """This method takes in a TexFile object and parses all contained
-        preprocessor commands resulting in a set of ProblemFilters which are
-        added to this instance's list of filters to be applied to any given
-        problem.
+        """Parses preprocessor statements in a TeX file.
 
-        :param file: TexFile object containing the LaTeX sourcecode to be parsed
+        This method takes a :class:`~latexbuddy.texfile.TexFile`
+        object and parses all preprocessor statements contained in it.
+        This results in a set of of :class:`~.ProblemFilter` objects,
+        which are then added to this instance's list of filters and
+        later applied to the problems.
+
+        :param file: TeX file object containing the LaTeX source code
+                     to be parsed
         """
 
         line_num = 0  # lines are 1-based
@@ -302,14 +300,14 @@ class Preprocessor:
         line: str,
         line_num: int,
     ) -> list[ProblemFilter]:
-        """Parses a single preprocessor command resulting in a list of zero or
-        more ProblemFilters which are returned.
+        """Parses a preprocessor statement into filters.
 
-        :param line: the LaTeX code line which contains the preprocessor command to be
-                     parsed
-        :param line_num: line number of the LaTeX code line to be parsed
-        :return: a list of zero or more ProblemFilters resulting from the preprocessor
-                 command
+        :param line: the LaTeX code line which contains the
+                     preprocessor command to be parsed
+        :param line_num: line number of the LaTeX code line to be
+                         parsed
+        :return: a list of zero or more ProblemFilters resulting from
+                 the preprocessor command
         """
 
         matchers: list[Callable[[str, int], list[ProblemFilter] | None]] = [
@@ -353,7 +351,8 @@ class Preprocessor:
         match = Preprocessor.__RE_IGNORE_NEXT_ONE_LINE.fullmatc(line)
         if match is not None:
             LOG.debug(
-                f"Created LineProblemFilter from line {line_num + 1} to {line_num + 1}",
+                f"Created LineProblemFilter "
+                f"from line {line_num + 1} to {line_num + 1}",
             )
             return [LineProblemFilter(line_num + 1, line_num + 1)]
 
@@ -378,7 +377,8 @@ class Preprocessor:
         if match is not None:
             n = int(match.group(1))
             LOG.debug(
-                f"Created LineProblemFilter from line {line_num + 1} to {line_num + n}",
+                f"Created LineProblemFilter "
+                f"from line {line_num + 1} to {line_num + n}",
             )
             return [LineProblemFilter(line_num + 1, line_num + n)]
 
@@ -389,12 +389,15 @@ class Preprocessor:
         line: str,
         line_num: int,
     ) -> list[ProblemFilter] | None:
-        """Checks, if the provided command matches the regex pattern and
-        creates a LineProblemFilter beginning at line_num + 1.
+        """Creates a line filter.
+
+        Checks, if the provided command matches the regex pattern and
+        creates a ``LineProblemFilter`` beginning at ``line_num + 1``.
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
-        :return: open-ended LineProblemFilter as a list, None if regex not matching
+        :return: open-ended ``LineProblemFilter`` as a list,
+                 ``None`` if regex not matching
         """
 
         match = Preprocessor.__RE_BEGIN_IGNORE_ANYTHING.fullmatch(line)
@@ -406,7 +409,8 @@ class Preprocessor:
 
             if open_ended_filter is not None:
                 LOG.info(
-                    f"Ignored duplicate command 'begin-ignore' in line {line_num}",
+                    f"Ignored duplicate command 'begin-ignore' "
+                    f"in line {line_num}",
                 )
                 return []
             else:
@@ -423,14 +427,16 @@ class Preprocessor:
         line: str,
         line_num: int,
     ) -> list[ProblemFilter] | None:
-        """Checks, if the provided command matches the regex pattern and
-        creates ModuleProblemFilters corresponding to the provided module names
-        beginning at line_num + 1.
+        """Creates filters with respect to the ignored modules.
+
+        Checks, if the provided command matches the regex pattern and
+        creates ModuleProblemFilters corresponding to the provided
+        module names beginning at ``line_num + 1``.
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
-        :return: list of open-ended ModuleProblemFilters to match the provided modules,
-                None if regex not matching
+        :return: list of open-ended ``ModuleProblemFilter``s to match
+                 the provided modules, ``None`` if regex not matching
         """
 
         match = Preprocessor.__RE_BEGIN_IGNORE_MODULES.fullmatch(line)
@@ -452,7 +458,8 @@ class Preprocessor:
                 else:
                     LOG.debug(
                         f"Created open-ended ModuleProblemFilter "
-                        f"for module '{module}' beginning in line {line_num + 1}",
+                        f"for module '{module}' "
+                        f"beginning in line {line_num + 1}",
                     )
                     filters.append(ModuleProblemFilter(module, line_num + 1))
 
@@ -496,15 +503,17 @@ class Preprocessor:
                         )
                     else:
                         LOG.debug(
-                            f"Created open-ended ModuleProblemFilter for severity "
-                            f"'{str(enum_severity)}' beginning in line {line_num + 1}",
+                            f"Created open-ended ModuleProblemFilter "
+                            f"for severity '{str(enum_severity)}' "
+                            f"beginning in line {line_num + 1}",
                         )
                         filters.append(
                             SeverityProblemFilter(enum_severity, line_num + 1),
                         )
                 except KeyError:
                     LOG.warning(
-                        f"Invalid syntax: Unknown ProblemSeverity '{severity}' "
+                        f"Invalid syntax: "
+                        f"Unknown ProblemSeverity '{severity}' "
                         f"in line {line_num}",
                     )
 
@@ -524,7 +533,8 @@ class Preprocessor:
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
         :return: list of open-ended WhitelistKeyProblemFilters
-                 to match the provided whitelist keys, None if regex not matching
+                 to match the provided whitelist keys, None if regex
+                 not matching
         """
 
         match = Preprocessor.__RE_BEGIN_IGNORE_WL_KEYS.fullmatch(line)
@@ -546,7 +556,8 @@ class Preprocessor:
                 else:
                     LOG.debug(
                         f"Created open-ended WhitelistKeyProblemFilter "
-                        f"for whitelist-key '{key}' beginning in line {line_num + 1}",
+                        f"for whitelist-key '{key}' beginning "
+                        f"in line {line_num + 1}",
                     )
                     filters.append(
                         WhitelistKeyProblemFilter(key, line_num + 1),
@@ -578,11 +589,13 @@ class Preprocessor:
 
             if open_ended_filter is None:
                 LOG.info(
-                    f"Ignored duplicate command 'end-ignore' in line {line_num}",
+                    f"Ignored duplicate command 'end-ignore' "
+                    f"in line {line_num}",
                 )
             else:
                 LOG.debug(
-                    f"Ended existing open-ended LineProblemFilter in line {line_num}",
+                    f"Ended existing open-ended LineProblemFilter "
+                    f"in line {line_num}",
                 )
                 open_ended_filter.end(line_num)
 
@@ -615,7 +628,8 @@ class Preprocessor:
 
                 if open_ended_filter is None:
                     LOG.info(
-                        f"Ignored duplicate command 'end-ignore' for module '{module}' "
+                        f"Ignored duplicate command 'end-ignore' "
+                        f"for module '{module}' "
                         f"in line {line_num}",
                     )
                 else:
@@ -662,13 +676,15 @@ class Preprocessor:
                         )
                     else:
                         LOG.debug(
-                            f"Ended existing open-ended SeverityProblemFilter for "
-                            f"severity '{str(enum_severity)}' in line {line_num + 1}",
+                            f"Ended existing open-ended SeverityProblemFilter "
+                            f"for severity '{str(enum_severity)}' "
+                            f"in line {line_num + 1}",
                         )
                         open_ended_filter.end(line_num)
                 except KeyError:
                     LOG.warning(
-                        f"Invalid syntax: Unknown ProblemSeverity '{severity}' "
+                        f"Invalid syntax: "
+                        f"Unknown ProblemSeverity '{severity}' "
                         f"in line {line_num}",
                     )
 
@@ -722,13 +738,17 @@ class Preprocessor:
         """Searches for any open-ended (no end set) ProblemFilter matching the
         provided reference ProblemFilter.
 
-        :param reference_filter: reference to find matching open-ended filter
+        :param reference_filter: reference to find matching open-ended
+                                 filter
         :return: matching open-ended filter, if found
         """
 
         for f in self.filters:
-            if f.end_line is None and f.custom_parameters_equal(reference_filter):
-                return f
+            if f.end_line is not None:
+                continue
+            if not f.custom_parameters_equal(reference_filter):
+                continue
+            return f
 
         return None
 
@@ -743,8 +763,11 @@ class Preprocessor:
                 return False
         return True
 
-    def apply_preprocessor_filter(self, problems: list[Problem]) -> list[Problem]:
-        """Applies all parsed ProblemFilters and returns all non-matching
+    def apply_preprocessor_filter(
+        self,
+        problems: list[Problem],
+    ) -> list[Problem]:
+        """Applies all parsed ProblemFilters and returns all non- matching
         Problems.
 
         :param problems: list of Problems to filter

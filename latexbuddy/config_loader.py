@@ -42,7 +42,8 @@ class ConfigLoader:
     def __init__(self, cli_arguments: Optional[Namespace] = None):
         """Creates a ConfigLoader module.
 
-        :param cli_arguments: The commandline arguments specified in the LaTeXBuddy call
+        :param cli_arguments: The command-line arguments specified in
+                              the LaTeXBuddy call
         """
 
         self.main_configurations: Dict[str, Any] = {}
@@ -59,7 +60,8 @@ class ConfigLoader:
 
         if not cli_arguments.config:
             LOG.warning(
-                "No configuration file specified. Default values will be used.",
+                "No configuration file specified. "
+                "Default values will be used.",
             )
             return
 
@@ -77,14 +79,17 @@ class ConfigLoader:
         self,
         args: Namespace,
     ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
-        """This private helper-function parses commandline arguments into two
-        dictionaries: one for main-instance configurations and one for module
-        configurations.
+        """Parses and sorts command-line arguments into two dicts.
 
-        :param args: commandline arguments specified at the start of LaTeXBuddy
-        :return: a tuple of dictionaries, the first of which contains configuration
-                 options for the main LatexBuddy instance and the second of which
-                 contains all remaining options for other modules
+        The first :py:class:`dict` stores main-instance configuration,
+        the second one stores the module-specific options.
+
+        :param args: commandline arguments specified at the start of
+                     LaTeXBuddy
+        :return: a tuple of dictionaries, the first of which contains
+                 configuration options for the main LatexBuddy instance
+                 and the second of which contains all remaining options
+                 for other modules
         """
 
         args_dict = {
@@ -197,7 +202,7 @@ class ConfigLoader:
         parsed_main: Dict[str, Any],
         parsed_modules: Dict[str, Dict[str, Any]],
     ) -> Tuple[Dict[str, Any], Dict[str, Dict[str, Any]]]:
-        """This private helper-function parses the CLI flag '--language'."""
+        """This private helper-function parses the CLI flag '-- language'."""
         language_match = self._REGEX_LANGUAGE_FLAG.fullmatch(flag_value)
 
         if language_match is not None:
@@ -218,8 +223,9 @@ class ConfigLoader:
         return parsed_main, parsed_modules
 
     def load_configurations(self, config_file_path: Path) -> None:
-        """This helper-function loads the contents of a specified config .py-
-        file.
+        """This helper-function loads the contents of a specified config.
+
+        .py- file.
 
         :param config_file_path: config file to be loaded (.py)
         :return: None
@@ -238,7 +244,8 @@ class ConfigLoader:
 
         tools.execute_no_exceptions(
             lambda_function,
-            f"An error occurred while loading config file at '{str(config_file_path)}'",
+            f"An error occurred while loading config file at "
+            f"'{str(config_file_path)}'",
         )
 
     @staticmethod
@@ -253,30 +260,40 @@ class ConfigLoader:
         ] = None,
         error_indicator: str = "config",
     ) -> Any:
-        """This private helper-function searches for a config entry in the
-        specified dictionary (config or flags). It raises an error, if the
-        requested config option is not specified in the specified dictionary or
-        the retrieved entry does not match a specified verification criterion.
+        """Searches for a config entry in the specified dictionary (config or
+        flags).
+
+        It raises an error, if the requested config option is not found
+        in the dictionary or if the retrieved entry does not match
+        specified criteria.
 
         :param config_dict: dictionary to be searched
-        :param module: type or an instance of the module owning the config option; if
-                       unspecified, this method will treat the config_dict as a
-                       dictionary for main instance configuration entries
+        :param module: type or an instance of the module owning the
+                       config option;
+                       if unspecified, this method will treat the
+                       ``config_dict`` as a dictionary for main
+                       instance configuration entries
         :param key: key of the config option
-        :param verify_type: typing type that the config entry is required to be an
-                            instance of (otherwise ConfigOptionVerificationError is
+        :param verify_type: typing type that the config entry is
+                            required to be an instance of (otherwise
+                            ``ConfigOptionVerificationError`` is
                             raised)
-        :param verify_regex: regular expression that the config entry is required to
-                             match fully (otherwise ConfigOptionVerificationError is
+        :param verify_regex: regular expression that the config entry
+                             is required to match fully (otherwise
+                             ``ConfigOptionVerificationError`` is
                              raised)
-                             Note: this overrides verify_type with 'AnyStr'
-        :param verify_choices: a list/tuple/set of valid values in which the config
-                               entry needs to be contained in order to be valid
-        :param error_indicator: custom string displayed in the error message on failure
+                             Note: this overrides ``verify_type`` with
+                             py:obj:`typing.AnyStr`
+        :param verify_choices: a list/tuple/set of valid values in
+                               which the config entry needs to be
+                               contained in order to be valid
+        :param error_indicator: custom string displayed in the error
+                                message on failure
         :return: the value of the requested config option, if it exists
-        :raises: ConfigOptionNotFoundError, if the requested config option doesn't exist
-        :raises: ConfigOptionVerificationError, if the requested config option does not
-                 meet the specified criteria
+        :raises: ConfigOptionNotFoundError, if the requested config
+                 option doesn't exist
+        :raises: ConfigOptionVerificationError, if the requested config
+                 option does not meet the specified criteria
         """
 
         # importing this here to avoid circular import error
@@ -292,7 +309,8 @@ class ConfigLoader:
 
             if key not in config_dict:
                 raise ConfigOptionNotFoundError(
-                    f"Module: {module_name}, key: {key} " f"({error_indicator})",
+                    f"Module: {module_name}, "
+                    f"key: {key} " f"({error_indicator})",
                 )
 
             entry = config_dict[key]
@@ -360,8 +378,9 @@ class ConfigLoader:
 
         if pattern.fullmatch(entry) is None:
             raise ConfigOptionVerificationError(
-                f"config entry '{key}' for module '{module_name}' does not match "
-                f"the provided regular expression: entry: '{entry}', "
+                f"config entry '{key}' for module '{module_name}' "
+                f"does not match the provided regular expression: "
+                f"entry: '{entry}', "
                 f"regex: '{verify_regex}'",
             )
 
@@ -380,8 +399,8 @@ class ConfigLoader:
         if entry not in verify_choices:
             raise ConfigOptionVerificationError(
                 f"value '{str(entry)}' of config entry '{key}' for "
-                f"module '{module_name}' is not contained in the specified list of "
-                f"valid values: {str(verify_choices)}",
+                f"module '{module_name}' is not contained in the specified "
+                f"list of valid values: {str(verify_choices)}",
             )
 
     # TODO: resolve circular import error between config_loader.py and
@@ -401,23 +420,28 @@ class ConfigLoader:
         such an entry doesn't exist or the retrieved entry does not match a
         specified verification criterion.
 
-        :param module: type or an instance of the module owning the config option; if
-                       unspecified, this method will look for a configuration option
-                       in the main instance's dictionary
+        :param module: type or an instance of the module owning the
+                       config option; if unspecified, this method will
+                       look for a configuration option in the main
+                       instance's dictionary
         :param key: key of the config option
-        :param verify_type: typing type that the config entry is required to be an
-                            instance of (otherwise ConfigOptionVerificationError is
-                            raised)
-        :param verify_regex: regular expression that the config entry is required to
-                             match fully (otherwise ConfigOptionVerificationError is
+        :param verify_type: typing type that the config entry is
+                            required to be an instance of (otherwise
+                            ``ConfigOptionVerificationError`` is raised)
+        :param verify_regex: regular expression that the config entry
+                             is required to match fully (otherwise
+                             ``ConfigOptionVerificationError`` is
                              raised)
+
                              Note: this overrides verify_type with 'AnyStr'
-        :param verify_choices: a list/tuple/set of valid values in which the config
-                               entry needs to be contained in order to be valid
+        :param verify_choices: a list/tuple/set of valid values in
+                               which the config entry needs to be
+                               contained in order to be valid
         :return: the value of the requested config option, if it exists
-        :raises: ConfigOptionNotFoundError, if the requested config option doesn't exist
-        :raises: ConfigOptionVerificationError, if the requested config option does not
-                 meet the specified criteria
+        :raises: ConfigOptionNotFoundError, if the requested config
+                 option doesn't exist
+        :raises: ConfigOptionVerificationError, if the requested config
+                 option does not meet the specified criteria
         """
 
         # importing this here to avoid circular import error
@@ -495,22 +519,27 @@ class ConfigLoader:
         such an entry doesn't exist or the retrieved entry does not match a
         specified verification criterion.
 
-        :param module: type or an instance of the module owning the config option; if
-                       unspecified, this method will look for a configuration option
-                       in the main instance's dictionary
+        :param module: type or an instance of the module owning the
+                       config option; if unspecified, this method will
+                       look for a configuration option in the main
+                       instance's dictionary
         :param key: key of the config option
-        :param default_value: default value in case the requested option doesn't exist
-        :param verify_type: typing type that the config entry is required to be an
-                            instance of (otherwise ConfigOptionVerificationError is
-                            raised)
-        :param verify_regex: regular expression that the config entry is required to
-                             match fully (otherwise ConfigOptionVerificationError is
-                             raised)
-                             Note: this overrides verify_type with 'AnyStr'
-        :param verify_choices: a list/tuple/set of valid values in which the config
-                               entry needs to be contained in order to be valid
-        :return: the value of the requested config option or default_value, if the
-            config option doesn't exist
+        :param default_value: default value in case the requested
+                              option doesn't exist
+        :param verify_type: typing type that the config entry is
+                            required to be an instance of (otherwise
+                            ``ConfigOptionVerificationError`` is raised)
+        :param verify_regex: regular expression that the config entry
+                             is required to match fully (otherwise
+                             ``ConfigOptionVerificationError`` is raised).
+
+                             Note: this overrides ``verify_type`` with
+                             :py:obj:`typing.AnyStr`
+        :param verify_choices: a list/tuple/set of valid values in
+                               which the config entry needs to be
+                               contained in order to be valid
+        :return: the value of the requested config option or
+                 ``default_value``, if the config option doesn't exist
         """
 
         try:
@@ -524,7 +553,8 @@ class ConfigLoader:
 
         except ConfigOptionNotFoundError:
             LOG.info(
-                f"Config entry '{key}' for module '{module.display_name}' not found. "
+                f"Config entry '{key}' "
+                f"for module '{module.display_name}' not found. "
                 f"Using default value '{str(default_value)}' instead...",
             )
 
@@ -532,7 +562,8 @@ class ConfigLoader:
 
         except ConfigOptionVerificationError as e:
             LOG.warning(
-                f"Config entry invalid. Using default value '{str(default_value)}' "
+                f"Config entry invalid. "
+                f"Using default value '{str(default_value)}' "
                 f"instead. Details: {str(e)}",
             )
 

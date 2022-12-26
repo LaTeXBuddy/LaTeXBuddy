@@ -40,9 +40,6 @@ class TexFile:
     def __init__(self, file: Path, compile_tex: bool):
         """Creates a new file instance.
 
-        By default, the file is being read, but not detexed. The file can be detexed at
-        any point using `detex()` method.
-
         :param file: Path object of the file to be loaded
         :param compile_tex: Bool if the tex should be compiled
         """
@@ -153,8 +150,10 @@ class TexFile:
     def __str__(self) -> str:
         return str(self.tex_file)
 
-    def __compile_tex(self, compile_pdf: bool) -> tuple[Path | None, Path | None]:
-
+    def __compile_tex(
+        self,
+        compile_pdf: bool,
+    ) -> tuple[Path | None, Path | None]:
         from latexbuddy.buddy import LatexBuddy
 
         compiler = "latex"
@@ -222,7 +221,8 @@ class TexFile:
             f"TEXFILE: {str(self.tex_file)}, exists: {self.tex_file.exists()}",
         )
         LOG.debug(
-            f"PATH: {str(compilation_path)}, exists: {compilation_path.exists()}",
+            f"PATH: {str(compilation_path)}, "
+            f"exists: {compilation_path.exists()}",
         )
 
         print(self.tex_file.name)

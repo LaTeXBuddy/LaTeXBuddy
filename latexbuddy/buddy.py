@@ -74,8 +74,9 @@ class LatexBuddy(MainModule):
         """Initializes the LaTeXBuddy instance.
 
         :param config_loader: ConfigLoader object to manage config options
-        :param module_provider: ModuleProvider instance as a source of Module instances
-                                for running checks on the specified file
+        :param module_provider: ModuleProvider instance as a source of
+                                Module instances for running checks on
+                                the specified file
         :param file_to_check: file that will be checked
         :param path_list: a list of the paths for the html output
         :param compile_tex: boolean if the tex file should be compiled
@@ -142,11 +143,15 @@ class LatexBuddy(MainModule):
         :param problem: problem to add to the dictionary
         """
 
-        if (
-            LatexBuddy.instance.preprocessor is None
-            or LatexBuddy.instance.preprocessor.matches_preprocessor_filter(problem)
-        ) and not equation_re.match(problem.text):
-            LatexBuddy.instance.errors[problem.uid] = problem
+        pp = LatexBuddy.instance.preprocessor
+        if pp is not None:
+            if not pp.matches_preprocessor_filter(problem):
+                return
+
+        if equation_re.match(problem.text):
+            return
+
+        LatexBuddy.instance.errors[problem.uid] = problem
 
     @staticmethod
     def check_whitelist():
@@ -161,7 +166,8 @@ class LatexBuddy(MainModule):
         ):
             return  # if no whitelist yet, don't have to check
 
-        whitelist_entries = LatexBuddy.instance.whitelist_file.read_text().splitlines()
+        whitelist_entries = LatexBuddy.instance.whitelist_file\
+            .read_text().splitlines()
         # TODO: Ignore emtpy strings in here
 
         # need to copy here or we get an error deleting
@@ -171,16 +177,16 @@ class LatexBuddy(MainModule):
                 del LatexBuddy.instance.errors[uid]
 
         LOG.debug(
-            f"Finished whitelist-check in {round(time.perf_counter() - start_time, 2)} "
-            f"seconds",
+            f"Finished whitelist-check in "
+            f"{round(time.perf_counter() - start_time, 2)} seconds",
         )
 
     @staticmethod
     def add_to_whitelist(uid):
         """Adds the error identified by the given UID to the whitelist.
 
-        Afterwards this method deletes all other errors that are the same as the one
-        just whitelisted.
+        Afterwards this method deletes all other errors that are
+        the same as the one just whitelisted.
 
         :param uid: the UID of the error to be deleted
         """
@@ -201,7 +207,8 @@ class LatexBuddy(MainModule):
         added_key = LatexBuddy.instance.errors[uid].key
         del LatexBuddy.instance.errors[uid]
 
-        # check if there are other errors equal to the one just added to the whitelist
+        # check if there are other errors equal to the one just added
+        # to the whitelist
         uids = list(LatexBuddy.instance.errors.keys())
         for curr_uid in uids:
             if LatexBuddy.instance.errors[curr_uid].key == added_key:
@@ -328,9 +335,11 @@ class LatexBuddy(MainModule):
                 LatexBuddy.instance.tex_file.tex,
                 LatexBuddy.instance.errors,
                 LatexBuddy.instance.path_list,
+                # TODO: this should be the path (str) where the PDF file
+                #  is located
                 str(
                     LatexBuddy.instance.tex_file.pdf_file,
-                ),  # TODO: this should be the path (str) where the pdf file is located
+                ),
             ),
         )
 
@@ -340,7 +349,6 @@ class LatexBuddy(MainModule):
 
     @staticmethod
     def output_flask_html():
-
         # importing this here to avoid circular import error
         from latexbuddy.output import render_flask_html
 
@@ -357,9 +365,11 @@ class LatexBuddy(MainModule):
                 LatexBuddy.instance.tex_file.tex,
                 LatexBuddy.instance.errors,
                 LatexBuddy.instance.path_list,
+                # TODO: this should be the path (str) where the PDF file
+                #  is located
                 str(
                     LatexBuddy.instance.tex_file.pdf_file,
-                ),  # TODO: this should be the path (str) where the pdf file is located
+                ),
             ),
         )
 

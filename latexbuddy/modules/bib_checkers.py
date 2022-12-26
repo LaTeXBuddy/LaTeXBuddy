@@ -60,10 +60,13 @@ def parse_bibfile(bibfile: Path) -> (str, str, str):
         try:
             bib_database = bibtexparser.load(bibtex_file)
             entries = bib_database.entries
-        # catch error that is raised if the bibtex file is not correctly formatted
+        # catch error that is raised if the bibtex file is not correctly
+        # formatted
         except UndefinedString as e:
             raise ValueError(
-                f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}',
+                f'{str(bibfile)}:'
+                f'Could not parse BibTeX file: '
+                f'Invalid format: {str(e)}',
             )
 
     results = []
@@ -71,7 +74,8 @@ def parse_bibfile(bibfile: Path) -> (str, str, str):
         try:
             """if (entry["ENTRYTYPE"] == "inproceedings"):"""
             t = entry["title"]
-            # remove parenthesis from start/end of title for better comparison later on
+            # remove parenthesis from start/end of title for better comparison
+            # later on
             while t[0] == "{" or t[0] == "(":
                 t = t[1:]
             while t[-1] == "}" or t[-1] == ")":
@@ -91,12 +95,17 @@ class NewerPublications(Module):
         self.found_pubs = []
         self.debug = False
 
-    def check_for_new(self, publication: (str, str), s) -> (str, str, str, (str, str)):
+    def check_for_new(
+        self,
+        publication: tuple[str, str],
+        session: requests.Session,
+    ) -> None:
         # send requests
-        # ex: https://dblp.org/search/publ/api?format=json&q=In%20Search%20of%20an%20Understandable%20Consensus%20Algorithm
+        # Example:
+        # https://dblp.org/search/publ/api?format=json&q=In%20Search%20of%20an%20Understandable%20Consensus%20Algorithm
 
         c_returns = 4  # number of max returns from the request
-        x = s.get(
+        x = session.get(
             f"https://dblp.org/search/publ/api?format=json&h={c_returns}&q={publication[0]}",
         )
         ret = json.loads(x.text)["result"]
@@ -113,7 +122,8 @@ class NewerPublications(Module):
                     continue
 
                 title = hit["info"]["title"]
-                if title[-1] == ".":  # remove . at the end, dblp adds it sometimes
+                # remove period at the end, dblp adds it sometimes
+                if title[-1] == ".":
                     title = title[:-1]
 
                 # Check if the title is somewhat similar to the one from BibTeX
@@ -171,7 +181,8 @@ class NewerPublications(Module):
 
         for pub in self.found_pubs:
             bibtex_id = pub[3][2]
-            if output_format in html_formats:  # HTML tags if output to HTML page
+            # HTML tags if output to HTML page
+            if output_format in html_formats:
                 suggestion = (
                     f'Potential newer version "<i>{pub[0]}</i>" from '
                     f'<b>{pub[1]}</b> at <a href="{pub[2]}"'
@@ -179,7 +190,8 @@ class NewerPublications(Module):
                 )
             else:
                 suggestion = (
-                    f'Potential newer version "{pub[0]}" from {pub[1]} at {pub[2]}'
+                    f'Potential newer version "{pub[0]}" '
+                    f'from {pub[1]} at {pub[2]}'
                 )
             problems.append(
                 Problem(
@@ -229,12 +241,12 @@ class BibtexDuplicates(Module):
         ratio = total_ratio / len(same_keys)
         if ratio > 0.85:
             LOG.debug(
-                f"------------------\n{ratio}\n{entry_1}\n{entry_2}\n------------------",
+                f"{entry_1} is probably a duplicate of {entry_2}. "
+                f"Similarity ratio: {ratio}",
             )
             self.found_duplicates.append(ids)
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
-
         bib_file = get_bibfile(file)
 
         if bib_file is None:
@@ -245,10 +257,13 @@ class BibtexDuplicates(Module):
             try:
                 bib_database = bibtexparser.load(bibtex_file)
                 entries = bib_database.entries
-            # catch error that is raised if the bibtex file is not correctly formatted
+            # catch error that is raised if the bibtex file is not correctly
+            # formatted
             except UndefinedString as e:
                 raise ValueError(
-                    f'Error in the .bib; prob no "" or parenthesis used here: {str(e)}',
+                    f'{str(bib_file)}:'
+                    f'Could not parse BibTeX file: '
+                    f'Invalid format: {str(e)}',
                 )
 
         for i in range(len(entries)):

@@ -99,7 +99,7 @@ def _get_parser() -> argparse.ArgumentParser:
         "--disable-modules",
         type=str,
         default=None,
-        help="Comma-separated list of module names that should not be executed."
+        help="Comma-separated list of modules that should be disabled. "
         "(Every other module will be implicitly enabled!)",
     )
     return parser
