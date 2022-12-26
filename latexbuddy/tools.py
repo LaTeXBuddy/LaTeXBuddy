@@ -357,8 +357,8 @@ def match_lines(
     """Matches the lines with the given regexes.
 
     :param lines: the lines
-    :unchecked_files: the unchecked_files
-    :checked_files: the checked_files
+    :param unchecked_files: the unchecked_files
+    :param checked_files: the checked_files
     :return: the unchecked_files
     """
     for line in lines:
