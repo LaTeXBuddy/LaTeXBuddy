@@ -18,7 +18,7 @@ from typing import Union
 from pydantic import BaseModel
 from pydantic import ValidationError
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.exceptions import ConfigOptionNotFoundError
 from latexbuddy.exceptions import ConfigOptionVerificationError
 
@@ -158,7 +158,7 @@ class ConfigLoader:
 
         parsed_main["enable-modules-by-default"] = False
 
-        for module_name in self.module_configurations.keys():
+        for module_name in self.module_configurations:
             if module_name not in parsed_modules:
                 parsed_modules[module_name] = {}
 
@@ -182,7 +182,7 @@ class ConfigLoader:
         disable_modules'."""
         parsed_main["enable-modules-by-default"] = True
 
-        for module_name in self.module_configurations.keys():
+        for module_name in self.module_configurations:
             if module_name not in parsed_modules:
                 parsed_modules[module_name] = {}
 
@@ -242,7 +242,7 @@ class ConfigLoader:
             self.main_configurations = config.main
             self.module_configurations = config.modules
 
-        tools.execute_no_exceptions(
+        latexbuddy.tools.execute_no_exceptions(
             lambda_function,
             f"An error occurred while loading config file at "
             f"'{str(config_file_path)}'",
@@ -308,23 +308,19 @@ class ConfigLoader:
             module_name = "LatexBuddy (main instance)"
 
             if key not in config_dict:
-                raise ConfigOptionNotFoundError(
-                    f"Module: {module_name}, "
-                    f"key: {key} " f"({error_indicator})",
-                )
+                _msg = f"Module: {module_name}, key: {key} ({error_indicator})"
+                raise ConfigOptionNotFoundError(_msg)
 
             entry = config_dict[key]
 
         else:
-
             module_name = module.display_name
 
             if module_name not in config_dict or key not in config_dict[
                     module_name
             ]:
-                raise ConfigOptionNotFoundError(
-                    f"Module: {module_name}, key: {key} ({error_indicator})",
-                )
+                _msg = f"Module: {module_name}, key: {key} ({error_indicator})"
+                raise ConfigOptionNotFoundError(_msg)
 
             entry = config_dict[module_name][key]
 
@@ -355,12 +351,10 @@ class ConfigLoader:
 
         try:
             TypeVerifier(cfg_entry=entry)
-        except ValidationError:
-
-            raise ConfigOptionVerificationError(
-                f"config entry '{key}' for module '{module_name}' is of "
-                f"type '{str(type(entry))}' (expected '{str(verify_type)}')",
-            )
+        except ValidationError as err:
+            _msg = f"config entry '{key}' for module '{module_name}' is of " \
+                   f"type '{str(type(entry))}' (expected '{str(verify_type)}')"
+            raise ConfigOptionVerificationError(_msg) from err
 
     @staticmethod
     def __verify_regex(
@@ -377,12 +371,13 @@ class ConfigLoader:
         pattern = re.compile(verify_regex)
 
         if pattern.fullmatch(entry) is None:
-            raise ConfigOptionVerificationError(
+            _msg = (
                 f"config entry '{key}' for module '{module_name}' "
                 f"does not match the provided regular expression: "
                 f"entry: '{entry}', "
                 f"regex: '{verify_regex}'",
             )
+            raise ConfigOptionVerificationError(_msg)
 
     @staticmethod
     def __verify_choices(
@@ -397,11 +392,12 @@ class ConfigLoader:
             return
 
         if entry not in verify_choices:
-            raise ConfigOptionVerificationError(
+            _msg = (
                 f"value '{str(entry)}' of config entry '{key}' for "
                 f"module '{module_name}' is not contained in the specified "
                 f"list of valid values: {str(verify_choices)}",
             )
+            raise ConfigOptionVerificationError(_msg)
 
     # TODO: resolve circular import error between config_loader.py and
     #  modules.__init__.py when importing NamedModule
@@ -476,30 +472,28 @@ class ConfigLoader:
                 verify_choices=verify_choices,
             )
 
-        else:
-
-            try:
-                return ConfigLoader.__get_option(
-                    self.module_flags,
-                    module,
-                    key,
-                    error_indicator="module flag",
-                    verify_type=verify_type,
-                    verify_regex=verify_regex,
-                    verify_choices=verify_choices,
-                )
-            except ConfigOptionNotFoundError:
-                pass
-
+        try:
             return ConfigLoader.__get_option(
-                self.module_configurations,
+                self.module_flags,
                 module,
                 key,
-                error_indicator="module config",
+                error_indicator="module flag",
                 verify_type=verify_type,
                 verify_regex=verify_regex,
                 verify_choices=verify_choices,
             )
+        except ConfigOptionNotFoundError:
+            pass
+
+        return ConfigLoader.__get_option(
+            self.module_configurations,
+            module,
+            key,
+            error_indicator="module config",
+            verify_type=verify_type,
+            verify_regex=verify_regex,
+            verify_choices=verify_choices,
+        )
 
     # TODO: resolve circular import error between config_loader.py and
     #  modules.__init__.py when importing NamedModule

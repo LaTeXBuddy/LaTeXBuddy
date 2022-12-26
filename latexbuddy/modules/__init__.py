@@ -15,7 +15,7 @@ class NamedModule:
     module instance."""
 
     @classproperty
-    def display_name(cls) -> str:
+    def display_name(cls) -> str:  # noqa N805
         """Returns the canonical display name of the module."""
         return cls.__name__
 

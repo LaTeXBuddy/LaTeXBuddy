@@ -119,7 +119,10 @@ def main(args: Sequence[str] | None = None) -> int:
         verbosity,
     )
 
-    print(f"{colour.CYAN}{__app_name__}{colour.RESET_ALL} v{__version__}")
+    sys.stderr.write(
+        f"{colour.CYAN}{__app_name__}{colour.RESET_ALL} v{__version__}\n",
+    )
+    sys.stderr.flush()
     LOG.debug(f"Parsed CLI args: {str(parsed_args)}")
 
     __execute_latexbuddy_checks(parsed_args)

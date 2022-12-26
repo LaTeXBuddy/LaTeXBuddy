@@ -14,7 +14,7 @@ from typing import List
 
 import requests
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.exceptions import ExecutableNotFoundError
@@ -135,9 +135,7 @@ class LanguageTool(Module):
 
         self.find_disabled_rules(config)
 
-        result = self.check_tex(file)
-
-        return result
+        return self.check_tex(file)
 
     def find_supported_languages(self) -> list[str]:
         """Acquires a list of supported languages from the version of
@@ -148,7 +146,7 @@ class LanguageTool(Module):
             cmd = self.find_languagetool_command_prefix()
             cmd.append("--list")
 
-            result = tools.execute(*cmd)
+            result = latexbuddy.tools.execute(*cmd)
 
             supported_languages = [
                 lang.split(" ")[0]
@@ -160,21 +158,20 @@ class LanguageTool(Module):
 
             return supported_languages
 
-        elif self.mode == Mode.LOCAL_SERVER:
+        if self.mode == Mode.LOCAL_SERVER:
 
             return self.lt_languages_get_request(
                 f"http://localhost:{self.local_server.port}/v2/languages",
             )
 
-        elif self.mode == Mode.REMOTE_SERVER:
+        if self.mode == Mode.REMOTE_SERVER:
 
             if not self.remote_url_languages:
                 return []
 
             return self.lt_languages_get_request(self.remote_url_languages)
 
-        else:
-            return []
+        return []
 
     def matches_language_regex(self, language: str) -> bool:
         """Determines whether a given string is a language code by matching it
@@ -186,12 +183,12 @@ class LanguageTool(Module):
         """Finds the prefix of the shell command executing LanguageTool in the
         commandline."""
 
-        tools.find_executable(
+        latexbuddy.tools.find_executable(
             "java", "JRE (Java Runtime Environment)", LOG,
         )
 
         try:
-            result = tools.find_executable(
+            result = latexbuddy.tools.find_executable(
                 "languagetool",
                 "LanguageTool (CLI)",
                 LOG,
@@ -201,7 +198,7 @@ class LanguageTool(Module):
 
         except ExecutableNotFoundError:
 
-            result = tools.find_executable(
+            result = latexbuddy.tools.find_executable(
                 "languagetool-commandline.jar",
                 "LanguageTool (CLI)",
                 LOG,
@@ -366,7 +363,7 @@ class LanguageTool(Module):
         cmd = list(self.lt_console_command)
         cmd.append(str(file.plain_file))
 
-        output = tools.execute_no_errors(*cmd, encoding="utf_8")
+        output = latexbuddy.tools.execute_no_errors(*cmd, encoding="utf_8")
 
         if len(output) > 0:
             output = output[output.find("{"):]
@@ -476,12 +473,12 @@ class LanguageToolLocalServer:
         This method also checks if Java is installed.
         """
 
-        tools.find_executable(
+        latexbuddy.tools.find_executable(
             "java", "JRE (Java Runtime Environment)", LOG,
         )
 
         try:
-            result = tools.find_executable(
+            result = latexbuddy.tools.find_executable(
                 "languagetool-server",
                 "LanguageTool (local server)",
                 LOG,
@@ -491,7 +488,7 @@ class LanguageToolLocalServer:
 
         except ExecutableNotFoundError:
 
-            result = tools.find_executable(
+            result = latexbuddy.tools.find_executable(
                 "languagetool-server.jar",
                 "LanguageTool (local server)",
                 LOG,
@@ -530,7 +527,9 @@ class LanguageToolLocalServer:
 
         self.get_server_run_command()
 
-        self.server_process = tools.execute_background(*self.lt_server_command)
+        self.server_process = latexbuddy.tools.execute_background(
+            *self.lt_server_command,
+        )
 
         self.wait_till_server_up()
 
@@ -559,7 +558,8 @@ class LanguageToolLocalServer:
                 time.sleep(0.5)
 
         if not up:
-            raise ConnectionError("Could not connect to local server.")
+            _msg = "Could not connect to local server."
+            raise ConnectionError(_msg)
 
     def stop_local_server(self) -> None:
         """Stops the local LanguageTool server process."""
@@ -567,7 +567,7 @@ class LanguageToolLocalServer:
         if not self.server_process:
             return
 
-        tools.kill_background_process(self.server_process)
+        latexbuddy.tools.kill_background_process(self.server_process)
         self.server_process = None
 
     @staticmethod

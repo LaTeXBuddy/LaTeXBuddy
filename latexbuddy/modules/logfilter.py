@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 from tempfile import mkstemp
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import not_found
 from latexbuddy.modules import Module
@@ -37,7 +37,7 @@ class LogFilter(Module):
         :return: a list of problems
         """
         try:
-            tools.find_executable("awk")
+            latexbuddy.tools.find_executable("awk")
         except FileNotFoundError:
             LOG.error(not_found("awk", "AWK"))
 
@@ -49,7 +49,7 @@ class LogFilter(Module):
             prefix="latexbuddy",
             suffix="raw_log_errors",
         )
-        tools.execute(
+        latexbuddy.tools.execute(
             "awk",
             "-f",
             str(self.texfilt_path),
@@ -80,7 +80,8 @@ class LogFilter(Module):
                 continue
             severity = match.group("severity").upper()
             file_path = file.tex_file
-            # position = (int(match.group("line_no")), 1)   # Does not work yet
+            # Does not work yet
+            # position = (int(match.group("line_no")), 1)  # noqa
 
             # TODO: refactor this
             split_match = problem_line.split(f"{match.group()}")

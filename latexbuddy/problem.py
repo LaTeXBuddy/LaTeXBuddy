@@ -59,8 +59,10 @@ class ProblemSeverity(Enum):
         return self.value == other.value
 
     def __lt__(self, other):
+        # TODO: do we actually need this check?
         if self.__class__ is other.__class__:
             return self.value < other.value
+        return False
 
 
 def set_language(lang):
@@ -138,13 +140,10 @@ class Problem:
             or isinstance(checker, LatexBuddy)
             or (isinstance(checker, type) and checker == LatexBuddy)
         ):
-            raise ValueError(
-                "Checker module can not be main LatexBuddy instance.",
-            )
+            _msg = "Checker module can not be main LatexBuddy instance."
+            raise ValueError(_msg)
 
-        else:
-
-            self.checker = checker.display_name
+        self.checker = checker.display_name
 
         if position is not None and len(text) < 1:
             LOG.warning(
@@ -259,22 +258,20 @@ class ProblemJSONEncoder(JSONEncoder):
     """Provides JSON serializability for class Problem."""
 
     def default(self, obj: typing.Any):
-        if isinstance(obj, Problem):
-
-            return {
-                "position": obj.position,
-                "text": obj.text,
-                "checker": obj.checker,
-                "p_type": obj.p_type,
-                "file": str(obj.file),
-                "severity": str(obj.severity),
-                "length": obj.length,
-                "category": obj.category,
-                "description": obj.description,
-                "context": obj.context,
-                "suggestions": obj.suggestions,
-                "key": obj.key,
-            }
-
-        else:
+        if not isinstance(obj, Problem):
             return JSONEncoder.default(self, obj)
+
+        return {
+            "position": obj.position,
+            "text": obj.text,
+            "checker": obj.checker,
+            "p_type": obj.p_type,
+            "file": str(obj.file),
+            "severity": str(obj.severity),
+            "length": obj.length,
+            "category": obj.category,
+            "description": obj.description,
+            "context": obj.context,
+            "suggestions": obj.suggestions,
+            "key": obj.key,
+        }

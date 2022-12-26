@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import re
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem
@@ -46,7 +46,10 @@ class UnreferencedFigures(Module):
                     labels[(start, length)] = label
 
         for (position, length), label in labels.items():
-            line, col, offset = tools.absolute_to_linecol(file.tex, position)
+            line, col, offset = latexbuddy.tools.absolute_to_linecol(
+                file.tex,
+                position,
+            )
             if re.search(r"\\c?ref{" + label + re.escape("}"), tex) is None:
                 problems.append(
                     Problem(
@@ -105,7 +108,9 @@ class SiUnitx(Module):
         for number_match in numbers:
             start, end = number_match.span()
             length = end - start
-            line, col, offset = tools.absolute_to_linecol(text, start)
+            line, col, offset = latexbuddy.tools.absolute_to_linecol(
+                text, start,
+            )
             problems.append(
                 Problem(
                     position=(line, col),
@@ -209,7 +214,9 @@ class SiUnitx(Module):
             for unit_match in used_unit:
                 start, end = unit_match.span()
                 length = end - start
-                line, col, offset = tools.absolute_to_linecol(text, start)
+                line, col, offset = latexbuddy.tools.absolute_to_linecol(
+                    text, start,
+                )
                 problems.append(
                     Problem(
                         position=(line, col),
@@ -242,7 +249,9 @@ class EmptySections(Module):
         for section_match in empty_sections:
             start, end = section_match.span()
             length = end - start
-            line, col, offset = tools.absolute_to_linecol(tex, start)
+            line, col, offset = latexbuddy.tools.absolute_to_linecol(
+                tex, start,
+            )
             text = section_match.group(1)
             problems.append(
                 Problem(
@@ -283,7 +292,9 @@ class URLCheck(Module):
             command_len = len("\\url{")
             if tex[start - command_len: start] == "\\url{":
                 continue
-            line, col, offset = tools.absolute_to_linecol(tex, start)
+            line, col, offset = latexbuddy.tools.absolute_to_linecol(
+                tex, start,
+            )
             problems.append(
                 Problem(
                     position=(line, col),
@@ -340,7 +351,7 @@ class CheckFigureResolution(Module):
         problems = []
         figures = []
 
-        for root, dirs, files in os.walk(search_root):
+        for root, _dirs, files in os.walk(search_root):
             root_name = os.path.basename(root)
             for current_file in files:
                 name, ending = os.path.splitext(current_file)
@@ -384,7 +395,7 @@ class NativeUseOfRef(Module):
 
         curr_problem_start = tex.find(ref_pattern)  # init
         while curr_problem_start != -1:
-            line, col, offset = tools.absolute_to_linecol(
+            line, col, offset = latexbuddy.tools.absolute_to_linecol(
                 tex, curr_problem_start,
             )
             end_command = tex.find("}", curr_problem_start) + 1

@@ -48,8 +48,8 @@ class ProblemFilter(ABC):
         if self.end_line is None:
             self.end_line = end_line
             return True
-        else:
-            return False
+
+        return False
 
     def __match_line(self, problem: Problem) -> bool:
         """Determines, whether a given problem is located within the
@@ -65,8 +65,8 @@ class ProblemFilter(ABC):
 
         if self.end_line is None:
             return self.start_line <= problem.position[0]
-        else:
-            return self.start_line <= problem.position[0] <= self.end_line
+
+        return self.start_line <= problem.position[0] <= self.end_line
 
     def match(self, problem: Problem) -> bool:
         """Matches custom filter's requirements against a problem.
@@ -401,26 +401,25 @@ class Preprocessor:
         """
 
         match = Preprocessor.__RE_BEGIN_IGNORE_ANYTHING.fullmatch(line)
-        if match is not None:
+        if match is None:
+            return None
 
-            open_ended_filter = self.__get_open_ended_filter(
-                LineProblemFilter(0),
+        open_ended_filter = self.__get_open_ended_filter(
+            LineProblemFilter(0),
+        )
+
+        if open_ended_filter is None:
+            LOG.debug(
+                f"Created open-ended LineProblemFilter "
+                f"beginning in line {line_num + 1}",
             )
+            return [LineProblemFilter(line_num + 1)]
 
-            if open_ended_filter is not None:
-                LOG.info(
-                    f"Ignored duplicate command 'begin-ignore' "
-                    f"in line {line_num}",
-                )
-                return []
-            else:
-                LOG.debug(
-                    f"Created open-ended LineProblemFilter "
-                    f"beginning in line {line_num + 1}",
-                )
-                return [LineProblemFilter(line_num + 1)]
-
-        return None
+        LOG.info(
+            f"Ignored duplicate command 'begin-ignore' "
+            f"in line {line_num}",
+        )
+        return []
 
     def __regex_match_command_pattern_begin_ignore_modules(
         self,

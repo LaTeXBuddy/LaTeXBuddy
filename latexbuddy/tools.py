@@ -62,14 +62,13 @@ def execute_background(*cmd: str) -> subprocess.Popen:
 
     LOG.debug(f"Executing '{command}' in the background")
 
-    process = subprocess.Popen(
+    return subprocess.Popen(
         [command],
         shell=True,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         preexec_fn=os.setsid,
     )
-    return process
 
 
 def kill_background_process(process: subprocess.Popen):
@@ -120,6 +119,7 @@ def find_executable(
     name: str,
     to_install: str | None = None,
     err_logger: Logger = LOG,
+    *,
     log_errors: bool = True,
 ) -> str:
     """Finds path to an executable.
@@ -163,15 +163,12 @@ def find_executable(
                 f"in the system's PATH",
             )
 
-        raise ExecutableNotFoundError(
-            f"could not find executable '{name}' in system's PATH",
-        )
+        _msg = f"could not find executable '{name}' in system's PATH"
+        raise ExecutableNotFoundError(_msg)
 
-    else:
-
-        path_str = result.splitlines()[0]
-        err_logger.debug(f"Found executable {name} at '{path_str}'.")
-        return path_str
+    path_str = result.splitlines()[0]
+    err_logger.debug(f"Found executable {name} at '{path_str}'.")
+    return path_str
 
 
 location_re = re.compile(r"line (\d+), column (\d+)")
@@ -262,8 +259,7 @@ def execute_no_exceptions(
 
     try:
         function_call()
-    except Exception as e:
-
+    except Exception as e:  # noqa: BLE001
         LOG.error(
             f"{error_message}:\n{e.__class__.__name__}: "
             f"{getattr(e, 'message', e)}",
@@ -309,7 +305,8 @@ def get_all_paths_in_document(file_path: Path) -> list[Path]:
                 ),
             )
             continue
-        except Exception as e:
+        # TODO: define exception more precisely
+        except Exception as e:  # noqa: BLE001
             # If the file cannot be found it is already removed
             error_message = "Error while searching for files"
             LOG.error(
@@ -394,7 +391,7 @@ def get_abs_path(path) -> Path:
     return p
 
 
-class classproperty(property):
+class classproperty(property):  # noqa N801
     """Provides a way to implement a python property with class-level
     accessibility."""
 

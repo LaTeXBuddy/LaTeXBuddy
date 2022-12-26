@@ -1,4 +1,4 @@
-"""This module describes the main LaTeXBuddy instance class."""
+"""Contains the main LaTeXBuddy instance class."""
 from __future__ import annotations
 
 import json
@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 from typing import AnyStr
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.messages import error_occurred_in_module
 from latexbuddy.module_loader import ModuleProvider
@@ -58,7 +58,7 @@ class LatexBuddy(MainModule):
         self.compile_tex: bool
 
     @classproperty
-    def instance(cls):
+    def instance(cls):  # noqa N805
         if cls.__current_instance is None:
             cls.__current_instance = LatexBuddy()
         return cls.__current_instance
@@ -69,6 +69,7 @@ class LatexBuddy(MainModule):
         module_provider: ModuleProvider,
         file_to_check: Path,
         path_list: list[Path],
+        *,
         compile_tex: bool,
     ):
         """Initializes the LaTeXBuddy instance.
@@ -87,7 +88,10 @@ class LatexBuddy(MainModule):
         LatexBuddy.instance.preprocessor = None
         LatexBuddy.instance.module_provider = module_provider
         LatexBuddy.instance.file_to_check = file_to_check
-        LatexBuddy.instance.tex_file = TexFile(file_to_check, compile_tex)
+        LatexBuddy.instance.tex_file = TexFile(
+            file_to_check,
+            compile_tex=compile_tex,
+        )
         LatexBuddy.instance.path_list = path_list
 
         # file where the error should be saved
@@ -240,7 +244,7 @@ class LatexBuddy(MainModule):
                 f"{round(time.perf_counter() - start_time, 2)} seconds",
             )
 
-        tools.execute_no_exceptions(
+        latexbuddy.tools.execute_no_exceptions(
             lambda_function,
             error_occurred_in_module(module.display_name),
             "DEBUG",
@@ -288,20 +292,13 @@ class LatexBuddy(MainModule):
             for problem in problems:
                 LatexBuddy.instance.add_error(problem)
 
-        # FOR TESTING ONLY
-        # LatexBuddy.instance.check_whitelist()
-        # keys = list(LatexBuddy.instance.errors.keys())
-        # for key in keys:
-        #     LatexBuddy.instance.add_to_whitelist(key)
-        #     return
-
     @staticmethod
     def output_json():
         """Writes all the current problem objects to the output file."""
 
         list_of_problems = []
 
-        for problem_uid in LatexBuddy.instance.errors.keys():
+        for problem_uid in LatexBuddy.instance.errors:
             list_of_problems.append(LatexBuddy.instance.errors[problem_uid])
 
         json_output_path = Path(

@@ -9,7 +9,7 @@ from abc import abstractmethod
 from pathlib import Path
 from types import ModuleType
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
 
@@ -53,7 +53,7 @@ class ModuleLoader(ModuleProvider):
 
         modules = self.load_modules()
 
-        selected = [
+        return [
             module
             for module in modules
             if cfg.get_config_option_or_default(
@@ -62,12 +62,10 @@ class ModuleLoader(ModuleProvider):
                 cfg.get_config_option_or_default(
                     LatexBuddy,
                     "enable-modules-by-default",
-                    True,
+                    default_value=True,
                 ),
             )
         ]
-
-        return selected
 
     def load_modules(self) -> list[Module]:
         """This method loads every module that is found in the ModuleLoader's
@@ -107,10 +105,9 @@ class ModuleLoader(ModuleProvider):
 
         loaded_modules = []
 
-        for py_file in py_files:
-
+        def make_lambda(file):
             def lambda_function() -> None:
-                module_path = str(py_file.stem)
+                module_path = str(file.stem)
 
                 LOG.debug(
                     f"Attempting to load module from '{module_path}'",
@@ -118,9 +115,11 @@ class ModuleLoader(ModuleProvider):
                 module = importlib.import_module(module_path)
 
                 loaded_modules.append(module)
+            return lambda_function
 
-            tools.execute_no_exceptions(
-                lambda_function,
+        for py_file in py_files:
+            latexbuddy.tools.execute_no_exceptions(
+                make_lambda(py_file),
                 f"An error occurred while loading module file at "
                 f"{str(py_file)}",
             )

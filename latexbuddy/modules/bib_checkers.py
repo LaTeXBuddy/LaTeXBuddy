@@ -38,14 +38,14 @@ def get_bibfile(file: TexFile) -> Path | None:
     m = re.search(pattern, tex)
 
     if m is None:  # TODO: maybe log this
-        # raise ValueError("No valid bibliography found in the .tex at {path}")
         return None
 
     path = str(path)[: -len(path.parts[-1])]  # remove filename
     bib_path = Path(path + m.group(1) + ".bib")
 
     if not bib_path.exists():
-        raise FileNotFoundError(f"No bibliography found at {bib_path}")
+        _msg = f"No bibliography found at {bib_path}"
+        raise FileNotFoundError(_msg)
 
     return bib_path  # assuming theres only one bibtex file
 
@@ -62,12 +62,13 @@ def parse_bibfile(bibfile: Path) -> (str, str, str):
             entries = bib_database.entries
         # catch error that is raised if the bibtex file is not correctly
         # formatted
-        except UndefinedString as e:
-            raise ValueError(
-                f'{str(bibfile)}:'
-                f'Could not parse BibTeX file: '
-                f'Invalid format: {str(e)}',
+        except UndefinedString as exc:
+            _msg = (
+                f"{str(bibfile)}:"
+                f"Could not parse BibTeX file: "
+                f"Invalid format: {str(exc)}",
             )
+            raise ValueError(_msg) from exc
 
     results = []
     for entry in entries:
@@ -106,7 +107,10 @@ class NewerPublications(Module):
 
         c_returns = 4  # number of max returns from the request
         x = session.get(
-            f"https://dblp.org/search/publ/api?format=json&h={c_returns}&q={publication[0]}",
+            f"https://dblp.org/search/publ/api"
+            f"?format=json"
+            f"&h={c_returns}"
+            f"&q={publication[0]}",
         )
         ret = json.loads(x.text)["result"]
 
@@ -191,7 +195,7 @@ class NewerPublications(Module):
             else:
                 suggestion = (
                     f'Potential newer version "{pub[0]}" '
-                    f'from {pub[1]} at {pub[2]}'
+                    f"from {pub[1]} at {pub[2]}"
                 )
             problems.append(
                 Problem(
@@ -259,12 +263,11 @@ class BibtexDuplicates(Module):
                 entries = bib_database.entries
             # catch error that is raised if the bibtex file is not correctly
             # formatted
-            except UndefinedString as e:
-                raise ValueError(
-                    f'{str(bib_file)}:'
-                    f'Could not parse BibTeX file: '
-                    f'Invalid format: {str(e)}',
-                )
+            except UndefinedString as exc:
+                _msg = f"{str(bib_file)}:" \
+                       f"Could not parse BibTeX file: " \
+                       f"Invalid format: {str(exc)}"
+                raise ValueError(_msg) from exc
 
         for i in range(len(entries)):
             for j in range(i + 1, len(entries)):

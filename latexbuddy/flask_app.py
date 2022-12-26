@@ -135,7 +135,6 @@ def document_check():
         return redirect("/")
 
     files = request.files.getlist("file")
-    # print(files)
 
     if len(files) < 1:
         return redirect("/")
@@ -206,9 +205,7 @@ def display_result(result_id, file_name):
     )
 
     with open(file_path) as f:
-        file_contents = f.read()
-
-    return file_contents
+        return f.read()
 
 
 @app.route("/result/<result_id_0>/compiled/<result_id_1>/<pdf_name>")
@@ -307,7 +304,8 @@ def run_buddy(file_path: Path, output_dir: Path, path_list: list[Path]):
         ),
         file_path,
         path_list,
-        True,  # TODO: change this to only compile the first/main file
+        # TODO: change this to only compile the first/main file
+        compile_tex=True,
     )
 
     LatexBuddy.run_tools()

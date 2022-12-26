@@ -139,19 +139,13 @@ def sort_problems(
 def calculate_line_numbers(file_text: str) -> list[str]:
     split_lines = file_text.split("\n")
     line_numbers = []
-    i = 1
     line_count = len(split_lines)
-    for line in split_lines:
-        diff = len(str(line_count)) - len(str(i))
-        new_line = ""
+    for lineno in range(line_count):
+        diff = len(str(line_count)) - len(str(lineno))
 
-        # add whitespaces
-        for x in range(0, diff):
-            new_line += "&nbsp;" + "&nbsp;"
-        new_line += str(i) + "." + "&nbsp;"
-
-        line_numbers.append(new_line)
-        i += 1
+        line_numbers.append(
+            "&nbsp;" * 2 * diff + str(lineno) + "." + "&nbsp;",
+        )
 
     return line_numbers
 
@@ -179,7 +173,8 @@ class Interval:
             problems = [problems]
 
         if not problems or len(problems) == 0:
-            raise ValueError("An interval must have at least one problem!")
+            _msg = "An interval must have at least one problem."
+            raise ValueError(_msg)
 
         self._problems = problems
 
@@ -187,9 +182,8 @@ class Interval:
         self._end = end if end else self.start + problems[0].length
 
         if self.end < self.start:
-            raise ValueError(
-                "End position can not be smaller than start position!",
-            )
+            _msg = "End position can not be smaller than start position."
+            raise ValueError(_msg)
 
     @property
     def problems(self):
@@ -226,8 +220,8 @@ class Interval:
 
         if other.start < self.start:
             return other.end > self.start
-        else:
-            return other.start < self.end
+
+        return other.start < self.end
 
     def perform_intersection(self, other: Interval) -> list[Interval] | None:
         """Performs an intersection of two intervals and returns a list of new

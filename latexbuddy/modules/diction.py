@@ -8,7 +8,7 @@ from typing import AnyStr
 
 from unidecode import unidecode
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
@@ -27,7 +27,7 @@ class Diction(Module):
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         # check, if diction is installed
-        tools.find_executable("diction", "Diction", LOG)
+        latexbuddy.tools.find_executable("diction", "Diction", LOG)
 
         self.language = config.get_config_option_or_default(
             LatexBuddy,
@@ -41,7 +41,6 @@ class Diction(Module):
         lines = Path(file.plain_file).read_text()
         original_lines = lines.splitlines(keepends=True)
 
-        # print(original_lines)
         lines = unidecode(lines)
 
         # write cleaned text to tempfile
@@ -49,7 +48,7 @@ class Diction(Module):
         cleaned_file.write_text(lines)
 
         # execute diction and collect output
-        errors = tools.execute(
+        errors = latexbuddy.tools.execute(
             f"diction --suggest "
             f"--language {self.language} "
             f"{str(cleaned_file)}",
@@ -69,15 +68,13 @@ class Diction(Module):
         # remove temp file
         os.remove(cleaned_file)
 
-        result = self.format_errors(
+        # return list of Problems
+        return self.format_errors(
             cleaned_errors,
             original_lines,
             file.plain_file,
             file,
         )
-
-        # return list of Problems
-        return result
 
     def format_errors(
         self,

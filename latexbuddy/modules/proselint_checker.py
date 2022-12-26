@@ -31,16 +31,14 @@ class ProseLint(Module):
 
         suggestions = proselint.tools.lint(file.plain)
 
-        result = self.format_errors(suggestions, file)
-
-        return result
+        return self.format_errors(suggestions, file)
 
     def format_errors(self, suggestions: list, file: TexFile):
         problems = []
         for suggestion in suggestions:
             p_type = suggestion[0]
             description = suggestion[1]
-            # line, col = (suggestion[2] + 1, suggestion[3] + 1)
+            # line, col = (suggestion[2] + 1, suggestion[3] + 1)  # noqa
             start_char = suggestion[4] - 1
             position = file.get_position_in_tex(start_char)
             length = suggestion[6]

@@ -64,7 +64,7 @@ def _get_parser() -> argparse.ArgumentParser:
         default="./whitelist",
         help="Location of the whitelist file.",
     )
-    subparsers = parser.add_subparsers(help='available operations')
+    subparsers = parser.add_subparsers(help="available operations")
 
     add_parser = subparsers.add_parser(
         "add",
@@ -116,5 +116,5 @@ def main(args: Sequence[str] | None = None) -> int:
     return 2
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())

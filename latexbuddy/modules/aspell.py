@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from typing import AnyStr
 
-import latexbuddy.tools as tools
+import latexbuddy.tools
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
@@ -30,7 +30,7 @@ class Aspell(Module):
                      option)
         """
 
-        tools.find_executable("aspell", "GNU Aspell", LOG)
+        latexbuddy.tools.find_executable("aspell", "GNU Aspell", LOG)
 
         supported_languages = self.find_languages()
 
@@ -63,7 +63,7 @@ class Aspell(Module):
         for line in lines:  # check every line
             if len(line) > 0:
                 escaped_line = line.replace("'", "\\'")
-                output = tools.execute(
+                output = latexbuddy.tools.execute(
                     f"echo '{escaped_line}' | aspell -a -l {self.language}",
                 )
                 # the first line specifies aspell version
@@ -86,7 +86,9 @@ class Aspell(Module):
         """
         return [
             lang
-            for lang in tools.execute("aspell", "dump dicts").splitlines()
+            for lang in latexbuddy.tools.execute(
+                "aspell", "dump dicts",
+            ).splitlines()
             if "-" not in lang
         ]
 
