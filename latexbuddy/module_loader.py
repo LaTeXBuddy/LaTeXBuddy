@@ -152,21 +152,21 @@ class ModuleLoader(ModuleProvider):
 
         if not self.directory.is_dir():
             LOG.warning(
-                f"{str(self.directory.absolute())} is not a directory. "
+                f"{str(self.directory.resolve())} is not a directory. "
                 f"No modules could be loaded.",
             )
             return []
 
         LOG.debug(
             f"Searching for Python files inside "
-            f"'{str(self.directory.absolute())}'",
+            f"'{str(self.directory.resolve())}'",
         )
 
         files = sorted(self.directory.rglob("*.py"))
 
         LOG.debug(
             f"Found the following .py-files in directory "
-            f"'{str(self.directory.absolute())}': {str(files)}",
+            f"'{str(self.directory.resolve())}': {str(files)}",
         )
 
         return files

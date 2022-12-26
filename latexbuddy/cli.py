@@ -166,7 +166,7 @@ def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
     )
 
     for file in args.file:  # args.file is a list
-        file_path = Path(file).absolute()
+        file_path = Path(file).resolve()
         first_path = True
         paths = get_all_paths_in_document(file_path)
 
