@@ -150,8 +150,27 @@ def main(args: Sequence[str] | None = None) -> int:
 def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
     config_loader = ConfigLoader(args)
 
-    """ For each Tex file transferred, all paths
-    are fetched and Latexbuddy is executed """
+    # For each Tex file transferred, all paths are fetched and LaTeXBuddy
+    # is executed
+
+    if os.environ.get("LATEXBUDDY_USE_NEW_RUNNER", False):
+        from latexbuddy.application import Application
+
+        for file in args.file:
+            file_path = Path(file).resolve()
+            paths = get_all_paths_in_document(file_path)
+
+            compile_tex = True
+            for sub_file in paths:
+                app = Application(
+                    [sub_file],
+                    compile_tex=compile_tex,
+                )
+                compile_tex = False
+
+                app.run()
+
+        return
 
     buddy = LatexBuddy.instance
     module_loader = ModuleLoader(
