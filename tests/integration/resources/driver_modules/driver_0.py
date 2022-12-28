@@ -27,7 +27,6 @@ class FirstDriver(Module):
         pass
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
-
         problems = [
             Problem(
                 position=None,
