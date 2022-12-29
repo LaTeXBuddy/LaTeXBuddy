@@ -1,4 +1,7 @@
+covdefaults>=2.2
 pytest>=7
+pytest-cov>=4
+pytest-xdist[psutil]>=3
 
 covdefaults
 coverage[toml]
