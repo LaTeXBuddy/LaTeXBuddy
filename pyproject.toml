@@ -77,6 +77,14 @@ include = ["latexbuddy"]
 [tool.autopep8]
 ignore = ["W503"]
 
+[tool.coverage.run]
+plugins = ["covdefaults"]
+source = ["latexbuddy"]
+parallel = true
+
+[tool.pytest.ini_options]
+addopts = "--tb=short --cov=latexbuddy --numprocesses logical"
+
 [tool.ruff]
 line-length = 79
 target-version = "py37"
