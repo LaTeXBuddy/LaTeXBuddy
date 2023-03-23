@@ -63,7 +63,7 @@ ignore = ["W503"]
 line-length = 79
 target-version = "py37"
 
-select = [
+extend-select = [
     "F",  # pyflakes
     "E", "W",  # pycodestyle
     "C90",  # mccabe
