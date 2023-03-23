@@ -1,9 +1,9 @@
 {%- if versiondata["version"] == "unreleased" -%}
 ## Unreleased
 
-:::{warning}
+```{warning}
 These changes have **not** been part of a release yet.
-:::
+```
 {% else -%}
 ## [{{ versiondata["version"] }}](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/tree/v{{ versiondata["version"] }}) - {{ versiondata["date"] }}
 {%- endif %}
