@@ -65,6 +65,7 @@ Developer's guide
    :maxdepth: 2
 
    developer/environment.md
+   developer/author.md
 
 .. toctree::
    :caption: Appendix

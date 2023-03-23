@@ -111,3 +111,48 @@ multiprocessing = "mp"
 
 [tool.ruff.flake8-quotes]
 inline-quotes = "double"
+
+[tool.towncrier]
+package = "latexbuddy"
+filename = "CHANGELOG.md"
+directory = "changelog.d"
+start_string = "<!-- towncrier release notes start -->\n"
+underlines = ["", "", ""]
+template = "changelog.d/_template.md.jinja"
+title_format = ""
+issue_format = "[#{issue}](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/issues/{issue})"
+
+  [[tool.towncrier.type]]
+  directory = "breaking"
+  name = "🔥 BREAKING CHANGES"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "add"
+  name = "Added"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "change"
+  name = "Changed"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "fix"
+  name = "Fixed"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "remove"
+  name = "Removed"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "deprecate"
+  name = "Deprecated"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "internal"
+  name = "Behind-the-scenes"
+  showcontent = true

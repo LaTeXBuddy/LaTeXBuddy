@@ -1,0 +1,29 @@
+{%- if versiondata["version"] == "unreleased" -%}
+## Unreleased
+
+```{warning}
+These changes have **not** been part of a release yet.
+```
+{% else -%}
+## [{{ versiondata["version"] }}](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/tree/v{{ versiondata["version"] }}) - {{ versiondata["date"] }}
+{%- endif %}
+
+{% for section, _ in sections.items() %}
+{% if sections[section] %}
+{% for category, val in definitions.items() if category in sections[section] %}
+
+### {{ definitions[category]['name'] }}
+
+{% for text, values in sections[section][category].items() %}
+- {% if values %}{{ values|join(',\n  ') }}: {% endif -%}
+  {{ text }}
+{% endfor %}
+
+{% endfor %}
+{% else %}
+
+No significant changes.
+
+
+{% endif %}
+{% endfor %}

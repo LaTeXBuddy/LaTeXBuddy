@@ -4,6 +4,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 from __future__ import annotations
 
+from pathlib import Path
+
 import latexbuddy
 
 
@@ -16,6 +18,8 @@ author = "LaTeXBuddy team"
 release = latexbuddy.__version__
 version = release
 
+PROJECT_ROOT_DIR = Path(__file__).parent.parent.absolute()
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -24,6 +28,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinxarg.ext",
     "myst_parser",
+    "sphinxcontrib.towncrier.ext",
 ]
 
 autodoc_typehints = "description"
@@ -66,3 +71,9 @@ html_theme_options = {
         },
     ],
 }
+
+# Options: draft/sphinx-version/sphinx-release
+towncrier_draft_autoversion_mode = "draft"
+towncrier_draft_include_empty = True
+towncrier_draft_working_directory = PROJECT_ROOT_DIR
+towncrier_draft_config_path = "pyproject.toml"
