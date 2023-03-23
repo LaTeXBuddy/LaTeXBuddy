@@ -11,7 +11,7 @@ build:
   jobs:
     post_create_environment:
       # Install hatch
-      - pip install hatchling
+      - pip install hatch
       # Export requirements for the docs
       - hatch -e docs dep show requirements >! docs/requirements.txt
 
