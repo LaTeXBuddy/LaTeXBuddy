@@ -67,22 +67,38 @@ extend-select = [
     "F",  # pyflakes
     "E", "W",  # pycodestyle
     "C90",  # mccabe
-    # TODO: complete docs in a separate issue
-#    "D1", "D3",  # pydocstyle
     "N",  # pep8-naming
+    # TODO: complete docs in a separate issue
+    # "D",  # pydocstyle
+    "YTT",  # flake8-2020
     "S",  # bandit
     "BLE",  # flake8-blind-except
     "FBT",  # flake8-boolean-trap
     "B",  # flake8-bugbear
+    "A",  # flake8-builtins
     "C4",  # flake8-comprehensions
+    "DTZ",  # flake8-datetimez
+    "T10",  # flake8-debugger
     "EM",  # flake8-errmsg
+    "ISC",  # flake8-implicit-str-concat
     "ICN",  # flake8-import-conventions
+    "INP",  # flake8-no-pep420
+    "PIE",  # flake8-pie
     "T20",  # flake8-print
+    "PT",  # flake8-pytest-style
     "Q",  # flake8-quotes
-    "RET",  # flake8-return
+    "RSE",  # flake8-raise
+    "SLF",  # flake8-return
+    "RET",  # flake8-self
     "SIM",  # flake8-simplify
+    "TID",  # flake8-tidy-imports
+    "TCH",  # flake8-type-checking
+    "ARG",  # flake8-unused-arguments
+    "PTH",  # flake8-use-pathlib
     "ERA",  # eradicate
     "PLC", "PLE", "PLR", "PLW",  # pylint
+    "TRY",  # tryceratops
+    "RUF",  # ruff
 ]
 
 [tool.ruff.mccabe]
