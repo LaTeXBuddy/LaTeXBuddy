@@ -8,10 +8,10 @@ development. For more information please consult the [wiki].
 _LaTeXBuddy_ is a Python-based application.
 
 -   **Required** for development
-    -   [Python] version 3.7 or newer. It is recommended, that the newest version is
-        used for development. At the time of writing it is `3.11.1`
-    -   [Poetry] is used for dependency management and building. You can install it
-        using any method you like. Use the latest version
+    -   [Python] version 3.7 or newer. It is recommended, that the newest
+        version is used for development. At the time of writing it is 3.11
+    -   [tox] is used for environment management. You can install it using any
+        method you like. Use the latest version
 -   **Needed for modules to work**
     -   [chktex]
     -   [languagetool]
@@ -23,24 +23,24 @@ Windows.
 ## Preparation
 
 After you've installed the prerequisities and cloned the repo, it is time to
-prepare it for work.
-
-To install needed dependencies, run
+initialize the environment:
 
 ```sh
-poetry install --sync
+tox devenv .venv
 ```
 
-This will install all dependencies in a virtual environment. Your terminal
-doesn't have access to it yet. If you run
+This will create a virtual environment under `.venv/`. Now, you need to activate
+it. On Linux or macOS, run:
 
 ```sh
-poetry shell
+source .venv/bin/activate
 ```
 
-you will spawn a shell within your terminal. This will make all installed
-packages available in your terminal. Note that you'll need to do this every time
-you open a new terminal window.
+On Windows, run:
+
+```ps
+.venv\Scripts\activate.bat
+```
 
 > #### Helpful!
 >
@@ -51,10 +51,12 @@ To deactivate the shell, simply type `deactivate` and hit Enter.
 
 ## Building
 
-To build the package, run
+You can develop without ever building the package; this will be done by our CI
+pipeline. If you want to build the package, install `build` and run it:
 
 ```sh
-poetry build
+pip install build
+python3 -m build
 ```
 
 This will create the `dist/` directory and generate the .tar.gz and .whl files,
@@ -122,6 +124,6 @@ an issue, and we'll look into it!
 
 [chktex]: https://www.nongnu.org/chktex/
 [languagetool]: https://github.com/languagetool-org/languagetool
-[poetry]: https://python-poetry.org/
 [python]: https://www.python.org/
+[tox]: https://tox.wiki/
 [wiki]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/wikis/Development%20Guide
