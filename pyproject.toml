@@ -1,60 +1,78 @@
-[tool.poetry]
+[build-system]
+requires = ["setuptools>=61", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
 name = "latexbuddy"
-version = "0.4.2"
-description = ""
-license = "GPL-3.0-or-later"
-authors = [
-    "Niklas Pieninck <n.pieninck@tu-braunschweig.de>",
-    "Levi Elsner <levi.elsner@tu-braunschweig.de>",
-    "Paul Franke <paul.franke@tu-braunschweig.de>",
-    "Jana Haupt <jana.haupt@tu-braunschweig.de>",
-    "Hendrik Hentschel <h.hentschel@tu-braunschweig.de>",
-    "Nikita Karamov <me@kytta.dev>",
-    "Lennart Lutz <l.lutz@tu-braunschweig.de>",
-    "David Meyer <da.meyer@tu-braunschweig.de>",
-    "Paul Nowitzki <p.nowitzki@tu-braunschweig.de>",
-    "Maik Weber <maik.weber@tu-braunschweig.de>"
-]
+description = "The only LaTeX checking tool you'll ever need."
 readme = "README.md"
-include = ["CHANGELOG.md", "NOTICE"]
+requires-python = ">=3.7.15"
+license ={text = "GPL-3.0-or-later"}
+authors = [
+    { name = "Niklas Pieninck", email = "n.pieninck@tu-braunschweig.de" },
+    { name = "Levi Elsner", email = "levi.elsner@tu-braunschweig.de" },
+    { name = "Paul Franke", email = "paul.franke@tu-braunschweig.de" },
+    { name = "Jana Haupt", email = "jana.haupt@tu-braunschweig.de" },
+    { name = "Hendrik Hentschel", email = "h.hentschel@tu-braunschweig.de" },
+    { name = "Nikita Karamov", email = "me@kytta.dev" },
+    { name = "Lennart Lutz", email = "l.lutz@tu-braunschweig.de" },
+    { name = "David Meyer", email = "da.meyer@tu-braunschweig.de" },
+    { name = "Paul Nowitzki", email = "p.nowitzki@tu-braunschweig.de" },
+    { name = "Maik Weber", email = "maik.weber@tu-braunschweig.de" }
+]
+maintainers = [
+    { name = "Nikita Karamov", email = "me@kytta.dev" },
+    { name = "Niklas Pieninck", email = "n.pieninck@tu-braunschweig.de" },
+    { name = "Paul Nowitzki", email = "p.nowitzki@tu-braunschweig.de" },
+    { name = "Maik Weber", email = "maik.weber@tu-braunschweig.de" }
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Text Processing",
+    "Topic :: Text Processing :: Markup :: LaTeX",
+    "Typing :: Typed"
+]
+dependencies = [
+    "requests",
+    "Jinja2",
+    "yalafi",
+    "chardet",
+    "proselint~=0.11.3",
+    "Unidecode",
+    "colorama>=0.4.6; platform_system == 'Windows'",
+    "pydantic~=1.10",
+    "bibtexparser",
+    "Flask",
+    "PyLaTeX",
+    "platformdirs",
+    "importlib_metadata;python_version<'3.8'",
+]
+dynamic = ["version"]
 
-[tool.poetry.dependencies]
-python = "^3.7.15"
-requests = "^2.28.1"
-Jinja2 = "^3.0.1"
-yalafi = "^1.4.0"
-chardet = "^5.0.0"
-proselint = "~0.11.3"
-Unidecode = "^1.2.0"
-colorama = { version = "^0.4.6", markers = "sys_platform == 'win32'"}
-pydantic = "^1.10.2"
-bibtexparser = "^1.4.0"
-Flask = "^2.0.1"
-PyLaTeX = "^1.4.1"
-platformdirs = "^2.6.0"
+[project.urls]
+Homepage = "https://latexbuddy.gitlab.io/"
+Documentation = "https://latexbuddy.readthedocs.io/"
+Repository = "https://gitlab.com/LaTeXBuddy/LaTeXBuddy/"
+"Bug tracker" = "https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/issues"
 
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.2.0"
-
-
-[tool.poetry.group.docs.dependencies]
-sphinx = "^5.3.0"
-myst-parser = "~0.18.1"
-furo = "2022.12.7"
-readthedocs-sphinx-search = "~0.1.2"
-sphinx-autobuild = "^2021.3.14"
-sphinx-argparse = "~0.4.0"
-
-
-[tool.poetry.scripts]
+[project.scripts]
 latexbuddy = "latexbuddy.cli:main"
 latexbuddy-server = "latexbuddy.flask_app:run_server"
 latexbuddy-whitelist = "latexbuddy.whitelist:main"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.setuptools.packages.find]
+include = ["latexbuddy"]
+
+[tool.setuptools_scm]
 
 [tool.autopep8]
 ignore = ["W503"]

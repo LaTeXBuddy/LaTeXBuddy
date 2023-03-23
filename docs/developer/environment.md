@@ -60,9 +60,9 @@ To be able to "juggle" around Python versions easily, a Python version manager i
 
 Windows users can also install both Python 3.7 and Python 3.11 from .exe installers and set up their editors to use separate versions for separate occasions.
 
-## Poetry
+## Tox
 
-[Poetry] is the dependency management tool that we use. It is crucial that you install it. You can install it via `pip`, however it's highly recommended that you use [the provided install scripts](https://python-poetry.org/docs/#installing-with-the-official-installer).
+[Tox] is the environment manager and runner that we use. It is crucial that you install it. You can install it via `pip`; consult [the official installation instructions](https://tox.wiki/en/latest/installation.html).
 
 ## pre-commit
 
@@ -81,12 +81,12 @@ pre-commit install
 [gitkraken]: https://www.gitkraken.com/
 [homebrew]: https://brew.sh/
 [jetbrains education]: https://www.jetbrains.com/community/education/
-[poetry]: https://python-poetry.org/
 [pre-commit]: https://pre-commit.com/
 [pycharm]: https://www.jetbrains.com/pycharm/
 [pyenv]: https://github.com/pyenv/pyenv
 [python]: https://www.python.org/
 [sourcetree]: https://www.sourcetreeapp.com/
+[tox]: https://tox.wiki/
 [ubuntu]: https://ubuntu.com/
 [visual studio code]: https://code.visualstudio.com/
 [wsl]: https://docs.microsoft.com/windows/wsl/

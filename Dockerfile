@@ -6,20 +6,16 @@ FROM python:alpine AS build-latexbuddy
 # install GCC and other libs for building
 RUN apk update && apk add build-base
 
-# install Poetry
-ENV POETRY_HOME /etc/poetry
-RUN wget 'https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py' \
-	&& python get-poetry.py --no-modify-path \
-	&& rm -rf get-poetry.py
-ENV PATH /etc/poetry/bin:$PATH
+# install 'build'
+RUN python3 -m pip install build
 
 # copy files
 WORKDIR /latexbuddy
-COPY pyproject.toml poetry.lock README.md CHANGELOG.md NOTICE ./
+COPY pyproject.toml README.md CHANGELOG.md NOTICE ./
 COPY ./latexbuddy ./latexbuddy
 
 # build LaTeXBuddy
-RUN poetry install && poetry build
+RUN python3 -m build
 
 
 

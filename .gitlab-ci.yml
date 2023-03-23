@@ -2,7 +2,6 @@ image: python:latest
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pypoetry"
   PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
   SRC_DIR: "$CI_PROJECT_DIR/latexbuddy"
   XDG_CACHE_HOME: "$CI_PROJECT_DIR/.cache"
@@ -11,10 +10,9 @@ cache:
   - key:
       files:
         - pyproject.toml
-        - poetry.lock
+        - requirements-dev.txt
     paths:
       - ${PIP_CACHE_DIR}
-      - ${POETRY_CACHE_DIR}
   - key:
       files:
         - .pre-commit-config.yaml
@@ -50,10 +48,9 @@ pre-commit-all-files:
 .smoke: &smoke_base
   stage: Smoke Test
   before_script:
-    - pip install poetry
-    - poetry install
+    - pip install .
   script:
-    - poetry run latexbuddy --help
+    - latexbuddy --help
   only:
     - master
     - merge_requests
@@ -69,10 +66,9 @@ smoke-py311:
 build:
   stage: Build
   before_script:
-    - pip install poetry
-    - poetry install
+    - pip install --upgrade build
   script:
-    - poetry build
+    - python3 -m build
   artifacts:
     paths:
       - dist/*.whl
@@ -84,10 +80,9 @@ build:
 publish:
   stage: Publish
   before_script:
-    - pip install poetry
-    - poetry config repositories.gitlab ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi
+    - pip install --upgrade twine
   script:
-    - poetry publish --repository gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
+    - python3 -m twine upload
   only:
     - tags
   dependencies:

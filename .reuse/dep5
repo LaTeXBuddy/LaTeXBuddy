@@ -22,7 +22,6 @@ Files:
  .git-blame-ignore-revs
  AUTHORS
  NOTICE
- poetry.lock
 Copyright: 2021-2022 LaTeXBuddy <latexbuddy@mailbox.org>
 License: CC0-1.0
 

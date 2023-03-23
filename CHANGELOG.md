@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   LaTeXBuddy is now open-source under the terms of GPL-3.0-or-later (#105, !175)
 -   some calls to `os.path` were replaced with `pathlib.Path`
 
+### Behind-the-scenes
+
+-   Poetry was ditched in favour of a rather vanilla setuptools+tox setup
+
 ## [0.4.2] - 25 Dec 2022 :christmas_tree:
 
 ### Fixed
