@@ -16,14 +16,20 @@
 from __future__ import annotations
 
 import logging.handlers
+import sys
 
 import latexbuddy.tools
 from latexbuddy.logging_formatter import ConsoleFormatter
 
+if sys.version_info < (3, 8):  # pragma: <3.8 cover
+    from importlib_metadata import version
+else:  # pragma: >=3.8 cover
+    from importlib.metadata import version
+
 # package metadata
 __app_name__ = "LaTeXBuddy"  # proper name
 __name__ = "latexbuddy"  # "unixified" name
-__version__ = "0.4.2"
+__version__ = version("latexbuddy")
 
 
 # by default, don't add any handler
