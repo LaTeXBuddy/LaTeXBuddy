@@ -5,26 +5,16 @@ All notable changes to LaTeXBuddy will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+Changes for the upcoming release can be found in the
+["changelog.d" directory](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/tree/master/changelog.d)
+in our repository.
 
-### 🔥 BREAKING CHANGES
+<!--
+Do *NOT* add changelog entries here!
+This changelog is managed by towncrier and is compiled at release time.
+-->
 
--   CLI got reamped and simplified (#112, !183)
-    -   **removed** option `--flask` ⇒ use executable `latexbuddy-server` instead
-    -   **removed** options `--wl_add_keys` and `--wl_from_wordlist` ⇒ use
-        executable `latexbuddy-whitelist` instead
-        -   whitelist operations got moved to the new `whitelist` module
-    -   removed the big mutually exclusive group, which should affect usage
-
-### Changed
-
--   `extend_path()` call was removed, making LaTeXBuddy not a namespace any more
--   LaTeXBuddy is now open-source under the terms of GPL-3.0-or-later (#105, !175)
--   some calls to `os.path` were replaced with `pathlib.Path`
-
-### Behind-the-scenes
-
--   Poetry was ditched in favour of a rather vanilla setuptools+tox setup
+<!-- towncrier release notes start -->
 
 ## [0.4.2] - 25 Dec 2022 :christmas_tree:
 
