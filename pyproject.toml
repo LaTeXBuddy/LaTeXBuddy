@@ -53,7 +53,8 @@ dependencies = [
     "bibtexparser~=1.4",
     "Flask~=2.0",
     "PyLaTeX~=1.4",
-    "platformdirs~=2.6"
+    "platformdirs~=2.6",
+    "importlib_metadata;python_version<'3.8'",
 ]
 dynamic = ["version"]
 
