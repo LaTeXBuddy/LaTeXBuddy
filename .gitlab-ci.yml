@@ -82,9 +82,8 @@ publish:
   stage: Publish
   before_script:
     - pip install hatch
-    - poetry config publish.index.repos.gitlab.url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi
   script:
-    - poetry publish --repo gitlab --user gitlab-ci-token --auth ${CI_JOB_TOKEN}
+    - hatch publish
   only:
     - tags
   dependencies:
