@@ -13,7 +13,7 @@ build:
       # Install hatch
       - pip install hatch
       # Export requirements for the docs
-      - hatch -e docs dep show requirements >! docs/requirements.txt
+      - hatch -e docs dep show requirements > docs/requirements.txt
 
 formats:
   - epub
