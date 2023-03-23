@@ -109,5 +109,13 @@ inline-quotes = "double"
 
 [tool.hatch]
 
+[tool.hatch.envs.default]
+dependencies = [
+    "pytest",
+]
+
+[tool.hatch.envs.default.scripts]
+test = 'pytest {args:tests}'
+
 [tool.hatch.version]
 source = "vcs"
