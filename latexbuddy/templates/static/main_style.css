@@ -17,17 +17,17 @@
  */
 
 .monospaced {
-    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono",
-        Menlo, monospace;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo,
+    monospace;
 }
 
 body {
-    font-size: 14px;
-    padding: 1rem 2rem 0;
+  font-size: 14px;
+  padding: 1rem 2rem 0;
 }
 
 header h1 > svg {
-    height: 2.5em;
+  height: 2.5em;
 }
 
 /*
@@ -40,182 +40,182 @@ pre {
 */
 
 main {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: flex-start;
-    align-content: flex-start;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  align-content: flex-start;
 }
 
 @media (max-width: 1200px) {
-    main {
-        flex-wrap: wrap;
-    }
+  main {
+    flex-wrap: wrap;
+  }
 }
 
 main > div {
-    padding: 0.5rem;
+  padding: 0.5rem;
 }
 
 #file-contents {
-    flex: 1 0 min(100%, 80ch);
+  flex: 1 0 min(100%, 80ch);
 }
 
 #problems-list {
-    display: flex;
-    flex-direction: column;
-    width: 40%;
-    min-width: 40%;
-    height: 1000px;
-    overflow: auto;
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  min-width: 40%;
+  height: 1000px;
+  overflow: auto;
 }
 
 .problem {
-    padding: 0.666rem 0;
-    border-bottom: 1px solid #eeeeee;
+  padding: 0.666rem 0;
+  border-bottom: 1px solid #eeeeee;
 }
 
 .problem-context {
-    margin: 0 0 0.5em;
+  margin: 0 0 0.5em;
 }
 
 .problem-text {
-    text-decoration-style: wavy;
-    text-decoration-line: underline;
-    text-decoration-thickness: 0.07em;
+  text-decoration-style: wavy;
+  text-decoration-line: underline;
+  text-decoration-thickness: 0.07em;
 }
 
 .under {
-    text-decoration-style: wavy;
-    text-decoration-line: underline;
-    text-decoration-thickness: 1px;
+  text-decoration-style: wavy;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
 }
 
 .problem.is-none .problem-text,
 .under.is-none {
-    text-decoration-color: transparent;
+  text-decoration-color: transparent;
 }
 
 .problem.is-info .problem-text,
 .under.is-info {
-    text-decoration-color: steelblue;
+  text-decoration-color: steelblue;
 }
 
 .problem.is-warning .problem-text,
 .under.is-warning {
-    text-decoration-color: orange;
+  text-decoration-color: orange;
 }
 
 .problem.is-error .problem-text,
 .under.is-error {
-    text-decoration-color: red;
+  text-decoration-color: red;
 }
 
 .problem p {
-    margin: 0 0 0.5rem;
+  margin: 0 0 0.5rem;
 }
 
 .problem p:last-child {
-    margin: 0;
+  margin: 0;
 }
 
 .problem-meta {
-    font-size: smaller;
-    font-weight: normal;
+  font-size: smaller;
+  font-weight: normal;
 }
 
 .problem-list-header {
-    display: flex;
-    flex-direction: row;
-    margin-left: 25px;
+  display: flex;
+  flex-direction: row;
+  margin-left: 25px;
 }
 
 .problem-list-header label {
-    margin-left: 25px;
-    margin-top: 8px;
+  margin-left: 25px;
+  margin-top: 8px;
 }
 
 .problem-list-header .switch .off {
-    left: 70%;
+  left: 70%;
 }
 
 .problem-list-header .switch .on {
-    right: 65%;
+  right: 65%;
 }
 
 .spelling {
-    text-decoration-style: wavy;
-    text-decoration-line: underline;
-    text-decoration-color: lightcoral;
-    text-decoration-thickness: 0.07em;
+  text-decoration-style: wavy;
+  text-decoration-line: underline;
+  text-decoration-color: lightcoral;
+  text-decoration-thickness: 0.07em;
 }
 
 .grammar {
-    background-color: lightyellow;
+  background-color: lightyellow;
 }
 
 #problem-disp {
-    display: none;
+  display: none;
 }
 
 #general-problem-disp {
-    display: block;
+  display: block;
 }
 
 #pdf-disp {
-    margin-top: 15px;
-    margin-right: 10px;
-    margin-bottom: 15px;
-    display: none;
-    width: 100%;
-    height: 29.8cm;
+  margin-top: 15px;
+  margin-right: 10px;
+  margin-bottom: 15px;
+  display: none;
+  width: 100%;
+  height: 29.8cm;
 }
 
 #pdf-ifr {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    max-height: 29.8cm;
-    margin-bottom: 15px;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  max-height: 29.8cm;
+  margin-bottom: 15px;
 }
 
 #file-container {
-    display: flex;
-    margin: 0 auto;
-    width: 60%;
-    height: 1000px;
+  display: flex;
+  margin: 0 auto;
+  width: 60%;
+  height: 1000px;
 }
 
 .text-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    background-color: #eeeeee;
-    border-radius: 0.5rem;
-    overflow: auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #eeeeee;
+  border-radius: 0.5rem;
+  overflow: auto;
 }
 
 .line-container {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 .line-container code {
-    margin-left: 10px;
-    padding-top: 2px;
-    line-height: 20px;
+  margin-left: 10px;
+  padding-top: 2px;
+  line-height: 20px;
 }
 
 .line-number {
-    font-size: 1em;
-    padding: 4px;
-    background: silver;
+  font-size: 1em;
+  padding: 4px;
+  background: silver;
 }
 
 .latex {
-    background-color: lightblue;
+  background-color: lightblue;
 }
 
 /* not yet set for every style TODO

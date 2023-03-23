@@ -17,36 +17,36 @@
  */
 
 div.collapsible {
-    background-color: #f1f1f1;
+  background-color: #f1f1f1;
 }
 
 div.collapsible > button.collapsible-toggle {
-    background-color: #eeeeee;
-    cursor: pointer;
-    width: 100%;
-    padding: 1em;
-    border: none;
-    outline: none;
-    text-align: left;
-    font-size: 15px;
+  background-color: #eeeeee;
+  cursor: pointer;
+  width: 100%;
+  padding: 1em;
+  border: none;
+  outline: none;
+  text-align: left;
+  font-size: 15px;
 }
 
 div.collapsible > button.collapsible-toggle:after {
-    content: "\02795"; /* plus sign in unicode */
-    font-size: 13px;
-    color: #005a5b;
-    float: right;
-    margin-left: 5px;
+  content: "\02795"; /* plus sign in unicode */
+  font-size: 13px;
+  color: #005a5b;
+  float: right;
+  margin-left: 5px;
 }
 
 div.collapsible > button.collapsible-toggle.active:after {
-    content: "\02796"; /* minus sign in unicode*/
+  content: "\02796"; /* minus sign in unicode*/
 }
 
 div.collapsible > div.collapsible-content {
-    background-color: #f1f1f1;
-    padding: 0 2em;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
+  padding: 0 2em;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
 }

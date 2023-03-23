@@ -4,8 +4,8 @@
 
 You can code on any system you want! However, since the project is in the first place targeted at the user of Unix-like systems, we highly recommend you install on. Here are some user-friendly distributions for you to try out:
 
--   [Ubuntu] — probably, the most popular distro. Software Center, `snap` and `apt` will get you assessed with all the tools you need.
--   [Fedora] — another very popular distro. A repo for PyCharm is shipped with the OS!
+- [Ubuntu] — probably, the most popular distro. Software Center, `snap` and `apt` will get you assessed with all the tools you need.
+- [Fedora] — another very popular distro. A repo for PyCharm is shipped with the OS!
 
 Ubuntu and Fedora offer different desktop environments. If you want a macOS-like experience with little clutter and sleek designs, choose GNOME-based variants (the default ones). If you are more familiar with Windows and/or want the highest degree of customizability, choose KDE- or XFCE-based versions (Kubuntu, Fedora KDE). If you only care about performance, choose Xfce-based versions (Xubuntu, Fedora Xfce).
 

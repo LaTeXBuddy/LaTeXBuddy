@@ -7,14 +7,14 @@ development. For more information please consult the [wiki].
 
 _LaTeXBuddy_ is a Python-based application.
 
--   **Required** for development
-    -   [Python] version 3.7 or newer. It is recommended, that the newest
-        version is used for development. At the time of writing it is 3.11
-    -   [tox] is used for environment management. You can install it using any
-        method you like. Use the latest version
--   **Needed for modules to work**
-    -   [chktex]
-    -   [languagetool]
+- **Required** for development
+  - [Python] version 3.7 or newer. It is recommended, that the newest
+    version is used for development. At the time of writing it is 3.11
+  - [tox] is used for environment management. You can install it using any
+    method you like. Use the latest version
+- **Needed for modules to work**
+  - [chktex]
+  - [languagetool]
 
 It is recommended that you use a \*nix-based OS for development (like GNU/Linux
 or macOS). We do not guarantee complete tech support for developers running

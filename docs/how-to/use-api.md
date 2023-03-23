@@ -68,11 +68,11 @@ This method fetches the value of the config entry with the specified key for the
 
 Parameters:
 
--   `module: Optional[Union[Type[NamedModule], NamedModule]]`: type or instance of the Module owning the config option
--   `key: str`: key of the config option
--   `verify_type: Type`: type that the config entry is required to be an instance of
--   `verify_regex: Optional[str]`: regular expression that the config entry is required to match fully
--   `verify_choices: Optional[Union[List[Any], Tuple[Any], Set[Any]]]`: a list/tuple/set of valid values in which the config entry is required to be contained
+- `module: Optional[Union[Type[NamedModule], NamedModule]]`: type or instance of the Module owning the config option
+- `key: str`: key of the config option
+- `verify_type: Type`: type that the config entry is required to be an instance of
+- `verify_regex: Optional[str]`: regular expression that the config entry is required to match fully
+- `verify_choices: Optional[Union[List[Any], Tuple[Any], Set[Any]]]`: a list/tuple/set of valid values in which the config entry is required to be contained
 
 #### `get_config_option(module, key, default_value, verify_type, verify_regex, verify_choices) -> Any`
 
@@ -80,12 +80,12 @@ This method fetches the value of the config entry with the specified key for the
 
 Parameters:
 
--   `module: Optional[Union[Type[NamedModule], NamedModule]]`: type or instance of the Module owning the config option
--   `key: str`: key of the config option
--   `default_value: Any`: default value in case the requested option doesn't exist
--   `verify_type: Type`: type that the config entry is required to be an instance of
--   `verify_regex: Optional[str]`: regular expression that the config entry is required to match fully
--   `verify_choices: Optional[Union[List[Any], Tuple[Any], Set[Any]]]`: a list/tuple/set of valid values in which the config entry is required to be contained
+- `module: Optional[Union[Type[NamedModule], NamedModule]]`: type or instance of the Module owning the config option
+- `key: str`: key of the config option
+- `default_value: Any`: default value in case the requested option doesn't exist
+- `verify_type: Type`: type that the config entry is required to be an instance of
+- `verify_regex: Optional[str]`: regular expression that the config entry is required to match fully
+- `verify_choices: Optional[Union[List[Any], Tuple[Any], Set[Any]]]`: a list/tuple/set of valid values in which the config entry is required to be contained
 
 ## Using the included utilities
 
@@ -97,8 +97,8 @@ Executes a shell command via python's `subprocess` library and returns the combi
 
 **Parameters:**
 
--   `*cmd`: Tuple of strings representing the shell command and its flags and arguments
--   _optional:_ `encoding`: name of the encoding python uses to decode the contents in stdout and stderr
+- `*cmd`: Tuple of strings representing the shell command and its flags and arguments
+- _optional:_ `encoding`: name of the encoding python uses to decode the contents in stdout and stderr
 
 _Example usage:_
 
@@ -123,7 +123,7 @@ Any output by the background process to stdout or stderr will be ignored.
 
 **Parameters:**
 
--   `*cmd`: Tuple of strings representing the shell command and its flags and arguments
+- `*cmd`: Tuple of strings representing the shell command and its flags and arguments
 
 ### `kill_background_process(process: subprocess.Popen) -> None`
 
@@ -131,7 +131,7 @@ Kills a previously started background process by sending a `SIGTERM` signal.
 
 **Parameters:**
 
--   `process`: Popen object representing a running process. Accepts return values of `execute_background`.
+- `process`: Popen object representing a running process. Accepts return values of `execute_background`.
 
 ### `execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str`
 
@@ -139,8 +139,8 @@ Executes a shell command via python's `subprocess` library and returns the conte
 
 **Parameters:**
 
--   `*cmd`: Tuple of strings representing the shell command and its flags and arguments
--   _optional:_ `encoding`: string name of the encoding python uses to decode the contents in stdout
+- `*cmd`: Tuple of strings representing the shell command and its flags and arguments
+- _optional:_ `encoding`: string name of the encoding python uses to decode the contents in stdout
 
 ### `find_executable(name: str, to_install: Optional[str] = None, logger: Optional[Logger] = None, log_errors: bool = True) -> str`
 
@@ -149,10 +149,10 @@ Raises a `FileNotFoundError`, if the executable could not be located.
 
 **Parameters:**
 
--   `name`: name of the executable to be found
--   _optional:_ `to_install`: correct name of the program or project which the requested executable belongs to (used in log messages, defaults to the value of `name`, if unspecified)
--   _optional:_ `logger`: logger instance of the calling module, defaults to the standard logger for tools.py
--   _optional:_ `log_errors`: specifies whether error messages should be logges as error (`True`) or debug (`False`) messages
+- `name`: name of the executable to be found
+- _optional:_ `to_install`: correct name of the program or project which the requested executable belongs to (used in log messages, defaults to the value of `name`, if unspecified)
+- _optional:_ `logger`: logger instance of the calling module, defaults to the standard logger for tools.py
+- _optional:_ `log_errors`: specifies whether error messages should be logges as error (`True`) or debug (`False`) messages
 
 ### `absolute_to_linecol(text: str, position: int) -> Tuple[int, int, List[int]]`
 
@@ -160,8 +160,8 @@ Calculates the line and column of a given character from the absolute position o
 
 **Parameters:**
 
--   `text`: text containing the character
--   `position`: absolute position of the character (0-based)
+- `text`: text containing the character
+- `position`: absolute position of the character (0-based)
 
 ### `get_line_offsets(text: str) -> List[int]`
 
@@ -171,7 +171,7 @@ Indices correspond to the line numbers, but are 0-based. For example, if the fir
 
 **Parameters:**
 
--   `text`: the text to be processed
+- `text`: the text to be processed
 
 ### `is_binary(file_bytes: bytes) -> bool`
 
@@ -180,7 +180,7 @@ For correct detection, it is recommended, that at least 1024 bytes were read.
 
 **Parameters:**
 
--   `bytes`: bytes of a file
+- `bytes`: bytes of a file
 
 ### `execute_no_exceptions(function_call: Callable[[], None], error_message: str, traceback_log_level: Optional[str] = None) -> None`
 
@@ -189,6 +189,6 @@ If an Exception is caught, the function is aborted and the error is logged, but 
 
 **Parameters:**
 
--   `function_call`: python function to be executed
--   _optional:_ `error_message`: custom error message passed to the logger, defaults to `"An error occurred while executing lambda function"`
--   _optional:_ `traceback_log_level`: sets the log_level that is used to log the error traceback. If it is None, no traceback will be logged. Valid values are: "DEBUG", "INFO", "WARNING", "ERROR"
+- `function_call`: python function to be executed
+- _optional:_ `error_message`: custom error message passed to the logger, defaults to `"An error occurred while executing lambda function"`
+- _optional:_ `traceback_log_level`: sets the log_level that is used to log the error traceback. If it is None, no traceback will be logged. Valid values are: "DEBUG", "INFO", "WARNING", "ERROR"

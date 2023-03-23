@@ -17,106 +17,106 @@
  */
 
 header h1 > svg {
-    height: 12em;
+  height: 12em;
 }
 
 header h1 {
-    margin-top: 4em;
-    display: grid;
-    place-items: center;
+  margin-top: 4em;
+  display: grid;
+  place-items: center;
 }
 
 body {
-    display: grid;
-    place-items: center;
+  display: grid;
+  place-items: center;
 }
 
 body form {
-    display: grid;
-    place-items: center;
-    width: 70%;
+  display: grid;
+  place-items: center;
+  width: 70%;
 }
 
 form div.collapsible {
-    width: 100%;
-    margin: 2em 5em 0em;
+  width: 100%;
+  margin: 2em 5em 0em;
 }
 
 div.inline-form-element {
-    margin-top: 10px;
-    margin-bottom: 5px;
+  margin-top: 10px;
+  margin-bottom: 5px;
 }
 
 div.inline-form-element > * {
-    display: inline;
+  display: inline;
 }
 
 .label_text {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 .file_input {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 .float_right {
-    float: right;
+  float: right;
 }
 
 .submit_input {
-    margin-top: 20px;
-    padding: 5px;
-    padding-top: 6px;
-    font-size: 16px;
-    border: 2px solid rgba(0, 150, 148, 0.54);
-    background: #f1f1f1;
-    border-radius: 5px 5px 5px 5px;
+  margin-top: 20px;
+  padding: 5px;
+  padding-top: 6px;
+  font-size: 16px;
+  border: 2px solid rgba(0, 150, 148, 0.54);
+  background: #f1f1f1;
+  border-radius: 5px 5px 5px 5px;
 }
 
 .submit_input:hover {
-    background: #d5d5d5;
+  background: #d5d5d5;
 }
 
 .lang_input {
-    border-radius: 3px 3px 3px 3px;
-    border: 1px solid black;
-    float: right;
-    width: 150px;
-    height: 20px;
+  border-radius: 3px 3px 3px 3px;
+  border: 1px solid black;
+  float: right;
+  width: 150px;
+  height: 20px;
 }
 
 .lang_input:focus {
-    border: 1px solid rgb(0, 150, 148);
-    outline: none;
+  border: 1px solid rgb(0, 150, 148);
+  outline: none;
 }
 
 .module_input {
-    border-radius: 3px 3px 3px 3px;
-    border: 1px solid black;
-    width: 150px;
-    float: right;
-    height: 20px;
+  border-radius: 3px 3px 3px 3px;
+  border: 1px solid black;
+  width: 150px;
+  float: right;
+  height: 20px;
 }
 
 .module_input:focus {
-    border: 1px solid rgb(0, 150, 148);
-    outline: none;
+  border: 1px solid rgb(0, 150, 148);
+  outline: none;
 }
 
 .list_selector {
-    border: 2px solid rgba(0, 150, 148, 0.54);
-    border-radius: 5px 5px 5px 5px;
-    float: right;
-    width: 150px;
-    height: 20px;
+  border: 2px solid rgba(0, 150, 148, 0.54);
+  border-radius: 5px 5px 5px 5px;
+  float: right;
+  width: 150px;
+  height: 20px;
 }
 
 .module_selector {
-    border: 2px solid rgba(0, 150, 148, 0.54);
-    border-radius: 5px 5px 5px 5px;
-    float: right;
-    width: 150px;
-    margin-left: 10px;
-    height: 20px;
-    margin-bottom: 4px;
+  border: 2px solid rgba(0, 150, 148, 0.54);
+  border-radius: 5px 5px 5px 5px;
+  float: right;
+  width: 150px;
+  margin-left: 10px;
+  height: 20px;
+  margin-bottom: 4px;
 }

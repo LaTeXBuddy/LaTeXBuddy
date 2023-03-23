@@ -35,16 +35,16 @@ You are free to create as many other classes as needed, but remember that any cl
 
 The `TexFile` class encapsulates all information about the LaTeX file that is supposed to be checked. It offers these attributes:
 
--   `tex`: contains the contents of the `.tex` file as a String (`str`)
--   `plain`: contains the contents of the deTeXed version (plain text) of the `.tex` file as a String (`str`)
--   `tex_file`: contains the `.tex` file's path as a `pathlib.Path` object
--   `plain_file`: contains the deTeXed version (plain text) of the `.tex` file as a `pathlib.Path` object
--   `is_faulty`: contains a boolean that is `True`, if the `.tex` file is invalid or contains syntax errors and `False` otherwise
+- `tex`: contains the contents of the `.tex` file as a String (`str`)
+- `plain`: contains the contents of the deTeXed version (plain text) of the `.tex` file as a String (`str`)
+- `tex_file`: contains the `.tex` file's path as a `pathlib.Path` object
+- `plain_file`: contains the deTeXed version (plain text) of the `.tex` file as a `pathlib.Path` object
+- `is_faulty`: contains a boolean that is `True`, if the `.tex` file is invalid or contains syntax errors and `False` otherwise
 
 `TexFile` also offers two methods to convert positions in the deTeXed text to the corresponding positions in the original LaTeX code:
 
--   `get_position_in_tex(char_pos: int) -> Optional[Tuple[int, int]]`: Takes in the absolute position of a character in the deTeXed text and returns the line and column of the same character in the original LaTeX code. If the specified position is invalid, None is returned.
--   `get_position_in_tex_from_linecol(line: int, col: int) -> Optional[Tuple[int, int]]`: Takes in the line and column of a character in the deTeXed text and returns the line and column of the same character in the original LaTeX code. If the specified position is invalid, None is returned.
+- `get_position_in_tex(char_pos: int) -> Optional[Tuple[int, int]]`: Takes in the absolute position of a character in the deTeXed text and returns the line and column of the same character in the original LaTeX code. If the specified position is invalid, None is returned.
+- `get_position_in_tex_from_linecol(line: int, col: int) -> Optional[Tuple[int, int]]`: Takes in the line and column of a character in the deTeXed text and returns the line and column of the same character in the original LaTeX code. If the specified position is invalid, None is returned.
 
 ## Working with `Problem`
 
@@ -88,16 +88,16 @@ _optional:_ A string containing an internal ID of the problem's category (e.g. '
 
 _optional:_ an `Enum` specifying the level of severity for this problem. Valid values are:
 
--   `NONE`: Problems are not being highlighted, but are still being output.
+- `NONE`: Problems are not being highlighted, but are still being output.
 
--   `INFO`: Problems are highlighted with light blue color. These are suggestions; problems, that aren't criticizing the text.
-    Example: suggestion to use "lots" instead of "a lot"
+- `INFO`: Problems are highlighted with light blue color. These are suggestions; problems, that aren't criticizing the text.
+  Example: suggestion to use "lots" instead of "a lot"
 
--   `WARNING`: Problems are highlighted with orange color. These are warnings about problematic areas in documents. The files compile and work as expected, but some behavior may be unacceptable.
-    Example: warning about using "$$" in LaTeX
+- `WARNING`: Problems are highlighted with orange color. These are warnings about problematic areas in documents. The files compile and work as expected, but some behavior may be unacceptable.
+  Example: warning about using "$$" in LaTeX
 
--   `ERROR`: Problems are highlighted with red color. These are errors, that prevent the documents to compile correctly.
-    Example: not closed environment, or wrong LaTeX syntax
+- `ERROR`: Problems are highlighted with red color. These are errors, that prevent the documents to compile correctly.
+  Example: not closed environment, or wrong LaTeX syntax
 
 _defaults to:_ `ProblemSeverity.WARNING`
 
