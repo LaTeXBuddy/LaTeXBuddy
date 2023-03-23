@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "latexbuddy"
 description = "The only LaTeX checking tool you'll ever need."
@@ -101,3 +105,5 @@ multiprocessing = "mp"
 
 [tool.ruff.flake8-quotes]
 inline-quotes = "double"
+
+[tool.hatch]
