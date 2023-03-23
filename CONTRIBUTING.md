@@ -9,8 +9,8 @@ _LaTeXBuddy_ is a Python-based application.
 
 -   **Required** for development
     -   [Python] version 3.7 or newer. It is recommended, that the newest version is
-        used for development. At the time of writing it is `3.11.1`
-    -   [Poetry] is used for dependency management and building. You can install it
+        used for development. At the time of writing it is 3.11
+    -   [Hatch] is used for dependency management and building. You can install it
         using any method you like. Use the latest version
 -   **Needed for modules to work**
     -   [chktex]
@@ -22,39 +22,29 @@ Windows.
 
 ## Preparation
 
-After you've installed the prerequisities and cloned the repo, it is time to
-prepare it for work.
-
-To install needed dependencies, run
+Hatch will handle creating and maintaining virtualenvs for you, so you don't
+have to worry about it. To enter the virtual environment for development, run
 
 ```sh
-poetry install --sync
+hatch shell
 ```
 
-This will install all dependencies in a virtual environment. Your terminal
-doesn't have access to it yet. If you run
-
-```sh
-poetry shell
-```
-
-you will spawn a shell within your terminal. This will make all installed
-packages available in your terminal. Note that you'll need to do this every time
-you open a new terminal window.
+This will make all installedcpackages available in your terminal. Note that
+you'll need to do this every time you open a new terminal window.
 
 > #### Helpful!
 >
 > If you use VSCode or PyCharm, every in-IDE terminal window
 > will activate the environment automatically
 
-To deactivate the shell, simply type `deactivate` and hit Enter.
+To deactivate the shell, press <kbd>Ctrl</kbd>+<kbd>D</kbd>
 
 ## Building
 
 To build the package, run
 
 ```sh
-poetry build
+hatch build
 ```
 
 This will create the `dist/` directory and generate the .tar.gz and .whl files,
@@ -121,7 +111,7 @@ organized and structured. If you don't find something you're looking for, create
 an issue, and we'll look into it!
 
 [chktex]: https://www.nongnu.org/chktex/
+[hatch]: https://hatch.pypa.io/
 [languagetool]: https://github.com/languagetool-org/languagetool
-[poetry]: https://python-poetry.org/
 [python]: https://www.python.org/
 [wiki]: https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/wikis/Development%20Guide
