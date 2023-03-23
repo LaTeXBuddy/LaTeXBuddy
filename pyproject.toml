@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "latexbuddy"
 description = "The only LaTeX checking tool you'll ever need."
@@ -63,6 +67,9 @@ Repository = "https://gitlab.com/LaTeXBuddy/LaTeXBuddy/"
 latexbuddy = "latexbuddy.cli:main"
 latexbuddy-server = "latexbuddy.flask_app:run_server"
 latexbuddy-whitelist = "latexbuddy.whitelist:main"
+
+[tool.setuptools.packages.find]
+include = ["latexbuddy"]
 
 [tool.autopep8]
 ignore = ["W503"]
