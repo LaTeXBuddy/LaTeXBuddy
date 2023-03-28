@@ -12,9 +12,12 @@ Files:
  docs/*.bat
  docs/Makefile
  docs/*.py
+ docs/requirements.txt
  config.py
  Dockerfile
  pyproject.toml
+ requirements-dev.txt
+ tox.ini
 Copyright: 2021-2022 LaTeXBuddy <latexbuddy@mailbox.org>
 License: Apache-2.0
 
@@ -26,6 +29,7 @@ Copyright: 2021-2022 LaTeXBuddy <latexbuddy@mailbox.org>
 License: CC0-1.0
 
 Files:
+ changelog.d/*
  docs/*.ico
  docs/*.md
  docs/*.rst
