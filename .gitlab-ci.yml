@@ -42,7 +42,16 @@ pre-commit-changed:
   only:
     - merge_requests
 
-.smoke: &smoke_base
+smoke:
+  parallel:
+    matrix:
+      - PYTHON_VERSION:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+  image: python:$PYTHON_VERSION-alpine
   stage: Test
   before_script:
     - pip install .
@@ -51,26 +60,6 @@ pre-commit-changed:
   only:
     - master
     - merge_requests
-
-Smoke test 37/5:
-  <<: *smoke_base
-  image: python:3.7
-
-Smoke test 38/5:
-  <<: *smoke_base
-  image: python:3.8
-
-Smoke test 39/5:
-  <<: *smoke_base
-  image: python:3.9
-
-Smoke test 310/5:
-  <<: *smoke_base
-  image: python:3.10
-
-Smoke test 311/5:
-  <<: *smoke_base
-  image: python:3.11
 
 build:
   stage: Build
