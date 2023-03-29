@@ -34,7 +34,8 @@ pre-commit: &pre-commit
         - ${PRE_COMMIT_HOME}
 
   before_script:
-    - *setup
+    - apk add git nodejs
+    - python --version --version
     - pip install pre-commit
   script:
     - pre-commit run --all-files
