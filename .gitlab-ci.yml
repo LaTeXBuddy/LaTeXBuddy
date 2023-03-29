@@ -5,18 +5,10 @@ variables:
   PIP_CACHE_DIR: "$XDG_CACHE_HOME/pip"
   PRE_COMMIT_HOME: "$XDG_CACHE_HOME/pre-commit"
 
-cache:
-  - key:
-      files:
-        - pyproject.toml
-        - requirements-dev.txt
-    paths:
-      - ${PIP_CACHE_DIR}
-  - key:
-      files:
-        - .pre-commit-config.yaml
-    paths:
-      - ${PRE_COMMIT_HOME}
+cache: &global_cache
+  key: v1-pip-$CI_COMMIT_REF_SLUG
+  paths:
+    - ${PIP_CACHE_DIR}
 
 stages:
   - Lint
@@ -31,6 +23,16 @@ default:
 
 pre-commit: &pre-commit
   stage: Lint
+  cache:
+    - key: v1-pip-$CI_COMMIT_REF_SLUG
+      paths:
+        - ${PIP_CACHE_DIR}
+    - key:
+        files:
+          - .pre-commit-config.yaml
+      paths:
+        - ${PRE_COMMIT_HOME}
+
   before_script:
     - *setup
     - pip install pre-commit
@@ -48,6 +50,9 @@ pre-commit-changed:
     - merge_requests
 
 smoke:
+  cache:
+    <<: *global_cache
+    key: v1-pip-$CI_COMMIT_REF_SLUG-$PYTHON_VERSION
   parallel:
     matrix:
       - PYTHON_VERSION:
@@ -69,6 +74,7 @@ smoke:
 
 build:
   stage: Build
+  cache: {}
   before_script:
     - *setup
     - pip install --upgrade build
@@ -84,6 +90,7 @@ build:
 
 publish:
   stage: Publish
+  cache: {}
   needs:
     - build
   before_script:
