@@ -14,12 +14,9 @@ default:
     - source .venv/bin/activate
 
 cache:
-  - key:
-      files:
-        - pyproject.toml
-        - requirements-dev.txt
-    paths:
+  - paths:
       - ${PIP_CACHE_DIR}
+      - .venv/
   - key:
       files:
         - .pre-commit-config.yaml
