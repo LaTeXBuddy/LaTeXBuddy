@@ -1,9 +1,9 @@
 image: python:alpine
 
 variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
   XDG_CACHE_HOME: "$CI_PROJECT_DIR/.cache"
+  PIP_CACHE_DIR: "$XDG_CACHE_HOME/pip"
+  PRE_COMMIT_HOME: "$XDG_CACHE_HOME/pre-commit"
 
 cache:
   - key:
