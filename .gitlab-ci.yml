@@ -6,7 +6,7 @@ variables:
   PRE_COMMIT_HOME: "$XDG_CACHE_HOME/pre-commit"
 
 default:
-  before_script:
+  before_script: &default-setup
     - apk add git
     - python --version --version
     - pip install --upgrade setuptools pip virtualenv
@@ -31,8 +31,10 @@ stages:
 
 pre-commit: &pre-commit
   stage: Lint
-  script:
+  before_script:
+    - *default-setup
     - pip install pre-commit
+  script:
     - pre-commit run --all-files
   only:
     - master
