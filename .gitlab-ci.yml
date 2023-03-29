@@ -24,9 +24,15 @@ stages:
   - Build
   - Publish
 
+default:
+  before_script: &setup
+    - apk add git
+    - python --version --version
+
 pre-commit: &pre-commit
   stage: Lint
   before_script:
+    - *setup
     - pip install pre-commit
   script:
     - pre-commit run --all-files
@@ -53,6 +59,7 @@ smoke:
   image: python:$PYTHON_VERSION-alpine
   stage: Test
   before_script:
+    - *setup
     - pip install .
   script:
     - latexbuddy --help
@@ -63,6 +70,7 @@ smoke:
 build:
   stage: Build
   before_script:
+    - *setup
     - pip install --upgrade build
   script:
     - python3 -m build
@@ -79,6 +87,7 @@ publish:
   needs:
     - build
   before_script:
+    - *setup
     - pip install --upgrade twine
   script:
     - python3 -m twine upload
