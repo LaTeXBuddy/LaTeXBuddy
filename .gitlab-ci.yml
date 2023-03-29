@@ -1,53 +1,71 @@
-image: python:latest
+image: python:alpine
 
 variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
-  SRC_DIR: "$CI_PROJECT_DIR/latexbuddy"
   XDG_CACHE_HOME: "$CI_PROJECT_DIR/.cache"
+  PIP_CACHE_DIR: "$XDG_CACHE_HOME/pip"
+  PRE_COMMIT_HOME: "$XDG_CACHE_HOME/pre-commit"
 
-cache:
-  - key:
-      files:
-        - pyproject.toml
-        - requirements-dev.txt
-    paths:
-      - ${PIP_CACHE_DIR}
-  - key:
-      files:
-        - .pre-commit-config.yaml
-    paths:
-      - ${PRE_COMMIT_HOME}
+cache: &global_cache
+  key: v1-pip
+  paths:
+    - ${PIP_CACHE_DIR}
 
 stages:
   - Lint
-  - Smoke Test
+  - Test
   - Build
   - Publish
 
-.pre-commit: &pre-commit-base
-  stage: Lint
-  before_script:
-    - pip install pre-commit
+default:
+  before_script: &setup
+    - apk add git
+    - python --version --version
 
-pre-commit-on-merge:
-  <<: *pre-commit-base
+pre-commit: &pre-commit
+  stage: Lint
+  cache:
+    - key: v1-pip
+      paths:
+        - ${PIP_CACHE_DIR}
+    - key:
+        files:
+          - .pre-commit-config.yaml
+      paths:
+        - ${PRE_COMMIT_HOME}
+
+  before_script:
+    - apk add git nodejs
+    - python --version --version
+    - pip install pre-commit
+  script:
+    - pre-commit run --all-files
+  only:
+    - master
+
+pre-commit-changed:
+  <<: *pre-commit
   script:
     - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
     - pre-commit run --from-ref origin/"$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" --to-ref "$CI_COMMIT_SHA"
   only:
     - merge_requests
 
-pre-commit-all-files:
-  <<: *pre-commit-base
-  script:
-    - pre-commit run --all-files
-  only:
-    - master
-
-.smoke: &smoke_base
-  stage: Smoke Test
+smoke:
+  cache:
+    <<: *global_cache
+    key: v1-pip-$PYTHON_VERSION
+  parallel:
+    matrix:
+      - PYTHON_VERSION:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+  image: python:$PYTHON_VERSION-alpine
+  stage: Test
   before_script:
+    - *setup
     - pip install .
   script:
     - latexbuddy --help
@@ -55,17 +73,11 @@ pre-commit-all-files:
     - master
     - merge_requests
 
-smoke-py37:
-  <<: *smoke_base
-  image: python:3.7
-
-smoke-py311:
-  <<: *smoke_base
-  image: python:3.11
-
 build:
   stage: Build
+  cache: {}
   before_script:
+    - *setup
     - pip install --upgrade build
   script:
     - python3 -m build
@@ -79,7 +91,11 @@ build:
 
 publish:
   stage: Publish
+  cache: {}
+  needs:
+    - build
   before_script:
+    - *setup
     - pip install --upgrade twine
   script:
     - python3 -m twine upload
