@@ -5,18 +5,13 @@ variables:
   PIP_CACHE_DIR: "$XDG_CACHE_HOME/pip"
   PRE_COMMIT_HOME: "$XDG_CACHE_HOME/pre-commit"
 
-default:
-  before_script: &default-setup
-    - apk add git
-    - python --version --version
-    - pip install --upgrade setuptools pip virtualenv
-    - virtualenv .venv
-    - source .venv/bin/activate
-
 cache:
-  - paths:
+  - key:
+      files:
+        - pyproject.toml
+        - requirements-dev.txt
+    paths:
       - ${PIP_CACHE_DIR}
-      - .venv/
   - key:
       files:
         - .pre-commit-config.yaml
@@ -32,7 +27,6 @@ stages:
 pre-commit: &pre-commit
   stage: Lint
   before_script:
-    - *default-setup
     - pip install pre-commit
   script:
     - pre-commit run --all-files
@@ -58,8 +52,9 @@ smoke:
           - "3.11"
   image: python:$PYTHON_VERSION-alpine
   stage: Test
-  script:
+  before_script:
     - pip install .
+  script:
     - latexbuddy --help
   only:
     - master
@@ -67,8 +62,9 @@ smoke:
 
 build:
   stage: Build
-  script:
+  before_script:
     - pip install --upgrade build
+  script:
     - python3 -m build
   artifacts:
     paths:
@@ -82,8 +78,9 @@ publish:
   stage: Publish
   needs:
     - build
-  script:
+  before_script:
     - pip install --upgrade twine
+  script:
     - python3 -m twine upload
   only:
     - tags
