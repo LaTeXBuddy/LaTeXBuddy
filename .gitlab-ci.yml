@@ -44,8 +44,6 @@ pre-commit-changed:
 
 .smoke: &smoke_base
   stage: Test
-  needs:
-    - pre-commit
   before_script:
     - pip install .
   script:
