@@ -31,6 +31,7 @@ from latexbuddy import __app_name__
 from latexbuddy import __version__
 from latexbuddy import colour
 from latexbuddy.buddy import LatexBuddy
+from latexbuddy.config import get_core_config
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.module_loader import ModuleLoader
 from latexbuddy.tools import get_all_paths_in_document
@@ -63,43 +64,6 @@ def _get_parser() -> argparse.ArgumentParser:
         default=Path("config.py"),
         help="Location of the config file.",
     )
-    parser.add_argument(
-        "--output",
-        "-o",
-        type=str,
-        default=None,
-        help="Directory, in which to put the output file.",
-    )
-
-    # nargs="+" marks the beginning of a list
-    parser.add_argument(
-        "file",
-        nargs="+",
-        type=Path,
-        help="File(s) that will be processed.",
-    )
-    parser.add_argument(
-        "--language",
-        "-l",
-        type=str,
-        default=None,
-        help="Target language of the file.",
-    )
-    parser.add_argument(
-        "--whitelist",
-        "-w",
-        type=str,
-        default=None,
-        help="Location of the whitelist file.",
-    )
-    parser.add_argument(
-        "--format",
-        "-f",
-        type=str,
-        choices=["HTML", "html", "JSON", "json", "HTML_FLASK", "html_flask"],
-        default=None,
-        help="Format of the output file (either HTML or JSON).",
-    )
 
     module_selection = parser.add_mutually_exclusive_group()
     module_selection.add_argument(
@@ -124,7 +88,11 @@ def main(args: Sequence[str] | None = None) -> int:
     start = perf_counter()
 
     args = args if args is not None else sys.argv[1:]
-    parsed_args = _get_parser().parse_args(args)
+
+    parser = _get_parser()
+    config_cls = get_core_config(parser)
+    parsed_args = parser.parse_args()
+    config = config_cls.model(**vars(parsed_args))  # noqa: F841
 
     verbosity = parsed_args.verbose
     if os.environ.get("LATEXBUDDY_DEBUG"):
@@ -149,8 +117,9 @@ def main(args: Sequence[str] | None = None) -> int:
 
 def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
     config_loader = ConfigLoader(args)
-    """For each Tex file transferred, all paths are fetched and Latexbuddy is
-    executed."""
+
+    # For each Tex file transferred, all paths are fetched and
+    # Latexbuddy is executed
 
     buddy = LatexBuddy.instance
     module_loader = ModuleLoader(
