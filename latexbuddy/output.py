@@ -396,7 +396,7 @@ def resolve_interval_intersections(intervals: list[Interval]) -> None:
                       intersections
     """
 
-    if len(intervals) < 2:
+    if len(intervals) <= 1:
         return
 
     next_index: int = 1

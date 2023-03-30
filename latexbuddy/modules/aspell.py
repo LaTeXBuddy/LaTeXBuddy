@@ -31,6 +31,8 @@ LOG = logging.getLogger(__name__)
 
 
 class Aspell(Module):
+    SUGGESTIONS_COUNT = 5
+
     def __init__(self) -> None:
         self.language: str | None = None
 
@@ -140,8 +142,7 @@ class Aspell(Module):
             if error[0] == "&":
                 suggestions = suggestions_str.split(", ")
             # just take the first 5 suggestions
-            if len(suggestions) > 5:
-                suggestions = suggestions[0:5]
+            suggestions = suggestions[:self.SUGGESTIONS_COUNT]
 
             # calculate the char location
             tmp_split = tmp[0].split(" ")

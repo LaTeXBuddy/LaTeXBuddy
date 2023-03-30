@@ -102,6 +102,8 @@ def parse_bibfile(bibfile: Path) -> list[tuple[str, str, str]]:
 
 
 class NewerPublications(Module):
+    SIMILARITY_THRESHOLD = 0.85
+
     def __init__(self) -> None:
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
@@ -144,7 +146,7 @@ class NewerPublications(Module):
                     title.upper(),
                     publication[0].upper(),
                 ).ratio()
-                if sim < 0.85:
+                if sim < self.SIMILARITY_THRESHOLD:
                     continue
 
                 year = hit["info"]["year"]
@@ -217,6 +219,8 @@ class NewerPublications(Module):
 
 
 class BibtexDuplicates(Module):
+    SIMILARITY_THRESHOLD = 0.85
+
     def __init__(self) -> None:
         self.severity = ProblemSeverity.INFO
         self.category = "latex"
@@ -250,7 +254,7 @@ class BibtexDuplicates(Module):
                 self.clean_str(entry_2[key]),
             ).ratio()
         ratio = total_ratio / len(same_keys)
-        if ratio > 0.85:
+        if ratio > self.SIMILARITY_THRESHOLD:
             LOG.debug(
                 f"{entry_1} is probably a duplicate of {entry_2}. "
                 f"Similarity ratio: {ratio}",

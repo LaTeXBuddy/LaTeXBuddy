@@ -51,7 +51,7 @@ class Chktex(Module):
         latexbuddy.tools.find_executable("chktex", "ChkTeX", LOG)
 
         format_str = (
-            self.DELIMITER.join(
+            ":::".join(
                 ["%f", "%l", "%c", "%d", "%n", "%s", "%m", "%k", "%r", "%t"],
             )
             + "\n\n"
@@ -80,8 +80,12 @@ class Chktex(Module):
 
         for problem in out:
             out_split = problem.split(self.DELIMITER)
-            if len(out_split) < 10:
+
+            # Sometimes ChkTeX gives us less segments back
+            # TODO: fix this more elegantly
+            if len(out_split) < 10:  # noqa: PLR2004
                 continue
+
             severity = (
                 ProblemSeverity.WARNING
                 if out_split[7] == "Warning"
