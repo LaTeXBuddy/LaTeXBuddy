@@ -67,8 +67,6 @@ repos:
     rev: "v0.0.260"
     hooks:
       - id: ruff
-        # Respect `exclude` and `extend-exclude` settings.
-        args: ["--force-exclude"]
         files: ^latexbuddy/
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: "v1.1.1"
