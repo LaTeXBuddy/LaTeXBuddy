@@ -54,6 +54,9 @@ class ConfigLoader:
     specified config file or the default config file, if none is
     specified. ConfigLoader also offers methods for accessing config
     entries with the option to specify a default value on Failure.
+
+    .. deprecated:: 0.5.0
+       Use :py:class:`latexbuddy.config.Config` instead.
     """
 
     _REGEX_LANGUAGE_FLAG = re.compile(
