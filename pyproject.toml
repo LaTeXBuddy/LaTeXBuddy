@@ -103,6 +103,11 @@ select = [
     "PLC", "PLE", "PLR", "PLW",  # pylint
 ]
 
+extend-ignore = [
+    # TODO: un-ignore this later
+    "PLR0913",  # Too many arguments to function call
+]
+
 [tool.ruff.mccabe]
 max-complexity = 10
 
