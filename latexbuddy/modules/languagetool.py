@@ -329,7 +329,7 @@ class LanguageTool(Module):
         if self.disabled_categories:
             request_data["disabledCategories"] = self.disabled_categories
 
-        response = requests.post(url=server_url, data=request_data)
+        response = requests.post(url=server_url, data=request_data, timeout=60)
 
         try:
             return response.json()
@@ -348,7 +348,7 @@ class LanguageTool(Module):
         fail with an exception.
         """
 
-        response_json = requests.get(server_url).json()
+        response_json = requests.get(server_url, timeout=60).json()
 
         supported_languages = [entry["longCode"] for entry in response_json]
         supported_languages = list(
