@@ -47,7 +47,8 @@ if typing.TYPE_CHECKING:
 
 
 app = Flask(name)
-env = Environment(loader=PackageLoader("latexbuddy"))
+# TODO: Turn on autoescape after making sure it doesn't break templates
+env = Environment(loader=PackageLoader("latexbuddy"))  # noqa: S701
 LOG = logging.getLogger(__name__)
 
 ALLOWED_EXTENSIONS = [

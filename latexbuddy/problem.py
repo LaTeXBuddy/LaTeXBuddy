@@ -88,7 +88,7 @@ def set_language(lang: str | None) -> None:
     :param lang: global language that the modules currently work with
     """
     # FIXME: don't use global variables
-    global language
+    global language  # noqa: PLW0603
     language = lang
 
 

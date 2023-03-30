@@ -27,7 +27,8 @@ from latexbuddy.problem import Problem
 from latexbuddy.problem import ProblemSeverity
 
 
-env = Environment(loader=PackageLoader("latexbuddy"))
+# TODO: Turn on autoescape after making sure it doesn't break templates
+env = Environment(loader=PackageLoader("latexbuddy"))  # noqa: S701
 
 
 def problem_key(problem: Problem) -> int:
