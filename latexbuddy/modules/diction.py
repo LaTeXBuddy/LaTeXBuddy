@@ -184,7 +184,10 @@ class Diction(Module):
                 file,
             )
 
-        line_hash = hashlib.md5(o_line.encode()).hexdigest()
+        line_hash = hashlib.sha1(
+            o_line.encode(),
+            usedforsecurity=False,
+        ).hexdigest()
 
         return Problem(
             position=location,

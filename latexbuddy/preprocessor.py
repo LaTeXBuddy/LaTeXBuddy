@@ -772,10 +772,7 @@ class Preprocessor:
         :param problem: Problem to check
         :return: false if matching; true otherwise
         """
-        for f in self.filters:
-            if f.match(problem):
-                return False
-        return True
+        return all(not f.match(problem) for f in self.filters)
 
     def apply_preprocessor_filter(
         self,

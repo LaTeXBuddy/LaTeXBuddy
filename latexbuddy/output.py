@@ -27,7 +27,8 @@ from latexbuddy.problem import Problem
 from latexbuddy.problem import ProblemSeverity
 
 
-env = Environment(loader=PackageLoader("latexbuddy"))
+# TODO: Turn on autoescape after making sure it doesn't break templates
+env = Environment(loader=PackageLoader("latexbuddy"))  # noqa: S701
 
 
 def problem_key(problem: Problem) -> int:
@@ -114,7 +115,7 @@ def render_general_html(
         # TODO: temporary fix, might cause issues if another "compiled"
         #  directory is in pdf_path
         cut_path = pdf_path.find("compiled")
-        if -1 < cut_path:
+        if cut_path > -1:
             final_pdf_path = pdf_path[pdf_path.find("compiled"):]
     else:
         final_pdf_path = None
@@ -396,7 +397,7 @@ def resolve_interval_intersections(intervals: list[Interval]) -> None:
                       intersections
     """
 
-    if len(intervals) < 2:
+    if len(intervals) <= 1:
         return
 
     next_index: int = 1
