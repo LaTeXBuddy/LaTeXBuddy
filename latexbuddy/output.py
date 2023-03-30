@@ -114,7 +114,7 @@ def render_general_html(
         # TODO: temporary fix, might cause issues if another "compiled"
         #  directory is in pdf_path
         cut_path = pdf_path.find("compiled")
-        if -1 < cut_path:
+        if cut_path > -1:
             final_pdf_path = pdf_path[pdf_path.find("compiled"):]
     else:
         final_pdf_path = None

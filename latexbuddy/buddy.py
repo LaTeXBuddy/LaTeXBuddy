@@ -163,9 +163,8 @@ class LatexBuddy(MainModule):
         """
 
         pp = LatexBuddy.instance.preprocessor
-        if pp is not None:
-            if not pp.matches_preprocessor_filter(problem):
-                return
+        if pp is not None and not pp.matches_preprocessor_filter(problem):
+            return
 
         if equation_re.match(problem.text):
             return

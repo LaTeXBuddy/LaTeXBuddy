@@ -106,14 +106,14 @@ class FlaskConfigLoader(ConfigLoader):
         if module_selector_mode \
                 and module_selector_mode in ["blacklist", "whitelist"]:
             self.main_flags["enable-modules-by-default"] = (
-                True if module_selector_mode == "blacklist" else False
+                module_selector_mode == "blacklist"
             )
 
             if module_selection:
                 for module in module_selection.split(","):
                     self.module_flags[module] = {}
                     self.module_flags[module]["enabled"] = (
-                        False if module_selector_mode == "blacklist" else True
+                        module_selector_mode != "blacklist"
                     )
 
         if (
