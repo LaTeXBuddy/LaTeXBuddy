@@ -12,7 +12,7 @@ Main instance
 Configuration
 -------------
 
-.. automodule:: latexbuddy.config_loader
+.. automodule:: latexbuddy.config
    :members:
 
 TeX file
@@ -77,4 +77,13 @@ Tools
 ^^^^^
 
 .. automodule:: latexbuddy.tools
+   :members:
+
+Deprecated APIs
+---------------
+
+ConfigLoader
+^^^^^^^^^^^^
+
+.. automodule:: latexbuddy.config_loader
    :members:

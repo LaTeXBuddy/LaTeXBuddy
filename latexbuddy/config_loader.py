@@ -13,7 +13,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""This module describes the LaTeXBuddy config loader and its properties."""
+"""This module describes the LaTeXBuddy config loader and its properties.
+
+.. deprecated:: 0.5.0    Use :py:mod:`latexbuddy.config` instead.
+"""
 import importlib.util
 import logging
 import re
