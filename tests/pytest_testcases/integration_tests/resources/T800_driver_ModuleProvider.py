@@ -15,21 +15,24 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
+import logging
+
 from latexbuddy.config_loader import ConfigLoader
-from latexbuddy.log import Loggable
 from latexbuddy.module_loader import ModuleProvider
 from latexbuddy.modules import Module
 from latexbuddy.problem import Problem
 from latexbuddy.problem import ProblemSeverity
 from latexbuddy.texfile import TexFile
 
+LOG = logging.getLogger(__name__)
 
-class DriverModuleProvider(ModuleProvider, Loggable):
+
+class DriverModuleProvider(ModuleProvider):
     def load_selected_modules(self, cfg: ConfigLoader) -> list[Module]:
         return self.load_modules()
 
     def load_modules(self) -> list[Module]:
-        self.logger.debug("Returning scripted module instances.")
+        LOG.debug("Returning scripted module instances.")
         return [DriverModule0(), DriverModule1()]
 
 
@@ -38,7 +41,7 @@ class DriverModule0(Module):
         return
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
-        self.logger.debug("returning no problems")
+        LOG.debug("returning no problems")
         return []
 
 
