@@ -71,13 +71,17 @@ pytest:
     key: v1-pip-$PYTHON_VERSION
   parallel:
     matrix:
-      - PYTHON_VERSION:
-          - "3.7"
-          - "3.8"
-          - "3.9"
-          - "3.10"
-          - "3.11"
-  image: registry.gitlab.com/latexbuddy/ci-docker-image:$PYTHON_VERSION
+      - PYTHON_VERSION: "3.7"
+        IMAGE_TAG: "3-7"
+      - PYTHON_VERSION: "3.8"
+        IMAGE_TAG: "3-8"
+      - PYTHON_VERSION: "3.9"
+        IMAGE_TAG: "3-9"
+      - PYTHON_VERSION: "3.10"
+        IMAGE_TAG: "3-10"
+      - PYTHON_VERSION: "3.11"
+        IMAGE_TAG: "3-11"
+  image: $CI_REGISTRY/latexbuddy/ci-docker-image:$IMAGE_TAG
   stage: Test
   needs:
     - smoke
