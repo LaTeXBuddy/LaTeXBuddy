@@ -89,6 +89,12 @@ test:
   only:
     - master
     - merge_requests
+  artifacts:
+    when: always
+    paths:
+      - pytest-junit.xml
+    reports:
+      junit: pytest-junit.xml
 
 build:
   stage: Build
