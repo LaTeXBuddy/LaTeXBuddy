@@ -77,12 +77,13 @@ test:
           - "3.9"
           - "3.10"
           - "3.11"
-  image: python:$PYTHON_VERSION-alpine
+  image: python:$PYTHON_VERSION-slim
   stage: Test
   needs:
     - smoke
   before_script:
-    - *setup
+    - apt-get update && apt-get install git texlive-base aspell diction chktex
+    - python --version --version
     - pip install . tox virtualenv
   script:
     - tox run --skip-missing-interpreters
