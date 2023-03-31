@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import tempfile
 from pathlib import Path
@@ -84,58 +85,52 @@ def test_unit_buddy_checks(script_dir, config_loader):
     temp_dir = config_loader.get_config_option(LatexBuddy, "output")
 
     with open(temp_dir + "/latexbuddy_output.json") as f:
-        json_contents = f.read()
+        actual = json.load(f)
 
-    assert (
-        "\n" + json_contents + "\n"
-        == """
-[
-    {
-        "position": [
-            1,
-            1
-        ],
-        "text": "text",
-        "checker": "DummyModule0",
-        "p_type": "my_problem_id",
-        "file": "{file_str}",
-        "severity": "error",
-        "length": 4,
-        "category": "dumb mistakes",
-        "description": "this is a test error, please ignore it...",
-        "context": [
-            "",
-            "totally made up"
-        ],
-        "suggestions": [
-            "idk",
-            "try harder next time"
-        ],
-        "key": "my_very_unique_key"
-    },
-    {
-        "position": [
-            1,
-            2
-        ],
-        "text": "text2",
-        "checker": "DummyModule0",
-        "p_type": "",
-        "file": "{file_str}",
-        "severity": "warning",
-        "length": 5,
-        "category": null,
-        "description": null,
-        "context": [
-            "",
-            ""
-        ],
-        "suggestions": [],
-        "key": "DummyModule0__text2"
-    }
-]
-""".replace(
-            "{file_str}",
-            file_str,
-        )
-    )
+    expected = [
+        {
+            "position": [
+                1,
+                1,
+            ],
+            "text": "text",
+            "checker": "DummyModule0",
+            "p_type": "my_problem_id",
+            "file": str(file_str),
+            "severity": "error",
+            "length": 4,
+            "category": "dumb mistakes",
+            "description": "this is a test error, please ignore it...",
+            "context": [
+                "",
+                "totally made up",
+            ],
+            "suggestions": [
+                "idk",
+                "try harder next time",
+            ],
+            "key": "my_very_unique_key",
+        },
+        {
+            "position": [
+                1,
+                2,
+            ],
+            "text": "text2",
+            "checker": "DummyModule0",
+            "p_type": "",
+            "file": str(file_str),
+            "severity": "warning",
+            "length": 5,
+            "category": None,
+            "description": None,
+            "context": [
+                "",
+                "",
+            ],
+            "suggestions": [],
+            "key": "DummyModule0__text2",
+        },
+    ]
+
+    assert actual == expected
