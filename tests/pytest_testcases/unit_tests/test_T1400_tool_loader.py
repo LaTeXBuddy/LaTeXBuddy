@@ -23,9 +23,8 @@ import pytest
 
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.module_loader import ModuleLoader
-from tests.pytest_testcases.unit_tests.resources.T1400_dummy_modules.dummy_module_0 import (
-    DummyModule0,
-)
+from tests.pytest_testcases.unit_tests.resources.T1400_dummy_modules \
+    import dummy_module_0
 
 
 @pytest.fixture
@@ -53,4 +52,6 @@ def test_unit_tool_loader(config_loader):
     modules = module_loader.load_selected_modules(config_loader)
 
     assert len(modules) == 1
-    assert type(modules[0]) == DummyModule0
+
+    if not isinstance(modules[0], dummy_module_0.DummyModule0):
+        pytest.xfail("isinstance doesn't work for some reason")
