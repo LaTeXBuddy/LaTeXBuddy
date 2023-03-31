@@ -27,6 +27,7 @@ changelog:
   before_script:
     - apk add git
   script:
+    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
     - "! git diff --quiet origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME $CI_COMMIT_SHA -- changelog.d/"
   only:
     - merge_requests
