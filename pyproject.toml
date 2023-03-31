@@ -77,6 +77,13 @@ include = ["latexbuddy"]
 [tool.autopep8]
 ignore = ["W503"]
 
+[tool.coverage.run]
+plugins = ["covdefaults"]
+
+[tool.coverage.report]
+# TODO: increase this when coverage is good
+fail_under = 50
+
 [tool.ruff]
 line-length = 79
 target-version = "py37"
