@@ -89,7 +89,7 @@ pytest:
     - python --version --version
     - pip install . tox virtualenv
   script:
-    - tox run --skip-missing-interpreters
+    - tox run --skip-missing-interpreters --skip-env docs
   only:
     - master
     - merge_requests
