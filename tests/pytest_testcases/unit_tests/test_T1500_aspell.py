@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 from pathlib import Path
 
 import pytest
@@ -24,6 +25,11 @@ from latexbuddy.modules.aspell import Aspell
 from latexbuddy.texfile import TexFile
 from tests.pytest_testcases.unit_tests.resources.driver_config_loader import (
     ConfigLoader as DriverCL,
+)
+
+pytestmark = pytest.mark.skipif(
+    shutil.which("aspell") is None,
+    reason="GNU Aspell not installed",
 )
 
 
@@ -37,7 +43,7 @@ def test_unit_aspell_run_checks(script_dir):
     document_path = script_dir + "/resources/T1500.txt"
     aspell_instance = Aspell()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     output_problems = aspell_instance.run_checks(DriverCL(), test_file)
 

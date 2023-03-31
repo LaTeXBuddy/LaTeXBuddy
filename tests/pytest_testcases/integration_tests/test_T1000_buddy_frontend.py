@@ -94,6 +94,7 @@ def test_integration_buddy_frontend(script_dir, problem_list, config_loader):
         DriverModuleProvider(),
         Path(script_dir + "/resources/T1000_test_document.tex"),
         [Path(script_dir + "/resources/T1000_test_document.tex")],
+        compile_tex=False,
     )
 
     for problem in problem_list[0]:

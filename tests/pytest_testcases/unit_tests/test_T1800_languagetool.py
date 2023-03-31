@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 from pathlib import Path
 
 import pytest
@@ -24,6 +25,11 @@ from latexbuddy.modules.languagetool import LanguageTool
 from latexbuddy.texfile import TexFile
 from tests.pytest_testcases.unit_tests.resources.driver_config_loader import (
     ConfigLoader as DriverCL,
+)
+
+pytestmark = pytest.mark.skipif(
+    shutil.which("languagetool-commandline.jar") is None,
+    reason="LanguageTool not installed",
 )
 
 
@@ -37,7 +43,7 @@ def test_unit_languagetool_run_checks(script_dir):
     document_path = script_dir + "/resources/test_paper.tex"
     languagetool_instance = LanguageTool()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     problems = languagetool_instance.run_checks(DriverCL(), test_file)
 

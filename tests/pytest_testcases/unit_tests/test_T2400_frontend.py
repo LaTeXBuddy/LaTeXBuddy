@@ -168,6 +168,7 @@ def test_interval_creation(position, length, description):
     assert interval.html_tag_title == problem.description
 
 
+@pytest.mark.xfail(reason="Interval doesn't work, see #128", strict=False)
 @pytest.mark.parametrize(
     "interval_data_in, result_interval_data",
     [

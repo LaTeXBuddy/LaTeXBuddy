@@ -34,7 +34,7 @@ def script_dir():
 
 def test_unit_yalafi_detex_run_checks(script_dir):
     test_document = Path(script_dir + "/resources/T2100_test_document.tex")
-    tf = TexFile(test_document)
+    tf = TexFile(test_document, compile_tex=False)
     cl = ConfigLoader()
 
     problems = YaLafi().run_checks(cl, tf)

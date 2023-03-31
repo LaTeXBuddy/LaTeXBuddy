@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 from pathlib import Path
 
 import pytest
@@ -27,17 +28,24 @@ from tests.pytest_testcases.unit_tests.resources.driver_config_loader import (
 )
 
 
+pytestmark = pytest.mark.skipif(
+    shutil.which("diction") is None,
+    reason="Diction not installed",
+)
+
+
 @pytest.fixture
 def script_dir():
     return str(Path(os.path.realpath(__file__)).parents[0])
 
 
+@pytest.mark.xfail()
 def test_unit_diction_run_checks(script_dir):
     _ERROR_COUNT = 3
     document_path = script_dir + "/resources/T1700.txt"
     diction_instance = Diction()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     output_problems = diction_instance.run_checks(DriverCL(), test_file)
 

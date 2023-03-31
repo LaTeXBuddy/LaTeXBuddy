@@ -53,16 +53,8 @@ pre-commit-changed:
 smoke:
   cache:
     <<: *global_cache
-    key: v1-pip-$PYTHON_VERSION
-  parallel:
-    matrix:
-      - PYTHON_VERSION:
-          - "3.7"
-          - "3.8"
-          - "3.9"
-          - "3.10"
-          - "3.11"
-  image: python:$PYTHON_VERSION-alpine
+    key: v1-pip-3.7
+  image: python:3.7-alpine
   stage: Test
   before_script:
     - *setup
@@ -72,6 +64,37 @@ smoke:
   only:
     - master
     - merge_requests
+
+pytest:
+  cache:
+    <<: *global_cache
+    key: v1-pip-$PYTHON_VERSION
+  parallel:
+    matrix:
+      - PYTHON_VERSION:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+  image: $CI_REGISTRY/latexbuddy/ci-docker-image:$PYTHON_VERSION
+  stage: Test
+  needs:
+    - smoke
+  before_script:
+    - python --version --version
+    - pip install . tox virtualenv
+  script:
+    - tox run --skip-missing-interpreters --skip-env docs
+  only:
+    - master
+    - merge_requests
+  artifacts:
+    when: always
+    paths:
+      - pytest-junit.xml
+    reports:
+      junit: pytest-junit.xml
 
 build:
   stage: Build
