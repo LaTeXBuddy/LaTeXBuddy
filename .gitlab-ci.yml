@@ -95,6 +95,9 @@ pytest:
       - pytest-junit.xml
     reports:
       junit: pytest-junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
 
 build:
   stage: Build
