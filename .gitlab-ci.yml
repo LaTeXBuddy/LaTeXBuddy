@@ -77,12 +77,11 @@ pytest:
           - "3.9"
           - "3.10"
           - "3.11"
-  image: python:$PYTHON_VERSION-slim
+  image: registry.gitlab.com/latexbuddy/ci-docker-image:$PYTHON_VERSION
   stage: Test
   needs:
     - smoke
   before_script:
-    - apt-get update && apt-get install git texlive-base aspell diction chktex
     - python --version --version
     - pip install . tox virtualenv
   script:
