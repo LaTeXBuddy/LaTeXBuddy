@@ -32,6 +32,7 @@ def script_dir():
     return str(Path(os.path.realpath(__file__)).parents[0])
 
 
+@pytest.mark.xfail(reason="arXiv papers were deleted from the repo")
 def test_unit_proselint_run_checks(script_dir):
     _ERROR_COUNT = 7
     document_path = script_dir + "/resources/ConfoundedLearning/main.tex"
