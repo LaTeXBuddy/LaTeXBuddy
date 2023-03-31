@@ -21,6 +21,18 @@ default:
     - apk add git
     - python --version --version
 
+changelog:
+  stage: Lint
+  image: alpine:latest
+  before_script:
+    - apk add git
+  script:
+    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - "! git diff --quiet origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME $CI_COMMIT_SHA -- changelog.d/"
+  only:
+    - merge_requests
+  allow_failure: true
+
 pre-commit: &pre-commit
   stage: Lint
   cache:
