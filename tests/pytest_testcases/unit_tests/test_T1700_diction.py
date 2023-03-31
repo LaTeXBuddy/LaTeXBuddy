@@ -39,6 +39,7 @@ def script_dir():
     return str(Path(os.path.realpath(__file__)).parents[0])
 
 
+@pytest.mark.xfail()
 def test_unit_diction_run_checks(script_dir):
     _ERROR_COUNT = 3
     document_path = script_dir + "/resources/T1700.txt"

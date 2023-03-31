@@ -97,6 +97,7 @@ class Diction(Module):
     ) -> tuple[str, tuple[int, int], str]:
         o_line = ""
 
+        # FIXME: This may return less items
         src, lines, chars, sugg = error.split(":", maxsplit=3)
         split_lines = lines.split("-")
         split_chars = chars.split("-")
