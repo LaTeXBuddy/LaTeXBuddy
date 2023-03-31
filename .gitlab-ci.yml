@@ -65,7 +65,7 @@ smoke:
     - master
     - merge_requests
 
-test:
+pytest:
   cache:
     <<: *global_cache
     key: v1-pip-$PYTHON_VERSION
