@@ -89,6 +89,7 @@ pytest:
   only:
     - master
     - merge_requests
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     when: always
     paths:
