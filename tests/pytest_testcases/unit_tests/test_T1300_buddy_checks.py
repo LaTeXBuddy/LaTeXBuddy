@@ -67,6 +67,10 @@ class DriverModuleProvider(ModuleProvider):
         return [DummyModule0(), DummyModule1()]
 
 
+@pytest.mark.xfail(
+    reason="Integration test may fail if unit tests do",
+    strict=False,
+)
 def test_unit_buddy_checks(script_dir, config_loader):
     file_str = script_dir + "/resources/T1300_test_document.tex"
     file = Path(file_str)

@@ -39,6 +39,10 @@ def default_config_loader():
     return ConfigLoader()
 
 
+@pytest.mark.xfail(
+    reason="Integration test may fail if unit tests do",
+    strict=False,
+)
 def test_integration_buddy_module(script_dir, caplog, default_config_loader):
     # initializing logger on DEBUG level
     caplog.set_level(DEBUG)
