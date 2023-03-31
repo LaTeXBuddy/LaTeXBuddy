@@ -48,7 +48,7 @@ def test_unit_unreferenced_figures_run_checks(script_dir):
     assert len(problems) == _ERROR_COUNT
     assert str(
         problems[0],
-    ) == "Latex info on 2:1: gantt: Figure gantt not referenced.."
+    ) == "Latex info on 17:1: gantt: Figure gantt not referenced.."
 
 
 def test_unit_si_unit_run_checks(script_dir):
@@ -110,8 +110,7 @@ def test_unit_native_use_of_ref_run_checks(script_dir):
     output_problems = checker_instance.run_checks(DriverCL(), test_file)
 
     assert len(output_problems) == _ERROR_COUNT
-    assert (
-        str(output_problems[0]) == "Latex info on 20:1: \\ref{: Instead of "
-        "\\ref{} use a more precise command e.g. "
-        "\\cref{}."
-    )
+    assert str(output_problems[0]) == \
+        R"Latex info on 35:1: " \
+        R"\ref{: Instead of \ref{} use a more precise command, " \
+        R"for example, \cref{}."
