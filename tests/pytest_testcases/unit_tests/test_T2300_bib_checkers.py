@@ -41,7 +41,7 @@ def test_unit_bib_checkers_run_checks(script_dir):
     bib_new_instance = NewerPublications()
 
     document_path = script_dir + "/resources/T2300.tex"
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     output_problems_dup = bib_dup_instance.run_checks(DriverCL(), test_file)
     output_problems_new = bib_new_instance.run_checks(DriverCL(), test_file)

@@ -89,6 +89,7 @@ def init_buddy(scd, cl):
         DummyModuleProvider(),
         file,
         [file],
+        compile_tex=False,
     )
 
 

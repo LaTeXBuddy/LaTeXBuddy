@@ -37,7 +37,7 @@ def test_unit_proselint_run_checks(script_dir):
     document_path = script_dir + "/resources/ConfoundedLearning/main.tex"
     proselint_checker_instance = ProseLint()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     problems = proselint_checker_instance.run_checks(
         DriverCL(), test_file,

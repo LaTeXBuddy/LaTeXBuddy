@@ -37,7 +37,7 @@ def test_unit_aspell_run_checks(script_dir):
     document_path = script_dir + "/resources/T1500.txt"
     aspell_instance = Aspell()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     output_problems = aspell_instance.run_checks(DriverCL(), test_file)
 

@@ -39,7 +39,7 @@ def test_unit_logfilter_all_problems_in_texfilt(script_dir):
     texfilt_path = script_dir + "/latexbuddy/modules/texfilt.awk"
     log_filter = LogFilter()
     config_loader = ConfigLoader()
-    tex_file = TexFile(document_path)
+    tex_file = TexFile(document_path, compile_tex=False)
     descriptor, raw_problems_path = mkstemp(
         prefix="latexbuddy",
         suffix="raw_log_errors",
@@ -69,7 +69,7 @@ def test_unit_logfilter_all_texfilt_in_problems(script_dir):
     texfilt_path = script_dir + "/latexbuddy/modules/texfilt.awk"
     log_filter = LogFilter()
     config_loader = ConfigLoader()
-    tex_file = TexFile(document_path)
+    tex_file = TexFile(document_path, compile_tex=False)
     descriptor, raw_problems_path = mkstemp(
         prefix="latexbuddy",
         suffix="raw_log_errors",

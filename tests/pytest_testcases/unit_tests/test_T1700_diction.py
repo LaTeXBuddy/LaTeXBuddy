@@ -37,7 +37,7 @@ def test_unit_diction_run_checks(script_dir):
     document_path = script_dir + "/resources/T1700.txt"
     diction_instance = Diction()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     output_problems = diction_instance.run_checks(DriverCL(), test_file)
 

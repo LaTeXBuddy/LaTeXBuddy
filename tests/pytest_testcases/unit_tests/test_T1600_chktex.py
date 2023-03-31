@@ -40,7 +40,7 @@ def test_unit_chktex_run_checks(script_dir):
     document_path = script_dir + "/resources/T1600.tex"
     chktex_instance = Chktex()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     output_problems = chktex_instance.run_checks(DriverCL(), test_file)
 

@@ -75,6 +75,7 @@ def test_unit_buddy_checks(script_dir, config_loader):
         DriverModuleProvider(),
         file,
         [file],
+        compile_tex=False,
     )
 
     LatexBuddy.run_tools()

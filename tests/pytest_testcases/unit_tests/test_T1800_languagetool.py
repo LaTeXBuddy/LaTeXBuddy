@@ -37,7 +37,7 @@ def test_unit_languagetool_run_checks(script_dir):
     document_path = script_dir + "/resources/test_paper.tex"
     languagetool_instance = LanguageTool()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     problems = languagetool_instance.run_checks(DriverCL(), test_file)
 

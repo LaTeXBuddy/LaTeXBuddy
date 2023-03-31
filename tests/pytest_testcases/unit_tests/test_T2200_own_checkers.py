@@ -41,7 +41,7 @@ def test_unit_unreferenced_figures_run_checks(script_dir):
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = UnreferencedFigures()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     problems = checker_instance.run_checks(DriverCL(), test_file)
 
@@ -56,7 +56,7 @@ def test_unit_si_unit_run_checks(script_dir):
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = SiUnitx()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     output_problems = checker_instance.run_checks(DriverCL(), test_file)
 
@@ -76,7 +76,7 @@ def test_unit_empty_sections_run_checks(script_dir):
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = EmptySections()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     output_problems = checker_instance.run_checks(DriverCL(), test_file)
 
@@ -92,7 +92,7 @@ def test_unit_url_check_run_checks(script_dir):
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = URLCheck()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     output_problems = checker_instance.run_checks(DriverCL(), test_file)
 
@@ -105,7 +105,7 @@ def test_unit_native_use_of_ref_run_checks(script_dir):
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = NativeUseOfRef()
 
-    test_file = TexFile(Path(document_path))
+    test_file = TexFile(Path(document_path), compile_tex=False)
 
     output_problems = checker_instance.run_checks(DriverCL(), test_file)
 

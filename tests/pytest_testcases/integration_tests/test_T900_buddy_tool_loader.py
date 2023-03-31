@@ -45,6 +45,7 @@ def test_integration_buddy_tool_loader(script_dir, caplog, default_config_loader
         ModuleLoader(Path("latexbuddy/modules/")),
         Path(script_dir + "/resources/T900_test_document.tex"),
         [Path(script_dir + "/resources/T900_test_document.tex")],
+        compile_tex=False,
     )
 
     LatexBuddy.run_tools()
