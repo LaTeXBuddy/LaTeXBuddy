@@ -16,40 +16,9 @@ This changelog is managed by towncrier and is compiled at release time.
 
 <!-- towncrier release notes start -->
 
-## [0.4.3a1](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/tree/v0.4.3a1) - 2023-04-01
+## [0.4.3a2](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/tree/v0.4.3a2) - 2023-04-01
 
-### 🔥 BREAKING CHANGES
-
-- [#112](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/issues/112): CLI got revamped and simplified
-
-  - **removed** option `--flask` ⇒ use executable `latexbuddy-server` instead
-  - **removed** options `--wl_add_keys` and `--wl_from_wordlist` ⇒ use executable `latexbuddy-whitelist` instead
-  - whitelist operations got moved to the new `whitelist` module
-  - removed the big mutually exclusive group, which should affect usage
-
-- `extend_path()` call was removed, making LaTeXBuddy not a namespace any more
-
-### Changed
-
-- [#105](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/issues/105): LaTeXBuddy is now open-source under the terms of GPL-3.0-or-later
-- [#110](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/issues/110): some calls to `os.path` were replaced with `pathlib.Path`
-- Replaced usage of MD5 with SHA-1 and marked this usage as insecure. This should
-  allow execution of LaTeXBuddy in protected environments and on FIPS builds of
-  Python.
-- Requests to the LanguageTool API now have a timeout of 60 seconds.
-
-### Behind-the-scenes
-
-- [#125](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/issues/125): Poetry was ditched in favour of a rather vanilla setuptools+tox setup
-- [#126](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/issues/126): Enabled test results output in GitLab CI.
-- Enabled code coverage calculation on each test.
-- Improved CI
-
-  - smoke test is now being run in parallel on multiple Python versions
-  - improved caching of pip between jobs and branches
-
-- Not adding changelog entries to a merge request will now raise a warning in CI.
-- Towncrier is now used to generate the changelog
+I am testing the semi-automatic release process
 
 ## [0.4.2] - 25 Dec 2022 :christmas_tree:
 

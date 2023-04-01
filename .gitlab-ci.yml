@@ -111,6 +111,10 @@ pytest:
         coverage_format: cobertura
         path: coverage.xml
 
+########################################################################
+#                           RELEASE WORKFLOW                           #
+########################################################################
+
 build:
   stage: Build
   cache: {}
@@ -125,6 +129,7 @@ build:
       - dist/*.tar.gz
     expire_in: 1 week
   only:
+    - master
     - tags
 
 publish:
@@ -136,7 +141,7 @@ publish:
     - *setup
     - pip install --upgrade twine
   script:
-    - python3 -m twine upload
+    - python3 -m twine upload dist/*
   only:
     - tags
   dependencies:
