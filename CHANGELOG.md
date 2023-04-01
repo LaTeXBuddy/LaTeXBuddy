@@ -16,10 +16,6 @@ This changelog is managed by towncrier and is compiled at release time.
 
 <!-- towncrier release notes start -->
 
-## [0.4.3a5](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/tree/v0.4.3a5) - 2023-04-01
-
-I am testing the semi-automatic release process
-
 ## [0.4.2] - 25 Dec 2022 :christmas_tree:
 
 ### Fixed
