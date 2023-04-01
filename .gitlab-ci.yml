@@ -155,7 +155,11 @@ release:
   before_script:
     - apk add git
   script:
-    - sed "/${CI_COMMIT_TAG}/,/^## /!d;//d" CHANGELOG.md > CURRENT_CHANGES.md
+    - |
+      VERSION="$(echo "$CI_COMMIT_TAG" | sed 's/\./\\./g')"
+      export VERSION
+    - |
+      sed '/'"$VERSION"'/,/^## /!d;//d' CHANGELOG.md > CURRENT_CHANGES.md
   release:
     tag_name: "$CI_COMMIT_TAG"
     description: ./CURRENT_CHANGES.md
