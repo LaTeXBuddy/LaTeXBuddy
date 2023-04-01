@@ -1,37 +1,31 @@
+(install)=
+
 # Install
 
-LaTeXBuddy is a Python package and thus can be installed with `pip`
+LaTeXBuddy is a Python package and thus can be installed with `pip`. However, it
+is not published to PyPI, but rather to GitLab Package Registry. This is because
+we do not want to publish our unfinished software just yet. You can expect
+LaTeXBuddy to become available on PyPI with the release of v1.0.0 Alpha 1.
 
-## GITZ registry
-
-```{attention}
-This section is outdated. It relies on the GITZ server, where we used to host our project at.
-```
-
-### Create a token
-
-To install packages from GITZ's GitLab Package Registry you'll need to create a personal token. Go to https://git.rz.tu-bs.de/-/profile/personal_access_tokens and create a personal token with the `read_api` scope. You can give it any name and expiration date you want.
-
-![Screenshot of the "Personal Access Tokens" page](../images/pat-page.png)
-
-After clicking "Create personal access token", you'll be shown your created token. **This is the only time you'll see it**, so make sure to copy it to not lose it!
-
-![Screenshot of the generated token](../images/pat.png)
-
-### Enable VPN
-
-Access to most parts of the GITZ infrastructure is closed for people not affiliated with the university. For good measure, [enable your VPN](https://doku.rz.tu-bs.de/doku.php?id=netz:vpn:vpn_einrichten).
-
-### Install the package
+## Install from GitLab Package Registry
 
 To install the package, execute the following command:
 
 ```sh
-pip install latexbuddy --extra-index-url https://__token__:<your_personal_token>@git.rz.tu-bs.de/api/v4/projects/585/packages/pypi/simple
+pip install latexbuddy --index-url https://gitlab.com/api/v4/projects/28436730/packages/pypi/simple
 ```
 
-Don't forget to replace `<your_personal_token>` with the token, generated in the previous step!
+This will install the latest version of the package.
 
 ### Other versions
 
-To install other versions and to view the generic information about the package, you can navigate to [its page in GitLab](https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/packages/8).
+```{important}
+GitLab Package Registry is mutable, which means we can delete packages if we
+want to. For now, we are experimenting with publishing a lot, so we can't
+guarantee that a particular version will never get deleted from the registry,
+especially the pre-release versions.
+```
+
+To install other versions and to view the generic information about the package,
+you can navigate to
+[the package registry page](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/packages).
