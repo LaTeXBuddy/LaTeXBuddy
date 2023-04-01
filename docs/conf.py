@@ -13,8 +13,8 @@ import latexbuddy
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "LaTeXBuddy"
-copyright = "2022, LaTeXBuddy team"
-author = "LaTeXBuddy team"
+copyright = "2022–2023, LaTeXBuddy authors"
+author = "LaTeXBuddy authors"
 release = latexbuddy.__version__
 version = release
 
