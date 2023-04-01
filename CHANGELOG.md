@@ -16,7 +16,7 @@ This changelog is managed by towncrier and is compiled at release time.
 
 <!-- towncrier release notes start -->
 
-## [0.4.3a3](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/tree/v0.4.3a3) - 2023-04-01
+## [0.4.3a4](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/tree/v0.4.3a4) - 2023-04-01
 
 I am testing the semi-automatic release process
 
