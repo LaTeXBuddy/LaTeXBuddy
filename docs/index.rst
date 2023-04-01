@@ -66,6 +66,7 @@ Developer's guide
 
    developer/environment.md
    developer/author.md
+   developer/release.rst
 
 .. toctree::
    :caption: Appendix
