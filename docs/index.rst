@@ -73,4 +73,4 @@ Developer's guide
    :titlesonly:
    :hidden:
 
-   COPYING.md
+   appendix/FDL-1.3.md
