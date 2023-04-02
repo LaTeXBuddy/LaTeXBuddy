@@ -59,7 +59,7 @@ User's guide
    :caption: Reference
    :maxdepth: 2
 
-   reference/cli.rst
+   reference/cli.md
    reference/api.rst
    reference/module-api.rst
    reference/server-api.rst
