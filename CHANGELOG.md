@@ -38,6 +38,10 @@ This changelog is managed by towncrier and is compiled at release time.
   Python.
 - Requests to the LanguageTool API now have a timeout of 60 seconds.
 
+### Fixed
+
+- fix a couple documentation issues, like missing modules and broken links
+
 ### Behind-the-scenes
 
 - [#125](https://gitlab.com/LaTeXBuddy/LaTeXBuddy/-/issues/125): Poetry was ditched in favour of a rather vanilla setuptools+tox setup
