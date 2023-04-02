@@ -84,5 +84,7 @@ developer/release.md
 :titlesonly:
 :hidden:
 
+appendix/brand.md
+appendix/external.md
 appendix/FDL-1.3.md
 ```
