@@ -9,7 +9,7 @@ from pathlib import Path
 import latexbuddy
 
 
-# -- Project information -----------------------------------------------------
+# --- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "LaTeXBuddy"
@@ -20,14 +20,15 @@ version = release
 
 PROJECT_ROOT_DIR = Path(__file__).parent.parent.absolute()
 
-# -- General configuration ---------------------------------------------------
+
+# --- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
+    "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinxarg.ext",
-    "myst_parser",
     "sphinxcontrib.towncrier.ext",
 ]
 
@@ -40,9 +41,17 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
 }
 
+
+# --- MyST-Parser configuration -----------------------------------------------
+# https://myst-parser.readthedocs.io/en/latest/configuration.html
+
+myst_enable_extensions = [
+    "colon_fence",
+]
 myst_heading_anchors = 2
 
-# -- Options for HTML output -------------------------------------------------
+
+# --- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_title = f"{project} documentation"
@@ -74,7 +83,10 @@ html_theme_options = {
     ],
 }
 
-# Options: draft/sphinx-version/sphinx-release
+
+# --- Towncrier configuration -------------------------------------------------
+# https://sphinxcontrib-towncrier.readthedocs.io/en/latest/#how-to-use-this
+
 towncrier_draft_autoversion_mode = "draft"
 towncrier_draft_include_empty = True
 towncrier_draft_working_directory = PROJECT_ROOT_DIR
