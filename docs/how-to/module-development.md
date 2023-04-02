@@ -57,7 +57,7 @@ A tuple specifying the problem's position in the checked `.tex` file and consist
 If no position is specified, the Problem is considered _general_ and will appear in a different section than problems with a specific position.
 
 ```{note}
-If you are checking the TeX version of the file and only have the absolute position of a problem, you can convert it using the first two return values of the [`absolute_to_linecol`](./Using-the-LaTeXBuddy-API#using-the-included-utilities) method in `latexbuddy.tools`.
+If you are checking the TeX version of the file and only have the absolute position of a problem, you can convert it using the first two return values of the [`absolute_to_linecol`](./use-api.md#using-the-included-utilities) method in `latexbuddy.tools`.
 ```
 
 ```{note}
@@ -142,5 +142,5 @@ _defaults to:_ `None`
 
 ## Further Information
 
-For advanced information to improve the capabilities of your module and to make your life easier, feel free to read the manual on [Advanced API](./Using-the-LaTeXBuddy-API).
+For advanced information to improve the capabilities of your module and to make your life easier, feel free to read the manual on [Advanced API](./use-api.md).
 This page includes documentation for LaTeXBuddy's config and included utilities.

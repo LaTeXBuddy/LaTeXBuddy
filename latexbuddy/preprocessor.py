@@ -86,7 +86,7 @@ class ProblemFilter(ABC):
     def match(self, problem: Problem) -> bool:
         """Matches custom filter's requirements against a problem.
 
-        This method etermines, whether a given `problem is located
+        This method determines, whether a given problem is located
         within the filter's line boundaries and matches all custom
         requirements that the subclass implementation imposes.
 
@@ -449,8 +449,9 @@ class Preprocessor:
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
-        :return: list of open-ended ``ModuleProblemFilter``s to match
-                 the provided modules, ``None`` if regex not matching
+        :return: list of open-ended ``ModuleProblemFilter`` objectss to
+                 match the provided modules, ``None`` if regex not
+                 matching
         """
 
         match = Preprocessor.__RE_BEGIN_IGNORE_MODULES.fullmatch(line)

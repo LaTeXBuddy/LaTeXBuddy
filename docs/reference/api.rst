@@ -60,12 +60,6 @@ Exceptions
 .. automodule:: latexbuddy.exceptions
    :members:
 
-Logging
-^^^^^^^
-
-.. automodule:: latexbuddy.log
-   :members:
-
 
 Messages
 ^^^^^^^^
