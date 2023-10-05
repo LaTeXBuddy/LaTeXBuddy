@@ -28,6 +28,12 @@ repos:
       - id: fix-encoding-pragma
         args: [--remove]
       # - id: name-tests-test  # TODO: enable after fixing test names
+  - repo: "https://github.com/pre-commit/pygrep-hooks"
+    rev: "v1.10.0"
+    hooks:
+      - id: python-no-eval
+      - id: python-no-log-warn
+      - id: python-check-mock-methods
 
   - repo: "https://github.com/PyCQA/isort"
     rev: "5.12.0"
