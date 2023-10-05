@@ -41,7 +41,7 @@ script/bootstrap
 ```
 
 This will install all dependencies in a virtual environment. Your terminal
-doesn't have acces to it yet. If you run 
+doesn't have acces to it yet. If you run
 
 ```sh
 script/console
@@ -141,7 +141,7 @@ creating issues and merge requests, CI and CD as well as many other topics, well
 organized and structured. If you don't find something you're looking for, create
 an issue, and we'll look into it!
 
-    
+
 [chktex]: https://www.nongnu.org/chktex/
 [languagetool]: https://github.com/languagetool-org/languagetool
 [Poetry]: https://python-poetry.org/
