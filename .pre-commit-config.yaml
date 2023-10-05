@@ -28,3 +28,8 @@ repos:
       - id: fix-encoding-pragma
         args: [--remove]
       # - id: name-tests-test  # TODO: enable after fixing test names
+
+  - repo: "https://github.com/PyCQA/isort"
+    rev: "5.12.0"
+    hooks:
+      - id: isort
