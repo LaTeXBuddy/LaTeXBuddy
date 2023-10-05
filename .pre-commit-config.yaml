@@ -35,6 +35,12 @@ repos:
       - id: python-no-log-warn
       - id: python-check-mock-methods
 
+  - repo: "https://github.com/asottile/pyupgrade"
+    rev: "v3.14.0"
+    hooks:
+      - id: pyupgrade
+        args:
+          - "--py37-plus"
   - repo: "https://github.com/PyCQA/isort"
     rev: "5.12.0"
     hooks:
