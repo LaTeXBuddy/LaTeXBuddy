@@ -22,13 +22,12 @@ def config_loader(script_dir):
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path)
 
-    return ConfigLoader(parser.parse_args(
-        ["--config", script_dir + "/resources/T1400_config.py"]
-    ))
+    return ConfigLoader(
+        parser.parse_args(["--config", script_dir + "/resources/T1400_config.py"])
+    )
 
 
 def test_unit_tool_loader(config_loader):
-
     module_loader = ModuleLoader(
         Path("tests/pytest_testcases/unit_tests/resources/T1400_dummy_modules/")
     )

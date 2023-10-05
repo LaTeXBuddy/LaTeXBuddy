@@ -23,7 +23,6 @@ def script_dir():
 
 
 def test_unit_unreferenced_figures_run_checks(script_dir):
-
     _ERROR_COUNT = 1
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = UnreferencedFigures()
@@ -33,12 +32,13 @@ def test_unit_unreferenced_figures_run_checks(script_dir):
     output_problems = checker_instance.run_checks(DriverCL(), test_file)
 
     assert len(output_problems) == _ERROR_COUNT
-    assert str(output_problems[0]) == "Latex info on 2:1: gantt: Figure gantt not " \
-                                      "referenced.."
+    assert (
+        str(output_problems[0]) == "Latex info on 2:1: gantt: Figure gantt not "
+        "referenced.."
+    )
 
 
 def test_unit_si_unit_run_checks(script_dir):
-
     _ERROR_COUNT = 3
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = SiUnitx()
@@ -48,14 +48,17 @@ def test_unit_si_unit_run_checks(script_dir):
     output_problems = checker_instance.run_checks(DriverCL(), test_file)
 
     assert len(output_problems) == _ERROR_COUNT
-    assert str(output_problems[0]) == "Latex info on 4:47: 2021: For number 2021 " \
-                                      "\\num from siunitx may be used.."
-    assert str(output_problems[1]) == "Latex info on 10:1: 2002: For number 2002 " \
-                                      "\\num from siunitx may be used.."
+    assert (
+        str(output_problems[0]) == "Latex info on 4:47: 2021: For number 2021 "
+        "\\num from siunitx may be used.."
+    )
+    assert (
+        str(output_problems[1]) == "Latex info on 10:1: 2002: For number 2002 "
+        "\\num from siunitx may be used.."
+    )
 
 
 def test_unit_empty_sections_run_checks(script_dir):
-
     _ERROR_COUNT = 1
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = EmptySections()
@@ -65,12 +68,13 @@ def test_unit_empty_sections_run_checks(script_dir):
     output_problems = checker_instance.run_checks(DriverCL(), test_file)
 
     assert len(output_problems) == _ERROR_COUNT
-    assert str(output_problems[0]) == "Latex info on None: : Sections may not be " \
-                                      "empty.."
+    assert (
+        str(output_problems[0]) == "Latex info on None: : Sections may not be "
+        "empty.."
+    )
 
 
 def test_unit_url_check_run_checks(script_dir):
-
     _ERROR_COUNT = 1
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = URLCheck()
@@ -84,7 +88,6 @@ def test_unit_url_check_run_checks(script_dir):
 
 
 def test_unit_native_use_of_ref_run_checks(script_dir):
-
     _ERROR_COUNT = 1
     document_path = script_dir + "/resources/T2200.tex"
     checker_instance = NativeUseOfRef()
@@ -94,6 +97,8 @@ def test_unit_native_use_of_ref_run_checks(script_dir):
     output_problems = checker_instance.run_checks(DriverCL(), test_file)
 
     assert len(output_problems) == _ERROR_COUNT
-    assert str(output_problems[0]) == "Latex info on 20:1: \\ref{: Instead of " \
-                                      "\\ref{} use a more precise command e.g. " \
-                                      "\\cref{}."
+    assert (
+        str(output_problems[0]) == "Latex info on 20:1: \\ref{: Instead of "
+        "\\ref{} use a more precise command e.g. "
+        "\\cref{}."
+    )

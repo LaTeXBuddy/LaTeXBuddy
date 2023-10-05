@@ -319,7 +319,6 @@ class LatexBuddy(MainModule):
 
     @staticmethod
     def output_flask_html():
-
         # importing this here to avoid circular import error
         from latexbuddy.output import render_flask_html
 

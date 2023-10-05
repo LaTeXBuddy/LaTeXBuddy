@@ -226,7 +226,6 @@ class BibtexDuplicates(Module):
             self.found_duplicates.append(ids)
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-
         bib_file = get_bibfile(file)
 
         if bib_file is None:

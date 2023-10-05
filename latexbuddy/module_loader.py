@@ -50,7 +50,6 @@ class ModuleLoader(ModuleProvider, Loggable):
         self.directory = directory
 
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
-
         # importing this here to avoid circular import error
         from latexbuddy.buddy import LatexBuddy
 
@@ -82,7 +81,6 @@ class ModuleLoader(ModuleProvider, Loggable):
         modules = []
 
         for module in imported_py_modules:
-
             classes = [
                 cls_obj
                 for cls_name, cls_obj in inspect.getmembers(module, inspect.isclass)
@@ -109,7 +107,6 @@ class ModuleLoader(ModuleProvider, Loggable):
         for py_file in py_files:
 
             def lambda_function() -> None:
-
                 module_path = str(py_file.stem)
 
                 self.logger.debug(f"Attempting to load module from '{module_path}'")

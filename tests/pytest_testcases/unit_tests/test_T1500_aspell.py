@@ -17,7 +17,6 @@ def script_dir():
 
 
 def test_unit_aspell_run_checks(script_dir):
-
     _ERROR_COUNT = 3  # From aspell commandline output
     document_path = script_dir + "/resources/T1500.txt"
     aspell_instance = Aspell()

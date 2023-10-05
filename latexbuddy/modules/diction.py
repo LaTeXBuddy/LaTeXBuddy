@@ -16,14 +16,12 @@ from latexbuddy.texfile import TexFile
 
 
 class Diction(Module):
-
     __SUPPORTED_LANGUAGES = ["en", "de", "nl"]
 
     def __init__(self):
         self.language = None
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-
         # check, if diction is installed
         tools.find_executable("diction", "Diction", self.logger)
 
@@ -83,7 +81,6 @@ class Diction(Module):
         """
         problems = []
         for error in out:
-
             o_line = ""
 
             split_error = error.split(" ")
@@ -99,7 +96,6 @@ class Diction(Module):
                         break
 
             if double_world:
-
                 src, lines, chars, sugg = error.split(":", maxsplit=3)
                 split_lines = lines.split("-")
                 split_chars = chars.split("-")

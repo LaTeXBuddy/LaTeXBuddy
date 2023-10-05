@@ -45,9 +45,7 @@ modules = {
     "LogFilter": {
         "enabled": True,
     },
-    "ProseLint": {
-        "enabled": True
-    },
+    "ProseLint": {"enabled": True},
     "SiUnitx": {
         "enabled": True,
     },
@@ -63,13 +61,7 @@ modules = {
     "CheckFigureResolution": {
         "enabled": True,
     },
-    "YaLafi": {
-        "enabled": True
-    },
-    "NewerPublications": {
-        "enabled": False
-    },
-    "BibtexDuplicates": {
-        "enabled": False
-    },
+    "YaLafi": {"enabled": True},
+    "NewerPublications": {"enabled": False},
+    "BibtexDuplicates": {"enabled": False},
 }

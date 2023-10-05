@@ -267,7 +267,6 @@ class URLCheck(Module):
         urls = re.finditer(pattern, tex)
 
         for url_match in urls:
-
             start, end = url_match.span()
             length = end - start
             command_len = len("\\url{")
@@ -292,7 +291,6 @@ class URLCheck(Module):
 
 
 class CheckFigureResolution(Module):
-
     file_endings = [
         ".png",
         ".jpg",

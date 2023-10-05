@@ -138,7 +138,6 @@ class LanguageTool(Module):
         """
 
         if self.mode == Mode.COMMANDLINE:
-
             cmd = self.find_languagetool_command_prefix()
             cmd.append("--list")
 
@@ -152,13 +151,11 @@ class LanguageTool(Module):
             return supported_languages
 
         elif self.mode == Mode.LOCAL_SERVER:
-
             return self.lt_languages_get_request(
                 f"http://localhost:{self.local_server.port}/v2/languages"
             )
 
         elif self.mode == Mode.REMOTE_SERVER:
-
             if not self.remote_url_languages:
                 return []
 
@@ -189,7 +186,6 @@ class LanguageTool(Module):
             executable_source = "native"
 
         except ExecutableNotFoundError:
-
             result = tools.find_executable(
                 "languagetool-commandline.jar", "LanguageTool (CLI)", self.logger
             )
@@ -374,7 +370,6 @@ class LanguageTool(Module):
         tool_name = raw_problems["software"]["name"]
 
         for match in raw_problems["matches"]:
-
             context = match["context"]
             context_offset = context["offset"]
             context_end = context["length"] + context_offset
@@ -466,7 +461,6 @@ class LanguageToolLocalServer:
             executable_source = "native"
 
         except ExecutableNotFoundError:
-
             result = tools.find_executable(
                 "languagetool-server.jar", "LanguageTool (local server)", self.logger
             )

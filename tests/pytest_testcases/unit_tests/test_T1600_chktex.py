@@ -17,7 +17,6 @@ def script_dir():
 
 
 def test_unit_chktex_run_checks(script_dir):
-
     _ERROR_COUNT = 112
     # added tolerance because of versional differences in ChkTeX
     _ERROR_COUNT_TOLERANCE = 1

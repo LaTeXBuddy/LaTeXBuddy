@@ -11,12 +11,10 @@ class YaLafi(Module):
         pass
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-
         problems = []
 
         if file.is_faulty:
             for raw_err in file._parse_problems:
-
                 problems.append(
                     Problem(
                         position=raw_err[0],

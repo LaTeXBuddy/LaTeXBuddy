@@ -31,10 +31,16 @@ def config_loader(script_dir, temp_dir):
     parser.add_argument("--config", type=Path)
     parser.add_argument("--output", type=str)
 
-    return ConfigLoader(parser.parse_args(
-        ["--config", script_dir + "/resources/T1200_config.py",
-         "--output", temp_dir]
-    ))
+    return ConfigLoader(
+        parser.parse_args(
+            [
+                "--config",
+                script_dir + "/resources/T1200_config.py",
+                "--output",
+                temp_dir,
+            ]
+        )
+    )
 
 
 @pytest.fixture
@@ -43,20 +49,24 @@ def config_loader_temp_wl(script_dir, temp_dir):
     parser.add_argument("--config", type=Path)
     parser.add_argument("--output", type=str)
 
-    return ConfigLoader(parser.parse_args(
-        ["--config", script_dir + "/resources/T1200_config_temp_wl.py",
-         "--output", temp_dir]
-    ))
+    return ConfigLoader(
+        parser.parse_args(
+            [
+                "--config",
+                script_dir + "/resources/T1200_config_temp_wl.py",
+                "--output",
+                temp_dir,
+            ]
+        )
+    )
 
 
 class DummyModuleProvider(ModuleProvider):
-
     def load_selected_modules(self, cfg: ConfigLoader) -> List[Module]:
         return []
 
 
 def init_buddy(scd, cl):
-
     file = Path(scd + "/resources/T1200_test_document.tex")
 
     LatexBuddy.init(
@@ -79,7 +89,6 @@ def write_original_to_temp_wl(script_dir: str) -> str:
 
 
 def test_unit_buddy_whitelist_check_filter(script_dir, config_loader):
-
     init_buddy(script_dir, config_loader)
 
     LatexBuddy.add_error(
@@ -100,7 +109,6 @@ def test_unit_buddy_whitelist_check_filter(script_dir, config_loader):
 
 
 def test_unit_buddy_whitelist_check_non_filter(script_dir, config_loader):
-
     init_buddy(script_dir, config_loader)
 
     LatexBuddy.add_error(
@@ -121,7 +129,6 @@ def test_unit_buddy_whitelist_check_non_filter(script_dir, config_loader):
 
 
 def test_unit_buddy_whitelist_add_successful(script_dir, config_loader_temp_wl):
-
     original_content = write_original_to_temp_wl(script_dir)
 
     init_buddy(script_dir, config_loader_temp_wl)
@@ -156,7 +163,6 @@ def test_unit_buddy_whitelist_add_successful(script_dir, config_loader_temp_wl):
 
 
 def test_unit_buddy_whitelist_add_unsuccessful(script_dir, config_loader_temp_wl):
-
     original_content = write_original_to_temp_wl(script_dir)
 
     init_buddy(script_dir, config_loader_temp_wl)

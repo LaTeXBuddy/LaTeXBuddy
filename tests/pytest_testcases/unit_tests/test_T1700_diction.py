@@ -17,7 +17,6 @@ def script_dir():
 
 
 def test_unit_diction_run_checks(script_dir):
-
     _ERROR_COUNT = 3
     document_path = script_dir + "/resources/T1700.txt"
     diction_instance = Diction()
@@ -28,5 +27,7 @@ def test_unit_diction_run_checks(script_dir):
 
     assert len(output_problems) == _ERROR_COUNT
     assert output_problems[0].text == "This Sentence cause a double double Word Error."
-    assert output_problems[1].text == "This Sentence causes a Error, thats why its " \
-                                      "important."
+    assert (
+        output_problems[1].text == "This Sentence causes a Error, thats why its "
+        "important."
+    )

@@ -13,14 +13,13 @@ class FirstDriver(Module):
         pass
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-
         problems = [
             Problem(
                 position=None,
                 text="just a general problem",
                 checker=FirstDriver,
                 file=file.plain_file,
-                severity=ProblemSeverity.ERROR
+                severity=ProblemSeverity.ERROR,
             )
         ]
 
@@ -32,7 +31,7 @@ class FirstDriver(Module):
                 checker=FirstDriver,
                 file=file.plain_file,
                 severity=ProblemSeverity.ERROR,
-                description="Not an actual error, just testing the software..."
+                description="Not an actual error, just testing the software...",
             )
         )
 

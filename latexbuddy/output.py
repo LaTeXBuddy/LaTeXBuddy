@@ -37,7 +37,6 @@ def render_flask_html(
     path_list: Path,
     pdf_path: str,
 ) -> str:
-
     return render_general_html(
         env.get_template("flask_result.html"),
         file_name,
@@ -55,7 +54,6 @@ def render_html(
     path_list: Path,
     pdf_path: str,
 ) -> str:
-
     return render_general_html(
         env.get_template("result.html"),
         file_name,
@@ -132,7 +130,6 @@ def sort_problems(problems: Dict[str, Problem]) -> Tuple[List[Problem], List[Pro
 
 
 def calculate_line_numbers(file_text: str) -> List[str]:
-
     split_lines = file_text.split("\n")
     line_numbers = []
     i = 1
@@ -185,7 +182,6 @@ class Interval:
         start: Optional[int] = None,
         end: Optional[int] = None,
     ) -> None:
-
         if isinstance(problems, Problem):
             problems = [problems]
 
@@ -359,7 +355,6 @@ def add_basic_problem_intervals(
 
         # split the interval, if it reaches across lines
         while interval.end - 1 > len(tex_lines[line]):
-
             new_interval = Interval(problem, interval.start, len(tex_lines[line]) + 1)
             line_intervals[line].append(new_interval)
 
@@ -389,7 +384,6 @@ def resolve_interval_intersections(intervals: List[Interval]) -> None:
     next_index: int = 1
 
     while next_index < len(intervals):
-
         intervals.sort(key=attrgetter("start"))
 
         intersect_result = intervals[next_index - 1].perform_intersection(
@@ -397,7 +391,6 @@ def resolve_interval_intersections(intervals: List[Interval]) -> None:
         )
 
         if intersect_result is not None:
-
             # remove both intersected intervals
             intervals.pop(next_index - 1)
             intervals.pop(next_index - 1)
@@ -441,7 +434,6 @@ def mark_intervals_in_tex_line(tex_line: str, intervals: List[Interval]) -> str:
 
     offset: int = 0
     for i in range(len(intervals)):
-
         interval = intervals[i]
         open_tag, close_tag = generate_wrapper_html_tags(interval)
 

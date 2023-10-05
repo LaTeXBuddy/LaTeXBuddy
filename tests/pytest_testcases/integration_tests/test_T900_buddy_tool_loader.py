@@ -21,7 +21,6 @@ def default_config_loader():
 
 
 def test_integration_buddy_tool_loader(script_dir, caplog, default_config_loader):
-
     # initializing logger on DEBUG level
     caplog.set_level(DEBUG)
 
@@ -39,8 +38,10 @@ def test_integration_buddy_tool_loader(script_dir, caplog, default_config_loader
     # asserting that all available modules are being executed (since there is no
     # config file that disables any modules)
 
-    assert "Executing the following modules in parallel: ['Aspell', " \
-           "'BibtexDuplicates', 'NewerPublications', 'Chktex', 'Diction', " \
-           "'LanguageTool', 'LogFilter', 'CheckFigureResolution', 'EmptySections'," \
-           " 'NativeUseOfRef', 'SiUnitx', 'URLCheck', 'UnreferencedFigures'," \
-           " 'ProseLint', 'YaLafi']" in records
+    assert (
+        "Executing the following modules in parallel: ['Aspell', "
+        "'BibtexDuplicates', 'NewerPublications', 'Chktex', 'Diction', "
+        "'LanguageTool', 'LogFilter', 'CheckFigureResolution', 'EmptySections',"
+        " 'NativeUseOfRef', 'SiUnitx', 'URLCheck', 'UnreferencedFigures',"
+        " 'ProseLint', 'YaLafi']" in records
+    )

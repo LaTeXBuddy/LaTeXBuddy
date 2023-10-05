@@ -136,7 +136,6 @@ class TexFile(Loggable):
         return str(self.tex_file)
 
     def __compile_tex(self, compile_pdf: bool) -> Tuple[Optional[Path], Optional[Path]]:
-
         from latexbuddy.buddy import LatexBuddy
 
         compiler = "latex"

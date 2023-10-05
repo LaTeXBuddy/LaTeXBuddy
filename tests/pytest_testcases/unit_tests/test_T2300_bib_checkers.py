@@ -17,7 +17,6 @@ def script_dir():
 
 
 def test_unit_bib_checkers_run_checks(script_dir):
-
     _ERROR_COUNT_DUP = 2
     _ERROR_COUNT_NEW = 2
 
