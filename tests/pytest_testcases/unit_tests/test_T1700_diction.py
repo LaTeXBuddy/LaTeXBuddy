@@ -1,11 +1,14 @@
-import pytest
 import os
 
 from pathlib import Path
+
+import pytest
+
 from latexbuddy.modules.diction import Diction
 from latexbuddy.texfile import TexFile
-from tests.pytest_testcases.unit_tests.resources.driver_config_loader import \
-    ConfigLoader as DriverCL
+from tests.pytest_testcases.unit_tests.resources.driver_config_loader import (
+    ConfigLoader as DriverCL,
+)
 
 
 @pytest.fixture

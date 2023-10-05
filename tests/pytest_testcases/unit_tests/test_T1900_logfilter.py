@@ -1,14 +1,16 @@
-import re
-
-import pytest
 import os
+import re
 
 from pathlib import Path
 from tempfile import mkstemp
-from tests.pytest_testcases.tools import execute_and_collect
+
+import pytest
+
+from resources.driver_config_loader import ConfigLoader
+
 from latexbuddy.modules.logfilter import LogFilter
 from latexbuddy.texfile import TexFile
-from resources.driver_config_loader import ConfigLoader
+from tests.pytest_testcases.tools import execute_and_collect
 
 
 @pytest.fixture
