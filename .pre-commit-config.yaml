@@ -1,0 +1,30 @@
+repos:
+  - repo: "https://github.com/pre-commit/pre-commit-hooks"
+    rev: "v4.4.0"
+    hooks:
+      # general sanity checks for files
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+      - id: check-case-conflict
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+
+      # data files
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+
+      # Git checks
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+
+      # Python checks
+      - id: check-ast
+      - id: debug-statements
+      - id: fix-encoding-pragma
+        args: [--remove]
+      # - id: name-tests-test  # TODO: enable after fixing test names
