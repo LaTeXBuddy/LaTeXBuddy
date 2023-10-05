@@ -49,3 +49,13 @@ repos:
     rev: "23.9.1"
     hooks:
       - id: black
+
+  - repo: "https://github.com/executablebooks/mdformat"
+    rev: "0.7.17"
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-frontmatter
+          - mdformat-footnote
+          - mdformat-black
