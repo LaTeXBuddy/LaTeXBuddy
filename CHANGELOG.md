@@ -8,14 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### BREAKING CHANGES
+
 - minimal Python version set to 3.7 (!168)
 
 ### Added
+
 - line numbers (!135)
 - new test cases for multiple occurrences of own_checkers problems (!110)
 - custom key for YaLafi problems (!109)
 - filter for log files (!121)
-- new base class for all modules and LatexBuddy (NamedModule`) (!108)
+- new base class for all modules and LatexBuddy (`NamedModule`) (!108)
 - new `Loggable` base class which provides a properly named logger to any class inheriting from it (!108)
 - new module "NewerPublications" that checks for each entry in the BibTeX file if a newer publication exists (!120)
 - new module "BibtexDuplicates" that checks the BibTeX file for similar entries (!120)
@@ -28,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - flask server as a GUI for checking documents (!154)
 
 ### Changed
+
 - the problem list and text is now scrollable (!135)
 - language selection for aspell now works dynamically and using the config (!105)
 - language codes are now standardized to fit different formats (!116)
@@ -45,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - updated the Docker image to add TeX Live (!157)
 
 ### Fixed
+
 - regex usage in own_checkers (!110)
 - inconsistent naming of some checkers in config, Problem API and classnames (!108)
 - shortened slightly lengthy methods in config_loader.py (!140)
@@ -55,14 +59,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.0] - 15 Jun 2021
 
 ### Added
+
 - centralized file for LaTeXBuddy exceptions (!94)
 - checker to warn about low resolution in figures (!101)
-- checker to detect \ref instead of e.g. \cref (!99)
+- checker to detect \\ref instead of e.g. \\cref (!99)
 - language support in whitelist for spelling or grammar errors (!102)
 - added option to manually add keys and word lists to the whitelist via command line (!106)
 - added Docker file for Docker-based install (!103)
 
 ### Changed
+
 - moved module execution time measurements from individual modules to the main buddy instance (!93)
 - improved logging for tool-methods find_executable and execute_no_errors (!94)
 - adapted all modules using tool-methods find_executable and execute_no_errors to the new features (!94)
@@ -73,6 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - number of suggestions in a problem is now capped at 10 (!102)
 
 ### Fixed
+
 - minor issue in languagetool.py: module didn't stop execution after java-check failed in find_languagetool_command() (!94)
 - import issue with proselint, because proselint.py shared the same name with the imported API (!95)
 - usage of old `compare_...` functions (#45, !97)
@@ -148,8 +155,7 @@ This is the first (pre-)release of LaTeXBuddy.
 - draft of the abstract module API (!22)
 - logo (!38)
 
-
-[Unreleased]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.3.0...master
-[0.3.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.2.0...v0.3.0
-[0.2.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.1.0...v0.2.0
 [0.1.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/124d0730...v0.1.0
+[0.2.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.1.0...v0.2.0
+[0.3.0]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.2.0...v0.3.0
+[unreleased]: https://git.rz.tu-bs.de/sw-technik-fahrzeuginformatik/sep/sep-2021/ibr_alg_0/latexbuddy/-/compare/v0.3.0...master

@@ -136,7 +136,6 @@ def find_executable(
     result = execute("which", name)
 
     if not result or "not found" in result:
-
         if log_errors:
             err_logger.error(
                 not_found(name, to_install if to_install is not None else name)
@@ -153,7 +152,6 @@ def find_executable(
         )
 
     else:
-
         path_str = result.splitlines()[0]
         err_logger.debug(f"Found executable {name} at '{path_str}'.")
         return path_str
@@ -240,12 +238,10 @@ def execute_no_exceptions(
     try:
         function_call()
     except Exception as e:
-
         logger.error(
             f"{error_message}:\n{e.__class__.__name__}: {getattr(e, 'message', e)}"
         )
         if traceback_log_level is not None:
-
             stack_trace = traceback.format_exc()
 
             if traceback_log_level == "DEBUG":

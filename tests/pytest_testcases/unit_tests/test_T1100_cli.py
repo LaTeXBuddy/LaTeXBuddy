@@ -1,7 +1,8 @@
 import os
 import re
+
 from pathlib import Path
-from typing import Optional, List, Tuple
+from typing import List, Optional, Tuple
 
 import pytest
 
@@ -22,7 +23,6 @@ def generate_cli_command(
     en_modules: Optional[List[str]],
     dis_modules: Optional[List[str]],
 ) -> List[str]:
-
     cmd = ["latexbuddy", "-v"]
 
     if language:
@@ -69,9 +69,8 @@ def assert_flag_config_options(
     output: Optional[str],
     format: Optional[str],
     en_modules: Optional[List[str]],
-    dis_modules: Optional[List[str]]
+    dis_modules: Optional[List[str]],
 ):
-
     main_match = __REGEX_CLI_CONFIG_OPTIONS_MAIN.search(cmd_output)
     modules_match = __REGEX_CLI_CONFIG_OPTIONS_MODULES.search(cmd_output)
 
@@ -146,7 +145,10 @@ def assert_flag_config_options(
         ),
         (
             (None, (None, None)),
-            ("resources/my_nonexistent_whitelist", "'resources/my_nonexistent_whitelist'"),
+            (
+                "resources/my_nonexistent_whitelist",
+                "'resources/my_nonexistent_whitelist'",
+            ),
             (None, None),
             (None, None),
             (None, None),
@@ -173,7 +175,10 @@ def assert_flag_config_options(
             (None, None),
             (None, None),
             (None, None),
-            (["LanguageTool", "Aspell", "FantasyModule"], ["LanguageTool", "Aspell", "FantasyModule"]),
+            (
+                ["LanguageTool", "Aspell", "FantasyModule"],
+                ["LanguageTool", "Aspell", "FantasyModule"],
+            ),
             (None, None),
         ),
         (
@@ -182,7 +187,10 @@ def assert_flag_config_options(
             (None, None),
             (None, None),
             (None, None),
-            (["LanguageTool", "Diction", "FantasyModule2"], ["LanguageTool", "Diction", "FantasyModule2"]),
+            (
+                ["LanguageTool", "Diction", "FantasyModule2"],
+                ["LanguageTool", "Diction", "FantasyModule2"],
+            ),
         ),
     ],
 )
@@ -193,9 +201,8 @@ def test_unit_cli_check_flag_parsing(
     output: Tuple[Optional[str], Optional[str]],
     format: Tuple[Optional[str], Optional[str]],
     en_modules: Tuple[Optional[List[str]], Optional[List[str]]],
-    dis_modules: Tuple[Optional[List[str]], Optional[List[str]]]
+    dis_modules: Tuple[Optional[List[str]], Optional[List[str]]],
 ):
-
     cmd = generate_cli_command(
         script_dir=script_dir,
         language=language[0],
@@ -203,7 +210,7 @@ def test_unit_cli_check_flag_parsing(
         output=output[0],
         format=format[0],
         en_modules=en_modules[0],
-        dis_modules=dis_modules[0]
+        dis_modules=dis_modules[0],
     )
     result = execute_and_collect(*cmd)
 
@@ -214,5 +221,5 @@ def test_unit_cli_check_flag_parsing(
         output=output[1],
         format=format[1],
         en_modules=en_modules[1],
-        dis_modules=dis_modules[1]
+        dis_modules=dis_modules[1],
     )

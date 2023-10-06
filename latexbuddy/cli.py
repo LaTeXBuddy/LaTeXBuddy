@@ -159,7 +159,6 @@ def main():
 
 
 def __setup_logger(args: argparse.Namespace) -> logging.Logger:
-
     display_debug = args.verbose or os.environ.get("LATEXBUDDY_DEBUG", False)
 
     __setup_root_logger(root_logger, logging.DEBUG if display_debug else logging.INFO)
@@ -171,7 +170,6 @@ def __execute_flask_startup(args: argparse.Namespace) -> None:
 
 
 def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
-
     config_loader = ConfigLoader(args)
 
     """ For each Tex file transferred, all paths
@@ -192,7 +190,6 @@ def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
         paths = get_all_paths_in_document(Path(p))
 
         for path in paths:
-
             # re-initialize the buddy instance with a new path
             buddy.init(
                 config_loader=config_loader,

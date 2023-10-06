@@ -4,5 +4,5 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-poetry run isort latexbuddy
-poetry run black latexbuddy
+pre-commit run isort
+pre-commit run black

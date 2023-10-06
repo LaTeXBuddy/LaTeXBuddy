@@ -1,4 +1,5 @@
 import os
+
 from pathlib import Path
 
 import pytest
@@ -15,7 +16,6 @@ def script_dir():
 
 
 def test_unit_yalafi_detex_run_checks(script_dir):
-
     test_document = Path(script_dir + "/resources/T2100_test_document.tex")
     tf = TexFile(test_document)
     cl = ConfigLoader()

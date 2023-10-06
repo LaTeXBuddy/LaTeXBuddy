@@ -41,7 +41,6 @@ ALLOWED_EXTENSIONS = [
 
 
 class FlaskConfigLoader(ConfigLoader):
-
     _REGEX_LANGUAGE_FLAG = re.compile(r"([a-zA-Z]{2,3})(?:[-_\s]([a-zA-Z]{2,3}))?")
 
     def __init__(
@@ -124,7 +123,6 @@ def index():
 
 @app.route("/check", methods=["GET", "POST"])
 def document_check():
-
     if request.method != "POST":
         return redirect("/")
 
@@ -141,7 +139,6 @@ def document_check():
     saved_tex_files = []
 
     for file in files:
-
         if not allowed_file(file.filename):
             continue
 
@@ -160,7 +157,6 @@ def document_check():
         saved_tex_files.extend(tex_files)
 
     for file in saved_tex_files:
-
         # TODO: compile PDF only in main document
         run_buddy(file, Path(result_path), saved_tex_files)
 
@@ -169,7 +165,6 @@ def document_check():
 
 @app.route("/result/<result_id>")
 def check_result(result_id):
-
     result_path = Path(
         os.path.join(app.config["RESULTS_FOLDER"], secure_filename(result_id))
     )
@@ -187,7 +182,6 @@ def check_result(result_id):
 
 @app.route("/result/<result_id>/<file_name>")
 def display_result(result_id, file_name):
-
     result_path = Path(
         os.path.join(app.config["RESULTS_FOLDER"], secure_filename(result_id))
     )
@@ -197,7 +191,7 @@ def display_result(result_id, file_name):
 
     file_path = Path(os.path.join(str(result_path), secure_filename(file_name)))
 
-    with open(file_path, "r") as f:
+    with open(file_path) as f:
         file_contents = f.read()
 
     return file_contents
@@ -205,7 +199,6 @@ def display_result(result_id, file_name):
 
 @app.route("/result/<result_id_0>/compiled/<result_id_1>/<pdf_name>")
 def compiled_pdf(result_id_0, result_id_1, pdf_name):
-
     result_id = result_id_0
     if result_id_0 != result_id_1:
         abort(404)
@@ -222,7 +215,6 @@ def compiled_pdf(result_id_0, result_id_1, pdf_name):
 
 @app.route("/whitelist-api/upload", methods=["GET", "POST"])
 def upload_whitelist():
-
     if request.method != "POST":
         return redirect("/")
 
@@ -234,7 +226,6 @@ def upload_whitelist():
     date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     for wl_file in files:
-
         if not allowed_whitelist_file(wl_file.filename):
             continue
 
@@ -255,7 +246,6 @@ def allowed_whitelist_file(filename: str) -> bool:
 
 
 def run_buddy(file_path: Path, output_dir: Path, path_list: List[Path]):
-
     if not output_dir.exists():
         output_dir.mkdir()
 
@@ -301,7 +291,6 @@ def run_buddy(file_path: Path, output_dir: Path, path_list: List[Path]):
 
 
 def get_available_whitelist_ids() -> List[str]:
-
     whitelist_path = Path(app.config["WHITELIST_FOLDER"])
 
     if not whitelist_path.exists() or not whitelist_path.is_dir():
@@ -309,7 +298,6 @@ def get_available_whitelist_ids() -> List[str]:
 
     wl_ids = []
     for child in whitelist_path.glob("./*"):
-
         if child.is_dir():
             continue
 
@@ -319,7 +307,6 @@ def get_available_whitelist_ids() -> List[str]:
 
 
 def get_whitelist_path(whitelist_id: str) -> Optional[str]:
-
     if whitelist_id not in get_available_whitelist_ids():
         return None
 

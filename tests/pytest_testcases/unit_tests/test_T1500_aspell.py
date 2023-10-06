@@ -1,11 +1,14 @@
-import pytest
 import os
 
 from pathlib import Path
+
+import pytest
+
 from latexbuddy.modules.aspell import Aspell
 from latexbuddy.texfile import TexFile
-from tests.pytest_testcases.unit_tests.resources.driver_config_loader import \
-    ConfigLoader as DriverCL
+from tests.pytest_testcases.unit_tests.resources.driver_config_loader import (
+    ConfigLoader as DriverCL,
+)
 
 
 @pytest.fixture
@@ -14,7 +17,6 @@ def script_dir():
 
 
 def test_unit_aspell_run_checks(script_dir):
-
     _ERROR_COUNT = 3  # From aspell commandline output
     document_path = script_dir + "/resources/T1500.txt"
     aspell_instance = Aspell()

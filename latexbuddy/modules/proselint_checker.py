@@ -14,7 +14,6 @@ class ProseLint(Module):
         self.problem_type = "grammar"
 
     def run_checks(self, config: ConfigLoader, file: TexFile) -> List[Problem]:
-
         lang = config.get_config_option_or_default(LatexBuddy, "language", None)
 
         if lang != "en":

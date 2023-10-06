@@ -1,13 +1,17 @@
 import os
+
 from logging import DEBUG
 from pathlib import Path
 
 import pytest
+
 from latexbuddy.buddy import LatexBuddy
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.problem import Problem, ProblemSeverity
-from tests.pytest_testcases.integration_tests.resources.T800_driver_ModuleProvider \
-    import DriverModuleProvider, DriverModule1
+from tests.pytest_testcases.integration_tests.resources.T800_driver_ModuleProvider import (
+    DriverModule1,
+    DriverModuleProvider,
+)
 
 
 @pytest.fixture
@@ -21,7 +25,6 @@ def default_config_loader():
 
 
 def test_integration_buddy_module(script_dir, caplog, default_config_loader):
-
     # initializing logger on DEBUG level
     caplog.set_level(DEBUG)
 
@@ -47,9 +50,9 @@ def test_integration_buddy_module(script_dir, caplog, default_config_loader):
     assert len(problem_list) == 1
 
     assert problem_list[0] == Problem(
-                position=None,
-                text="just a general problem",
-                checker=DriverModule1,
-                file=LatexBuddy.instance.tex_file.plain_file,
-                severity=ProblemSeverity.INFO
-            )
+        position=None,
+        text="just a general problem",
+        checker=DriverModule1,
+        file=LatexBuddy.instance.tex_file.plain_file,
+        severity=ProblemSeverity.INFO,
+    )

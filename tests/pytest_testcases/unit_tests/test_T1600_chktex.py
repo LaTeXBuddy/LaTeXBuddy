@@ -1,11 +1,14 @@
-import pytest
 import os
 
 from pathlib import Path
+
+import pytest
+
 from latexbuddy.modules.chktex import Chktex
 from latexbuddy.texfile import TexFile
-from tests.pytest_testcases.unit_tests.resources.driver_config_loader import \
-    ConfigLoader as DriverCL
+from tests.pytest_testcases.unit_tests.resources.driver_config_loader import (
+    ConfigLoader as DriverCL,
+)
 
 
 @pytest.fixture
@@ -14,7 +17,6 @@ def script_dir():
 
 
 def test_unit_chktex_run_checks(script_dir):
-
     _ERROR_COUNT = 112
     # added tolerance because of versional differences in ChkTeX
     _ERROR_COUNT_TOLERANCE = 1

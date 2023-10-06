@@ -134,11 +134,9 @@ class LineProblemFilter(ProblemFilter):
         super().__init__(start_line, end_line)
 
     def custom_match(self, problem: Problem) -> bool:
-
         return True
 
     def custom_parameters_equal(self, other: ProblemFilter) -> bool:
-
         return type(other) == LineProblemFilter
 
 
@@ -164,11 +162,9 @@ class ModuleProblemFilter(ProblemFilter):
         self.module_name = module_name
 
     def custom_match(self, problem: Problem) -> bool:
-
         return problem.checker == self.module_name
 
     def custom_parameters_equal(self, other: ProblemFilter) -> bool:
-
         return (
             type(other) == ModuleProblemFilter and other.module_name == self.module_name
         )
@@ -196,11 +192,9 @@ class SeverityProblemFilter(ProblemFilter):
         self.severity = severity
 
     def custom_match(self, problem: Problem) -> bool:
-
         return problem.severity == self.severity
 
     def custom_parameters_equal(self, other: ProblemFilter) -> bool:
-
         return type(other) == SeverityProblemFilter and other.severity == self.severity
 
 
@@ -224,11 +218,9 @@ class WhitelistKeyProblemFilter(ProblemFilter):
         self.wl_key = wl_key
 
     def custom_match(self, problem: Problem) -> bool:
-
         return problem.key == self.wl_key
 
     def custom_parameters_equal(self, other: ProblemFilter) -> bool:
-
         return type(other) == WhitelistKeyProblemFilter and other.wl_key == self.wl_key
 
 
@@ -291,7 +283,6 @@ class Preprocessor(Loggable):
 
         line_num = 0  # lines are 1-based
         for line in file.tex.splitlines():
-
             line_num += 1  # lines are 1-based
 
             if not Preprocessor.__COMMAND_PATTERN.fullmatch(line):
@@ -330,7 +321,6 @@ class Preprocessor(Loggable):
         ]
 
         for matcher in matchers:
-
             match = matcher(line, line_num)
             if match is not None:
                 return match
@@ -400,7 +390,6 @@ class Preprocessor(Loggable):
 
         match = Preprocessor.__COMMAND_PATTERN_BEGIN_IGNORE_ANYTHING.fullmatch(line)
         if match is not None:
-
             open_ended_filter = self.__get_open_ended_filter(LineProblemFilter(0))
 
             if open_ended_filter is not None:
@@ -437,7 +426,6 @@ class Preprocessor(Loggable):
 
             filters = []
             for module in modules:
-
                 open_ended_filter = self.__get_open_ended_filter(
                     ModuleProblemFilter(module, 0)
                 )
@@ -478,7 +466,6 @@ class Preprocessor(Loggable):
 
             filters = []
             for severity in severities:
-
                 try:
                     enum_severity = ProblemSeverity[severity.upper()]
 
@@ -529,7 +516,6 @@ class Preprocessor(Loggable):
 
             filters = []
             for key in keys:
-
                 open_ended_filter = self.__get_open_ended_filter(
                     WhitelistKeyProblemFilter(key, 0)
                 )
@@ -564,7 +550,6 @@ class Preprocessor(Loggable):
 
         match = Preprocessor.__COMMAND_PATTERN_END_IGNORE_ANYTHING.fullmatch(line)
         if match is not None:
-
             open_ended_filter = self.__get_open_ended_filter(LineProblemFilter(0))
 
             if open_ended_filter is None:
@@ -598,7 +583,6 @@ class Preprocessor(Loggable):
             modules = match.group(1).strip().split(" ")
 
             for module in modules:
-
                 open_ended_filter = self.__get_open_ended_filter(
                     ModuleProblemFilter(module, 0)
                 )
@@ -636,7 +620,6 @@ class Preprocessor(Loggable):
             severities = match.group(1).strip().split(" ")
 
             for severity in severities:
-
                 try:
                     enum_severity = ProblemSeverity[severity.upper()]
 
@@ -682,7 +665,6 @@ class Preprocessor(Loggable):
             keys = match.group(1).strip().split(" ")
 
             for key in keys:
-
                 open_ended_filter = self.__get_open_ended_filter(
                     WhitelistKeyProblemFilter(key, 0)
                 )

@@ -1,14 +1,16 @@
-import re
-
-import pytest
 import os
+import re
 
 from pathlib import Path
 from tempfile import mkstemp
-from tests.pytest_testcases.tools import execute_and_collect
+
+import pytest
+
+from resources.driver_config_loader import ConfigLoader
+
 from latexbuddy.modules.logfilter import LogFilter
 from latexbuddy.texfile import TexFile
-from resources.driver_config_loader import ConfigLoader
+from tests.pytest_testcases.tools import execute_and_collect
 
 
 @pytest.fixture
@@ -30,7 +32,8 @@ def test_unit_logfilter_all_problems_in_texfilt(script_dir):
     problems = log_filter.run_checks(config_loader, tex_file)
 
     cmd = [
-        "awk", "-f",
+        "awk",
+        "-f",
         texfilt_path,
         f"{str(tex_file.log_file)} > {raw_problems_path}",
     ]
@@ -61,22 +64,21 @@ def test_unit_logfilter_all_texfilt_in_problems(script_dir):
         problem_line_nos.append(problem.position[0])
 
     cmd = [
-        "awk", "-f",
+        "awk",
+        "-f",
         texfilt_path,
         f"{str(tex_file.log_file)} > {raw_problems_path}",
     ]
     execute_and_collect(*cmd)  # output not used
     raw_problems = Path(raw_problems_path).read_text()
-    texfilt_problems_split = raw_problems.split(' ')
-    problem_re = re.compile(
-        r"(?P<line_no>\d+):"
-    )
+    texfilt_problems_split = raw_problems.split(" ")
+    problem_re = re.compile(r"(?P<line_no>\d+):")
 
     test = True
     for problem in texfilt_problems_split:
         match = problem_re.match(problem)
         if not match:
             continue
-        line_no = match.group('line_no')
+        line_no = match.group("line_no")
         test = test and line_no in problem_line_nos
     assert test

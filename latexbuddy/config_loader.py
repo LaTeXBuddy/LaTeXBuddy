@@ -115,9 +115,7 @@ class ConfigLoader(Loggable):
         }
 
         for key in args_dict:
-
             if key in flag_function_map:
-
                 parsed_main, parsed_modules = flag_function_map[key](
                     args_dict[key], parsed_main, parsed_modules
                 )
@@ -190,14 +188,12 @@ class ConfigLoader(Loggable):
         language_match = self._REGEX_LANGUAGE_FLAG.fullmatch(flag_value)
 
         if language_match is not None:
-
             parsed_main["language"] = language_match.group(1)
 
             if language_match.group(2) is not None:
                 parsed_main["language_country"] = language_match.group(2)
 
         else:
-
             self.logger.warning(
                 f"Specified language '{flag_value}' is not a valid "
                 f"language key. Please use a key in the following syntax: "
@@ -270,7 +266,6 @@ class ConfigLoader(Loggable):
             or isinstance(module, LatexBuddy)
             or (isinstance(module, type) and module == LatexBuddy)
         ):
-
             module_name = "LatexBuddy (main instance)"
 
             if key not in config_dict:
@@ -281,7 +276,6 @@ class ConfigLoader(Loggable):
             entry = config_dict[key]
 
         else:
-
             module_name = module.display_name
 
             if module_name not in config_dict or key not in config_dict[module_name]:
@@ -314,7 +308,6 @@ class ConfigLoader(Loggable):
         try:
             TypeVerifier(cfg_entry=entry)
         except ValidationError:
-
             raise ConfigOptionVerificationError(
                 f"config entry '{key}' for module '{module_name}' is of "
                 f"type '{str(type(entry))}' (expected '{str(verify_type)}')"
@@ -399,7 +392,6 @@ class ConfigLoader(Loggable):
             or isinstance(module, LatexBuddy)
             or (isinstance(module, type) and module == LatexBuddy)
         ):
-
             try:
                 return ConfigLoader.__get_option(
                     self.main_flags,
@@ -424,7 +416,6 @@ class ConfigLoader(Loggable):
             )
 
         else:
-
             try:
                 return ConfigLoader.__get_option(
                     self.module_flags,

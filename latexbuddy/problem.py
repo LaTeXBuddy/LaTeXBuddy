@@ -130,7 +130,6 @@ class Problem(Loggable):
             raise ValueError("Checker module can not be main LatexBuddy instance.")
 
         else:
-
             self.checker = checker.display_name
 
         if position is not None and len(text) < 1:
@@ -241,9 +240,7 @@ class ProblemJSONEncoder(JSONEncoder):
     """Provides JSON serializability for class Problem"""
 
     def default(self, obj: Any):
-
         if type(obj) == Problem:
-
             return {
                 "position": obj.position,
                 "text": obj.text,

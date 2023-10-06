@@ -1,4 +1,5 @@
 import os
+
 from pathlib import Path
 
 import pytest
@@ -12,7 +13,6 @@ def script_dir():
 
 
 def test_integration_buddy_cli(script_dir):
-
     config_path = script_dir + "/resources/T700_config.py"
     whitelist_path = script_dir + "/resources/T700_whitelist"
     document_path = script_dir + "/resources/T700_test_document.tex"
@@ -22,9 +22,12 @@ def test_integration_buddy_cli(script_dir):
     cmd = [
         "latexbuddy",
         "--verbose",
-        "--config", config_path,
-        "--whitelist", whitelist_path,
-        "--output", output_path,
+        "--config",
+        config_path,
+        "--whitelist",
+        whitelist_path,
+        "--output",
+        output_path,
         document_path,
     ]
     result = execute_and_collect(*cmd)

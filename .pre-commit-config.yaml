@@ -1,0 +1,71 @@
+repos:
+  - repo: "https://github.com/pre-commit/pre-commit-hooks"
+    rev: "v4.4.0"
+    hooks:
+      # general sanity checks for files
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+      - id: check-case-conflict
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+
+      # data files
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+
+      # Git checks
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+
+      # Python checks
+      - id: check-ast
+      - id: debug-statements
+      - id: fix-encoding-pragma
+        args: [--remove]
+      # - id: name-tests-test  # TODO: enable after fixing test names
+  - repo: "https://github.com/pre-commit/pygrep-hooks"
+    rev: "v1.10.0"
+    hooks:
+      - id: python-no-eval
+      - id: python-no-log-warn
+      - id: python-check-mock-methods
+
+  - repo: "https://github.com/asottile/pyupgrade"
+    rev: "v3.14.0"
+    hooks:
+      - id: pyupgrade
+        args:
+          - "--py37-plus"
+  - repo: "https://github.com/PyCQA/isort"
+    rev: "5.12.0"
+    hooks:
+      - id: isort
+  - repo: "https://github.com/psf/black-pre-commit-mirror"
+    rev: "23.9.1"
+    hooks:
+      - id: black
+
+  - repo: "https://github.com/tox-dev/pyproject-fmt"
+    rev: "1.2.0"
+    hooks:
+      - id: pyproject-fmt
+  - repo: "https://github.com/executablebooks/mdformat"
+    rev: "0.7.17"
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-frontmatter
+          - mdformat-footnote
+          - mdformat-black
+  - repo: "https://github.com/adamchainz/blacken-docs"
+    rev: "1.16.0"
+    hooks:
+      - id: blacken-docs
+        additional_dependencies:
+        - black==23.9.1
