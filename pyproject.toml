@@ -35,8 +35,6 @@ PyLaTeX = "^1.4.1"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.10.0"
-isort = "^5.10.1"
 pytest = "^7.2.0"
 
 
