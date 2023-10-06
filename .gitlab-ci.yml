@@ -1,7 +1,9 @@
 image: python:latest
 
 variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  XDG_CACHE_HOME: "$CI_PROJECT_DIR/.cache"
+  PIP_CACHE_DIR: "$XDG_CACHE_HOME/pip"
+  PRE_COMMIT_HOME: "$XDG_CACHE_HOME/pre-commit"
   SRC_DIR: "$CI_PROJECT_DIR/latexbuddy"
 
 cache:
@@ -17,23 +19,36 @@ stages:
   - Build
   - Publish
 
-isort:
+pre-commit: &pre-commit
   stage: Lint
+  image: python:alpine
+  cache:
+    - key: v1-pip
+      paths:
+        - ${PIP_CACHE_DIR}
+    - key:
+        files:
+          - .pre-commit-config.yaml
+      paths:
+        - ${PRE_COMMIT_HOME}
+
+  before_script:
+    - apk add git build-base
+    - python --version --version
+    - pip install pre-commit
   script:
-    - pip install isort
-    - isort --check --diff "$SRC_DIR"
+    - pre-commit run --all-files
   only:
     - master
+
+pre-commit-changed:
+  <<: *pre-commit
+  script:
+    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - pre-commit run --from-ref origin/"$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" --to-ref "$CI_COMMIT_SHA"
+  only:
     - merge_requests
 
-black:
-  stage: Lint
-  script:
-    - pip install black
-    - black --check --diff "$SRC_DIR"
-  only:
-    - master
-    - merge_requests
 
 .smoke: &smoke_base
   stage: Smoke Test
