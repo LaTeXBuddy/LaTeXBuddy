@@ -119,7 +119,7 @@ dependencies = [
 ]
 
 [tool.hatch.envs.docs.scripts]
-build = "make -C docs html"
+build = "sphinx-build -b html -d docs/_build/doctrees docs docs/_build/html"
 watch = "sphinx-autobuild --watch latexbuddy docs docs/_build/html"
 
 [tool.autopep8]

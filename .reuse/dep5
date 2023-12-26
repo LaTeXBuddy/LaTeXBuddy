@@ -12,7 +12,6 @@ Files:
  docs/*.bat
  docs/Makefile
  docs/*.py
- docs/requirements.txt
  config.py
  Dockerfile
  pyproject.toml
