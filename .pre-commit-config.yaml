@@ -19,6 +19,9 @@ repos:
       - id: debug-statements
       - id: fix-encoding-pragma
         args: [--remove]
+      - id: name-tests-test
+        args: [--pytest]
+        files: ^tests/unit/ # TODO: change after all tests get renamed
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:
