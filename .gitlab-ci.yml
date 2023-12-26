@@ -96,9 +96,12 @@ pytest:
     - smoke
   before_script:
     - python --version --version
-    - pip install . tox virtualenv
+    - pip install . -r requirements-dev.txt
   script:
-    - tox run --skip-missing-interpreters --skip-env docs
+    - coverage erase
+    - coverage run -m pytest --junitxml=pytest-junit.xml --cov=latexbuddy -n auto tests
+    - coverage report
+    - coverage xml
   only:
     - master
     - merge_requests
