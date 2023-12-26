@@ -16,7 +16,6 @@ Files:
  config.py
  Dockerfile
  pyproject.toml
- requirements-dev.txt
  tox.ini
 Copyright: 2021-2022 LaTeXBuddy <latexbuddy@mailbox.org>
 License: Apache-2.0
