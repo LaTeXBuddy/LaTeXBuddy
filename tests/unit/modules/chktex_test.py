@@ -1,19 +1,48 @@
-% LaTeXBuddy tests
-% Copyright (C) 2021-2022  LaTeXBuddy
-%
-% This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-%
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-%
-% You should have received a copy of the GNU General Public License
-% along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Note: This file was written with only two purposes in mind:
+#  LaTeXBuddy - a LaTeX checking tool
+#  Copyright (c) 2023  LaTeXBuddy
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from __future__ import annotations
+
+import shutil
+from pathlib import Path
+
+import pytest
+
+from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.modules.chktex import Chktex
+from latexbuddy.texfile import TexFile
+
+pytestmark = pytest.mark.skipif(
+    shutil.which("chktex") is None,
+    reason="ChkTeX is not installed",
+)
+
+_DOCUMENT_CONTENTS = R"""Note: This file was written with only two purposes in mind:
     o To test the program upon it
     o To show off some of the features
 
@@ -255,3 +284,18 @@ $$(
 % require-final-newline: nil
 % End:
 % There should be no newline at the end of this file to test bug #46539
+"""
+
+
+@pytest.fixture
+def tex_file(tmp_path: Path) -> TexFile:
+    document = tmp_path / "document.tex"
+    document.write_text(_DOCUMENT_CONTENTS)
+    return TexFile(document, compile_tex=False)
+
+
+def test_run_checks(tex_file: TexFile, driver_config_loader) -> None:
+    output_problems = Chktex().run_checks(driver_config_loader, tex_file)
+
+    # added tolerance because of versional differences in ChkTeX
+    assert 112 <= len(output_problems) <= 117
