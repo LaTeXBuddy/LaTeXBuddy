@@ -22,6 +22,11 @@ import pytest
 
 
 @pytest.fixture
+def resources_dir() -> Path:
+    return Path(__file__).parent / "resources"
+
+
+@pytest.fixture
 def output_dir(tmp_path: Path) -> Path:
     output_dir = tmp_path / "output"
     output_dir.mkdir(parents=True)
