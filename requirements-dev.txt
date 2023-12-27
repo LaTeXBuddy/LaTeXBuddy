@@ -1,6 +1,8 @@
 pytest>=7
+pytest-cov>=4
+pytest-xdist>=3
 
-covdefaults
+covdefaults>=2.2
 coverage[toml]
 
 towncrier

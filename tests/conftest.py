@@ -22,6 +22,11 @@ import pytest
 
 
 @pytest.fixture
+def resources_dir() -> Path:
+    return Path(__file__).parent / "resources"
+
+
+@pytest.fixture
 def output_dir(tmp_path: Path) -> Path:
     output_dir = tmp_path / "output"
     output_dir.mkdir(parents=True)
@@ -33,3 +38,42 @@ def empty_whitelist_file(tmp_path: Path) -> Path:
     whitelist_file = tmp_path / "whitelist"
     whitelist_file.touch()
     return whitelist_file
+
+
+@pytest.fixture
+def driver_config_loader():
+    class ConfigLoader:
+        def __init__(self):
+            pass
+
+        def get_config_option_or_default(
+            self,
+            module,
+            key: str,
+            default_value=None,
+            verify_type=None,
+            verify_regex=None,
+            verify_choices=None,
+        ):
+            if key == "language":
+                return "en"
+            if key == "language_country":
+                return None
+            if key == "mode":
+                return "COMMANDLINE"
+            if key == "disabled-rules":
+                return ""
+            if key == "disabled-categories":
+                return ""
+            if key == "format":
+                return "not html"
+
+        def get_config_option(
+            self,
+            module,
+            key: str,
+        ):
+            if key == "format":
+                return "json"
+
+    return ConfigLoader()

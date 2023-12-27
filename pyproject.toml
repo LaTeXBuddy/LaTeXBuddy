@@ -79,10 +79,15 @@ ignore = ["W503"]
 
 [tool.coverage.run]
 plugins = ["covdefaults"]
+source = ["latexbuddy"]
+parallel = true
 
 [tool.coverage.report]
 # TODO: increase this when coverage is good
 fail_under = 50
+
+[tool.pytest.ini_options]
+addopts = "--tb=short"
 
 [tool.ruff]
 line-length = 79

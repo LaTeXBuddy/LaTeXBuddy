@@ -1,19 +1,31 @@
-% LaTeXBuddy tests
-% Copyright (C) 2021-2022  LaTeXBuddy
-%
-% This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-%
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-%
-% You should have received a copy of the GNU General Public License
-% along with this program.  If not, see <https://www.gnu.org/licenses/>.
-\documentclass{article}
+#  LaTeXBuddy - a LaTeX checking tool
+#  Copyright (c) 2023  LaTeXBuddy
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from __future__ import annotations
+
+import re
+import subprocess
+from pathlib import Path
+
+import pytest
+
+from latexbuddy.config_loader import ConfigLoader
+from latexbuddy.modules.logfilter import LogFilter
+from latexbuddy.texfile import TexFile
+
+_DOCUMENT_CONTENTS = R"""\documentclass{article}
 % \begin{document}
 \chapter{Entwicklungsrichtlinien}
 
@@ -114,3 +126,54 @@ Außerdem werden die folgenden Instrumente für die nicht mit dem Source-Code ve
     \item [\textit{ShareLaTeX}] \textit{(heutzutage auch Overleaf)} Online-Editor für \LaTeX-Dokumente. Bereitgestellt vom GITZ, dieser ermöglicht unter anderem die gleichzeitige Arbeit von mehreren Team-Mitgliedern an einem Dokument\footnote{\url{https://sharelatex.rz.tu-bs.de/}}.
 \end{description}
 \end{document}
+"""
+
+
+@pytest.fixture
+def tex_file(tmp_path: Path) -> TexFile:
+    document = tmp_path / "document.tex"
+    document.write_text(_DOCUMENT_CONTENTS)
+    return TexFile(document, compile_tex=True)
+
+
+@pytest.fixture
+def tex_filter(tmp_path: Path) -> Path:
+    return Path(
+        __file__,
+    ).parent.parent.parent.parent / "latexbuddy" / "modules" / "texfilt.awk"
+
+
+_problem_re = re.compile(
+    r"(?P<line_no>\d+):",
+)
+
+_space_re = re.compile(r'\s+')
+
+
+def test_run_checks(
+    tex_file: TexFile,
+    tex_filter: Path,
+):
+
+    problems = LogFilter().run_checks(ConfigLoader(), tex_file)
+
+    process = subprocess.run(
+        ("awk", "-f", tex_filter, tex_file.log_file),
+        capture_output=True,
+    )
+    raw_problems = process.stdout.decode("utf-8")
+    raw_problems_normalized = _space_re.sub(' ', raw_problems)
+
+    for problem in problems:
+        if problem.description is not None:
+            assert _space_re.sub(' ', problem.description).strip() in \
+                raw_problems_normalized
+
+    # FIXME: LogFilter does not set positions
+    # problem_line_nos = [problem.position[0] for problem in problems]
+    # for problem in raw_problems.split(" "):
+    #     match = _problem_re.match(problem)
+    #     if not match:
+    #         continue
+    #     line_no = match.group("line_no")
+    #     assert line_no in problem_line_nos
