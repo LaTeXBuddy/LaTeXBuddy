@@ -20,6 +20,7 @@ import json
 import logging
 import re
 import socket
+import subprocess
 import time
 from contextlib import closing
 from enum import Enum
@@ -56,6 +57,75 @@ class Mode(Enum):
     COMMANDLINE = "COMMANDLINE"
     LOCAL_SERVER = "LOCAL_SERVER"
     REMOTE_SERVER = "REMOTE_SERVER"
+
+
+def find_languagetool_command_prefix() -> list[str]:
+    """Find a valid LanguageTool executable and return the command prefix.
+
+    This method finds either an executable named ``languagetool`` or
+    the ``languagetool-commandline.jar`` file. In the case of the
+    latter, it returns the path to the file prefixed with ``java``.
+
+    :return: Prefix of the LanguageTool command
+    """
+    try:
+        return [
+            latexbuddy.tools.find_executable(
+                "languagetool",
+                "LanguageTool (CLI)",
+                LOG,
+                log_errors=False, ),
+        ]
+    except ExecutableNotFoundError:
+        latexbuddy.tools.find_executable(
+            "java", "JRE (Java Runtime Environment)", LOG,
+        )
+
+        return [
+            "java",
+            "-jar",
+            latexbuddy.tools.find_executable(
+                "languagetool-commandline.jar",
+                "LanguageTool (CLI)",
+                LOG,
+            ),
+        ]
+
+
+def find_languagetool_server_prefix() -> list[str]:
+    """Find a valid LanguageTool server executable and return the command
+    prefix.
+
+    This method finds either an executable named
+    ``languagetool-server`` or the ``languagetool-server.jar`` file.
+    In the case of the latter, it returns the path to the file prefixed
+    with ``java``.
+
+    :return: Prefix of the LanguageTool server command
+    """
+    try:
+        return [
+            latexbuddy.tools.find_executable(
+                "languagetool-server",
+                "LanguageTool (local server)",
+                LOG,
+                log_errors=False, ),
+        ]
+    except ExecutableNotFoundError:
+        latexbuddy.tools.find_executable(
+            "java", "JRE (Java Runtime Environment)", LOG,
+        )
+
+        return [
+            "java",
+            "-cp",
+            latexbuddy.tools.find_executable(
+                "languagetool-server.jar",
+                "LanguageTool (local server)",
+                LOG,
+            ),
+            "org.languagetool.server.HTTPServer",
+        ]
 
 
 class LanguageTool(Module):
@@ -159,14 +229,13 @@ class LanguageTool(Module):
 
         if self.mode == Mode.COMMANDLINE:
 
-            cmd = self.find_languagetool_command_prefix()
+            cmd = find_languagetool_command_prefix()
             cmd.append("--list")
 
-            result = latexbuddy.tools.execute(*cmd)
-
+            languagetool_output = subprocess.check_output(cmd, text=True)
             supported_languages = [
                 lang.split(" ")[0]
-                for lang in result.splitlines()
+                for lang in languagetool_output.splitlines()
             ]
             return list(
                 filter(self.matches_language_regex, supported_languages),
@@ -219,40 +288,15 @@ class LanguageTool(Module):
             )
             executable_source = "java"
 
-        lt_path = result
         command_prefix = []
 
         if executable_source == "java":
             command_prefix.append("java")
             command_prefix.append("-jar")
 
-        command_prefix.append(lt_path)
+        command_prefix.append(result)
 
         return command_prefix
-
-    def find_languagetool_command(self) -> None:
-        """Searches for the LanguageTool command line app.
-
-        This method also checks if Java is installed.
-        """
-
-        self.lt_console_command = self.find_languagetool_command_prefix()
-
-        self.lt_console_command.append("--json")
-
-        if self.language:
-            self.lt_console_command.append("-l")
-            self.lt_console_command.append(self.language)
-        else:
-            self.lt_console_command.append("--autoDetect")
-
-        if self.disabled_rules:
-            self.lt_console_command.append("--disable")
-            self.lt_console_command.append(self.disabled_rules)
-
-        if self.disabled_categories:
-            self.lt_console_command.append("--disablecategories")
-            self.lt_console_command.append(self.disabled_categories)
 
     def find_disabled_rules(self, config: ConfigLoader) -> None:
         """Reads all disabled rules and categories from the specified
@@ -362,14 +406,27 @@ class LanguageTool(Module):
         :return: app's response
         """
 
-        self.find_languagetool_command()
+        command: list[str] = find_languagetool_command_prefix()
+        command.append("--json")
+        if self.language:
+            command.append("-l")
+            command.append(self.language)
+        else:
+            command.append("--autoDetect")
+        if self.disabled_rules:
+            command.append("--disable")
+            command.append(self.disabled_rules)
+        if self.disabled_categories:
+            command.append("--disablecategories")
+            command.append(self.disabled_categories)
 
-        # cloning list to in order to append the file name
-        # w/o changing lt_console_command
-        cmd = list(self.lt_console_command)
-        cmd.append(str(file.plain_file))
-
-        output = latexbuddy.tools.execute_no_errors(*cmd, encoding="utf_8")
+        output = subprocess.check_output(
+            (
+                *command,
+                file.plain_file,
+            ),
+            text=True,
+        )
 
         if len(output) > 0:
             output = output[output.find("{"):]
@@ -474,52 +531,6 @@ class LanguageToolLocalServer:
     def __del__(self) -> None:
         self.stop_local_server()
 
-    def get_server_run_command(self) -> None:
-        """Searches for the LanguageTool server executable.
-
-        This method also checks if Java is installed.
-        """
-
-        latexbuddy.tools.find_executable(
-            "java", "JRE (Java Runtime Environment)", LOG,
-        )
-
-        try:
-            result = latexbuddy.tools.find_executable(
-                "languagetool-server",
-                "LanguageTool (local server)",
-                LOG,
-                log_errors=False,
-            )
-            executable_source = "native"
-
-        except ExecutableNotFoundError:
-
-            result = latexbuddy.tools.find_executable(
-                "languagetool-server.jar",
-                "LanguageTool (local server)",
-                LOG,
-            )
-            executable_source = "java"
-
-        self.lt_path = result
-
-        if executable_source == "java":
-            self.lt_server_command = [
-                "java",
-                "-cp",
-                self.lt_path,
-                "org.languagetool.server.HTTPServer",
-            ]
-
-        elif executable_source == "native":
-            self.lt_server_command = [
-                self.lt_path,
-            ]
-
-        self.lt_server_command.append("--port")
-        self.lt_server_command.append(str(self.port))
-
     def start_local_server(self, port: int = __DEFAULT_PORT) -> int:
         """Starts the LanguageTool server locally.
 
@@ -532,10 +543,13 @@ class LanguageToolLocalServer:
 
         self.port = self.find_free_port(port)
 
-        self.get_server_run_command()
-
-        self.server_process = latexbuddy.tools.execute_background(
-            *self.lt_server_command,
+        self.server_process = subprocess.Popen(
+            (
+                *find_languagetool_server_prefix(),
+                "--port",
+                str(self.port),
+            ),
+            start_new_session=True,
         )
 
         self.wait_till_server_up()
