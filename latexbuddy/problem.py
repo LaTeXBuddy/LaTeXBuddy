@@ -218,9 +218,11 @@ class Problem:
             #  default to `None`
             space = " "
             minus = "-"
-            key = f"{self.checker}_" \
-                  f"{self.p_type}_" \
-                  f"{self.text.replace(space, minus)}"
+            key = (
+                f"{self.checker}_"
+                f"{self.p_type}_"
+                f"{self.text.replace(space, minus)}"
+            )
 
         # add language to the key if its a spelling or grammar error
         if language is not None and (

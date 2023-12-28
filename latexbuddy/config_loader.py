@@ -255,8 +255,10 @@ class ConfigLoader:
                 config_file_path,
             )
             if spec is None or spec.loader is None:
-                _msg = f"{str(config_file_path)}: " \
-                       f"Import error: Couldn't find a suitable file loader"
+                _msg = (
+                    f"{str(config_file_path)}: "
+                    "Import error: Couldn't find a suitable file loader"
+                )
                 raise ValueError(_msg)
             config = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(config)
@@ -374,8 +376,10 @@ class ConfigLoader:
         try:
             TypeVerifier(cfg_entry=entry)
         except ValidationError as err:
-            _msg = f"config entry '{key}' for module '{module_name}' is of " \
-                   f"type '{str(type(entry))}' (expected '{str(verify_type)}')"
+            _msg = (
+                f"config entry '{key}' for module '{module_name}' is of "
+                f"type '{str(type(entry))}' (expected '{str(verify_type)}')"
+            )
             raise ConfigOptionVerificationError(_msg) from err
 
     @staticmethod

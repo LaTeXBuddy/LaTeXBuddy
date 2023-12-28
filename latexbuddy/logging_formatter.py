@@ -42,9 +42,11 @@ class ConsoleFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         if self.colour:
-            level_msg = f"{LOG_LEVEL_COLORS[record.levelname]}" \
-                        f"[{record.levelname}]" \
-                        f"{colour.RESET_ALL}"
+            level_msg = (
+                f"{LOG_LEVEL_COLORS[record.levelname]}"
+                f"[{record.levelname}]"
+                f"{colour.RESET_ALL}"
+            )
         else:
             level_msg = f"[{record.levelname}]"
 

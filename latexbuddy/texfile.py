@@ -167,8 +167,10 @@ class TexFile:
         return self.tex_file == other.tex_file
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(" \
-               f"file={str(self.tex_file.resolve())})"
+        return (
+            f"{self.__class__.__name__}("
+            f"file={str(self.tex_file.resolve())})"
+        )
 
     def __str__(self) -> str:
         return str(self.tex_file)

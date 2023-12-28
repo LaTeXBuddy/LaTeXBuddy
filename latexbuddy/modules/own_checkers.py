@@ -135,8 +135,10 @@ class SiUnitx(Module):
                     p_type="num",
                     file=file.tex_file,
                     severity=self.severity,
-                    description=f"For number {number_match.group(0)}, "
-                                f"\\num from siunitx may be used.",
+                    description=(
+                        f"For number {number_match.group(0)}, "
+                        R"\num from siunitx may be used."
+                    ),
                     key=self.display_name + "_" + number_match.group(0),
                     length=length,
                 ),
@@ -241,8 +243,10 @@ class SiUnitx(Module):
                         p_type="unit",
                         file=file.tex_file,
                         severity=self.severity,
-                        description=f"For unit {unit_match.group(0)}, "
-                                    f"siunitx may be used.",
+                        description=(
+                            f"For unit {unit_match.group(0)}, "
+                            "siunitx may be used."
+                        ),
                         key=self.display_name + "_" + unit_match.group(0),
                         length=length,
                     ),
@@ -386,8 +390,10 @@ class CheckFigureResolution(Module):
                         p_type="0",
                         file=file.tex_file,
                         severity=self.severity,
-                        description=f"Figure might have low resolution due "
-                                    f"to its file format: {ending}",
+                        description=(
+                            "Figure might have low resolution due "
+                            f"to its file format: {ending}"
+                        ),
                         key=self.display_name + "_" + current_file,
                         length=1,
                     ),

@@ -275,9 +275,10 @@ class BibtexDuplicates(Module):
             # catch error that is raised if the bibtex file is not correctly
             # formatted
             except UndefinedString as exc:
-                _msg = f"{str(bib_file)}:" \
-                       f"Could not parse BibTeX file: " \
-                       f"Invalid format: {str(exc)}"
+                _msg = (
+                    f"{str(bib_file)}: "
+                    f"Could not parse BibTeX file: Invalid format: {str(exc)}"
+                )
                 raise ValueError(_msg) from exc
 
         for i in range(len(entries)):
