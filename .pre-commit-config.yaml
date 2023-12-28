@@ -46,10 +46,9 @@ repos:
         args: [--py37-plus]
         files: ^latexbuddy/config_loader.py$
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: v2.4.0
+    rev: v3.1.0
     hooks:
       - id: add-trailing-comma
-        args: [--py36-plus]
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.3.1
     hooks:
