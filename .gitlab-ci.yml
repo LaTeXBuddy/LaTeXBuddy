@@ -3,12 +3,19 @@ image: python:alpine
 variables:
   XDG_CACHE_HOME: "$CI_PROJECT_DIR/.cache"
   PIP_CACHE_DIR: "$XDG_CACHE_HOME/pip"
+  HATCH_CACHE_DIR: "$XDG_CACHE_HOME/hatch"
   PRE_COMMIT_HOME: "$XDG_CACHE_HOME/pre-commit"
+  NPM_CONFIG_CACHE: "$XDG_CACHE_HOME/npm"
 
 cache: &global_cache
-  key: v1-pip
-  paths:
-    - ${PIP_CACHE_DIR}
+  - key: v1-pip
+    paths:
+      - ${PIP_CACHE_DIR}
+  - key:
+      files:
+        - pyproject.toml
+    paths:
+      - ${HATCH_CACHE_DIR}
 
 stages:
   - Lint
@@ -20,11 +27,15 @@ stages:
 default:
   before_script: &setup
     - apk add git
+    - python -m pip install --upgrade pip hatch
     - python --version --version
+    - pip --version
+    - hatch --version
 
 changelog:
   stage: Lint
   image: alpine:latest
+  cache: {}
   before_script:
     - apk add git
   script:
@@ -37,19 +48,19 @@ changelog:
 pre-commit: &pre-commit
   stage: Lint
   cache:
-    - key: v1-pip
-      paths:
-        - ${PIP_CACHE_DIR}
+    - *global_cache
     - key:
         files:
           - .pre-commit-config.yaml
       paths:
         - ${PRE_COMMIT_HOME}
+        - ${NPM_CONFIG_CACHE}
 
   before_script:
     - apk add git nodejs
+    - pip install --upgrade pip pre-commit
     - python --version --version
-    - pip install pre-commit
+    - pre-commit --version
   script:
     - pre-commit run --all-files
   only:
@@ -65,12 +76,14 @@ pre-commit-changed:
 
 smoke:
   cache:
-    <<: *global_cache
-    key: v1-pip-3.7
+    - key: v1-pip
+      paths:
+        - ${PIP_CACHE_DIR}
   image: python:3.7-alpine
   stage: Test
+  variables:
+    SETUPTOOLS_SCM_PRETEND_VERSION: "0.0.0"
   before_script:
-    - *setup
     - pip install .
   script:
     - latexbuddy --help
@@ -79,9 +92,6 @@ smoke:
     - merge_requests
 
 pytest:
-  cache:
-    <<: *global_cache
-    key: v1-pip-$PYTHON_VERSION
   parallel:
     matrix:
       - PYTHON_VERSION:
@@ -95,13 +105,31 @@ pytest:
   needs:
     - smoke
   before_script:
-    - python --version --version
-    - pip install . -r requirements-dev.txt
+    - apk add build-base gcc libffi-dev
+    - *setup
   script:
-    - coverage erase
-    - coverage run -m pytest --junitxml=pytest-junit.xml --cov=latexbuddy -n auto tests
-    - coverage report
-    - coverage xml
+    - hatch run +py=$PYTHON_VERSION test:cov
+  only:
+    - master
+    - merge_requests
+  artifacts:
+    when: always
+    reports:
+      junit: pytest-junit.xml
+    paths:
+      - ".coverage*"
+
+coverage:
+  image: python:3.11-alpine
+  stage: Test
+  needs:
+    - pytest
+  dependencies:
+    - pytest
+  script:
+    - hatch run coverage:combine
+    - hatch run coverage:report
+    - hatch run coverage:xml
   only:
     - master
     - merge_requests
@@ -109,7 +137,6 @@ pytest:
   artifacts:
     when: always
     reports:
-      junit: pytest-junit.xml
       coverage_report:
         coverage_format: cobertura
         path: coverage.xml
@@ -121,11 +148,8 @@ pytest:
 build:
   stage: Build
   cache: {}
-  before_script:
-    - *setup
-    - pip install --upgrade build
   script:
-    - python3 -m build
+    - hatch build
   artifacts:
     paths:
       - dist/*.whl
@@ -140,11 +164,12 @@ publish:
   cache: {}
   needs:
     - build
-  before_script:
-    - *setup
-    - pip install --upgrade twine
+  variables:
+    HATCH_INDEX_REPO: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi"
+    HATCH_INDEX_USER: "gitlab-ci-token"
+    HATCH_INDEX_AUTH: "${CI_JOB_TOKEN}"
   script:
-    - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python3 -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+    - hatch publish
   only:
     - tags
   dependencies:

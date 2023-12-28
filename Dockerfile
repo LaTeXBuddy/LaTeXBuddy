@@ -3,8 +3,8 @@
 #
 FROM python:alpine AS build-latexbuddy
 
-# install GCC and other libs for building
-RUN apk update && apk add build-base
+# install Git to detect version
+RUN apk update && apk add git
 
 # install 'build'
 RUN python3 -m pip install build
@@ -13,6 +13,7 @@ RUN python3 -m pip install build
 WORKDIR /latexbuddy
 COPY pyproject.toml README.md CHANGELOG.md NOTICE ./
 COPY ./latexbuddy ./latexbuddy
+COPY ./.git ./.git
 
 # build LaTeXBuddy
 RUN python3 -m build
