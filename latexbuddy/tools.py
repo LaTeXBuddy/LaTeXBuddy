@@ -55,27 +55,6 @@ def kill_background_process(process: subprocess.Popen[AnyStr]) -> None:
     os.killpg(os.getpgid(process.pid), signal.SIGTERM)
 
 
-def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
-    """Executes a terminal command while suppressing errors.
-
-    :param cmd: command name and arguments
-    :param encoding: output encoding
-    :return: command output
-    """
-    command = get_command_string(cmd)
-
-    LOG.debug(f"Executing '{command}' (ignoring errors)")
-
-    error_list = subprocess.Popen(
-        [command],
-        shell=True,  # noqa: S602
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
-    )
-    out, err_out = error_list.communicate()
-    return out.decode(encoding)
-
-
 def get_command_string(cmd: tuple[str, ...]) -> str:
     """Constructs a command string from a tuple of arguments.
 

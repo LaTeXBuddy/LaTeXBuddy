@@ -99,15 +99,6 @@ Kills a previously started background process by sending a `SIGTERM` signal.
 
 - `process`: Popen object representing a running process. Accepts return values of `execute_background`.
 
-### `execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str`
-
-Executes a shell command via python's `subprocess` library and returns the contents of stdout as a string. Any output to stderr is ignored.
-
-**Parameters:**
-
-- `*cmd`: Tuple of strings representing the shell command and its flags and arguments
-- _optional:_ `encoding`: string name of the encoding python uses to decode the contents in stdout
-
 ### `find_executable(name: str, to_install: Optional[str] = None, logger: Optional[Logger] = None, log_errors: bool = True) -> str`
 
 Finds the path to a given executable with a call to `which`. Consequently, any executable that should be found must at least be in the user's `$PATH`.
