@@ -165,6 +165,7 @@ extend-select = [
 extend-ignore = [
     # TODO: un-ignore this later
     "PLR0913",  # Too many arguments to function call
+    "S603",  # Unchecked subprocess call
 ]
 
 [tool.ruff.mccabe]
