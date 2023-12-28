@@ -44,25 +44,6 @@ inc_re = re.compile(r"\\include{(?P<file_name>.*)}")
 inp_re = re.compile(r"\\input{(?P<file_name>.*)}")
 
 
-def execute_background(*cmd: str) -> subprocess.Popen[bytes]:
-    """Executes a terminal command in background.
-
-    :param cmd: command name and arguments
-    :return: subprocess instance of the executed command
-    """
-    command = get_command_string(cmd)
-
-    LOG.debug(f"Executing '{command}' in the background")
-
-    return subprocess.Popen(
-        [command],
-        shell=True,  # noqa: S602
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        start_new_session=True,
-    )
-
-
 def kill_background_process(process: subprocess.Popen[AnyStr]) -> None:
     """Kills previously opened background process.
 

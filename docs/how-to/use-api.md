@@ -91,15 +91,6 @@ Parameters:
 
 LaTeXBuddy offers a variety of utility methods in `tools.py` which mainly include functions for finding and executing shell commands or python functions and converting character positions between absolute indexing and line, column tuples. The concrete functions are:
 
-### `execute_background(*cmd: str) -> subprocess.Popen`
-
-Executes a shell command in the background via python's `subprocess` library and returns a handle for the running process that can be used to terminate it with `kill_background_process`.
-Any output by the background process to stdout or stderr will be ignored.
-
-**Parameters:**
-
-- `*cmd`: Tuple of strings representing the shell command and its flags and arguments
-
 ### `kill_background_process(process: subprocess.Popen) -> None`
 
 Kills a previously started background process by sending a `SIGTERM` signal.
