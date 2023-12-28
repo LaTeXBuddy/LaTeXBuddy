@@ -55,18 +55,6 @@ def kill_background_process(process: subprocess.Popen[AnyStr]) -> None:
     os.killpg(os.getpgid(process.pid), signal.SIGTERM)
 
 
-def get_command_string(cmd: tuple[str, ...]) -> str:
-    """Constructs a command string from a tuple of arguments.
-
-    :param cmd: tuple of command line arguments
-    :return: the command string
-    """
-    command = ""
-    for arg in cmd:
-        command += str(arg) + " "
-    return command.strip()
-
-
 def find_executable(
     name: str,
     to_install: str | None = None,
