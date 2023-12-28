@@ -31,7 +31,6 @@ from typing import Callable
 from platformdirs import PlatformDirs
 
 from latexbuddy.exceptions import ExecutableNotFoundError
-from latexbuddy.messages import not_found
 from latexbuddy.messages import path_not_found
 
 LOG = logging.getLogger(__name__)
@@ -45,49 +44,6 @@ inc_re = re.compile(r"\\include{(?P<file_name>.*)}")
 inp_re = re.compile(r"\\input{(?P<file_name>.*)}")
 
 
-def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
-    """Executes a terminal command with subprocess.
-
-    See usage example in latexbuddy.aspell.
-
-    :param cmd: command name and arguments
-    :param encoding: output encoding
-    :return: command output
-    """
-
-    command = get_command_string(cmd)
-
-    LOG.debug(f"Executing '{command}'")
-
-    error_list = subprocess.Popen(
-        [command],
-        shell=True,  # noqa: S602
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-    out, err_out = error_list.communicate()
-    return out.decode(encoding)
-
-
-def execute_background(*cmd: str) -> subprocess.Popen[bytes]:
-    """Executes a terminal command in background.
-
-    :param cmd: command name and arguments
-    :return: subprocess instance of the executed command
-    """
-    command = get_command_string(cmd)
-
-    LOG.debug(f"Executing '{command}' in the background")
-
-    return subprocess.Popen(
-        [command],
-        shell=True,  # noqa: S602
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        start_new_session=True,
-    )
-
-
 def kill_background_process(process: subprocess.Popen[AnyStr]) -> None:
     """Kills previously opened background process.
 
@@ -97,39 +53,6 @@ def kill_background_process(process: subprocess.Popen[AnyStr]) -> None:
     :param process: subprocess instance of the process
     """
     os.killpg(os.getpgid(process.pid), signal.SIGTERM)
-
-
-def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
-    """Executes a terminal command while suppressing errors.
-
-    :param cmd: command name and arguments
-    :param encoding: output encoding
-    :return: command output
-    """
-    command = get_command_string(cmd)
-
-    LOG.debug(f"Executing '{command}' (ignoring errors)")
-
-    error_list = subprocess.Popen(
-        [command],
-        shell=True,  # noqa: S602
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
-    )
-    out, err_out = error_list.communicate()
-    return out.decode(encoding)
-
-
-def get_command_string(cmd: tuple[str, ...]) -> str:
-    """Constructs a command string from a tuple of arguments.
-
-    :param cmd: tuple of command line arguments
-    :return: the command string
-    """
-    command = ""
-    for arg in cmd:
-        command += str(arg) + " "
-    return command.strip()
 
 
 def find_executable(
@@ -159,12 +82,13 @@ def find_executable(
     :return: path to the executable
     :raises FileNotFoundError: if the executable couldn't be found
     """
+    import shutil
 
-    result = execute("which", name)
-
-    if not result or "not found" in result:
-
+    result = shutil.which(name)
+    if result is None:
         if log_errors:
+            from latexbuddy.messages import not_found
+
             err_logger.error(
                 not_found(
                     name,
@@ -181,9 +105,8 @@ def find_executable(
         _msg = f"could not find executable '{name}' in system's PATH"
         raise ExecutableNotFoundError(_msg)
 
-    path_str = result.splitlines()[0]
-    err_logger.debug(f"Found executable {name} at '{path_str}'.")
-    return path_str
+    err_logger.debug(f"Found executable {name} at '{result}'.")
+    return result
 
 
 location_re = re.compile(r"line (\d+), column (\d+)")
@@ -248,8 +171,10 @@ def is_binary(file_bytes: bytes) -> bool:
     :param file_bytes: bytes of a file
     :return: True, if the file is binary, False otherwise
     """
-    textchars = bytearray({7, 8, 9, 10, 12, 13, 27}
-                          | set(range(0x20, 0x100)) - {0x7F})
+    textchars = bytearray(
+        {7, 8, 9, 10, 12, 13, 27}
+        | set(range(0x20, 0x100)) - {0x7F},
+    )
     return bool(file_bytes.translate(None, textchars))
 
 

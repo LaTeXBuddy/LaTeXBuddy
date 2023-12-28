@@ -20,6 +20,7 @@ ChkTeX Documentation: https://www.nongnu.org/chktex/ChkTeX.pdf
 from __future__ import annotations
 
 import logging
+import subprocess
 
 import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
@@ -58,16 +59,19 @@ class Chktex(Module):
         )
 
         file_path = str(file.tex_file)
-        command_output = latexbuddy.tools.execute(
-            "chktex",
-            "-f",
-            f"'{format_str}'",
-            "-q",
-            file_path,
-        )
-        out_split = command_output.split("\n")
 
-        return self.format_problems(out_split, file)
+        chktex_output = subprocess.check_output(
+            (
+                "chktex",
+                "-f",
+                format_str,
+                "-q",
+                file_path,
+            ),
+            text=True,
+        )
+
+        return self.format_problems(chktex_output.splitlines(), file)
 
     def format_problems(self, out: list[str], file: TexFile) -> list[Problem]:
         """Converts the output of chktex to a list of Problems.

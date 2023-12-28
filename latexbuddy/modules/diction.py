@@ -18,6 +18,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import os
+import subprocess
 from pathlib import Path
 from typing import AnyStr
 
@@ -63,16 +64,19 @@ class Diction(Module):
         cleaned_file.write_text(lines)
 
         # execute diction and collect output
-        errors_str = latexbuddy.tools.execute(
-            f"diction --suggest "
-            f"--language {self.language} "
-            f"{str(cleaned_file)}",
+        diction_output = subprocess.check_output(
+            (
+                "diction",
+                "--suggest",
+                "--language",
+                self.language,  # type: ignore
+                cleaned_file,
+            ),
+            text=True,
         )
 
         # remove unnecessary information and split lines
-        errors = errors_str.split("\n")
-        errors.pop()
-        errors.pop()
+        errors = diction_output.splitlines()[:-2]
 
         # remove empty lines
         cleaned_errors = []

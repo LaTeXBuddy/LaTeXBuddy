@@ -18,11 +18,14 @@ working with."""
 from __future__ import annotations
 
 import logging
+import os
 import re
+import subprocess
 import sys
 from io import StringIO
 from pathlib import Path
 from tempfile import mkstemp
+from typing import Any
 
 from chardet import detect
 from yalafi.tex2txt import Options  # type: ignore
@@ -31,16 +34,23 @@ from yalafi.tex2txt import translate_numbers
 
 from latexbuddy.messages import not_found
 from latexbuddy.tools import absolute_to_linecol
-from latexbuddy.tools import execute
 from latexbuddy.tools import find_executable
 from latexbuddy.tools import get_line_offsets
 from latexbuddy.tools import is_binary
-
 
 # regex to parse out error location from tex2txt output
 location_re = re.compile(r"line (\d+), column (\d+)")
 
 LOG = logging.getLogger(__name__)
+
+
+def _create_texmf(config: dict[str, Any]) -> tuple[Path, str]:
+    from tempfile import mkdtemp
+    contents = "\n".join(f"{k}={str(v)}" for k, v in config.items())
+
+    file = Path(mkdtemp(None, "latexbuddy-")) / "texmf.cnf"
+    file.write_text(contents)
+    return file, f"{str(file.absolute())}:"
 
 
 class TexFile:
@@ -205,7 +215,13 @@ class TexFile:
         results_dir = html_path / "compiled" / str(self.tex_file.parent.name)
         results_dir.mkdir(parents=True, exist_ok=True)
 
-        tex_mf = self.__create_tex_mf(results_dir)
+        _, texmfcnf = _create_texmf(
+            {
+                "max_print_line": "1000",
+                "error_line": "254",
+                "half_error_line": "238",
+            },
+        )
 
         LOG.debug(
             f"TEXFILE: {str(self.tex_file)},"
@@ -216,15 +232,19 @@ class TexFile:
             f"exists: {results_dir.exists()}",
         )
 
-        execute(
-            f'TEXMFCNF="{tex_mf}";',
-            "cd",
-            f"{str(self.tex_file.parent)};",
-            compiler,
-            "-interaction=nonstopmode",
-            f"-output-directory='{str(results_dir)}'",
-            "-8bit",
-            str(self.tex_file.name),
+        subprocess.check_call(
+            (
+                compiler,
+                "-interaction", "nonstopmode",
+                "-output-directory", results_dir,
+                "-8bit",
+                self.tex_file.name,
+            ),
+            cwd=str(self.tex_file.parent),
+            env={
+                **os.environ,
+                "TEXMFCNF": texmfcnf,
+            },
         )
 
         log = results_dir / f"{self.tex_file.stem}.log"
@@ -235,15 +255,3 @@ class TexFile:
             pdf = results_dir / f"{self.tex_file.stem}.pdf"
             LOG.debug(f"PDF: {str(pdf)}, isFile: {pdf.is_file()}")
         return log, pdf
-
-    @staticmethod
-    def __create_tex_mf(path: Path) -> str:
-        """This method makes the log file be written correctly."""
-        # https://tex.stackexchange.com/questions/52988/avoid-linebreaks-in-latex-console-log-output-or-increase-columns-in-terminal
-        # https://tex.stackexchange.com/questions/410592/texlive-personal-texmf-cnf
-        text = "\n".join(
-            ["max_print_line=1000", "error_line=254", "half_error_line=238"],
-        )
-        cnf_path = path / "texmf.cnf"
-        Path(cnf_path).resolve().write_text(text)
-        return str(cnf_path.parent) + ":"

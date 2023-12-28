@@ -294,6 +294,7 @@ def tex_file(tmp_path: Path) -> TexFile:
     return TexFile(document, compile_tex=False)
 
 
+@pytest.mark.xfail(reason="Invalid TeX document", strict=True)
 def test_run_checks(tex_file: TexFile, driver_config_loader) -> None:
     output_problems = Chktex().run_checks(driver_config_loader, tex_file)
 

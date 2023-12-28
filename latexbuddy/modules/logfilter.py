@@ -17,8 +17,8 @@ from __future__ import annotations
 
 import logging
 import re
+import subprocess
 from pathlib import Path
-from tempfile import mkstemp
 
 import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
@@ -60,23 +60,21 @@ class LogFilter(Module):
         if log_path is None:
             return []
 
-        descriptor, raw_problems_path = mkstemp(
-            prefix="latexbuddy",
-            suffix="raw_log_errors",
-        )
-        latexbuddy.tools.execute(
-            "awk",
-            "-f",
-            str(self.texfilt_path),
-            f"{log_path} > {raw_problems_path}",
-        )
+        output = subprocess.check_output(
+            (
+                "awk",
+                "-f",
+                self.texfilt_path,
+                log_path,
+            ),
+            text=True,
+        ).splitlines()
 
-        raw_problems_path = Path(raw_problems_path)
-        return self.format_problems(raw_problems_path, file)
+        return self.format_problems(output, file)
 
     def format_problems(
         self,
-        raw_problems_path: Path,
+        raw_problems: list[str],
         file: TexFile,
     ) -> list[Problem]:
         """Formats the output to a List of Problems.
@@ -86,7 +84,6 @@ class LogFilter(Module):
         :return: a list of problems
         """
         problems = []
-        raw_problems = raw_problems_path.read_text().split("\n\n")
 
         for raw_problem in raw_problems:
             problem_line = raw_problem.replace("\n", " ")
