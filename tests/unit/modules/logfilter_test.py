@@ -150,18 +150,17 @@ _problem_re = re.compile(
 _space_re = re.compile(r'\s+')
 
 
+@pytest.mark.xfail(reason="Document can't get compiled", strict=True)
 def test_run_checks(
     tex_file: TexFile,
     tex_filter: Path,
 ):
-
     problems = LogFilter().run_checks(ConfigLoader(), tex_file)
 
-    process = subprocess.run(
+    raw_problems = subprocess.check_output(
         ("awk", "-f", tex_filter, tex_file.log_file),
-        capture_output=True,
+        text=True,
     )
-    raw_problems = process.stdout.decode("utf-8")
     raw_problems_normalized = _space_re.sub(' ', raw_problems)
 
     for problem in problems:
