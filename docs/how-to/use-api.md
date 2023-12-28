@@ -91,31 +91,6 @@ Parameters:
 
 LaTeXBuddy offers a variety of utility methods in `tools.py` which mainly include functions for finding and executing shell commands or python functions and converting character positions between absolute indexing and line, column tuples. The concrete functions are:
 
-### `execute(*cmd: str, encoding: str) -> str`
-
-Executes a shell command via python's `subprocess` library and returns the combined contents of stdout and stderr as a string.
-
-**Parameters:**
-
-- `*cmd`: Tuple of strings representing the shell command and its flags and arguments
-- _optional:_ `encoding`: name of the encoding python uses to decode the contents in stdout and stderr
-
-_Example usage:_
-
-```py
-# execute command 'echo Hello World!' with tuple notation
-
-execute("echo", "Hello", "World!")
-
-
-# execute command 'echo Hello World!' with list notation
-my_command = ["echo"]
-my_command.append("Hello")
-my_command.append("World!")
-
-execute(*my_command)
-```
-
 ### `execute_background(*cmd: str) -> subprocess.Popen`
 
 Executes a shell command in the background via python's `subprocess` library and returns a handle for the running process that can be used to terminate it with `kill_background_process`.

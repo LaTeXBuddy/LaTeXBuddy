@@ -44,30 +44,6 @@ inc_re = re.compile(r"\\include{(?P<file_name>.*)}")
 inp_re = re.compile(r"\\input{(?P<file_name>.*)}")
 
 
-def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
-    """Executes a terminal command with subprocess.
-
-    See usage example in latexbuddy.aspell.
-
-    :param cmd: command name and arguments
-    :param encoding: output encoding
-    :return: command output
-    """
-
-    command = get_command_string(cmd)
-
-    LOG.debug(f"Executing '{command}'")
-
-    error_list = subprocess.Popen(
-        [command],
-        shell=True,  # noqa: S602
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-    out, err_out = error_list.communicate()
-    return out.decode(encoding)
-
-
 def execute_background(*cmd: str) -> subprocess.Popen[bytes]:
     """Executes a terminal command in background.
 
