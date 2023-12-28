@@ -61,7 +61,7 @@ def execute(*cmd: str, encoding: str = "ISO8859-1") -> str:
 
     error_list = subprocess.Popen(
         [command],
-        shell=True,
+        shell=True,  # noqa: S602
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
@@ -81,10 +81,10 @@ def execute_background(*cmd: str) -> subprocess.Popen[bytes]:
 
     return subprocess.Popen(
         [command],
-        shell=True,
+        shell=True,  # noqa: S602
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
-        preexec_fn=os.setsid,
+        start_new_session=True,
     )
 
 
@@ -112,7 +112,7 @@ def execute_no_errors(*cmd: str, encoding: str = "ISO8859-1") -> str:
 
     error_list = subprocess.Popen(
         [command],
-        shell=True,
+        shell=True,  # noqa: S602
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
     )

@@ -223,9 +223,7 @@ class Problem:
             )
 
         # add language to the key if its a spelling or grammar error
-        if language is not None and (
-            self.category == "grammar" or self.category == "spelling"
-        ):
+        if language is not None and self.category in {"grammar", "spelling"}:
             return f"{language}_{key}"
 
         return key.replace("\n", "")

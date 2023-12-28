@@ -168,11 +168,9 @@ class LanguageTool(Module):
                 lang.split(" ")[0]
                 for lang in result.splitlines()
             ]
-            supported_languages = list(
+            return list(
                 filter(self.matches_language_regex, supported_languages),
             )
-
-            return supported_languages
 
         if self.mode == Mode.LOCAL_SERVER:
 
@@ -350,12 +348,12 @@ class LanguageTool(Module):
 
         response_json = requests.get(server_url, timeout=60).json()
 
-        supported_languages = [entry["longCode"] for entry in response_json]
-        supported_languages = list(
-            filter(self.matches_language_regex, supported_languages),
+        return list(
+            filter(
+                self.matches_language_regex,
+                [entry["longCode"] for entry in response_json],
+            ),
         )
-
-        return supported_languages
 
     def execute_commandline_request(self, file: TexFile) -> dict[str, Any]:
         """Execute the LanguageTool command line app to check the text.

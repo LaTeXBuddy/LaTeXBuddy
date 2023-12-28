@@ -73,7 +73,7 @@ repos:
         exclude_types:
           - jinja
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.260"
+    rev: "v0.1.9"
     hooks:
       - id: ruff
         files: ^latexbuddy/
