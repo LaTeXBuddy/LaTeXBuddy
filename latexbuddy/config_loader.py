@@ -572,9 +572,10 @@ class ConfigLoader:
             )
 
         except ConfigOptionNotFoundError:
+            name = module.display_name if module is not None else "None"
             LOG.info(
                 f"Config entry '{key}' "  # type: ignore
-                f"for module '{module.display_name}' not found. "
+                f"for module '{name}' not found. "
                 f"Using default value '{str(default_value)}' instead...",
             )
 
