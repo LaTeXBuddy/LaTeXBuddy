@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import logging
+import subprocess
 from typing import AnyStr
 
 import latexbuddy.tools
@@ -78,12 +79,13 @@ class Aspell(Module):
         lines = file.plain.splitlines(keepends=False)
         for line in lines:  # check every line
             if len(line) > 0:
-                escaped_line = line.replace("'", "\\'")
-                output = latexbuddy.tools.execute(
-                    f"echo '{escaped_line}' | aspell -a -l {self.language}",
-                )
                 # the first line specifies aspell version
-                out = output.splitlines()[1:]
+                out = subprocess.check_output(
+                    ("aspell", "-a", "-l", self.language),  # type: ignore
+                    input=line,
+                    text=True,
+                ).splitlines()[1:]
+
                 if len(out) > 0:  # only if the list inst empty
                     out.pop()  # remove last element
                 error_list.extend(self.format_errors(out, counter, file))
@@ -100,11 +102,13 @@ class Aspell(Module):
 
         :return: list of supported languages in str format
         """
+        aspell_output = subprocess.check_output(
+            ("aspell", "dump", "dicts"),
+            text=True,
+        )
         return [
             lang
-            for lang in latexbuddy.tools.execute(
-                "aspell", "dump dicts",
-            ).splitlines()
+            for lang in aspell_output.splitlines()
             if "-" not in lang
         ]
 
