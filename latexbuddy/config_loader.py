@@ -61,7 +61,7 @@ class ConfigLoader:
         """Creates a ConfigLoader module.
 
         :param cli_arguments: The command-line arguments specified in
-                              the LaTeXBuddy call
+            the LaTeXBuddy call
         """
 
         self.main_configurations: Dict[str, Any] = {}

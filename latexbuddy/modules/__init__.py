@@ -51,7 +51,7 @@ class Module(NamedModule):
         """Runs the checks and returns a list of discovered problems.
 
         :param config: the configuration options of the calling
-                       LaTeXBuddy instance
+            LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex
-                     option)
+            option)
         """

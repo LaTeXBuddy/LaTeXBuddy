@@ -89,10 +89,10 @@ class LatexBuddy(MainModule):
     ) -> None:
         """Initializes the LaTeXBuddy instance.
 
-        :param config_loader: ConfigLoader object to manage config options
+        :param config_loader: ConfigLoader object to manage config
+            options
         :param module_provider: ModuleProvider instance as a source of
-                                Module instances for running checks on
-                                the specified file
+            Module instances for running checks on the specified file
         :param file_to_check: file that will be checked
         :param path_list: a list of the paths for the html output
         :param compile_tex: boolean if the tex file should be compiled
@@ -203,8 +203,8 @@ class LatexBuddy(MainModule):
     def add_to_whitelist(uid: str) -> None:
         """Adds the error identified by the given UID to the whitelist.
 
-        Afterwards this method deletes all other errors that are
-        the same as the one just whitelisted.
+        Afterwards this method deletes all other errors that are the
+        same as the one just whitelisted.
 
         :param uid: the UID of the error to be deleted
         """

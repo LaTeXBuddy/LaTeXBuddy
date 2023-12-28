@@ -79,13 +79,13 @@ class LanguageTool(Module):
         """Runs the LanguageTool checks on a file and returns the results as a
         list.
 
-        Requires LanguageTool (server) to be set up.
-        Local or global servers can be used.
+        Requires LanguageTool (server) to be set up. Local or global
+        servers can be used.
 
         :param config: the configuration options of the calling
-                       LaTeXBuddy instance
+            LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex
-                     option)
+            option)
         """
 
         cfg_mode = config.get_config_option_or_default(
@@ -446,9 +446,9 @@ class LanguageTool(Module):
         """Converts LanguageTool's replacements to LaTeXBuddy suggestions list.
 
         :param json_replacements: list of LT's replacements for a
-                                  particular word
-        :param max_elements: max amount of proposed replacements for
-                             the given error
+            particular word
+        :param max_elements: max amount of proposed replacements for the
+            given error
         :return: list of string values of said replacements
         """
         output = []

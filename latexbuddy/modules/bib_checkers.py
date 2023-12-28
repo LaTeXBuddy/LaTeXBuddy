@@ -67,7 +67,8 @@ def parse_bibfile(bibfile: Path) -> list[tuple[str, str, str]]:
     """Parses the given BibTeX file to extract the publications.
 
     :param bibfile: Path object of the BibTeX file to be parsed
-    :return: the title, year, and BibTeX Id of each publication as 3-Tuple
+    :return: the title, year, and BibTeX Id of each publication as
+        3-Tuple
     """
     with bibfile.open() as bibtex_file:
         try:
@@ -86,7 +87,7 @@ def parse_bibfile(bibfile: Path) -> list[tuple[str, str, str]]:
     results = []
     for entry in entries:
         try:
-            """if (entry["ENTRYTYPE"] == "inproceedings"):"""
+            """If (entry["ENTRYTYPE"] == "inproceedings"):"""
             title: str = entry["title"]
             # remove parenthesis from start/end of title for better comparison
             # later on

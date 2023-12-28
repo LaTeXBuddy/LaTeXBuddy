@@ -125,7 +125,8 @@ class TexFile:
         """Gets position of a character in the original file.
 
         :param char_pos: absolute char position
-        :return: line and column number of the respective char in the tex file
+        :return: line and column number of the respective char in the
+            tex file
         """
         line, col, offsets = absolute_to_linecol(self.plain, char_pos)
 

@@ -141,23 +141,21 @@ def find_executable(
 ) -> str:
     """Finds path to an executable.
 
-    If the executable can not be located, an error message is logged
-    to the specified logger, otherwise the executable's path is logged
-    as a debug message.
+    If the executable can not be located, an error message is logged to
+    the specified logger, otherwise the executable's path is logged as a
+    debug message.
 
     This uses 'which', i.e. the executable should at least be in user's
     $PATH
 
     :param name: executable name
     :param to_install: correct name of the program or project which the
-                       requested executable belongs to (used in log
-                       messages)
+        requested executable belongs to (used in log messages)
     :param err_logger: custom logger to be used for logging debug/error
-                       messages
+        messages
     :param log_errors: specifies whether or not this method should log
-                       an error message, if the executable can not be
-                       located; if this is False, a debug message will
-                       be logged instead
+        an error message, if the executable can not be located; if this
+        is False, a debug message will be logged instead
     :return: path to the executable
     :raises FileNotFoundError: if the executable couldn't be found
     """
@@ -223,8 +221,8 @@ def get_line_offsets(text: str) -> list[int]:
     This is a port of YaLaFi's get_line_starts() function.
 
     :param text: contents of file to find offsets for
-    :return: list of line offsets with indices representing 0-based
-             line numbers
+    :return: list of line offsets with indices representing 0-based line
+        numbers
     """
     lines = text.splitlines(keepends=True)
     offset = 0
@@ -303,7 +301,7 @@ def get_all_paths_in_document(file_path: Path) -> list[Path]:
 
     If the file includes more files, these files will also be checked.
 
-    :param file_path:a string, containing file path
+    :param file_path: a string, containing file path
     :return: the files to check
     """
     unchecked_files: list[Path] = []

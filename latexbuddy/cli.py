@@ -149,9 +149,8 @@ def main(args: Sequence[str] | None = None) -> int:
 
 def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
     config_loader = ConfigLoader(args)
-
-    """ For each Tex file transferred, all paths
-    are fetched and Latexbuddy is executed """
+    """For each Tex file transferred, all paths are fetched and Latexbuddy is
+    executed."""
 
     buddy = LatexBuddy.instance
     module_loader = ModuleLoader(

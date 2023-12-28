@@ -36,9 +36,9 @@ class UnreferencedFigures(Module):
         """Finds unreferenced figures.
 
         :param config: the configuration options of the calling
-                       LaTeXBuddy instance
+            LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex
-                     option)
+            option)
         :return: a list of found problems
         """
         tex = file.tex
@@ -93,6 +93,8 @@ class SiUnitx(Module):
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         """Finds units and long numbers used without siunitx package.
 
+        :param: config: configurations of the buddy instance :param:
+        file:
         :param: config: configurations of the buddy instance
         :param: file: the file to check
         :return: a list of found problems
@@ -362,6 +364,8 @@ class CheckFigureResolution(Module):
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         """Finds potential low resolution figures.
 
+        :param: config: configurations of the buddy instance :param:
+        file:
         :param: config: configurations of the buddy instance
         :param: file: the file to check
         :return: a list of found problems
