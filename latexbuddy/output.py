@@ -34,7 +34,8 @@ env = Environment(loader=PackageLoader("latexbuddy"))  # noqa: S701
 def problem_key(problem: Problem) -> int:
     """Returns a number for each problem to be able to sort them.
 
-    This puts YaLaFi's problems on top, followed by errors without location.
+    This puts YaLaFi's problems on top, followed by errors without
+    location.
 
     :param problem: problem object
     :return: error's "rating" for sorting
@@ -100,7 +101,8 @@ def render_general_html(
     :param file_text: contents of the file
     :param problems: dictionary of errors returned from latexbuddy
     :param pdf_path: path of pdf file
-    :param path_list: a list, containing all file paths to the checked files
+    :param path_list: a list, containing all file paths to the checked
+        files
     :return: generated HTML
     """
 
@@ -297,7 +299,8 @@ def highlight(tex: str, problems: list[Problem]) -> str:
 
     :param tex: TeX source
     :param problems: list of problems
-    :return: HTML string with highlighted errors, ready to be put inside <pre>
+    :return: HTML string with highlighted errors, ready to be put inside
+        <pre>
     """
 
     tex_lines: list[str] = tex.splitlines(keepends=False)
@@ -394,7 +397,7 @@ def resolve_interval_intersections(intervals: list[Interval]) -> None:
     intersecting intervals that may contain more than one problem.
 
     :param intervals: list of intervals in one line to be checked for
-                      intersections
+        intersections
     """
 
     if len(intervals) <= 1:

@@ -125,7 +125,8 @@ class TexFile:
         """Gets position of a character in the original file.
 
         :param char_pos: absolute char position
-        :return: line and column number of the respective char in the tex file
+        :return: line and column number of the respective char in the
+            tex file
         """
         line, col, offsets = absolute_to_linecol(self.plain, char_pos)
 
@@ -167,8 +168,10 @@ class TexFile:
         return self.tex_file == other.tex_file
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(" \
-               f"file={str(self.tex_file.resolve())})"
+        return (
+            f"{self.__class__.__name__}("
+            f"file={str(self.tex_file.resolve())})"
+        )
 
     def __str__(self) -> str:
         return str(self.tex_file)

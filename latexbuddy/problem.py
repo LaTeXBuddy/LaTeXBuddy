@@ -118,26 +118,24 @@ class Problem:
         """Initializes a Problem object.
 
         :param position: position of the problem in the source file,
-                         encoded as ``(line, column)``
+            encoded as ``(line, column)``
         :param length: the length of the problematic text
         :param text: problematic text
-        :param checker: type or instance of the tool that discovered
-                        the problem
+        :param checker: type or instance of the tool that discovered the
+            problem
         :param p_type: ID of the problem type, used inside the
-                       respective checker
-        :param file: **[DEPRECATED]** path to the file where the
-                     problem was found
+            respective checker
+        :param file: **[DEPRECATED]** path to the file where the problem
+            was found
         :param severity: severity of the problem
         :param category: category of the problem, for example "grammar"
         :param description: description of the problem
         :param context: optional context of the problem, that is, text
-                        that comes before and after the problematic
-                        text
+            that comes before and after the problematic text
         :param suggestions: list of suggestions, that is, possible
-                            replacements for problematic text
-        :param key: semi-unique string, which can be used to compare
-                    two problems. Will be used for entries in the
-                    whitelist
+            replacements for problematic text
+        :param key: semi-unique string, which can be used to compare two
+            problems. Will be used for entries in the whitelist
         """
         # TODO: maybe move the defaults to the params, or was there a specific
         #  reason?
@@ -218,14 +216,14 @@ class Problem:
             #  default to `None`
             space = " "
             minus = "-"
-            key = f"{self.checker}_" \
-                  f"{self.p_type}_" \
-                  f"{self.text.replace(space, minus)}"
+            key = (
+                f"{self.checker}_"
+                f"{self.p_type}_"
+                f"{self.text.replace(space, minus)}"
+            )
 
         # add language to the key if its a spelling or grammar error
-        if language is not None and (
-            self.category == "grammar" or self.category == "spelling"
-        ):
+        if language is not None and self.category in {"grammar", "spelling"}:
             return f"{language}_{key}"
 
         return key.replace("\n", "")
@@ -248,7 +246,7 @@ class Problem:
         return f"{self.position[0]}:{self.position[1]}"
 
     def better_eq(self, key: str) -> bool:
-        """equal method based on the key/CompareID."""
+        """Equal method based on the key/CompareID."""
         return self.key == key
 
     def __eq__(self, o: object) -> bool:

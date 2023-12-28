@@ -79,13 +79,13 @@ class LanguageTool(Module):
         """Runs the LanguageTool checks on a file and returns the results as a
         list.
 
-        Requires LanguageTool (server) to be set up.
-        Local or global servers can be used.
+        Requires LanguageTool (server) to be set up. Local or global
+        servers can be used.
 
         :param config: the configuration options of the calling
-                       LaTeXBuddy instance
+            LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex
-                     option)
+            option)
         """
 
         cfg_mode = config.get_config_option_or_default(
@@ -168,11 +168,9 @@ class LanguageTool(Module):
                 lang.split(" ")[0]
                 for lang in result.splitlines()
             ]
-            supported_languages = list(
+            return list(
                 filter(self.matches_language_regex, supported_languages),
             )
-
-            return supported_languages
 
         if self.mode == Mode.LOCAL_SERVER:
 
@@ -350,12 +348,12 @@ class LanguageTool(Module):
 
         response_json = requests.get(server_url, timeout=60).json()
 
-        supported_languages = [entry["longCode"] for entry in response_json]
-        supported_languages = list(
-            filter(self.matches_language_regex, supported_languages),
+        return list(
+            filter(
+                self.matches_language_regex,
+                [entry["longCode"] for entry in response_json],
+            ),
         )
-
-        return supported_languages
 
     def execute_commandline_request(self, file: TexFile) -> dict[str, Any]:
         """Execute the LanguageTool command line app to check the text.
@@ -446,9 +444,9 @@ class LanguageTool(Module):
         """Converts LanguageTool's replacements to LaTeXBuddy suggestions list.
 
         :param json_replacements: list of LT's replacements for a
-                                  particular word
-        :param max_elements: max amount of proposed replacements for
-                             the given error
+            particular word
+        :param max_elements: max amount of proposed replacements for the
+            given error
         :return: list of string values of said replacements
         """
         output = []

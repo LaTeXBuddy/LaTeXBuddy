@@ -43,9 +43,9 @@ class Chktex(Module):
         Requires chktex to be installed separately
 
         :param config: the configuration options of the calling
-                       LaTeXBuddy instance
+            LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex
-                     option)
+            option)
         """
 
         latexbuddy.tools.find_executable("chktex", "ChkTeX", LOG)

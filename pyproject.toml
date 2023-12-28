@@ -141,9 +141,8 @@ addopts = "--tb=short"
 line-length = 79
 target-version = "py37"
 
-select = [
-    "F",  # pyflakes
-    "E", "W",  # pycodestyle
+extend-select = [
+    "W",  # pycodestyle
     "C90",  # mccabe
     # TODO: complete docs in a separate issue
 #    "D1", "D3",  # pydocstyle

@@ -45,10 +45,10 @@ class ModuleProvider(ABC):
         specified configuration context.
 
         :param cfg: ConfigLoader instance containing config options for
-                    enabled/disabled tools
+            enabled/disabled tools
         :return: a list of instances of classes implementing the Module
-                 API which have been enabled in the specified
-                 configuration context
+            API which have been enabled in the specified configuration
+            context
         """
 
 
@@ -87,7 +87,8 @@ class ModuleLoader(ModuleProvider):
         """This method loads every module that is found in the ModuleLoader's
         directory.
 
-        :return: a list of instances of classes implementing the Module API
+        :return: a list of instances of classes implementing the Module
+            API
         """
 
         imported_py_modules = self.import_py_files()
@@ -147,7 +148,7 @@ class ModuleLoader(ModuleProvider):
         or any subdirectories and returns a list of their paths.
 
         :return: a list of all Python files in the ModuleLoader's
-                 directory (or subfolders)
+            directory (or subfolders)
         """
 
         if not self.directory.is_dir():

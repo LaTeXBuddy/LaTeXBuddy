@@ -36,9 +36,9 @@ class UnreferencedFigures(Module):
         """Finds unreferenced figures.
 
         :param config: the configuration options of the calling
-                       LaTeXBuddy instance
+            LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex
-                     option)
+            option)
         :return: a list of found problems
         """
         tex = file.tex
@@ -93,6 +93,8 @@ class SiUnitx(Module):
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         """Finds units and long numbers used without siunitx package.
 
+        :param: config: configurations of the buddy instance :param:
+        file:
         :param: config: configurations of the buddy instance
         :param: file: the file to check
         :return: a list of found problems
@@ -135,8 +137,10 @@ class SiUnitx(Module):
                     p_type="num",
                     file=file.tex_file,
                     severity=self.severity,
-                    description=f"For number {number_match.group(0)}, "
-                                f"\\num from siunitx may be used.",
+                    description=(
+                        f"For number {number_match.group(0)}, "
+                        R"\num from siunitx may be used."
+                    ),
                     key=self.display_name + "_" + number_match.group(0),
                     length=length,
                 ),
@@ -241,8 +245,10 @@ class SiUnitx(Module):
                         p_type="unit",
                         file=file.tex_file,
                         severity=self.severity,
-                        description=f"For unit {unit_match.group(0)}, "
-                                    f"siunitx may be used.",
+                        description=(
+                            f"For unit {unit_match.group(0)}, "
+                            "siunitx may be used."
+                        ),
                         key=self.display_name + "_" + unit_match.group(0),
                         length=length,
                     ),
@@ -358,6 +364,8 @@ class CheckFigureResolution(Module):
     def run_checks(self, config: ConfigLoader, file: TexFile) -> list[Problem]:
         """Finds potential low resolution figures.
 
+        :param: config: configurations of the buddy instance :param:
+        file:
         :param: config: configurations of the buddy instance
         :param: file: the file to check
         :return: a list of found problems
@@ -386,8 +394,10 @@ class CheckFigureResolution(Module):
                         p_type="0",
                         file=file.tex_file,
                         severity=self.severity,
-                        description=f"Figure might have low resolution due "
-                                    f"to its file format: {ending}",
+                        description=(
+                            "Figure might have low resolution due "
+                            f"to its file format: {ending}"
+                        ),
                         key=self.display_name + "_" + current_file,
                         length=1,
                     ),

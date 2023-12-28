@@ -42,9 +42,9 @@ class Aspell(Module):
         Requires Aspell to be set up.
 
         :param config: the configuration options of the calling
-                       LaTeXBuddy instance
+            LaTeXBuddy instance
         :param file: LaTeX file to be checked (with built-in detex
-                     option)
+            option)
         """
 
         latexbuddy.tools.find_executable("aspell", "GNU Aspell", LOG)

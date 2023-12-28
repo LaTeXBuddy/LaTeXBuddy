@@ -71,8 +71,8 @@ class ProblemFilter(ABC):
         ProblemFilter's line boundaries.
 
         :param problem: Problem object to examine
-        :return: True, if the problem is located in the area covered by the
-                 ProblemFilter, False otherwise
+        :return: True, if the problem is located in the area covered by
+            the ProblemFilter, False otherwise
         """
 
         if problem.position is None:
@@ -162,7 +162,8 @@ class ModuleProblemFilter(ProblemFilter):
         """Initializes a new ModuleProblemFilter with a string representation
         of a module name as its custom parameter.
 
-        :param module_name: name of the module which created a problem object
+        :param module_name: name of the module which created a problem
+            object
         :param start_line: beginning of the filter's area
         :param end_line: end of the filter's area
         """
@@ -317,12 +318,11 @@ class Preprocessor:
     ) -> list[ProblemFilter]:
         """Parses a preprocessor statement into filters.
 
-        :param line: the LaTeX code line which contains the
-                     preprocessor command to be parsed
-        :param line_num: line number of the LaTeX code line to be
-                         parsed
+        :param line: the LaTeX code line which contains the preprocessor
+            command to be parsed
+        :param line_num: line number of the LaTeX code line to be parsed
         :return: a list of zero or more ProblemFilters resulting from
-                 the preprocessor command
+            the preprocessor command
         """
 
         matchers: list[Callable[[str, int], list[ProblemFilter] | None]] = [
@@ -493,8 +493,8 @@ class Preprocessor:
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
-        :return: list of open-ended SeverityProblemFilters
-                 to match the provided severities, None if regex not matching
+        :return: list of open-ended SeverityProblemFilters to match the
+            provided severities, None if regex not matching
         """
 
         match = Preprocessor.__RE_BEGIN_IGNORE_SEVERITIES.fullmatch(line)
@@ -547,9 +547,8 @@ class Preprocessor:
 
         :param line: inserted command from .tex file
         :param line_num: line number of command occurrence
-        :return: list of open-ended WhitelistKeyProblemFilters
-                 to match the provided whitelist keys, None if regex
-                 not matching
+        :return: list of open-ended WhitelistKeyProblemFilters to match
+            the provided whitelist keys, None if regex not matching
         """
 
         match = Preprocessor.__RE_BEGIN_IGNORE_WL_KEYS.fullmatch(line)
@@ -754,7 +753,7 @@ class Preprocessor:
         provided reference ProblemFilter.
 
         :param reference_filter: reference to find matching open-ended
-                                 filter
+            filter
         :return: matching open-ended filter, if found
         """
 
