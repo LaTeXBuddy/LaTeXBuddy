@@ -255,62 +255,50 @@ class LatexBuddy(MainModule):
             for problem in problems:
                 self.add_problem(problem)
 
-    def output_json(self) -> None:
-        """Write all problem objects to the output file."""
-        import json
-
-        from latexbuddy.problem import ProblemJSONEncoder
-
-        problems = list(self.errors.values())
-        output_file = Path(self.output_dir) / "latexbuddy_output.json"
-
-        with output_file.open("w") as fd:
-            json.dump(problems, fd, indent=4, cls=ProblemJSONEncoder)
-
-        LOG.info("Output saved to %s", output_file.resolve())
-
-    def output_html(self) -> None:
-        """Render problems as HTML and write to file."""
-        from latexbuddy.output import render_html
-
-        output_file = self.output_dir / \
-            f"output_{self.file_to_check.stem}.html"
-        output_file.write_text(
-            render_html(
-                str(self.tex_file.tex_file),
-                self.tex_file.tex,
-                self.errors,
-                self.path_list,
-                str(self.tex_file.pdf_file),
-            ),
-        )
-
-        LOG.info("Output saved to %s", output_file.resolve())
-
-    def output_flask_html(self) -> None:
-        from latexbuddy.output import render_flask_html
-
-        output_file = self.output_dir / \
-            f"output_{self.file_to_check.stem}.html"
-        output_file.write_text(
-            render_flask_html(
-                str(self.tex_file.tex_file),
-                self.tex_file.tex,
-                self.errors,
-                self.path_list,
-                str(self.tex_file.pdf_file),
-            ),
-        )
-
     def output_file(self) -> None:
         """Write all problems to the specified output file."""
 
         if self.output_format == "JSON":
-            self.output_json()
+            import json
+            from latexbuddy.problem import ProblemJSONEncoder
+
+            problems = list(self.errors.values())
+            output_file = self.output_dir / "latexbuddy_output.json"
+            contents = json.dumps(problems, indent=4, cls=ProblemJSONEncoder)
+
         elif self.output_format == "HTML":
-            self.output_html()
+            from latexbuddy.output import render_html
+
+            output_file = (
+                self.output_dir
+                / f"output_{self.file_to_check.stem}.html"
+            )
+            contents = render_html(
+                str(self.tex_file.tex_file),
+                self.tex_file.tex,
+                self.errors,
+                self.path_list,
+                str(self.tex_file.pdf_file),
+            )
+
         elif self.output_format == "HTML_FLASK":
-            self.output_flask_html()
+            from latexbuddy.output import render_flask_html
+
+            output_file = (
+                self.output_dir
+                / f"output_{self.file_to_check.stem}.html"
+            )
+            contents = render_flask_html(
+                str(self.tex_file.tex_file),
+                self.tex_file.tex,
+                self.errors,
+                self.path_list,
+                str(self.tex_file.pdf_file),
+
+            )
         else:
             _msg = f"Unknown output format: {self.output_format}"
             raise ValueError(_msg)
+
+        output_file.write_text(contents)
+        LOG.info("Output saved to %s", output_file.resolve())

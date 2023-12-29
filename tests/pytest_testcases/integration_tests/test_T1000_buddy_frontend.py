@@ -15,9 +15,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
-import argparse
 import os
 import tempfile
+from argparse import Namespace
 from pathlib import Path
 from typing import AnyStr
 
@@ -45,18 +45,11 @@ def temp_dir():
 
 @pytest.fixture
 def config_loader(script_dir, temp_dir):
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=Path)
-    parser.add_argument("--output", type=str)
-
     return ConfigLoader(
-        parser.parse_args(
-            [
-                "--config",
-                script_dir + "/resources/T1000_config.py",
-                "--output",
-                temp_dir,
-            ],
+        Namespace(
+            config=Path(script_dir) / "resources/T1000_config.py",
+            output=temp_dir,
+            format="HTML",
         ),
     )
 
@@ -100,7 +93,7 @@ def test_integration_buddy_frontend(script_dir, problem_list, config_loader):
     for problem in problem_list[0]:
         buddy.add_problem(problem)
 
-    buddy.output_html()
+    buddy.output_file()
 
     temp_dir = config_loader.get_config_option(
         LatexBuddy, "output", verify_type=AnyStr,
