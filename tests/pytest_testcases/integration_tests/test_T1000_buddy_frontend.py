@@ -89,7 +89,7 @@ def problem_list(script_dir):
 
 
 def test_integration_buddy_frontend(script_dir, problem_list, config_loader):
-    LatexBuddy.init(
+    buddy = LatexBuddy(
         config_loader,
         DriverModuleProvider(),
         Path(script_dir + "/resources/T1000_test_document.tex"),
@@ -98,9 +98,9 @@ def test_integration_buddy_frontend(script_dir, problem_list, config_loader):
     )
 
     for problem in problem_list[0]:
-        LatexBuddy.add_error(problem)
+        buddy.add_problem(problem)
 
-    LatexBuddy.output_html()
+    buddy.output_html()
 
     temp_dir = config_loader.get_config_option(
         LatexBuddy, "output", verify_type=AnyStr,

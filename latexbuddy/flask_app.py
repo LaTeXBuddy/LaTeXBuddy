@@ -338,7 +338,7 @@ def run_buddy(
         whitelist_id,
     )
 
-    LatexBuddy.init(
+    buddy = LatexBuddy(
         config_loader,
         ModuleLoader(
             Path(
@@ -355,12 +355,12 @@ def run_buddy(
         compile_tex=True,
     )
 
-    LatexBuddy.run_tools()
+    buddy.run_tools()
 
     if whitelist_id and whitelist_id != "[none]":
-        LatexBuddy.check_whitelist()
+        buddy.check_whitelist()
 
-    LatexBuddy.output_file()
+    buddy.output_file()
 
 
 def get_available_whitelist_ids() -> list[str]:

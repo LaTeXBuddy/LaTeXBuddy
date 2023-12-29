@@ -152,7 +152,6 @@ def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
     """For each Tex file transferred, all paths are fetched and Latexbuddy is
     executed."""
 
-    buddy = LatexBuddy.instance
     module_loader = ModuleLoader(
         Path(
             config_loader.get_config_option_or_default(
@@ -170,9 +169,8 @@ def __execute_latexbuddy_checks(args: argparse.Namespace) -> None:
         paths = get_all_paths_in_document(file_path)
 
         for path in paths:
-
             # re-initialize the buddy instance with a new path
-            buddy.init(
+            buddy = LatexBuddy(
                 config_loader=config_loader,
                 module_provider=module_loader,
                 file_to_check=path,

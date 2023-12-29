@@ -25,10 +25,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import Callable
 
-import latexbuddy.tools
 from latexbuddy.config_loader import ConfigLoader
 from latexbuddy.modules import Module
-
 
 LOG = logging.getLogger(__name__)
 
@@ -116,6 +114,7 @@ class ModuleLoader(ModuleProvider):
 
         :return: a list of python modules ready to be used
         """
+        from latexbuddy.tools import execute_no_exceptions
 
         py_files = self.find_py_files()
         sys.path.append(str(self.directory))
@@ -135,7 +134,7 @@ class ModuleLoader(ModuleProvider):
             return lambda_function
 
         for py_file in py_files:
-            latexbuddy.tools.execute_no_exceptions(
+            execute_no_exceptions(
                 make_lambda(py_file),
                 f"An error occurred while loading module file at "
                 f"{str(py_file)}",

@@ -54,7 +54,7 @@ def render_flask_html(
     file_name: str,
     file_text: str,
     problems: dict[str, Problem],
-    path_list: Path,
+    path_list: list[Path],
     pdf_path: str,
 ) -> str:
 
@@ -72,7 +72,7 @@ def render_html(
     file_name: str,
     file_text: str,
     problems: dict[str, Problem],
-    path_list: Path,
+    path_list: list[Path],
     pdf_path: str,
 ) -> str:
 
@@ -91,7 +91,7 @@ def render_general_html(
     file_name: str,
     file_text: str,
     problems: dict[str, Problem],
-    path_list: Path,
+    path_list: list[Path],
     pdf_path: str,
 ) -> str:
     """Renders an HTML page based on file contents and discovered problems.

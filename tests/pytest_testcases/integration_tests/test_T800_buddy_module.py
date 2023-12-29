@@ -47,7 +47,7 @@ def test_integration_buddy_module(script_dir, caplog, default_config_loader):
     # initializing logger on DEBUG level
     caplog.set_level(DEBUG)
 
-    LatexBuddy.init(
+    buddy = LatexBuddy(
         default_config_loader,
         DriverModuleProvider(),
         Path(script_dir + "/resources/T800_test_document.tex"),
@@ -55,7 +55,7 @@ def test_integration_buddy_module(script_dir, caplog, default_config_loader):
         compile_tex=False,
     )
 
-    LatexBuddy.run_tools()
+    buddy.run_tools()
 
     records = "\n".join([record.message for record in caplog.records])
 
@@ -68,7 +68,7 @@ def test_integration_buddy_module(script_dir, caplog, default_config_loader):
 
     problem_list = [
         problem for uid,
-        problem in LatexBuddy.instance.errors.items()
+        problem in buddy.errors.items()
     ]
     assert len(problem_list) == 1
 
@@ -76,6 +76,6 @@ def test_integration_buddy_module(script_dir, caplog, default_config_loader):
         position=None,
         text="just a general problem",
         checker=DriverModule1,
-        file=LatexBuddy.instance.tex_file.plain_file,
+        file=buddy.tex_file.plain_file,
         severity=ProblemSeverity.INFO,
     )

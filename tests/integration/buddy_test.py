@@ -104,20 +104,20 @@ def test_run_checks(
 ) -> None:
     config_loader = ConfigLoader(
         Namespace(
-            config=(tmp_path / 'config_does_not_exist.py'),
+            config=(tmp_path / "config_does_not_exist.py"),
             output=str(output_dir),
             format="JSON",
         ),
     )
-    LatexBuddy.init(
+    buddy = LatexBuddy(
         config_loader,
         DriverModuleProvider(),
         file,
         [file],
         compile_tex=False,
     )
-    LatexBuddy.run_tools()
-    LatexBuddy.output_file()
+    buddy.run_tools()
+    buddy.output_file()
 
     parsed_output_dir = config_loader.get_config_option(LatexBuddy, "output")
     output_file = (Path(parsed_output_dir) / "latexbuddy_output.json")

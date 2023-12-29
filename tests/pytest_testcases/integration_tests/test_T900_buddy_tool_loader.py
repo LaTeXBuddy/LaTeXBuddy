@@ -40,7 +40,7 @@ def test_integration_buddy_tool_loader(script_dir, caplog, default_config_loader
     # initializing logger on DEBUG level
     caplog.set_level(DEBUG)
 
-    LatexBuddy.init(
+    buddy = LatexBuddy(
         default_config_loader,
         ModuleLoader(Path("latexbuddy/modules/")),
         Path(script_dir + "/resources/T900_test_document.tex"),
@@ -48,7 +48,7 @@ def test_integration_buddy_tool_loader(script_dir, caplog, default_config_loader
         compile_tex=False,
     )
 
-    LatexBuddy.run_tools()
+    buddy.run_tools()
 
     records = "\n".join([record.message for record in caplog.records])
 

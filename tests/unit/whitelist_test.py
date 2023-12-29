@@ -98,14 +98,13 @@ def buddy(
     config_loader: ConfigLoader,
     module_provider: ModuleProvider,
 ) -> LatexBuddy:
-    LatexBuddy.init(
+    return LatexBuddy(
         config_loader,
         module_provider,
         document,
         [document],
         compile_tex=False,
     )
-    return LatexBuddy.instance
 
 
 def init_buddy(
@@ -115,7 +114,7 @@ def init_buddy(
 ) -> None:
     file = source_dir / "resources/T1200_test_document.tex"
 
-    LatexBuddy.init(
+    LatexBuddy(
         config_loader,
         module_provider,
         file,
@@ -137,7 +136,7 @@ def test_whitelist_filter(
     expected_post: int,
 ) -> None:
     word = "Dongbei" if to_apply else "Dongbeiii"
-    buddy.add_error(
+    buddy.add_problem(
         Problem(
             (1, 1),
             word,
@@ -177,7 +176,7 @@ def test_add_to_whitelist(
         Path("/"),
         key="en_spelling_Dongbeiii",
     )
-    buddy.add_error(problem)
+    buddy.add_problem(problem)
 
     assert len(buddy.errors) == 1
 
@@ -185,7 +184,7 @@ def test_add_to_whitelist(
         list(buddy.errors.keys())[0] if add_uid else "invalid",
     )
 
-    assert len(LatexBuddy.instance.errors) == expected_post
+    assert len(buddy.errors) == expected_post
 
     new_whitelist = buddy.whitelist_file.read_text().splitlines()
     new_line_count = len(new_whitelist)

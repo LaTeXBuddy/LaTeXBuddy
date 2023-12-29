@@ -191,7 +191,9 @@ class TexFile:
         *,
         compile_pdf: bool,
     ) -> tuple[Path | None, Path | None]:
-        from latexbuddy.buddy import LatexBuddy
+        from latexbuddy.buddy import get_instance
+
+        buddy = get_instance()
 
         compiler = "latex"
         try:
@@ -205,8 +207,8 @@ class TexFile:
         if compile_pdf:
             compiler = "pdflatex"
 
-        html_directory = LatexBuddy.instance.cfg.get_config_option_or_default(
-            LatexBuddy,
+        html_directory = buddy.cfg.get_config_option_or_default(
+            buddy.__class__,
             "output",
             "./latexbuddy_html/",
         )
